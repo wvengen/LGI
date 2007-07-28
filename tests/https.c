@@ -21,7 +21,7 @@ int main( int argc, char *argv[] )
   CURL *curl;
   CURLcode result;
  
-  if( argc < 3 )
+  if( argc < 2 )
   {
    printf( "USE https.x URL [POSTSTRING]\n\n" ); 
    return( 1 );
