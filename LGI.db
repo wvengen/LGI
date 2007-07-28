@@ -1,0 +1,151 @@
+-- MySQL dump 9.11
+--
+-- Host: localhost    Database: LGI
+-- ------------------------------------------------------
+-- Server version	4.0.21
+
+--
+-- Table structure for table `active_resources`
+--
+
+DROP TABLE IF EXISTS active_resources;
+CREATE TABLE active_resources (
+  resource_id int(10) unsigned NOT NULL auto_increment,
+  resource_name text NOT NULL,
+  client_certificate blob NOT NULL,
+  last_call_time int(10) unsigned NOT NULL default '0',
+  project_server int(10) unsigned NOT NULL default '0',
+  url text NOT NULL,
+  active int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (resource_id)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `active_resources`
+--
+
+--
+-- Table structure for table `groups_allowed`
+--
+
+DROP TABLE IF EXISTS groups_allowed;
+CREATE TABLE groups_allowed (
+  group_name text NOT NULL,
+  application text NOT NULL,
+  job_limit int(11) NOT NULL default '0',
+  PRIMARY KEY  (group_name(10),application(10))
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `groups_allowed`
+--
+
+--
+-- Table structure for table `groups_denied`
+--
+
+DROP TABLE IF EXISTS groups_denied;
+CREATE TABLE groups_denied (
+  group_name text NOT NULL,
+  application text NOT NULL,
+  PRIMARY KEY  (group_name(10),application(10))
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `groups_denied`
+--
+
+
+--
+-- Table structure for table `job_queue`
+--
+
+DROP TABLE IF EXISTS job_queue;
+CREATE TABLE job_queue (
+  job_id int(10) unsigned NOT NULL auto_increment,
+  state text NOT NULL,
+  application text NOT NULL,
+  owners text NOT NULL,
+  read_access text NOT NULL,
+  target_resources text NOT NULL,
+  input blob NOT NULL,
+  output blob NOT NULL,
+  job_specifics text NOT NULL,
+  lock_state int(10) unsigned NOT NULL default '0',
+  state_time_stamp int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (job_id)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `job_queue`
+--
+
+--
+-- Table structure for table `running_locks`
+--
+
+DROP TABLE IF EXISTS running_locks;
+CREATE TABLE running_locks (
+  lock_id int(10) unsigned NOT NULL auto_increment,
+  job_id int(10) unsigned NOT NULL default '0',
+  resource_id int(10) unsigned NOT NULL default '0',
+  lock_time int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (lock_id)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `running_locks`
+--
+
+
+--
+-- Table structure for table `updates`
+--
+
+DROP TABLE IF EXISTS updates;
+CREATE TABLE updates (
+  version int(10) unsigned NOT NULL auto_increment,
+  servers text NOT NULL,
+  update_query blob NOT NULL,
+  PRIMARY KEY  (version)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `updates`
+--
+
+
+--
+-- Table structure for table `users_allowed`
+--
+
+DROP TABLE IF EXISTS users_allowed;
+CREATE TABLE users_allowed (
+  user_name text NOT NULL,
+  application text NOT NULL,
+  job_limit int(11) NOT NULL default '0',
+  PRIMARY KEY  (user_name(10),application(10))
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `users_allowed`
+--
+
+INSERT INTO users_allowed VALUES ('any','any',2);
+
+--
+-- Table structure for table `users_denied`
+--
+
+DROP TABLE IF EXISTS users_denied;
+CREATE TABLE users_denied (
+  user_name text NOT NULL,
+  application text NOT NULL,
+  PRIMARY KEY  (user_name(10),application(10))
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `users_denied`
+--
+
+

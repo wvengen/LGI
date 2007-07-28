@@ -1,0 +1,437 @@
+<?php
+
+// Copyright (C) 2007 M.F. Somers, Theoretical Chemistry Group, Leiden University
+//
+// This is free software; you can redistribute it and/or modify it under the terms of
+// the GNU General Public License as published by the Free Software Foundation.
+//
+// http://www.gnu.org/licenses/gpl.txt
+
+require_once( '../inc/Config.inc' );
+require_once( '../inc/Ssl.inc' );
+require_once( '../inc/Errors.inc' );
+require_once( '../inc/Response.inc' );
+require_once( '../inc/MySQL.inc' );
+require_once( '../inc/Utils.inc' );
+
+// -------------------------------------------------------------------- 
+
+function Interface_Verify( $Project, $User, $Groups )
+{
+ global $ErrorMsgs;
+
+ // first see if valid client certificate was used in the connection ...
+ if( SSL_Verify_Client() ) return( 2 );
+
+ if( !isset( $Groups ) || ( $Groups == "" ) )
+  return( LGI_Error_Response( 31, $ErrorMsgs[ 31 ], "" ) );
+
+ if( !isset( $User ) || ( $User == "" ) )
+  return( LGI_Error_Response( 32, $ErrorMsgs[ 32 ], "" ) );
+
+ // get common name from certificate ...
+ $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
+ $CommonName = $CommonNameArray[ 1 ];
+
+ // check common name against posted username...
+ if( $CommonName != $User )
+  return( LGI_Error_Response( 30, $ErrorMsgs[ 30 ], "" ) );
+
+ // check if certificate has any allowed groups listed...
+ if( $CommonNameArray[ 0 ] >= 2 )
+ {
+  // check which posted groups are allowed by the certificate list...
+  $GroupArray = CommaSeparatedField2Array( $Groups, "," );
+  $NewGroupList = "";
+  $FoundAGroup = 0;
+
+  for( $i = 1; $i <= $GroupArray[ 0 ]; $i++ )
+   if( FoundInCommaSeparatedField( $CommonNameArray[ 2 ], $GroupArray[ $i ], "," ) )
+   { 
+    $NewGroupList .= ", ".$GroupArray[ $i ];
+    $FoundAGroup = 1;
+   }
+
+  // check if any posted group is allowed...
+  if( !$FoundAGroup )
+   return( LGI_Error_Response( 38, $ErrorMsgs[ 38 ], "" ) );
+  
+  // now only use the groups that are also allowed by the certificate...
+  $Groups = substr( $NewGroupList, 2 );
+ }
+
+ // now check if certificate has any allowed projects listed...
+ if( $CommonNameArray[ 0 ] >= 3 )
+ {
+  // if it was not posted, use default value for this server...
+  if( !isset( $Project ) || ( $Project == "" ) )
+   $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
+
+  // check if allowed...
+  if( FoundInCommaSeparatedField( $CommonNameArray[ 3 ], $Project, "," ) )
+   Select_MySQL_DataBase( $Project );
+  else
+    return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ], "" ) );
+ }
+ else
+ {
+  // otherwise just try the possibly posted Project...
+
+  if( isset( $Project ) && ( $Project != "" ) )
+    Select_MySQL_DataBase( $Project );
+ }
+
+}
+
+// -------------------------------------------------------------------- 
+
+function Get_Master_Server_URL( )
+{
+ global $ErrorMsgs;
+
+ $queryresult = mysql_query( "SELECT url FROM active_resources WHERE project_server=1" );
+
+ if( mysql_num_rows( $queryresult ) != 1 )
+  return( LGI_Error_Response( 6, $ErrorMsgs[ 6 ], "" ) );
+
+ $MasterServer = mysql_fetch_object( $queryresult );
+
+ mysql_free_result( $queryresult );
+
+ return( $MasterServer->url );
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_User_In_Group_Is_Allowed_To_Submit( $User, $Group, $Application, &$NrOfJobsAllowed )
+{
+
+ // escape the variables first...
+ $User = mysql_escape_string( $User );
+ $Group = mysql_escape_string( $Group );
+ $Application = mysql_escape_string( $Application );
+
+ // check if user or 'any' user is present in users_denied list for specific or 'any' app...
+ $queryresult = mysql_query( "SELECT user_name FROM users_denied WHERE ( user_name='".$User."' OR user_name='any' ) AND ( application='".$Application."' OR application='any' )" );
+ if( mysql_num_rows( $queryresult ) >= 1 )
+ {
+  mysql_free_result( $queryresult );
+  return( 0 );
+ }
+ mysql_free_result( $queryresult );
+
+ // check if user is present in users_allowed for specific application...
+ $queryresult = mysql_query( "SELECT job_limit FROM users_allowed WHERE user_name='".$User."' AND application='".$Application."'" );
+ if( mysql_num_rows( $queryresult ) >= 1 )
+ {
+  $querydata = mysql_fetch_object( $queryresult );
+  $NrOfJobsAllowed = $querydata -> job_limit;
+  mysql_free_result( $queryresult );
+  return( 1 );
+ }
+ mysql_free_result( $queryresult );
+
+ // check if user is present in users_allowed for 'any' application...
+ $queryresult = mysql_query( "SELECT job_limit FROM users_allowed WHERE user_name='".$User."' AND application='any'" );
+ if( mysql_num_rows( $queryresult ) >= 1 )
+ {
+  $querydata = mysql_fetch_object( $queryresult );
+  $NrOfJobsAllowed = $querydata -> job_limit;
+  mysql_free_result( $queryresult );
+  return( 1 );
+ }
+ mysql_free_result( $queryresult );
+
+ // check if group or 'any' group is present in groups_denied list for specific or 'any' app...
+ if( $Group != "" )
+ {
+  $queryresult = mysql_query( "SELECT group_name FROM groups_denied WHERE ( group_name='".$Group."' OR group_name='any' ) AND ( application='".$Application."' OR application='any' )" );
+  if( mysql_num_rows( $queryresult ) >= 1 )
+  {
+   mysql_free_result( $queryresult );
+   return( 0 );
+  }
+  mysql_free_result( $queryresult );
+ }
+
+ // check if group is present in groups_allowed for specific application...
+ if( $Group != "" )
+ {
+  $queryresult = mysql_query( "SELECT job_limit FROM groups_allowed WHERE group_name='".$Group."' AND application='".$Application."'" );
+  if( mysql_num_rows( $queryresult ) >= 1 )
+  {
+   $querydata = mysql_fetch_object( $queryresult );
+   $NrOfJobsAllowed = $querydata -> job_limit;
+   mysql_free_result( $queryresult );
+   return( 2 );
+  }
+  mysql_free_result( $queryresult );
+ }
+
+ // check if group is present in groups_allowed for 'any' application...
+ if( $Group != "" )
+ {
+  $queryresult = mysql_query( "SELECT job_limit FROM groups_allowed WHERE group_name='".$Group."' AND application='any'" );
+  if( mysql_num_rows( $queryresult ) >= 1 )
+  {
+   $querydata = mysql_fetch_object( $queryresult );
+   $NrOfJobsAllowed = $querydata -> job_limit;
+   mysql_free_result( $queryresult );
+   return( 2 );
+  }
+  mysql_free_result( $queryresult );
+ }
+
+ // check if 'any' user is present in users_allowed for specific application...
+ $queryresult = mysql_query( "SELECT job_limit FROM users_allowed WHERE user_name='any' AND application='".$Application."'" );
+ if( mysql_num_rows( $queryresult ) >= 1 )
+ {
+  $querydata = mysql_fetch_object( $queryresult );
+  $NrOfJobsAllowed = $querydata -> job_limit;
+  mysql_free_result( $queryresult );
+  return( 1 );
+ }
+ mysql_free_result( $queryresult );
+
+ // check if 'any' user is present in users_allowed for 'any' application...
+ $queryresult = mysql_query( "SELECT job_limit FROM users_allowed WHERE user_name='any' AND application='any'" );
+ if( mysql_num_rows( $queryresult ) >= 1 )
+ {
+  $querydata = mysql_fetch_object( $queryresult );
+  $NrOfJobsAllowed = $querydata -> job_limit;
+  mysql_free_result( $queryresult );
+  return( 1 );
+ }
+ mysql_free_result( $queryresult );
+ 
+ // check if 'any' group is present in groups_allowed for specific application...
+ $queryresult = mysql_query( "SELECT job_limit FROM groups_allowed WHERE group_name='any' AND application='".$Application."'" );
+ if( mysql_num_rows( $queryresult ) >= 1 )
+ {
+  $querydata = mysql_fetch_object( $queryresult );
+  $NrOfJobsAllowed = $querydata -> job_limit;
+  mysql_free_result( $queryresult );
+  return( 2 );
+ }
+ mysql_free_result( $queryresult );
+
+ // check if 'any' group is present in groups_allowed for 'any' application...
+ $queryresult = mysql_query( "SELECT job_limit FROM groups_allowed WHERE group_name='any' AND application='any'" );
+ if( mysql_num_rows( $queryresult ) >= 1 )
+ {
+  $querydata = mysql_fetch_object( $queryresult );
+  $NrOfJobsAllowed = $querydata -> job_limit;
+  mysql_free_result( $queryresult );
+  return( 2 );
+ }
+ mysql_free_result( $queryresult );
+
+ // by default we do not allow jobs if we know nothing...
+ return( 0 );   
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_Count_Owners_Jobs_In_Queue( $Owner, $Application, &$TotalNrOfJobs, &$NrOfRunningJobs )
+{
+ 
+ // first escape the variables...
+ $Owner = mysql_escape_string( $Owner );
+ $Application = mysql_escape_string( $Application );
+
+ $TheRegExpression = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
+
+ // query for number of 'running' jobs in job_queue of given owner and application..
+ $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE owners REGEXP '".$TheRegExpression."' AND application='".$Application."' AND state='running'" );
+ $querydata = mysql_fetch_object( $queryresult );
+
+ $NrOfRunningJobs = $querydata -> N;
+
+ mysql_free_result( $queryresult );
+
+ // query for number of 'running' jobs in job_queue of given owner and application..
+ $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE owners REGEXP '".$TheRegExpression."' AND application='".$Application."'" );
+ $querydata = mysql_fetch_object( $queryresult );
+
+ $TotalNrOfJobs = $querydata -> N;
+
+ mysql_free_result( $queryresult );
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_Is_Target_Resource_Known( $Resource )
+{
+ if( $Resource == "any" ) return( 1 );
+
+ $Resource = mysql_escape_string( $Resource );
+
+ $ReturnValue = 0;
+
+ $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name='".$Resource."'" );
+ if( mysql_num_rows( $queryresult ) >= 1 )
+  $ReturnValue = 1;
+
+ mysql_free_result( $queryresult );
+ return( $ReturnValue );
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_Clear_Spin_Lock_On_Job( $JobID )
+{
+ global $Config;
+ global $ErrorMsgs;
+
+ $queryresult = mysql_query( "SELECT lock_state FROM job_queue WHERE job_id=".$JobID." AND lock_state>=1" );
+ if( mysql_num_rows( $queryresult ) <= 0 )
+ {
+  mysql_free_result( $queryresult );
+  return( LGI_Error_Response( 36, $ErrorMsgs[ 36 ], "" ) );
+ }
+
+ $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobID );
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_Set_Spin_Lock_On_Job( $JobID )
+{
+ global $Config;
+ global $ErrorMsgs;
+
+ $Count = 0; 
+
+ while( $Count < $Config[ "LGI_SPIN_LOCK_ATTEMPTS" ] )
+ {
+  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state+1 WHERE job_id=".$JobID );
+
+  // if the update couldn't be done, the job wasn't there...
+  if( !$queryresult )
+   return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "" ) );
+
+  // check the value, which is now 1 or bigger...
+  $queryresult = mysql_query( "SELECT lock_state FROM job_queue WHERE job_id=".$JobID );
+  $LockState = mysql_fetch_object( $queryresult );
+  mysql_free_result( $queryresult );
+
+  // we did set it...
+  if( $LockState->lock_state == 1 )
+   return( 0 );
+
+  // we didn't set it... decrease value again and try again later...
+  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobID );
+
+  // if the update couldn't be done, the job wasn't there...
+  if( !$queryresult )
+   return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "" ) );
+
+  $Count++;
+  sleep( 1 );
+ }
+ 
+ // lock spin has timed-out... so we are to busy...
+ return( LGI_BackOff_Response( ) );
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_Wait_For_Cleared_Spin_Lock_On_Job( $JobID )
+{
+ global $Config;
+ global $ErrorMsgs;
+
+ $Count = 0; 
+
+ // now make sure we get data and there is no lock set...
+ while( $Count < $Config[ "LGI_SPIN_LOCK_ATTEMPTS" ] )
+ {
+  $queryresult = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobID );
+
+  if( mysql_num_rows( $queryresult ) <= 0 )
+  {
+   mysql_free_result( $queryresult );
+   return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "" ) );
+  }
+
+  $JobSpecs = mysql_fetch_object( $queryresult );
+  mysql_free_result( $queryresult );
+
+  // was lock not set...
+  if( $JobSpecs -> lock_state == 0 )
+   return( $JobSpecs );
+
+  sleep( 1 );
+  $Count++;
+ }
+
+ // lock spin has timed-out... so we are to busy...
+ return( LGI_BackOff_Response( ) );
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_Make_Query_For_Work_For_Owner( $Owner, $State, $Application, $Start, $Limit )
+{
+ // first escape the variables...
+ $Owner = mysql_escape_string( $Owner );
+ $State = mysql_escape_string( $State );
+ $Application = mysql_escape_string( $Application );
+
+ $RegExpUser = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
+
+ $Query = "SELECT job_id,state,application,state_time_stamp FROM job_queue WHERE owners REGEXP '".$RegExpUser."' OR read_access REGEXP '".$RegExpUser."'";
+
+ if( isset( $State ) && ( $State != "" ) )
+  $Query .= " AND state='".$State."'";
+
+ if( isset( $Application ) && ( $Application != "" ) )
+  $Query .= " AND application='".$Application."'";
+
+ $Query .= " ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start;
+
+ return( $Query );
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_Is_User_Allowed_To_Read_Job( $JobSpecs, $User, $Groups )
+{
+ $PossibleJobOwnersArray = CommaSeparatedField2Array( $User.", ".$Groups, "," );
+ $MatchFlag = 0;
+
+ for( $i = 1; $i <= $PossibleJobOwnersArray[ 0 ]; $i++ )
+  if( FoundInCommaSeparatedField( $JobSpecs->owners, $PossibleJobOwnersArray[ $i ], "," ) || FoundInCommaSeparatedField( $JobSpecs->read_access, $PossibleJobOwnersArray[ $i ], "," ) )
+   $MatchFlag = 1;
+
+ return( $MatchFlag );
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_Is_User_Allowed_To_Modify_Job( $JobSpecs, $User, $Groups )
+{
+ $PossibleJobOwnersArray = CommaSeparatedField2Array( $User.", ".$Groups, "," );
+ $MatchFlag = 0;
+
+ for( $i = 1; $i <= $PossibleJobOwnersArray[ 0 ]; $i++ )
+  if( FoundInCommaSeparatedField( $JobSpecs->owners, $PossibleJobOwnersArray[ $i ], "," ) )
+   $MatchFlag = 1;
+
+ return( $MatchFlag );
+}
+
+// -------------------------------------------------------------------- 
+
+function Interface_Found_Id_In_List( $JobIdArray, $JobId )
+{
+ for( $i = 1; $i <= $JobIdArray[ 0 ]; $i++ )
+  if( $JobIdArray[ $i ] == $JobId ) 
+   return( 1 );
+
+ return( 0 );
+}
+
+// -------------------------------------------------------------------- 
+
+?>
