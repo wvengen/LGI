@@ -3,19 +3,16 @@
 #include "resource_server_api.h"
 #include "xml.h"
 #include "binhex.h"
+#include "config.h"
 
 int main( int *argc, char *argv[] )
 {
- string bin = "1234";
- string hex = "xxxxxxxxxxxxxxxxxxxxxxx";
- string bincopy = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+ DaemonConfig Config( "LGI.cfg" );
 
- BinHex( bin, hex );
- HexBin( hex, bincopy );
-
- cout << bin << endl;
- cout << hex << endl;
- cout << bincopy << endl;
+ cout << Config.CA_Certificate_File() << endl;
+ cout << Config.Resource_Name() << endl;
+ cout << Config.Resource_URL() << endl;
+ cout << Config.Number_Of_Projects() << endl;
 }
 
 

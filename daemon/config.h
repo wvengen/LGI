@@ -20,12 +20,34 @@
 #if !defined(__CONFIG_INCLUDED__)
 #define __CONFIG_INCLUDED__
 
+#include <iostream>
+#include <fstream>
 #include <string>
 #include <cctype>
+
+#include "xml.h"
 
 using namespace std;
 
 // -----------------------------------------------------------------------------
+
+class DaemonConfig
+      {
+       public: 
+
+              DaemonConfig( string ConfigFile );
+
+              string CA_Certificate_File( void );
+              string Resource_Name( void );
+              string Resource_URL( void );
+              string Resource_Certificate_File( void );
+              string Resource_Key_File( void );
+              int    Number_Of_Projects( void );
+
+       private:
+
+       string ConfigurationXML;
+      };
 
 // -----------------------------------------------------------------------------
 
