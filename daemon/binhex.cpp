@@ -18,7 +18,6 @@
 // http://www.gnu.org/licenses/gpl.txt
 
 #include "binhex.h"
-#include <iostream>
 
 // -----------------------------------------------------------------------------
 

@@ -8,7 +8,7 @@ LD=g++
 
 # some defines...
 LIBS=-lcurl
-OBJS=testmain.o logger.o resource_server_api.o xml.o binhex.o
+OBJS=testmain.o logger.o resource_server_api.o xml.o binhex.o config.o
 
 # default target...
 testmain.x : ${OBJS}
@@ -19,6 +19,7 @@ testmain.o : testmain.cpp logger.h resource_server_api.h xml.h
 logger.o : logger.cpp logger.h
 xml.o : xml.cpp xml.h
 binhex.o : binhex.cpp binhex.h
+config.o : config.cpp config.h
 resource_server_api.o : resource_server_api.cpp resource_server_api.h
 
 # clean up...
