@@ -26,13 +26,12 @@ DaemonConfig::DaemonConfig( string ConfigFile )
  fstream Cfg( ConfigFile.c_str(), fstream::in );
  string Line;
 
- ConfigurationXML.reserve( 8192 ); 
+ ConfigurationXML.reserve( 8192 );         
  ConfigurationXML.clear();
 
- while( Cfg )
+ while( Cfg )                     // read in the file into the string...
  {
   getline( Cfg, Line );
-  Line.append( "\n" );
   ConfigurationXML.append( Line );
  }
 }
@@ -41,35 +40,35 @@ DaemonConfig::DaemonConfig( string ConfigFile )
 
 string DaemonConfig::CA_Certificate_File( void )
 {
- return( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "ca_certificate_file" ) );
+ return( NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "ca_certificate_file" ) ) );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfig::Resource_Name( void )
 {
- return( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_name" ) );
+ return( NormalizeString( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_name" ) ) );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfig::Resource_URL( void )
 {
- return( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_url" ) );
+ return( NormalizeString( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_url" ) ) );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfig::Resource_Certificate_File( void )
 {
- return( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_certificate_file" ) );
+ return( NormalizeString( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_certificate_file" ) ) );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfig::Resource_Key_File( void )
 {
- return( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_key_file" ) );
+ return( NormalizeString( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_key_file" ) ) );
 }
 
 // -----------------------------------------------------------------------------
