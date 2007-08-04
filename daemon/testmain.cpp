@@ -2,8 +2,24 @@
 #include "logger.h"
 #include "resource_server_api.h"
 #include "xml.h"
+#include "binhex.h"
 
 int main( int *argc, char *argv[] )
+{
+ string bin = "1234";
+ string hex = "xxxxxxxxxxxxxxxxxxxxxxx";
+ string bincopy = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+
+ BinHex( bin, hex );
+ HexBin( hex, bincopy );
+
+ cout << bin << endl;
+ cout << hex << endl;
+ cout << bincopy << endl;
+}
+
+
+int main_1( int *argc, char *argv[] )
 {
  string Response, Response2;
  string Attributes;
