@@ -17,6 +17,7 @@ int main( int *argc, char *argv[] )
  cout << "CA_Certificate_File: " << Config.CA_Certificate_File() << endl;
  cout << "Resource_Name: " << Config.Resource_Name() << endl;
  cout << "Resource_URL: " << Config.Resource_URL() << endl;
+ cout << "Run directory: " << Config.RunDirectory() << endl;
  cout << "Number of projects: " << Config.Number_Of_Projects() << endl;
 
  for( int i = 1; i <= Config.Number_Of_Projects(); ++i )

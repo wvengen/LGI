@@ -38,13 +38,18 @@ DaemonConfig::DaemonConfig( string ConfigFile )
  }
 
  DEBUG_LOG( "DaemonConfig::DaemonConfig; The configuration read in: " << ConfigurationXML );
+
+ ConfigurationXML = NormalizeString( Parse_XML( ConfigurationXML, "LGI" ) );
+
+ if( ConfigurationXML.empty() )
+  CRITICAL_LOG( "DaemonConfig::DaemonConfig; No data in LGI tag found" );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfig::CA_Certificate_File( void )
 {
- string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "ca_certificate_file" ) );
+ string Data = NormalizeString( Parse_XML( ConfigurationXML, "ca_certificate_file" ) );
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::CA_Certificate_File; No data in ca_certificate_file tag found" )
  else
@@ -55,7 +60,7 @@ string DaemonConfig::CA_Certificate_File( void )
 
 string DaemonConfig::Resource_Name( void )
 {
- string Data = NormalizeString( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_name" ) );
+ string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "resource_name" ) );
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_Name; No data in resource_name tag found" )
  else
@@ -66,7 +71,7 @@ string DaemonConfig::Resource_Name( void )
 
 string DaemonConfig::Resource_URL( void )
 {
- string Data = NormalizeString( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_url" ) );
+ string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "resource_url" ) );
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_URL; No data in resource_url tag found" )
  else
@@ -77,7 +82,7 @@ string DaemonConfig::Resource_URL( void )
 
 string DaemonConfig::Resource_Certificate_File( void )
 {
- string Data = NormalizeString( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_certificate_file" ) );
+ string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "resource_certificate_file" ) );
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_Certificate_File; No data in resource_certificate_file tag found" )
  else
@@ -88,7 +93,7 @@ string DaemonConfig::Resource_Certificate_File( void )
 
 string DaemonConfig::Resource_Key_File( void )
 {
- string Data = NormalizeString( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "resource_key_file" ) );
+ string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "resource_key_file" ) );
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_Key_File; No data in resource_key_file tag found" )
  else
@@ -97,9 +102,21 @@ string DaemonConfig::Resource_Key_File( void )
 
 // -----------------------------------------------------------------------------
 
+string DaemonConfig::RunDirectory( void )
+{
+ string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "run_directory" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfig::RunDirectory; No data in run_directory tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfig::RunDirectory; Returned " << Data );
+}
+
+
+// -----------------------------------------------------------------------------
+
 int DaemonConfig::Number_Of_Projects( void )
 {
- string Data = NormalizeString( Parse_XML( Parse_XML( Parse_XML( ConfigurationXML, "LGI" ), "resource" ), "number_of_projects" ) );
+ string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "number_of_projects" ) );
  if( Data.empty() )
   CRITICAL_LOG_RETURN( 0, "DaemonConfig::Number_Of_Projects; No data in number_of_projects tag found" )
  else
@@ -148,7 +165,7 @@ DaemonConfigProject::DaemonConfigProject( DaemonConfig &TheConfig, int TheProjec
   return;
  }
 
- string ResourceCache = Parse_XML( Parse_XML( TheConfig.ConfigurationXML, "LGI" ), "resource" );
+ string ResourceCache = Parse_XML( TheConfig.ConfigurationXML, "resource" );
 
  DEBUG_LOG( "DaemonConfigProject::DaemonConfigProject; Cached resource data with ResourceCache=" << ResourceCache );
 

@@ -50,6 +50,7 @@ class DaemonConfig
               string Resource_URL( void );
               string Resource_Certificate_File( void );
               string Resource_Key_File( void );
+              string RunDirectory( void );
               int    Number_Of_Projects( void );
 
               DaemonConfigProject Project( int Number );
