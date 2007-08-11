@@ -28,6 +28,12 @@ int main_2( int *argc, char *argv[] )
  DaemonConfigProject MyProject;
  DaemonConfigProjectApplication MyApplication;
 
+ if( !Config.IsValidConfigured() ) 
+ {
+  cout << "Not valid configured! Aborted!" << endl << endl;
+  return( 1 );
+ }
+ 
  cout << "CA_Certificate_File: " << Config.CA_Certificate_File() << endl;
  cout << "Resource_Name: " << Config.Resource_Name() << endl;
  cout << "Resource_URL: " << Config.Resource_URL() << endl;

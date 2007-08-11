@@ -45,6 +45,7 @@ class DaemonConfig
 
               DaemonConfig( string ConfigFile );
 
+              int    IsValidConfigured( void );
               string CA_Certificate_File( void );
               string Resource_Name( void );
               string Resource_URL( void );
