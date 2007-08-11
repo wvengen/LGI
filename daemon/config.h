@@ -24,10 +24,18 @@
 #include <fstream>
 #include <string>
 #include <cctype>
+#include <cstdio>
 
+#include "logger.h"
 #include "xml.h"
 
 using namespace std;
+
+// -----------------------------------------------------------------------------
+
+class DaemonConfig;
+class DaemonConfigProject;
+class DaemonConfigProjectApplication;
 
 // -----------------------------------------------------------------------------
 
@@ -44,9 +52,63 @@ class DaemonConfig
               string Resource_Key_File( void );
               int    Number_Of_Projects( void );
 
-       private:
+              DaemonConfigProject Project( int Number );
+
+              friend class DaemonConfigProject;
+              friend class DaemonConfigProjectApplication;
+
+       protected:
 
        string ConfigurationXML;
+      };
+
+// -----------------------------------------------------------------------------
+
+class DaemonConfigProject
+      {
+       public:
+
+              DaemonConfigProject( DaemonConfig &TheConfig, int TheProjectNumber = 0 );
+
+              string Project_Name( void );
+              string Project_Master_Server( void );
+              int    Number_Of_Applications( void );
+
+              DaemonConfigProjectApplication Application( int Number );
+              
+              friend class DaemonConfigProjectApplication;
+
+       protected:
+
+       int          ProjectNumber;
+       DaemonConfig *Config;
+       string       ProjectCache;
+      };
+
+// -----------------------------------------------------------------------------
+
+class DaemonConfigProjectApplication
+      {
+       public:
+              
+               DaemonConfigProjectApplication( DaemonConfig &TheConfig, int TheProjectNumber = 0, int TheApplicationNumber = 0 );
+
+               string Application_Name( void );
+               string Owner_Allow( void );
+               string Owner_Deny( void );
+               string Check_System_Limits_Script( void );
+               string Job_Check_Limits_Script( void );
+               string Job_Check_Running_Script( void );
+               string Job_Prologue_Script( void );
+               string Job_Run_Script( void );
+               string Job_Epilogue_Script( void );
+
+       protected:
+
+       int          ProjectNumber;
+       int          ApplicationNumber;
+       DaemonConfig *Config;
+       string       ApplicationCache;
       };
 
 // -----------------------------------------------------------------------------

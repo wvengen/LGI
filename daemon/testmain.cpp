@@ -7,12 +7,17 @@
 
 int main( int *argc, char *argv[] )
 {
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING);
+
  DaemonConfig Config( "LGI.cfg" );
 
  cout << Config.CA_Certificate_File() << endl;
  cout << Config.Resource_Name() << endl;
  cout << Config.Resource_URL() << endl;
  cout << Config.Number_Of_Projects() << endl;
+
+ Config.Project( 1 );
+
 }
 
 

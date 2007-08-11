@@ -106,14 +106,17 @@ string Parse_XML( string XML, string Tag )
 
 string NormalizeString( string S )
 {
+ string Empty;
  int Start = 0,
      End = S.size();
 
+ Empty.clear();
+ 
  while( isspace( S[ Start ] ) && ( Start < End ) ) Start++;   // ignore spaces in front of the string
- if( Start >= End ) return( S );
+ if( Start >= End ) return( Empty );
 
  while( isspace( S[ End - 1 ] ) && ( End > Start ) ) End--;   // and ignore spaces at the end of the string
- if( End <= Start ) return( S );
+ if( End <= Start ) return( Empty );
 
  return( S.substr( Start, End - Start ) );
 }
