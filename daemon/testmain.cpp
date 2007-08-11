@@ -7,16 +7,38 @@
 
 int main( int *argc, char *argv[] )
 {
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING);
+ // InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
 
  DaemonConfig Config( "LGI.cfg" );
+ DaemonConfigProject MyProject;
+ DaemonConfigProjectApplication MyApplication;
 
- cout << Config.CA_Certificate_File() << endl;
- cout << Config.Resource_Name() << endl;
- cout << Config.Resource_URL() << endl;
- cout << Config.Number_Of_Projects() << endl;
+ cout << "CA_Certificate_File: " << Config.CA_Certificate_File() << endl;
+ cout << "Resource_Name: " << Config.Resource_Name() << endl;
+ cout << "Resource_URL: " << Config.Resource_URL() << endl;
+ cout << "Number of projects: " << Config.Number_Of_Projects() << endl;
 
- Config.Project( 1 );
+ for( int i = 1; i <= Config.Number_Of_Projects(); ++i )
+ {
+  MyProject = Config.Project( i );
+  cout << " - ProjectName of project " << i << " is : " << MyProject.Project_Name() << endl;
+  cout << " - ProjectMasterServer of project " << i << " is : " << MyProject.Project_Master_Server() << endl;
+  cout << " - Number of applications of project " << i << " is : " << MyProject.Number_Of_Applications() << endl;
+  for( int j = 1; j <= MyProject.Number_Of_Applications(); ++j )
+  {
+   MyApplication = MyProject.Application( j );
+   cout << "  -- ApplicationName of application " << j << " is : " << MyApplication.Application_Name() << endl;
+   cout << "  -- OwnerAllow of application " << j << " is : " << MyApplication.Owner_Allow() << endl;
+   cout << "  -- OwnerDeny of application " << j << " is : " << MyApplication.Owner_Deny() << endl;
+   cout << "  -- CheckSystemLimitsScript of application " << j << " is : " << MyApplication.Check_System_Limits_Script() << endl;
+   cout << "  -- JobCheckLimitsScript of application " << j << " is : " << MyApplication.Job_Check_Limits_Script() << endl;
+   cout << "  -- JobCheckRunningScript of application " << j << " is : " << MyApplication.Job_Check_Running_Script() << endl;
+   cout << "  -- JobPrologueScript of application " << j << " is : " << MyApplication.Job_Prologue_Script() << endl;
+   cout << "  -- JobRunScript of application " << j << " is : " << MyApplication.Job_Run_Script() << endl;
+   cout << "  -- JobEpilogueScript of application " << j << " is : " << MyApplication.Job_Epilogue_Script() << endl;
+  }
+ }
 
 }
 

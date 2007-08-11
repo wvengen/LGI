@@ -68,6 +68,7 @@ class DaemonConfigProject
       {
        public:
 
+              DaemonConfigProject();
               DaemonConfigProject( DaemonConfig &TheConfig, int TheProjectNumber = 0 );
 
               string Project_Name( void );
@@ -80,9 +81,7 @@ class DaemonConfigProject
 
        protected:
 
-       int          ProjectNumber;
-       DaemonConfig *Config;
-       string       ProjectCache;
+       string ProjectCache;
       };
 
 // -----------------------------------------------------------------------------
@@ -91,7 +90,8 @@ class DaemonConfigProjectApplication
       {
        public:
               
-               DaemonConfigProjectApplication( DaemonConfig &TheConfig, int TheProjectNumber = 0, int TheApplicationNumber = 0 );
+               DaemonConfigProjectApplication();
+               DaemonConfigProjectApplication( DaemonConfigProject &TheProject, int TheApplicationNumber = 0 );
 
                string Application_Name( void );
                string Owner_Allow( void );
@@ -105,10 +105,7 @@ class DaemonConfigProjectApplication
 
        protected:
 
-       int          ProjectNumber;
-       int          ApplicationNumber;
-       DaemonConfig *Config;
-       string       ApplicationCache;
+       string ApplicationCache;
       };
 
 // -----------------------------------------------------------------------------

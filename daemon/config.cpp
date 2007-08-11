@@ -110,11 +110,13 @@ int DaemonConfig::Number_Of_Projects( void )
 
 DaemonConfigProject DaemonConfig::Project( int Number )
 {
+ DaemonConfigProject EmptyProject;
+
  if( Number > Number_Of_Projects() )
-  CRITICAL_LOG( "DaemonConfig::Project; Number > Number_Of_Projects" );
+  CRITICAL_LOG_RETURN( EmptyProject, "DaemonConfig::Project; Number > Number_Of_Projects" );
  
  if( Number <= 0 )
-  CRITICAL_LOG( "DaemonConfig::Project; Number <= 0" );
+  CRITICAL_LOG_RETURN( EmptyProject, "DaemonConfig::Project; Number <= 0" );
 
  DaemonConfigProject TheProject( (*this), Number );
 
@@ -123,25 +125,30 @@ DaemonConfigProject DaemonConfig::Project( int Number )
 
 // -----------------------------------------------------------------------------
 
+DaemonConfigProject::DaemonConfigProject( void )
+{
+ ProjectCache.clear();
+}
+
+// -----------------------------------------------------------------------------
+
 DaemonConfigProject::DaemonConfigProject( DaemonConfig &TheConfig, int TheProjectNumber )
 {
- Config = &TheConfig;
- ProjectNumber = TheProjectNumber;
  ProjectCache.clear();
 
- if( ProjectNumber > Config -> Number_Of_Projects() )
+ if( TheProjectNumber > TheConfig.Number_Of_Projects() )
  {
-  CRITICAL_LOG( "DaemonConfigProject::DaemonConfigProject; TheProjectNumber > TheConfig -> Number_Of_Projects()" );
+  CRITICAL_LOG( "DaemonConfigProject::DaemonConfigProject; TheProjectNumber > TheConfig.Number_Of_Projects()" );
   return;
  }
 
- if( ProjectNumber <= 0 )
+ if( TheProjectNumber <= 0 )
  {
   CRITICAL_LOG( "DaemonConfigProject::DaemonConfigProject; TheProjectNumber <= 0" );
   return;
  }
 
- string ResourceCache = Parse_XML( Parse_XML( Config -> ConfigurationXML, "LGI" ), "resource" );
+ string ResourceCache = Parse_XML( Parse_XML( TheConfig.ConfigurationXML, "LGI" ), "resource" );
 
  DEBUG_LOG( "DaemonConfigProject::DaemonConfigProject; Cached resource data with ResourceCache=" << ResourceCache );
 
@@ -158,12 +165,12 @@ DaemonConfigProject::DaemonConfigProject( DaemonConfig &TheConfig, int TheProjec
    if( sscanf( Attributes.c_str(), "number=%d", &FoundNumber ) != 1 )
     CRITICAL_LOG( "DaemonConfigProject::DaemonConfigProject; Error in project tag with Attributes=" << Attributes );
 
- } while ( ( StartPos < ResourceCache.length() ) && ( FoundNumber != ProjectNumber ) );
+ } while ( ( StartPos < ResourceCache.length() ) && ( FoundNumber != TheProjectNumber ) );
 
- if( FoundNumber != ProjectNumber )
+ if( FoundNumber != TheProjectNumber )
  {
   ProjectCache.clear();
-  CRITICAL_LOG( "DaemonConfigProject::DaemonConfigProject; Project tag with number=" << ProjectNumber << " not found" );
+  CRITICAL_LOG( "DaemonConfigProject::DaemonConfigProject; Project tag with number=" << TheProjectNumber << " not found, cache cleared" );
  }
 
 }
@@ -172,84 +179,197 @@ DaemonConfigProject::DaemonConfigProject( DaemonConfig &TheConfig, int TheProjec
 
 string DaemonConfigProject::Project_Name( void )
 {
+ string Data = NormalizeString( Parse_XML( ProjectCache, "project_name" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProject::Project_Name; No data in project_name tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Project_Name; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProject::Project_Master_Server( void )
 {
+ string Data = NormalizeString( Parse_XML( ProjectCache, "project_master_server" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProject::Project_Master_Server; No data in project_master_server tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Project_Master_Server; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 int DaemonConfigProject::Number_Of_Applications( void )
 {
+ string Data = NormalizeString( Parse_XML( ProjectCache, "number_of_applications" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::Number_Of_Applications; No data in number_of_applications tag found" )
+ else
+  DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProject::Number_Of_Applications; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 DaemonConfigProjectApplication DaemonConfigProject::Application( int Number )
 {
+ DaemonConfigProjectApplication EmptyApplication;
+
+ if( Number > Number_Of_Applications() )
+  CRITICAL_LOG_RETURN( EmptyApplication, "DaemonConfigProject::Application; Number > Number_Of_Applications" );
+
+ if( Number <= 0 )
+  CRITICAL_LOG_RETURN( EmptyApplication, "DaemonConfigProject::Application; Number <= 0" );
+
+ DaemonConfigProjectApplication TheApplication( (*this), Number );
+
+ DEBUG_LOG_RETURN( TheApplication, "DaemonConfigProject::Application; Returned application with Number=" << Number );
 }
 
 // -----------------------------------------------------------------------------
 
-DaemonConfigProjectApplication::DaemonConfigProjectApplication( DaemonConfig &TheConfig, int TheProjectNumber, int TheApplicationNumber )
+DaemonConfigProjectApplication::DaemonConfigProjectApplication( void )
 {
+ ApplicationCache.clear();
+}
+
+// -----------------------------------------------------------------------------
+
+DaemonConfigProjectApplication::DaemonConfigProjectApplication( DaemonConfigProject &TheProject, int TheApplicationNumber )
+{
+ ApplicationCache.clear();
+
+ if( TheApplicationNumber > TheProject.Number_Of_Applications() )
+ {
+  CRITICAL_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; TheApplicationNumber > TheProject.Number_Of_Applications()" );
+  return;
+ }
+
+ if( TheApplicationNumber <= 0 )
+ {
+  CRITICAL_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; TheApplicationNumber <= 0" );
+  return;
+ }
+
+ string Attributes;
+ int FoundNumber, StartPos = 0;
+
+ do
+ {
+  ApplicationCache = Parse_XML( TheProject.ProjectCache, "application", Attributes, StartPos );
+
+  DEBUG_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; Cached application data with ApplicationCache=" << ApplicationCache );
+
+  if( !ApplicationCache.empty() )
+   if( sscanf( Attributes.c_str(), "number=%d", &FoundNumber ) != 1 )
+    CRITICAL_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; Error in application tag with Attributes=" << Attributes );
+
+ } while ( ( StartPos < TheProject.ProjectCache.length() ) && ( FoundNumber != TheApplicationNumber ) );
+
+ if( FoundNumber != TheApplicationNumber )
+ {
+  ApplicationCache.clear();
+  CRITICAL_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; Application tag with number=" << TheApplicationNumber << " not found, cache cleared" );
+ } 
+
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProjectApplication::Application_Name( void )
 {
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "application_name" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Application_Name; No data in application_name tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Application_Name; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProjectApplication::Owner_Allow( void )
 {
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "owner_allow" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; No data in owner_allow tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProjectApplication::Owner_Deny( void )
 {
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "owner_deny" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; No data in owner_deny tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProjectApplication::Check_System_Limits_Script( void )
 {
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "check_system_limits_script" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Check_System_Limits_Script; No data in check_system_limits_script tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Check_System_Limits_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProjectApplication::Job_Check_Limits_Script( void )
 {
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "job_check_limits_script" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Limits_Script; No data in job_check_limits_script tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Limits_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProjectApplication::Job_Check_Running_Script( void )
 {
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "job_check_running_script" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Running_Script; No data in job_check_running_script tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Running_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProjectApplication::Job_Prologue_Script( void )
 {
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "job_prologue_script" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Prologue_Script; No data in job_prologue_script tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Prologue_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProjectApplication::Job_Run_Script( void )
 {
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "job_run_script" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Run_Script; No data in job_run_script tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Run_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
 
 string DaemonConfigProjectApplication::Job_Epilogue_Script( void )
 {
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "job_epilogue_script" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Epilogue_Script; No data in job_epilogue_script tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Epilogue_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
