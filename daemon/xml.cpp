@@ -123,3 +123,50 @@ string NormalizeString( string S )
 
 // -----------------------------------------------------------------------------
 
+vector<string> CommaSeparatedValues2Array( string Values, char Separator )
+{
+ vector<string> Array;
+
+ Array.push_back( "" );
+ 
+ for( int i = 0; i < Values.length(); ++i )
+  if( Values[ i ] != Separator ) 
+   Array[ Array.size() - 1 ].push_back( Values[ i ] );
+  else
+   Array.push_back( "" );
+
+ for( int i = 0; i < Array.size(); ++i )
+ {
+  Array[ i ] = NormalizeString( Array[ i ] ); 
+
+  if( Array[ i ].length() == 0 )
+  {
+   if( Array.size() > 1 ) Array[ i ] = Array[ Array.size() - 1 ];
+   Array.pop_back();
+   --i;
+  }
+ } 
+
+ return( Array );
+}
+
+// -----------------------------------------------------------------------------
+
+string NormalizeCommaSeparatedValues( string Values, char Separator )
+{
+ vector<string> Array = CommaSeparatedValues2Array( Values, Separator );
+
+ for( int i = 1; i < Array.size(); ++i )
+ {
+  Array[ 0 ].append( 1, Separator );
+  Array[ 0 ].append( 1, ' ' );
+  Array[ 0 ].append( Array[ i ] );
+ }
+
+ if( Array.size() > 1 )
+  return( Array[ 0 ] );
+ else
+  return( "" );
+}
+
+// -----------------------------------------------------------------------------

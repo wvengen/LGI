@@ -5,7 +5,21 @@
 #include "binhex.h"
 #include "config.h"
 
-int main( int *argc, char *argv[] )
+#define main_2 main
+
+int main_3( int *argc, char *argv[] )
+{
+ string Values = "mark , is     , ";
+ vector<string> Array = CommaSeparatedValues2Array( Values, ',' );
+
+ for( int i = 0; i < Array.size(); ++i )
+  cout << "VALUE: '" << Array[ i ] << "'" << endl;
+
+ cout << NormalizeCommaSeparatedValues( Values, ',' ) << endl;
+}
+
+
+int main_2( int *argc, char *argv[] )
 {
  // InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
  InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");

@@ -21,6 +21,7 @@
 #define __XML_INCLUDED__
 
 #include <string>
+#include <vector>
 #include <cctype>
 
 using namespace std;
@@ -32,6 +33,9 @@ string Parse_XML( string XML, string Tag, string &Attributes );
 string Parse_XML( string XML, string Tag );
 
 string NormalizeString( string S );
+
+vector<string> CommaSeparatedValues2Array( string Values, char Separator = ',' );
+string         NormalizeCommaSeparatedValues( string Values, char Separator = ',' );
 
 // -----------------------------------------------------------------------------
 
