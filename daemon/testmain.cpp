@@ -55,6 +55,7 @@ int main_2( int *argc, char *argv[] )
    cout << "  -- CheckSystemLimitsScript of application " << j << " is : " << MyApplication.Check_System_Limits_Script() << endl;
    cout << "  -- JobCheckLimitsScript of application " << j << " is : " << MyApplication.Job_Check_Limits_Script() << endl;
    cout << "  -- JobCheckRunningScript of application " << j << " is : " << MyApplication.Job_Check_Running_Script() << endl;
+   cout << "  -- JobCheckFinishedScript of application " << j << " is : " << MyApplication.Job_Check_Finished_Script() << endl;
    cout << "  -- JobPrologueScript of application " << j << " is : " << MyApplication.Job_Prologue_Script() << endl;
    cout << "  -- JobRunScript of application " << j << " is : " << MyApplication.Job_Run_Script() << endl;
    cout << "  -- JobEpilogueScript of application " << j << " is : " << MyApplication.Job_Epilogue_Script() << endl;

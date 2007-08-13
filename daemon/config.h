@@ -101,6 +101,7 @@ class DaemonConfigProjectApplication
                string Check_System_Limits_Script( void );
                string Job_Check_Limits_Script( void );
                string Job_Check_Running_Script( void );
+               string Job_Check_Finished_Script( void );
                string Job_Prologue_Script( void );
                string Job_Run_Script( void );
                string Job_Epilogue_Script( void );

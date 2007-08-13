@@ -72,11 +72,12 @@ int DaemonConfig::IsValidConfigured( void )
    AnApplication = AProject.Application( a );
 
    if( AnApplication.Application_Name().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Application_Name() empty for application number " << a << " for project number " << p );
-   if( AnApplication.Owner_Allow().empty() ) CRITICAL_LOG( "DaemonConfig::IsValidConfigured; Warning: Owner_Allow() empty for application number " << a << " for project number " << p );
+   if( AnApplication.Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Owner_Allow() empty for application number " << a << " for project number " << p );
    if( AnApplication.Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfig::IsValidConfigured; Warning: Owner_Deny() empty for application number " << a << " for project number " << p );
    if( AnApplication.Check_System_Limits_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Check_System_Limits_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Check_Limits_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Check_Limits_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Check_Running_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Check_Running_Script() empty for application number " << a << " for project number " << p );
+   if( AnApplication.Job_Check_Finished_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Check_Finished_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Prologue_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Prologue_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Run_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Run_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Epilogue_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Epilogue_Script() empty for application number " << a << " for project number " << p );
@@ -395,6 +396,17 @@ string DaemonConfigProjectApplication::Job_Check_Running_Script( void )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Running_Script; No data in job_check_running_script tag found" )
  else
   DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Running_Script; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonConfigProjectApplication::Job_Check_Finished_Script( void )
+{
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "job_check_finished_script" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Finished_Script; No data in job_check_finished_script tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Finished_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
