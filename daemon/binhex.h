@@ -27,8 +27,8 @@ using namespace std;
 
 // -----------------------------------------------------------------------------
 
-void BinHex( string& Bin, string &Hex );
-void HexBin( string& Hex, string &Bin );
+void BinHex( const string& Bin, string &Hex );
+void HexBin( const string& Hex, string &Bin );
 
 // -----------------------------------------------------------------------------
 

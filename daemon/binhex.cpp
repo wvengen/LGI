@@ -21,7 +21,7 @@
 
 // -----------------------------------------------------------------------------
 
-void BinHex( string& Bin, string &Hex )
+void BinHex( const string& Bin, string &Hex )
 {
  const char HEXDIGITS[] = "0123456789ABCDEF";
  int i, Length = Bin.length();
@@ -39,7 +39,7 @@ void BinHex( string& Bin, string &Hex )
 
 // -----------------------------------------------------------------------------
 
-void HexBin( string& Hex, string &Bin )
+void HexBin( const string& Hex, string &Bin )
 {
  const string HEXDIGITS = "0123456789ABCDEF";
  int i, Length = Hex.length();

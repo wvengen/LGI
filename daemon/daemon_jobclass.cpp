@@ -48,6 +48,8 @@ DaemonJob::DaemonJob( string TheJobDirectory )
 
 DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber )
 {
+ string TheHash;
+
  DEBUG_LOG( "DaemonJob::DaemonJob; Setting up job with XML=" << TheXML << " for ProjectNumber=" << ProjectNumber << " and ApplicationNumber=" << ApplicationNumber );
 
  JobDirectory.clear();
@@ -72,10 +74,9 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  JobDirectory = JobDirectory + "/" + TheConfig.Project( ProjectNumber ).Application( ApplicationNumber ).Application_Name();
  mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
 
- string TheHexedHash, TheHash = Hash( TheXML );
- BinHex( TheHash, TheHexedHash );
+ BinHex( Hash( TheXML ), TheHash );
 
- JobDirectory = JobDirectory + "/JOB_" + TheHexedHash;
+ JobDirectory = JobDirectory + "/JOB_" + TheHash;
  if( mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH ) )
  {
   CRITICAL_LOG( "DaemonJob::DaemonJob; Could not create job directory for JobDirectory=" << JobDirectory );
