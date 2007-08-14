@@ -43,7 +43,7 @@ int main_4( int *argc, char *argv[] )
   ServerAPI.Resource_Request_Job_Details( Response2, MyProject.Project_Master_Server(), MyProject.Project_Name(), Job_Id );
   cout << "Resource_Request_Job_Details " << Job_Id << " Response: " << Response2 << endl;
 
-  Response2 = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+  Response2 = Parse_XML( Parse_XML( Response2, "LGI" ), "response" );
 
   JobList.push_back( DaemonJob( Response2, Config, 1, 1 ) );
 

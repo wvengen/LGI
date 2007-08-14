@@ -70,6 +70,9 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
 
  JobDirectory = JobDirectory + "/" + TheConfig.Project( ProjectNumber ).Application( ApplicationNumber ).Application_Name();
+ mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
+
+ JobDirectory = JobDirectory + "/JOB_" + NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "job_id" ) );
  if( mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH ) )
  {
   CRITICAL_LOG( "DaemonJob::DaemonJob; Could not create job directory for JobDirectory=" << JobDirectory );
