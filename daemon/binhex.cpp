@@ -21,25 +21,25 @@
 
 // -----------------------------------------------------------------------------
 
-void BinHex( const string& Bin, string &Hex )
+void BinHex( string& Bin, string &Hex )
 {
  const char HEXDIGITS[] = "0123456789ABCDEF";
- int i, j, Length = Bin.length();
+ int i, Length = Bin.length();
 
  Hex.reserve( Length << 1 + 1 );
  Hex.clear();
  
- for( j = i = 0; i < Length; i++ )
+ for( i = 0; i < Length; i++ )
  {
-  Hex.push_back( HEXDIGITS[ Bin[ i ] >> 4 ] );
-  Hex.push_back( HEXDIGITS[ Bin[ i ] & 0x0F ] );
+  Hex.push_back( HEXDIGITS[ ( int )( ( Bin[ i ] >> 4 ) & 0x0F ) ] );
+  Hex.push_back( HEXDIGITS[ ( int )( Bin[ i ] & 0x0F ) ] );
  }
 
 }
 
 // -----------------------------------------------------------------------------
 
-void HexBin( const string& Hex, string &Bin )
+void HexBin( string& Hex, string &Bin )
 {
  const string HEXDIGITS = "0123456789ABCDEF";
  int i, Length = Hex.length();

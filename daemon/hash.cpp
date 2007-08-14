@@ -23,21 +23,21 @@
 
 string Hash( string S )
 {
- string TheHash = "0123456789ABCDEF";
+ string TheHash( "0123456789ABCDEF" );
  int r, i, n1, n2;
  char s;
 
  for( r = 0; r < 16; ++r )
   for( i = 0; i < S.length(); ++i )
   {
-   n1 = S[ i ] >> 4;
-   n2 = S[ i ] & 0x0F;
+   n1 = ( int )( S[ i ] >> 4 ) & 0x0F;
+   n2 = ( int )( S[ i ] ) & 0x0F;
 
    s = TheHash[ n1 ];
    TheHash[ n1 ] = TheHash[ n2 ];
    TheHash[ n2 ] = s;
 
-   TheHash[ r ] ^= S[ i ] + i;
+   TheHash[ r ] ^= ( char )( S[ i ] + i );
   }
 
  return( TheHash );

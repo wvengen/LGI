@@ -13,13 +13,16 @@
 
 int main_5( int *argc, char *argv[] )
 { 
- string S;
+ string S, S2, S3;
 
- getline( cin, S );
+ S.clear();
+ for( int i = 0; i < 256; ++i )
+  S.push_back( ( char )( i ) );
 
- BinHex( Hash( S ), S );
+ S2 = Hash( S );
+ BinHex( S2, S3 );
 
- cout << S << endl;
+ cout << S3 << endl;
 }
 
 int main_4( int *argc, char *argv[] )
