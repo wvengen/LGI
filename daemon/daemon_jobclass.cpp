@@ -1,10 +1,10 @@
 /* []--------------------------------------------------------[]
-    |                        xml.h                           |
+    |                   daemon_jobclass.cpp                  |
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
-    | VERSION:    1.00, 10 July 2007.                        |
-    | USE:        Implements a basic xml parser...           |
+    | VERSION:    1.00, 14 August 2007.                       |
+    | USE:        Implements job class...                    |
     |                                                        |
    []--------------------------------------------------------[]
 
@@ -17,21 +17,34 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-#if !defined(__XML_INCLUDED__)
-#define __XML_INCLUDED__
-
-#include <string>
-#include <vector>
-#include <cctype>
-
-using namespace std;
+#include "daemon_jobclass.h"
 
 // -----------------------------------------------------------------------------
 
-string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop );
-string Parse_XML( string XML, string Tag, string &Attributes );
-string Parse_XML( string XML, string Tag );
+DaemonJob::DaemonJob( void )
+{
+ RunDirectory.empty();
+}
 
 // -----------------------------------------------------------------------------
 
-#endif
+DaemonJob::DaemonJob( string TheRunDirectory )
+{
+}
+
+// -----------------------------------------------------------------------------
+
+DaemonJob::DaemonJob( string TheXML, DaemonConfigProjectApplication TheApplicationConfig )
+{
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::ReadStringFromFile( string FileName )
+{
+ string Buffer;
+
+ return( Buffer );
+}
+
+// -----------------------------------------------------------------------------

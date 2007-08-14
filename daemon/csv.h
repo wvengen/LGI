@@ -1,10 +1,10 @@
 /* []--------------------------------------------------------[]
-    |                        xml.h                           |
+    |                        csv.h                           |
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
-    | VERSION:    1.00, 10 July 2007.                        |
-    | USE:        Implements a basic xml parser...           |
+    | VERSION:    1.00, 14 August 2007.                      |
+    | USE:        Implements a csv parser...                 |
     |                                                        |
    []--------------------------------------------------------[]
 
@@ -17,8 +17,8 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-#if !defined(__XML_INCLUDED__)
-#define __XML_INCLUDED__
+#if !defined(__CSV_INCLUDED__)
+#define __CSV_INCLUDED__
 
 #include <string>
 #include <vector>
@@ -28,9 +28,10 @@ using namespace std;
 
 // -----------------------------------------------------------------------------
 
-string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop );
-string Parse_XML( string XML, string Tag, string &Attributes );
-string Parse_XML( string XML, string Tag );
+vector<string> CommaSeparatedValues2Array( string Values, char Separator = ',' );
+string         NormalizeCommaSeparatedValues( string Values, char Separator = ',' );
+
+string         NormalizeString( string S );
 
 // -----------------------------------------------------------------------------
 

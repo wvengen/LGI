@@ -1,5 +1,5 @@
 /* []--------------------------------------------------------[]
-    |                      config.cpp                        |
+    |                   daemon_config.cpp                    |
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
@@ -17,7 +17,7 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-#include "config.h"
+#include "daemon_config.h"
 
 // -----------------------------------------------------------------------------
 
@@ -81,6 +81,7 @@ int DaemonConfig::IsValidConfigured( void )
    if( AnApplication.Job_Prologue_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Prologue_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Run_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Run_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Epilogue_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Epilogue_Script() empty for application number " << a << " for project number " << p );
+   if( AnApplication.Job_Abort_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Abort_Script() empty for application number " << a << " for project number " << p );
   }
  }
 
@@ -440,6 +441,17 @@ string DaemonConfigProjectApplication::Job_Epilogue_Script( void )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Epilogue_Script; No data in job_epilogue_script tag found" )
  else
   DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Epilogue_Script; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonConfigProjectApplication::Job_Abort_Script( void )
+{
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "job_abort_script" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Abort_Script; No data in job_abort_script tag found" )
+ else
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Abort_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------

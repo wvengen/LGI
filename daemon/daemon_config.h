@@ -1,5 +1,5 @@
 /* []--------------------------------------------------------[]
-    |                       config.h                         |
+    |                    daemon_config.h                     |
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
@@ -17,8 +17,8 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-#if !defined(__CONFIG_INCLUDED__)
-#define __CONFIG_INCLUDED__
+#if !defined(__DAEMONCONFIG_INCLUDED__)
+#define __DAEMONCONFIG_INCLUDED__
 
 #include <iostream>
 #include <fstream>
@@ -28,6 +28,8 @@
 
 #include "logger.h"
 #include "xml.h"
+#include "csv.h"
+#include "binhex.h"
 
 using namespace std;
 
@@ -105,6 +107,7 @@ class DaemonConfigProjectApplication
                string Job_Prologue_Script( void );
                string Job_Run_Script( void );
                string Job_Epilogue_Script( void );
+               string Job_Abort_Script( void );
 
        protected:
 

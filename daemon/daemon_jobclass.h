@@ -1,10 +1,10 @@
 /* []--------------------------------------------------------[]
-    |                        xml.h                           |
+    |                    daemon_jobclass.h                   |
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
-    | VERSION:    1.00, 10 July 2007.                        |
-    | USE:        Implements a basic xml parser...           |
+    | VERSION:    1.00, 14 August 2007.                       |
+    | USE:        Implements job class...                    |
     |                                                        |
    []--------------------------------------------------------[]
 
@@ -17,20 +17,45 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-#if !defined(__XML_INCLUDED__)
-#define __XML_INCLUDED__
+#if !defined(__DAEMONJOBCLASS_INCLUDED__)
+#define __DAEMONJOBCLASS_INCLUDED__
 
+#include <iostream>
+#include <fstream>
 #include <string>
-#include <vector>
 #include <cctype>
+#include <cstdio>
+
+#include <sys/types.h>
+#include <unistd.h>
+#include <dirent.h>
+
+#include "logger.h"
+#include "xml.h"
+#include "csv.h"
+#include "binhex.h"
+#include "daemon_config.h"
 
 using namespace std;
 
 // -----------------------------------------------------------------------------
 
-string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop );
-string Parse_XML( string XML, string Tag, string &Attributes );
-string Parse_XML( string XML, string Tag );
+class DaemonJob
+      {
+       public:
+
+              DaemonJob();
+              DaemonJob( string TheRunDirectory );
+              DaemonJob( string TheXML, DaemonConfigProjectApplication TheApplicationConfig );
+
+       private:
+
+              string ReadStringFromFile( string FileName );
+
+       protected:
+
+       string RunDirectory;
+      };
 
 // -----------------------------------------------------------------------------
 

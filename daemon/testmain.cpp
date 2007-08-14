@@ -1,9 +1,12 @@
 #include <cstdlib>
+
 #include "logger.h"
 #include "resource_server_api.h"
 #include "xml.h"
+#include "csv.h"
 #include "binhex.h"
-#include "config.h"
+#include "daemon_config.h"
+#include "daemon_jobclass.h"
 
 #define main_2 main
 
@@ -59,6 +62,7 @@ int main_2( int *argc, char *argv[] )
    cout << "  -- JobPrologueScript of application " << j << " is : " << MyApplication.Job_Prologue_Script() << endl;
    cout << "  -- JobRunScript of application " << j << " is : " << MyApplication.Job_Run_Script() << endl;
    cout << "  -- JobEpilogueScript of application " << j << " is : " << MyApplication.Job_Epilogue_Script() << endl;
+   cout << "  -- JobAbortScript of application " << j << " is : " << MyApplication.Job_Abort_Script() << endl;
   }
  }
 
