@@ -30,6 +30,7 @@
 #include "xml.h"
 #include "csv.h"
 #include "binhex.h"
+#include "hash.h"
 
 using namespace std;
 

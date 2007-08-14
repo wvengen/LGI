@@ -5,10 +5,20 @@
 #include "xml.h"
 #include "csv.h"
 #include "binhex.h"
+#include "hash.h"
 #include "daemon_config.h"
 #include "daemon_jobclass.h"
 
-#define main_4 main
+#define main_5 main
+
+int main_5( int *argc, char *argv[] )
+{ 
+ string S = "dit is een string";
+
+ binhex( hash( S ), S );
+
+ cout << S << endl;
+}
 
 int main_4( int *argc, char *argv[] )
 {

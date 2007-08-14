@@ -35,6 +35,7 @@
 #include "xml.h"
 #include "csv.h"
 #include "binhex.h"
+#include "hash.h"
 #include "daemon_config.h"
 
 using namespace std;
