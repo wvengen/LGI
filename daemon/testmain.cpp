@@ -9,13 +9,15 @@
 #include "daemon_config.h"
 #include "daemon_jobclass.h"
 
-#define main_5 main
+#define main_4 main
 
 int main_5( int *argc, char *argv[] )
 { 
- string S = "dit is een string";
+ string S;
 
- binhex( hash( S ), S );
+ getline( cin, S );
+
+ BinHex( Hash( S ), S );
 
  cout << S << endl;
 }

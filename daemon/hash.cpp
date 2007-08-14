@@ -21,7 +21,7 @@
 
 // -----------------------------------------------------------------------------
 
-string hash( string S )
+string Hash( string S )
 {
  string TheHash = "0123456789ABCDEF";
  int r, i, n1, n2;
@@ -37,7 +37,7 @@ string hash( string S )
    TheHash[ n1 ] = TheHash[ n2 ];
    TheHash[ n2 ] = s;
 
-   TheHash[ i ] ^= S[ i ] + i;
+   TheHash[ r ] ^= S[ i ] + i;
   }
 
  return( TheHash );
