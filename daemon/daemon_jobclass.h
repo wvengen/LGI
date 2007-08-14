@@ -27,6 +27,7 @@
 #include <cstdio>
 
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
 
@@ -45,16 +46,17 @@ class DaemonJob
        public:
 
               DaemonJob();
-              DaemonJob( string TheRunDirectory );
-              DaemonJob( string TheXML, DaemonConfigProjectApplication TheApplicationConfig );
+              DaemonJob( string TheJobDirectory );
+              DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber );
 
        private:
 
               string ReadStringFromFile( string FileName );
+              void   WriteStringToFile( string String, string FileName );
 
        protected:
 
-       string RunDirectory;
+       string JobDirectory;
       };
 
 // -----------------------------------------------------------------------------

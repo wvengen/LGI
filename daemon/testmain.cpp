@@ -8,7 +8,51 @@
 #include "daemon_config.h"
 #include "daemon_jobclass.h"
 
-#define main_2 main
+#define main_4 main
+
+int main_4( int *argc, char *argv[] )
+{
+ DaemonConfigProject MyProject;
+ DaemonConfigProjectApplication MyApplication;
+ vector<DaemonJob> JobList;
+ string Response, Response2, Attributes, Job_Id;
+ int StartStop, NrOfJobs, i;
+
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
+ 
+ DaemonConfig Config( "LGI.cfg" );
+
+ MyProject = Config.Project( 1 );
+ MyApplication = MyProject.Application( 1 );
+
+ Resource_Server_API ServerAPI( Config.Resource_Key_File(), Config.Resource_Certificate_File(), Config.CA_Certificate_File() );
+
+ ServerAPI.Resource_SignUp_Resource( Response, MyProject.Project_Master_Server(), MyProject.Project_Name() );
+
+ ServerAPI.Resource_Request_Work( Response, MyProject.Project_Master_Server(), MyProject.Project_Name(), MyApplication.Application_Name() );
+
+ Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
+ NrOfJobs = atoi( NormalizeString( Parse_XML( Response, "number_of_jobs" ) ).c_str() );
+ StartStop = 0;
+
+ for( i = 0; i < NrOfJobs; ++i )
+ {
+  Job_Id = NormalizeString( Parse_XML( Parse_XML( Response, "job", Attributes, StartStop ), "job_id", Attributes ) );
+
+  ServerAPI.Resource_Request_Job_Details( Response2, MyProject.Project_Master_Server(), MyProject.Project_Name(), Job_Id );
+  cout << "Resource_Request_Job_Details " << Job_Id << " Response: " << Response2 << endl;
+
+  Response2 = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
+  JobList.push_back( DaemonJob( Response2, Config, 1, 1 ) );
+
+  ServerAPI.Resource_UnLock_Job( Response2, MyProject.Project_Master_Server(), MyProject.Project_Name(), Job_Id );
+ }
+ 
+ ServerAPI.Resource_SignOff_Resource( Response, MyProject.Project_Master_Server(), MyProject.Project_Name() );
+}
+
 
 int main_3( int *argc, char *argv[] )
 {
