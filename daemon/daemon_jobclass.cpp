@@ -20,9 +20,11 @@
 #include "daemon_jobclass.h"
 
 // -----------------------------------------------------------------------------
+#include <iostream>
 
 int UnlinkDirectoryRecursively( string Directory )
 {
+ string Name;
  struct dirent *Entry;
  DIR *Dir = opendir( Directory.c_str() );
 
@@ -30,12 +32,17 @@ int UnlinkDirectoryRecursively( string Directory )
 
  while( ( Entry = readdir( Dir ) ) != NULL )
  {
+  if( !strcmp( Entry -> d_name, "." ) ) continue;
+  if( !strcmp( Entry -> d_name, ".." ) ) continue;
+
+  Name = Directory + "/" + string( Entry -> d_name );
+
   if( Entry -> d_type & DT_DIR )
-  {
-   if( UnlinkDirectoryRecursively( ( Directory + "/" + string( Entry -> d_name ) ).c_str() ) ) return( 1 );
+  { 
+   if( UnlinkDirectoryRecursively( Name ) ) return( 1 );
   }
   else
-   if( unlink( ( Directory + "/" + string( Entry -> d_name ) ).c_str() ) ) return( 1 );
+   if( unlink( Name.c_str() ) ) return( 1 );
  }
 
  closedir( Dir );
@@ -380,7 +387,7 @@ void DaemonJob::CleanUpJobDirectory( void )
  if( UnlinkDirectoryRecursively( JobDirectory ) )
   CRITICAL_LOG( "DaemonJob::CleanUpJobDirectory; Error during cleanup of JobDirectory=" << JobDirectory )
  else
-  VERBOSE_DEBUG_LOG( "DaemonJob::CleanUpJobDirectory; Cleaned up job from directory JobDirectory=" << JobDirectory );
+  NORMAL_LOG( "DaemonJob::CleanUpJobDirectory; Cleaned up job from directory JobDirectory=" << JobDirectory );
 
  JobDirectory.empty();
 }
