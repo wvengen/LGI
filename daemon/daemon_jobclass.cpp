@@ -151,7 +151,7 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
 }
 
 // -----------------------------------------------------------------------------
-#include <iostream>
+
 string DaemonJob::ReadStringFromFile( string FileName )
 {
  fstream File( FileName.c_str(), fstream::in );
@@ -184,7 +184,7 @@ string DaemonJob::ReadStringFromFile( string FileName )
   CRITICAL_LOG_RETURN( Buffer, "DaemonJob::ReadStringFromFile; Data read from file " << FileName << " does not match hash" );
  }
  
- DEBUG_LOG_RETURN( Buffer, "DaemonJob::ReadStringFromFile; Data returned from file " << FileName << ":  " << Buffer );
+ VERBOSE_DEBUG_LOG_RETURN( Buffer, "DaemonJob::ReadStringFromFile; Data returned from file " << FileName << ":  " << Buffer );
 }
 
 // -----------------------------------------------------------------------------
@@ -199,6 +199,8 @@ void DaemonJob::WriteStringToFile( string String, string FileName )
 
  File << String;
  HashFile << TheHash;
+ 
+ VERBOSE_DEBUG_LOG( "DaemonJob::WriteStringToFile; Wrote file " << FileName << " with String=" << String );
 }
 
 // -----------------------------------------------------------------------------

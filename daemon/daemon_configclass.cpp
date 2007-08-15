@@ -98,7 +98,7 @@ string DaemonConfig::CA_Certificate_File( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::CA_Certificate_File; No data in ca_certificate_file tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfig::CA_Certificate_File; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::CA_Certificate_File; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -109,7 +109,7 @@ string DaemonConfig::Resource_Name( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_Name; No data in resource_name tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_Name; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_Name; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -120,7 +120,7 @@ string DaemonConfig::Resource_URL( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_URL; No data in resource_url tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_URL; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_URL; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ string DaemonConfig::Resource_Certificate_File( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_Certificate_File; No data in resource_certificate_file tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_Certificate_File; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_Certificate_File; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ string DaemonConfig::Resource_Key_File( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_Key_File; No data in resource_key_file tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_Key_File; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_Key_File; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -153,7 +153,7 @@ string DaemonConfig::RunDirectory( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::RunDirectory; No data in run_directory tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfig::RunDirectory; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::RunDirectory; Returned " << Data );
 }
 
 
@@ -165,7 +165,7 @@ int DaemonConfig::Number_Of_Projects( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( 0, "DaemonConfig::Number_Of_Projects; No data in number_of_projects tag found" )
  else
-  DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfig::Number_Of_Projects; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfig::Number_Of_Projects; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -182,7 +182,7 @@ DaemonConfigProject DaemonConfig::Project( int Number )
 
  DaemonConfigProject TheProject( (*this), Number );
 
- DEBUG_LOG_RETURN( TheProject, "DaemonConfig::Project; Returned project with Number=" << Number );
+ VERBOSE_DEBUG_LOG_RETURN( TheProject, "DaemonConfig::Project; Returned project with Number=" << Number );
 }
 
 // -----------------------------------------------------------------------------
@@ -212,7 +212,7 @@ DaemonConfigProject::DaemonConfigProject( DaemonConfig &TheConfig, int TheProjec
 
  string ResourceCache = Parse_XML( TheConfig.ConfigurationXML, "resource" );
 
- DEBUG_LOG( "DaemonConfigProject::DaemonConfigProject; Cached resource data with ResourceCache=" << ResourceCache );
+ VERBOSE_DEBUG_LOG( "DaemonConfigProject::DaemonConfigProject; Cached resource data with ResourceCache=" << ResourceCache );
 
  string Attributes;
  int FoundNumber, StartPos = 0;
@@ -221,7 +221,7 @@ DaemonConfigProject::DaemonConfigProject( DaemonConfig &TheConfig, int TheProjec
  {
   ProjectCache = Parse_XML( ResourceCache, "project", Attributes, StartPos );
 
-  DEBUG_LOG( "DaemonConfigProject::DaemonConfigProject; Cached project data with ProjectCache=" << ProjectCache );
+  VERBOSE_DEBUG_LOG( "DaemonConfigProject::DaemonConfigProject; Cached project data with ProjectCache=" << ProjectCache );
  
   if( !ProjectCache.empty() )
    if( sscanf( Attributes.c_str(), "number=%d", &FoundNumber ) != 1 )
@@ -245,7 +245,7 @@ string DaemonConfigProject::Project_Name( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProject::Project_Name; No data in project_name tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Project_Name; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Project_Name; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -256,7 +256,7 @@ string DaemonConfigProject::Project_Master_Server( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProject::Project_Master_Server; No data in project_master_server tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Project_Master_Server; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Project_Master_Server; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -267,7 +267,7 @@ int DaemonConfigProject::Number_Of_Applications( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::Number_Of_Applications; No data in number_of_applications tag found" )
  else
-  DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProject::Number_Of_Applications; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProject::Number_Of_Applications; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -284,7 +284,7 @@ DaemonConfigProjectApplication DaemonConfigProject::Application( int Number )
 
  DaemonConfigProjectApplication TheApplication( (*this), Number );
 
- DEBUG_LOG_RETURN( TheApplication, "DaemonConfigProject::Application; Returned application with Number=" << Number );
+ VERBOSE_DEBUG_LOG_RETURN( TheApplication, "DaemonConfigProject::Application; Returned application with Number=" << Number );
 }
 
 // -----------------------------------------------------------------------------
@@ -319,7 +319,7 @@ DaemonConfigProjectApplication::DaemonConfigProjectApplication( DaemonConfigProj
  {
   ApplicationCache = Parse_XML( TheProject.ProjectCache, "application", Attributes, StartPos );
 
-  DEBUG_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; Cached application data with ApplicationCache=" << ApplicationCache );
+  VERBOSE_DEBUG_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; Cached application data with ApplicationCache=" << ApplicationCache );
 
   if( !ApplicationCache.empty() )
    if( sscanf( Attributes.c_str(), "number=%d", &FoundNumber ) != 1 )
@@ -343,7 +343,7 @@ string DaemonConfigProjectApplication::Application_Name( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Application_Name; No data in application_name tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Application_Name; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Application_Name; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -354,7 +354,7 @@ string DaemonConfigProjectApplication::Owner_Allow( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; No data in owner_allow tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -365,7 +365,7 @@ string DaemonConfigProjectApplication::Owner_Deny( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; No data in owner_deny tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -376,7 +376,7 @@ string DaemonConfigProjectApplication::Check_System_Limits_Script( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Check_System_Limits_Script; No data in check_system_limits_script tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Check_System_Limits_Script; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Check_System_Limits_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -387,7 +387,7 @@ string DaemonConfigProjectApplication::Job_Check_Limits_Script( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Limits_Script; No data in job_check_limits_script tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Limits_Script; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Limits_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -398,7 +398,7 @@ string DaemonConfigProjectApplication::Job_Check_Running_Script( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Running_Script; No data in job_check_running_script tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Running_Script; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Running_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -409,7 +409,7 @@ string DaemonConfigProjectApplication::Job_Check_Finished_Script( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Finished_Script; No data in job_check_finished_script tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Finished_Script; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Finished_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -420,7 +420,7 @@ string DaemonConfigProjectApplication::Job_Prologue_Script( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Prologue_Script; No data in job_prologue_script tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Prologue_Script; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Prologue_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -431,7 +431,7 @@ string DaemonConfigProjectApplication::Job_Run_Script( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Run_Script; No data in job_run_script tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Run_Script; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Run_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -442,7 +442,7 @@ string DaemonConfigProjectApplication::Job_Epilogue_Script( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Epilogue_Script; No data in job_epilogue_script tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Epilogue_Script; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Epilogue_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -453,7 +453,7 @@ string DaemonConfigProjectApplication::Job_Abort_Script( void )
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Abort_Script; No data in job_abort_script tag found" )
  else
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Abort_Script; Returned " << Data );
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Abort_Script; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------

@@ -85,8 +85,8 @@ CURLcode Resource_Server_API::PerformcURLPost( string &Response, CURL *cURLHandl
    CRITICAL_LOG_RETURN( cURLResult, "Resource_Server_API::PerformcURLPost; Could not perform post, returned " << cURLResult )
   else
   {
-   NORMAL_LOG( "Resource_Server_API::PerformcURLPost; Performed post" ); 
-   DEBUG_LOG( "Resource_Server_API::PerformcURLPost; Response=" << Response );
+   DEBUG_LOG( "Resource_Server_API::PerformcURLPost; Performed post" ); 
+   VERBOSE_DEBUG_LOG( "Resource_Server_API::PerformcURLPost; Response=" << Response );
    return( cURLResult );
   }
 
@@ -114,7 +114,7 @@ int Resource_Server_API::Resource_SignUp_Resource( string &Response, string Serv
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
-  DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_SignUp_Resource; returned " << cURLResult );
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_SignUp_Resource; returned " << cURLResult );
  }
  else
   CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_SignUp_Resource; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
@@ -139,7 +139,7 @@ int Resource_Server_API::Resource_SignOff_Resource( string &Response, string Ser
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
-  DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_SignOff_Resource; returned " << cURLResult );
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_SignOff_Resource; returned " << cURLResult );
  }
  else
   CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_SignOff_Resource; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
@@ -167,7 +167,7 @@ int Resource_Server_API::Resource_Request_Work( string &Response, string ServerU
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
-  DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Request_Work; returned " << cURLResult );
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Request_Work; returned " << cURLResult );
  }
  else
   CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_Request_Work; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
@@ -193,7 +193,7 @@ int Resource_Server_API::Resource_Request_Job_Details( string &Response, string 
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
-  DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Request_Job_Details; returned " << cURLResult );
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Request_Job_Details; returned " << cURLResult );
  }
  else
   CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_Request_Job_Details; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
@@ -219,7 +219,7 @@ int Resource_Server_API::Resource_Lock_Job( string &Response, string ServerURL, 
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
-  DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Lock_Job; returned " << cURLResult );
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Lock_Job; returned " << cURLResult );
  }
  else
   CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_Lock_Job; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
@@ -245,7 +245,7 @@ int Resource_Server_API::Resource_UnLock_Job( string &Response, string ServerURL
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
-  DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_UnLock_Job; returned " << cURLResult );
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_UnLock_Job; returned " << cURLResult );
  }
  else
   CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_UnLock_Job; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
@@ -276,7 +276,7 @@ int Resource_Server_API::Resource_Update_Job( string &Response, string ServerURL
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
-  DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Update_Job; returned " << cURLResult );
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Update_Job; returned " << cURLResult );
  }
  else
   CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_Update_Job; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
@@ -308,7 +308,7 @@ int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
-  DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Submit_Job; returned " << cURLResult );
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Submit_Job; returned " << cURLResult );
  }
  else
   CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_Submit_Job; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
@@ -334,7 +334,7 @@ int Resource_Server_API::Resource_Job_State( string &Response, string ServerURL,
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
-  DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Job_state; returned " << cURLResult );
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Job_state; returned " << cURLResult );
  }
  else
   CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_Job_State; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );

@@ -30,19 +30,22 @@ using namespace std;
 
 #define DEFAULT_LOGGER_FILE "/dev/stdout"
 
-#define CRITICAL_LOGGING 1
-#define NORMAL_LOGGING   2
-#define DEBUG_LOGGING    4
+#define CRITICAL_LOGGING         1
+#define NORMAL_LOGGING           2
+#define DEBUG_LOGGING            4
+#define VERBOSE_DEBUG_LOGGING    8 
 
 #define LOGGER(tag)    ( LoggerStream << LoggerTime() << " [" << tag << "] " << __FILE__ << ":" << __LINE__ << " :: " )
 
-#define DEBUG_LOG( M )    { if( LoggerMode & DEBUG_LOGGING ) { LOGGER( "DEBUG" ) << M << endl; } }
-#define NORMAL_LOG( M )   { if( LoggerMode & NORMAL_LOGGING ) { LOGGER( "NORMAL" ) << M << endl; } }
-#define CRITICAL_LOG( M ) { if( LoggerMode & CRITICAL_LOGGING ) { LOGGER( "CRITICAL" ) << M << endl; } }
+#define DEBUG_LOG( M )            { if( LoggerMode & DEBUG_LOGGING ) { LOGGER( "DEBUG" ) << M << endl; } }
+#define VERBOSE_DEBUG_LOG( M )    { if( LoggerMode & VERBOSE_DEBUG_LOGGING ) { LOGGER( "VERBOSE DEBUG" ) << M << endl; } }
+#define NORMAL_LOG( M )           { if( LoggerMode & NORMAL_LOGGING ) { LOGGER( "NORMAL" ) << M << endl; } }
+#define CRITICAL_LOG( M )         { if( LoggerMode & CRITICAL_LOGGING ) { LOGGER( "CRITICAL" ) << M << endl; } }
 
-#define DEBUG_LOG_RETURN( X, M )    { if( LoggerMode & DEBUG_LOGGING ) { LOGGER( "DEBUG" ) << M << endl; } return( X ); }
-#define NORMAL_LOG_RETURN( X, M )   { if( LoggerMode & NORMAL_LOGGING ) { LOGGER( "NORMAL" ) << M << endl; } return( X ); }
-#define CRITICAL_LOG_RETURN( X, M ) { if( LoggerMode & CRITICAL_LOGGING ) { LOGGER( "CRITICAL" ) << M << endl; } return( X ); }
+#define DEBUG_LOG_RETURN( X, M )            { if( LoggerMode & DEBUG_LOGGING ) { LOGGER( "DEBUG" ) << M << endl; } return( X ); }
+#define VERBOSE_DEBUG_LOG_RETURN( X, M )    { if( LoggerMode & DEBUG_LOGGING ) { LOGGER( "VERBOSE DEBUG" ) << M << endl; } return( X ); }
+#define NORMAL_LOG_RETURN( X, M )           { if( LoggerMode & NORMAL_LOGGING ) { LOGGER( "NORMAL" ) << M << endl; } return( X ); }
+#define CRITICAL_LOG_RETURN( X, M )         { if( LoggerMode & CRITICAL_LOGGING ) { LOGGER( "CRITICAL" ) << M << endl; } return( X ); }
 
 // ------------------------------------------------------------------------------
 

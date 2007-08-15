@@ -33,7 +33,7 @@ int main_4( int *argc, char *argv[] )
  string Response, Response2, Attributes, Job_Id;
  int StartStop, NrOfJobs, i;
 
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
  
  DaemonConfig Config( "LGI.cfg" );
 
