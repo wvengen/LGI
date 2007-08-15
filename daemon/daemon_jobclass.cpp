@@ -21,6 +21,32 @@
 
 // -----------------------------------------------------------------------------
 
+int UnlinkDirectoryRecursively( string Directory )
+{
+ struct dirent *Entry;
+ DIR *Dir = opendir( Directory.c_str() );
+
+ if( Dir == NULL ) return( 1 );
+
+ while( ( Entry = readdir( Dir ) ) != NULL )
+ {
+  if( Entry -> d_type & DT_DIR )
+  {
+   if( UnlinkDirectoryRecursively( ( Directory + "/" + string( Entry -> d_name ) ).c_str() ) ) return( 1 );
+  }
+  else
+   if( unlink( ( Directory + "/" + string( Entry -> d_name ) ).c_str() ) ) return( 1 );
+ }
+
+ closedir( Dir );
+
+ if( rmdir( Directory.c_str() ) ) return( 1 );
+
+ return( 0 );
+}
+
+// -----------------------------------------------------------------------------
+
 DaemonJob::DaemonJob( void )
 {
  JobDirectory.empty();
@@ -234,7 +260,130 @@ void DaemonJob::WriteStringToHashedFile( string String, string FileName )
 
 string DaemonJob::GetJobDirectory( void )
 { 
- return( JobDirectory );
+ VERBOSE_DEBUG_LOG_RETURN( JobDirectory, "DaemonJob::GetJobDirectory; Returned " << JobDirectory );
 }
 
 // -----------------------------------------------------------------------------
+
+string DaemonJob::GetProject( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetProject; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetProject; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetThisProjectServer( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetThisProjectServer; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetThisProjectServer; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetProjectMasterServer( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetProjectMasterServer; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetProjectMasterServer; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetApplication( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetApplication; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetApplication; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetJobId( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetJobId; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetJobId; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetOwners( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetOwners; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetOwners; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetReadAccess( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetReadAccess; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetReadAccess; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetJobSpecifics( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetJobSpecifics; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetJobSpecifics; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetInput( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetInput; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetInput; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetOutput( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetOutput; JobDirectory empty" );
+ string Data = ReadStringFromFile( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetOutput; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetState( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetState; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetState; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetStateTimeStamp( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetStateTimeStamp; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetStateTimeStamp; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+void DaemonJob::CleanUpJobDirectory( void )
+{
+ if( JobDirectory.empty() ) { CRITICAL_LOG( "DaemonJob::CleanUpJobDirectory; JobDirectory empty" ); return; }
+
+ if( UnlinkDirectoryRecursively( JobDirectory ) )
+  CRITICAL_LOG( "DaemonJob::CleanUpJobDirectory; Error during cleanup of JobDirectory=" << JobDirectory )
+ else
+  VERBOSE_DEBUG_LOG( "DaemonJob::CleanUpJobDirectory; Cleaned up job from directory JobDirectory=" << JobDirectory );
+
+ JobDirectory.empty();
+}
+
+// -----------------------------------------------------------------------------
+

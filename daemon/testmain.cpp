@@ -73,6 +73,8 @@ int main_4( int *argc, char *argv[] )
  for( i = 0; i < JobList.size(); ++i )
   JobList2.push_back( DaemonJob( JobList[ i ].GetJobDirectory() ) );
 
+ for( i = 0; i < JobList.size(); ++i )
+  JobList2[ i ].CleanUpJobDirectory();
 }
 
 

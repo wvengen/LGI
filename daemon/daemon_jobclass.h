@@ -75,7 +75,21 @@ class DaemonJob
               DaemonJob( string TheJobDirectory );
               DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber );
 
+              void CleanUpJobDirectory( void );
+
               string GetJobDirectory( void );
+              string GetProject( void );
+              string GetThisProjectServer( void );
+              string GetProjectMasterServer( void );
+              string GetApplication( void );
+              string GetJobId( void );
+              string GetOwners( void );
+              string GetReadAccess( void );
+              string GetJobSpecifics( void );
+              string GetInput( void );
+              string GetOutput( void );
+              string GetState( void );
+              string GetStateTimeStamp( void );
 
        private:
 
@@ -89,5 +103,11 @@ class DaemonJob
       };
 
 // -----------------------------------------------------------------------------
+
+int UnlinkDirectoryRecursively( string Directory );
+
+// -----------------------------------------------------------------------------
+
+
 
 #endif
