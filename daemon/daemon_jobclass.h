@@ -53,6 +53,7 @@ using namespace std;
 #define LGI_JOBDAEMON_OWNERS_FILE                  "LGI_owners"
 #define LGI_JOBDAEMON_READ_ACCESS_FILE             "LGI_read_access"
 #define LGI_JOBDAEMON_JOB_SPECIFICS_FILE           "LGI_job_specifics"
+#define LGI_JOBDAEMON_TARGET_RESOURCES_FILE        "LGI_target_resources"
 #define LGI_JOBDAEMON_INPUT_FILE                   "LGI_input"
 #define LGI_JOBDAEMON_OUTPUT_FILE                  "LGI_output"
 #define LGI_JOBDAEMON_STATE_FILE                   "LGI_state"
@@ -87,6 +88,7 @@ class DaemonJob
               string GetOwners( void );
               string GetReadAccess( void );
               string GetJobSpecifics( void );
+              string GetTargetResources( void );
               string GetInput( void );
               string GetOutput( void );
               string GetState( void );

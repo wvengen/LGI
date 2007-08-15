@@ -20,7 +20,6 @@
 #include "daemon_jobclass.h"
 
 // -----------------------------------------------------------------------------
-#include <iostream>
 
 int UnlinkDirectoryRecursively( string Directory )
 {
@@ -81,6 +80,7 @@ DaemonJob::DaemonJob( string TheJobDirectory )
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_APPLICATION_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_TARGET_RESOURCES_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_ID_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_OWNERS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_READ_ACCESS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
@@ -165,6 +165,7 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  WriteStringToHashedFile( NormalizeString( Parse_XML( TheXML, "this_project_server" ) ), JobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( TheXML, "project_master_server" ) ), JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "application" ) ), JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE );
+ WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "target_resources" ) ), JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "job_id" ) ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "owners" ) ), JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "read_access" ) ), JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE );
@@ -304,6 +305,15 @@ string DaemonJob::GetApplication( void )
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetApplication; JobDirectory empty" );
  string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetApplication; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetTargetResources( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetTargetResources; JobDirectory empty" );
+ string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetTargetResources; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
