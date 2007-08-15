@@ -74,7 +74,10 @@ int main_4( int *argc, char *argv[] )
   JobList2.push_back( DaemonJob( JobList[ i ].GetJobDirectory() ) );
 
  for( i = 0; i < JobList.size(); ++i )
+ {
+  cout << "Cleaning up job " << JobList2[ i ].GetJobId() << endl;
   JobList2[ i ].CleanUpJobDirectory();
+ }
 }
 
 
