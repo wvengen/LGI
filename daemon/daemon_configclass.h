@@ -64,6 +64,8 @@ class DaemonConfig
 
        protected:
 
+              string ReadStringFromFile( string FileName );
+
        string ConfigurationXML;
       };
 

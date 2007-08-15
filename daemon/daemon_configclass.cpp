@@ -23,21 +23,9 @@
 
 DaemonConfig::DaemonConfig( string ConfigFile )
 {
- fstream Cfg( ConfigFile.c_str(), fstream::in );
- string Line;
-
  NORMAL_LOG( "DaemonConfig::DaemonConfig; Reading config file " << ConfigFile );
 
- ConfigurationXML.reserve( 8192 );         
- ConfigurationXML.clear();
-
- getline( Cfg, Line );
- while( Cfg )                  
- {
-  ConfigurationXML.append( Line );
-  ConfigurationXML.push_back( '\n' );
-  getline( Cfg, Line );
- }
+ ConfigurationXML = ReadStringFromFile( ConfigFile );
 
  DEBUG_LOG( "DaemonConfig::DaemonConfig; The configuration read in: " << ConfigurationXML );
 
@@ -45,6 +33,32 @@ DaemonConfig::DaemonConfig( string ConfigFile )
 
  if( ConfigurationXML.empty() )
   CRITICAL_LOG( "DaemonConfig::DaemonConfig; No data in LGI tag found" );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonConfig::ReadStringFromFile( string FileName )
+{
+ fstream File( FileName.c_str(), fstream::in );
+ string Buffer, Line;
+
+ Buffer.reserve( 1024 );
+ Buffer.clear();
+
+ getline( File, Line );
+ while( File )
+ {
+  Buffer.append( Line );
+  Buffer.push_back( '\n' );
+  getline( File, Line );
+ }
+
+ if( Buffer.length() >= 1 )
+  Buffer = Buffer.substr( 0, Buffer.length() - 1 );
+ else
+  Buffer.clear();
+
+ VERBOSE_DEBUG_LOG_RETURN( Buffer, "DaemonConfig::ReadStringFromFile; Data returned from file " << FileName << ":  " << Buffer );
 }
 
 // -----------------------------------------------------------------------------
@@ -76,6 +90,7 @@ int DaemonConfig::IsValidConfigured( void )
    if( AnApplication.Application_Name().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Application_Name() empty for application number " << a << " for project number " << p );
    if( AnApplication.Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Owner_Allow() empty for application number " << a << " for project number " << p );
    if( AnApplication.Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfig::IsValidConfigured; Warning: Owner_Deny() empty for application number " << a << " for project number " << p );
+
    if( AnApplication.Check_System_Limits_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Check_System_Limits_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Check_Limits_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Check_Limits_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Check_Running_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Check_Running_Script() empty for application number " << a << " for project number " << p );
@@ -84,6 +99,14 @@ int DaemonConfig::IsValidConfigured( void )
    if( AnApplication.Job_Run_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Run_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Epilogue_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Epilogue_Script() empty for application number " << a << " for project number " << p );
    if( AnApplication.Job_Abort_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Abort_Script() empty for application number " << a << " for project number " << p );
+
+   if( ReadStringFromFile( AnApplication.Check_System_Limits_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Cannot read from file " << AnApplication.Check_System_Limits_Script() << " for application number " << a << " for project number " << p );
+   if( ReadStringFromFile( AnApplication.Job_Check_Running_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Cannot read from file " << AnApplication.Job_Check_Running_Script() << " for application number " << a << " for project number " << p );
+   if( ReadStringFromFile( AnApplication.Job_Check_Finished_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Cannot read from file " << AnApplication.Job_Check_Finished_Script() << " for application number " << a << " for project number " << p );
+   if( ReadStringFromFile( AnApplication.Job_Prologue_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Cannot read from file " << AnApplication.Job_Prologue_Script() << " for application number " << a << " for project number " << p );
+   if( ReadStringFromFile( AnApplication.Job_Epilogue_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Cannot read from file " << AnApplication.Job_Epilogue_Script() << " for application number " << a << " for project number " << p );
+   if( ReadStringFromFile( AnApplication.Job_Run_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Cannot read from file " << AnApplication.Job_Run_Script() << " for application number " << a << " for project number " << p );
+   if( ReadStringFromFile( AnApplication.Job_Abort_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Cannot read from file " << AnApplication.Job_Abort_Script() << " for application number " << a << " for project number " << p );
   }
  }
 

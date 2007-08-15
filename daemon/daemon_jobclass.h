@@ -79,8 +79,9 @@ class DaemonJob
 
        private:
 
+              string ReadStringFromHashedFile( string FileName );
               string ReadStringFromFile( string FileName );
-              void   WriteStringToFile( string String, string FileName );
+              void   WriteStringToHashedFile( string String, string FileName );
 
        protected:
 

@@ -33,9 +33,12 @@ int main_4( int *argc, char *argv[] )
  string Response, Response2, Attributes, Job_Id;
  int StartStop, NrOfJobs, i;
 
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
+ // InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
  
  DaemonConfig Config( "LGI.cfg" );
+
+ if( !Config.IsValidConfigured() ) CRITICAL_LOG_RETURN( 1, "Aborted because of bad config" );
 
  MyProject = Config.Project( 1 );
  MyApplication = MyProject.Application( 1 );
