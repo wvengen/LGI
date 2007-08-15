@@ -43,7 +43,7 @@ using namespace std;
 #define CRITICAL_LOG( M )         { if( LoggerMode & CRITICAL_LOGGING ) { LOGGER( "CRITICAL" ) << M << endl; } }
 
 #define DEBUG_LOG_RETURN( X, M )            { if( LoggerMode & DEBUG_LOGGING ) { LOGGER( "DEBUG" ) << M << endl; } return( X ); }
-#define VERBOSE_DEBUG_LOG_RETURN( X, M )    { if( LoggerMode & DEBUG_LOGGING ) { LOGGER( "VERBOSE DEBUG" ) << M << endl; } return( X ); }
+#define VERBOSE_DEBUG_LOG_RETURN( X, M )    { if( LoggerMode & VERBOSE_DEBUG_LOGGING ) { LOGGER( "VERBOSE DEBUG" ) << M << endl; } return( X ); }
 #define NORMAL_LOG_RETURN( X, M )           { if( LoggerMode & NORMAL_LOGGING ) { LOGGER( "NORMAL" ) << M << endl; } return( X ); }
 #define CRITICAL_LOG_RETURN( X, M )         { if( LoggerMode & CRITICAL_LOGGING ) { LOGGER( "CRITICAL" ) << M << endl; } return( X ); }
 
