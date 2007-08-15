@@ -1,5 +1,5 @@
 /* []--------------------------------------------------------[]
-    |                   daemon_config.cpp                    |
+    |                 daemon_configclass.cpp                 |
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
@@ -17,7 +17,7 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-#include "daemon_config.h"
+#include "daemon_configclass.h"
 
 // -----------------------------------------------------------------------------
 

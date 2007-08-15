@@ -8,18 +8,18 @@ LD=g++
 
 # some defines...
 LIBS=-lcurl
-OBJS=testmain.o logger.o resource_server_api.o xml.o csv.o hash.o binhex.o daemon_config.o daemon_jobclass.o
+OBJS=testmain.o logger.o resource_server_api.o xml.o csv.o hash.o binhex.o daemon_configclass.o daemon_jobclass.o
 
 # default target...
 testmain.x : ${OBJS}
 	${LD} ${FLAGS} -o $@ ${OBJS} ${LIBS}
 
 # dependancies...
-testmain.o : testmain.cpp logger.h resource_server_api.h binhex.h hash.h csv.h xml.h daemon_config.h daemon_jobclass.h
+testmain.o : testmain.cpp logger.h resource_server_api.h binhex.h hash.h csv.h xml.h daemon_configclass.h daemon_jobclass.h
 
-daemon_jobclass.o : daemon_jobclass.cpp daemon_jobclass.h daemon_config.h xml.h binhex.h csv.h hash.h
+daemon_jobclass.o : daemon_jobclass.cpp daemon_jobclass.h daemon_configclass.h xml.h binhex.h csv.h hash.h
 
-daemon_config.o : daemon_config.cpp daemon_config.h xml.h binhex.h csv.h hash.h
+daemon_configclass.o : daemon_configclass.cpp daemon_configclass.h xml.h binhex.h csv.h hash.h
 
 resource_server_api.o : resource_server_api.cpp resource_server_api.h
 

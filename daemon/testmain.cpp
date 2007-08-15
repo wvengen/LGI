@@ -6,7 +6,7 @@
 #include "csv.h"
 #include "binhex.h"
 #include "hash.h"
-#include "daemon_config.h"
+#include "daemon_configclass.h"
 #include "daemon_jobclass.h"
 
 #define main_4 main

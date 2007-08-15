@@ -1,5 +1,5 @@
 /* []--------------------------------------------------------[]
-    |                    daemon_config.h                     |
+    |                 daemon_configclass.h                   |
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
@@ -17,8 +17,8 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-#if !defined(__DAEMONCONFIG_INCLUDED__)
-#define __DAEMONCONFIG_INCLUDED__
+#if !defined(__DAEMONCONFIGCLASS_INCLUDED__)
+#define __DAEMONCONFIGCLASS_INCLUDED__
 
 #include <iostream>
 #include <fstream>
