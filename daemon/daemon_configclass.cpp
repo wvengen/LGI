@@ -31,10 +31,12 @@ DaemonConfig::DaemonConfig( string ConfigFile )
  ConfigurationXML.reserve( 8192 );         
  ConfigurationXML.clear();
 
- while( Cfg )                     // read in the file into the string...
+ getline( Cfg, Line );
+ while( Cfg )                  
  {
-  getline( Cfg, Line );
   ConfigurationXML.append( Line );
+  ConfigurationXML.push_back( '\n' );
+  getline( Cfg, Line );
  }
 
  DEBUG_LOG( "DaemonConfig::DaemonConfig; The configuration read in: " << ConfigurationXML );

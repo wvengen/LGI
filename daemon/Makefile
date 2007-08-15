@@ -31,4 +31,4 @@ hash.o : hash.cpp hash.h
 
 # clean up...
 clean :
-	rm *.o; rm *.x; rm *.log
+	rm *.o; rm *.x; rm *.log; rm -rf ./runhere/*

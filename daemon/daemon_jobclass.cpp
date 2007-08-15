@@ -151,7 +151,7 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
 }
 
 // -----------------------------------------------------------------------------
-
+#include <iostream>
 string DaemonJob::ReadStringFromFile( string FileName )
 {
  fstream File( FileName.c_str(), fstream::in );
@@ -159,16 +159,18 @@ string DaemonJob::ReadStringFromFile( string FileName )
  string Buffer, Line, TheHash;
 
  Buffer.reserve( 1024 );
+ Buffer.clear();
 
+ getline( File, Line );
  while( File )
  {
-  getline( File, Line );
   Buffer.append( Line );
   Buffer.push_back( '\n' );
+  getline( File, Line );
  }
 
- if( Buffer.length() >= 2 ) 
-  Buffer = Buffer.substr( 0, Buffer.length() - 2 );
+ if( Buffer.length() >= 1 ) 
+  Buffer = Buffer.substr( 0, Buffer.length() - 1 );
  else
   Buffer.clear();
 
@@ -197,6 +199,13 @@ void DaemonJob::WriteStringToFile( string String, string FileName )
 
  File << String;
  HashFile << TheHash;
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetJobDirectory( void )
+{ 
+ return( JobDirectory );
 }
 
 // -----------------------------------------------------------------------------

@@ -75,6 +75,8 @@ class DaemonJob
               DaemonJob( string TheJobDirectory );
               DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber );
 
+              string GetJobDirectory( void );
+
        private:
 
               string ReadStringFromFile( string FileName );

@@ -29,11 +29,11 @@ int main_4( int *argc, char *argv[] )
 {
  DaemonConfigProject MyProject;
  DaemonConfigProjectApplication MyApplication;
- vector<DaemonJob> JobList;
+ vector<DaemonJob> JobList, JobList2;
  string Response, Response2, Attributes, Job_Id;
  int StartStop, NrOfJobs, i;
 
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
  
  DaemonConfig Config( "LGI.cfg" );
 
@@ -66,6 +66,10 @@ int main_4( int *argc, char *argv[] )
  }
  
  ServerAPI.Resource_SignOff_Resource( Response, MyProject.Project_Master_Server(), MyProject.Project_Name() );
+
+ for( i = 0; i < JobList.size(); ++i )
+  JobList2.push_back( DaemonJob( JobList[ i ].GetJobDirectory() ) );
+
 }
 
 
