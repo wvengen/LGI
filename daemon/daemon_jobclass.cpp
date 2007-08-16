@@ -441,7 +441,7 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
  } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
 
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; Error from server Response=" << Response );
+ if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; Error from server " << GetThisProjectServer() << " Response=" << Response );
 
  // Dump obtained details of job into correct files...
 
@@ -464,9 +464,7 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
 int DaemonJob::SetState( string State )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SetState; JobDirectory empty" );
-
  int Value = UpdateJob( State, "", "", "", "" ); 
-
  VERBOSE_DEBUG_LOG_RETURN( Value, "DaemonJob::SetState; Returned " << Value );
 }
 
@@ -475,9 +473,7 @@ int DaemonJob::SetState( string State )
 int DaemonJob:: SetJobSpecifics( string Specs )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SetJobSpecifics; JobDirectory empty" );
-
  int Value = UpdateJob( "", "", "", "", Specs ); 
-
  VERBOSE_DEBUG_LOG_RETURN( Value, "DaemonJob::SetJobSpecifics; Returned " << Value );
 }
 
@@ -486,9 +482,7 @@ int DaemonJob:: SetJobSpecifics( string Specs )
 int DaemonJob::SetTargetResources( string Resources )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SetTargetResources; JobDirectory empty" );
-
  int Value = UpdateJob( "", Resources, "", "", "" ); 
-
  VERBOSE_DEBUG_LOG_RETURN( Value, "DaemonJob::SetTargetResources; Returned " << Value );
 }
 
@@ -497,9 +491,7 @@ int DaemonJob::SetTargetResources( string Resources )
 int DaemonJob::SetInput( string Input )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SetInput; JobDirectory empty" );
-
  int Value = UpdateJob( "", "", Input, "", "" ); 
-
  VERBOSE_DEBUG_LOG_RETURN( Value, "DaemonJob::SetInput; Returned " << Value );
 }
 
@@ -508,9 +500,7 @@ int DaemonJob::SetInput( string Input )
 int DaemonJob::SetOutput( string Output )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SetOutput; JobDirectory empty" );
-
  int Value = UpdateJob( "", "", "", Output, "" ); 
-
  VERBOSE_DEBUG_LOG_RETURN( Value, "DaemonJob::SetOutput; Returned " << Value );
 }
 
