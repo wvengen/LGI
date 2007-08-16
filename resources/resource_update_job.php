@@ -30,10 +30,10 @@ if( !Resource_Has_Job_Locked( $ResourceData, $JobId ) )
  return( LGI_Error_Response( 14, $ErrorMsgs[ 14 ], "" ) ); 
 
 // start building the update query based on the posted fields...
-$UpdateQuery = "UPDATE job_queue SET job_id=".$JobId;
+$UpdateQuery = "UPDATE job_queue SET job_id=".$JobId.", state_time_stamp=UNIX_TIMESTAMP()";
 
 if( isset( $_POST[ "state" ] ) && ( $_POST[ "state" ] != "" ) )
- $UpdateQuery .= ", state_time_stamp=UNIX_TIMESTAMP(), state='".mysql_escape_string( $_POST[ "state" ] )."'";
+ $UpdateQuery .= ", state='".mysql_escape_string( $_POST[ "state" ] )."'";
 
 if( isset( $_POST[ "target_resources" ] ) && ( $_POST[ "target_resources" ] != "" ) )
 {
