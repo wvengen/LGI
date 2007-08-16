@@ -101,11 +101,18 @@ class DaemonJob
               string GetCertificateFile( void );
               string GetCACertificateFile( void );
 
-              void   SetJobSpecifics( string Specs );
-              void   SetTargetResources( string Resources ); 
-              void   SetInput( string Input );
-              void   SetOutput( string Output );
-              void   SetState( string State );
+              int    SetJobSpecifics( string Specs );
+              int    SetTargetResources( string Resources ); 
+              int    SetInput( string Input );
+              int    SetOutput( string Output );
+              int    SetState( string State );
+
+              void   UpdateJobFromServer( void );
+
+              int    LockJob( void );
+              int    UnLockJob( void );
+              int    SignOn( void );
+              int    SignOff( void );
 
        protected:
 

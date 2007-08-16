@@ -174,6 +174,8 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "owners" ) ), JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "read_access" ) ), JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "job_specifics" ) ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE );
+ WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "state" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
+ WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "state_time_stamp" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
 
  HexBin( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "input" ) ), TheScript );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
@@ -181,9 +183,6 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  HexBin( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "output" ) ), TheScript );
  WriteStringToFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
 
- WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "state" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
- WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "state_time_stamp" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
- 
  // finally also dump the scripts there...
 
  TheScript = ReadStringFromFile( Application.Job_Check_Limits_Script() );
@@ -354,7 +353,6 @@ string DaemonJob::GetState( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetState; JobDirectory empty" );
  string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
- /* .................... */
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetState; Returned " << Data );
 }
 
@@ -364,7 +362,6 @@ string DaemonJob::GetStateTimeStamp( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetStateTimeStamp; JobDirectory empty" );
  string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
- /* .................... */
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetStateTimeStamp; Returned " << Data );
 }
 
@@ -384,28 +381,70 @@ void DaemonJob::CleanUpJobDirectory( void )
 
 // -----------------------------------------------------------------------------
 
-void DaemonJob:: SetJobSpecifics( string Specs )
+int DaemonJob:: SetState( string State )
 {
  /* .................... */
 }
 
 // -----------------------------------------------------------------------------
 
-void DaemonJob::SetTargetResources( string Resources )
+int DaemonJob:: SetJobSpecifics( string Specs )
 {
  /* .................... */
 }
 
 // -----------------------------------------------------------------------------
 
-void DaemonJob::SetInput( string Input )
+int DaemonJob::SetTargetResources( string Resources )
 {
  /* .................... */
 }
 
 // -----------------------------------------------------------------------------
 
-void DaemonJob::SetOutput( string Output )
+int DaemonJob::SetInput( string Input )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::SetOutput( string Output )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::LockJob( void )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::UnLockJob( void )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::SignOn( void )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::SignOff( void )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+void DaemonJob::UpdateJobFromServer( void )
 {
  /* .................... */
 }
