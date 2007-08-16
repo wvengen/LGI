@@ -64,8 +64,6 @@ class DaemonConfig
 
        protected:
 
-              string ReadStringFromFile( string FileName );
-
        string ConfigurationXML;
       };
 
@@ -78,6 +76,7 @@ class DaemonConfigProject
               DaemonConfigProject();
               DaemonConfigProject( DaemonConfig &TheConfig, int TheProjectNumber = 0 );
 
+              int    IsValidConfigured( void );
               string Project_Name( void );
               string Project_Master_Server( void );
               int    Number_Of_Applications( void );
@@ -100,6 +99,7 @@ class DaemonConfigProjectApplication
                DaemonConfigProjectApplication();
                DaemonConfigProjectApplication( DaemonConfigProject &TheProject, int TheApplicationNumber = 0 );
 
+               int    IsValidConfigured( void );
                string Application_Name( void );
                string Owner_Allow( void );
                string Owner_Deny( void );
@@ -116,6 +116,11 @@ class DaemonConfigProjectApplication
 
        string ApplicationCache;
       };
+
+// -----------------------------------------------------------------------------
+
+string ReadStringFromFile( string FileName );
+void   WriteStringToFile( string String, string FileName );
 
 // -----------------------------------------------------------------------------
 

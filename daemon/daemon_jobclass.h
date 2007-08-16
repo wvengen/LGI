@@ -67,6 +67,10 @@ using namespace std;
 #define LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT          "LGI_job_epilogue_script"
 #define LGI_JOBDAEMON_JOB_ABORT_SCRIPT             "LGI_job_abort_script"
 
+#define LGI_JOBDAEMON_KEY_FILE                     "LGI_key_file"
+#define LGI_JOBDAEMON_CERTIFICATE_FILE             "LGI_certificate_file"
+#define LGI_JOBDAEMON_CA_CERTIFICATE_FILE          "LGI_ca_certificate_file"
+
 // -----------------------------------------------------------------------------
 
 class DaemonJob
@@ -87,18 +91,21 @@ class DaemonJob
               string GetJobId( void );
               string GetOwners( void );
               string GetReadAccess( void );
-              string GetJobSpecifics( void );
-              string GetTargetResources( void );
-              string GetInput( void );
-              string GetOutput( void );
-              string GetState( void );
-              string GetStateTimeStamp( void );
+              string GetJobSpecifics( void );          
+              string GetTargetResources( void );       
+              string GetInput( void );                 
+              string GetOutput( void );                
+              string GetState( void );                 
+              string GetStateTimeStamp( void );        
+              string GetKeyFile( void );
+              string GetCertificateFile( void );
+              string GetCACertificateFile( void );
 
-       private:
-
-              string ReadStringFromHashedFile( string FileName );
-              string ReadStringFromFile( string FileName );
-              void   WriteStringToHashedFile( string String, string FileName );
+              void   SetJobSpecifics( string Specs );
+              void   SetTargetResources( string Resources ); 
+              void   SetInput( string Input );
+              void   SetOutput( string Output );
+              void   SetState( string State );
 
        protected:
 
@@ -107,7 +114,9 @@ class DaemonJob
 
 // -----------------------------------------------------------------------------
 
-int UnlinkDirectoryRecursively( string Directory );
+int    UnlinkDirectoryRecursively( string Directory );
+string ReadStringFromHashedFile( string FileName );
+void   WriteStringToHashedFile( string String, string FileName );
 
 // -----------------------------------------------------------------------------
 

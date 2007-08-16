@@ -95,6 +95,10 @@ DaemonJob::DaemonJob( string TheJobDirectory )
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_RUN_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_ABORT_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
 
+ if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_KEY_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CA_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+
  // all files are there and are okay... accept the job directory...
 
  JobDirectory = TheJobDirectory;
@@ -170,7 +174,13 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "owners" ) ), JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "read_access" ) ), JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "job_specifics" ) ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE );
- WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "input" ) ), JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
+
+ HexBin( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "input" ) ), TheScript );
+ WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
+
+ HexBin( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "output" ) ), TheScript );
+ WriteStringToFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "state" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "state_time_stamp" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
  
@@ -197,71 +207,12 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  TheScript = ReadStringFromFile( Application.Job_Abort_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT );
 
+ // and finally write the SSL config too...
+ WriteStringToHashedFile( TheConfig.Resource_Key_File(), JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE );
+ WriteStringToHashedFile( TheConfig.Resource_Certificate_File(), JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE );
+ WriteStringToHashedFile( TheConfig.CA_Certificate_File(), JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE );
+
  NORMAL_LOG( "DaemonJob::DaemonJob; Job with JobDirectory=" << JobDirectory << " has been setup" );
-}
-
-// -----------------------------------------------------------------------------
-
-string DaemonJob::ReadStringFromHashedFile( string FileName )
-{
- fstream HashFile( ( FileName + HASHFILE_EXTENTION ).c_str(), fstream::in );
- string Buffer, Line, TheHash;
-
- Buffer = ReadStringFromFile( FileName );
-
- BinHex( Hash( Buffer ), TheHash );
-
- getline( HashFile, Line );
-
- if( Line != TheHash )
- {
-  Buffer.clear();
-  CRITICAL_LOG_RETURN( Buffer, "DaemonJob::ReadStringFromHashedFile; Data read from file " << FileName << " does not match hash" );
- }
- 
- VERBOSE_DEBUG_LOG_RETURN( Buffer, "DaemonJob::ReadStringFromHashedFile; Data returned from file " << FileName << ":  " << Buffer );
-}
-
-// -----------------------------------------------------------------------------
-
-string DaemonJob::ReadStringFromFile( string FileName )
-{
- fstream File( FileName.c_str(), fstream::in );
- string Buffer, Line;
-
- Buffer.reserve( 1024 );
- Buffer.clear();
-
- getline( File, Line );
- while( File )
- {
-  Buffer.append( Line );
-  Buffer.push_back( '\n' );
-  getline( File, Line );
- }
-
- if( Buffer.length() >= 1 )
-  Buffer = Buffer.substr( 0, Buffer.length() - 1 );
- else
-  Buffer.clear();
-
- VERBOSE_DEBUG_LOG_RETURN( Buffer, "DaemonJob::ReadStringFromFile; Data returned from file " << FileName << ":  " << Buffer );
-}
-
-// -----------------------------------------------------------------------------
- 
-void DaemonJob::WriteStringToHashedFile( string String, string FileName )
-{
- fstream File( FileName.c_str(), fstream::out );
- fstream HashFile( ( FileName + HASHFILE_EXTENTION ).c_str(), fstream::out );
- string  TheHash;
-
- BinHex( Hash( String ), TheHash );
-
- File << String;
- HashFile << TheHash;
- 
- VERBOSE_DEBUG_LOG( "DaemonJob::WriteStringToHashedFile; Wrote file " << FileName << " with String=" << String );
 }
 
 // -----------------------------------------------------------------------------
@@ -372,10 +323,38 @@ string DaemonJob::GetOutput( void )
 
 // -----------------------------------------------------------------------------
 
+string DaemonJob::GetKeyFile( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetKeyFile; JobDirectory empty" );
+ string Data = ReadStringFromFile( JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetKeyFile; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetCertificateFile( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetCertificateFile; JobDirectory empty" );
+ string Data = ReadStringFromFile( JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetCertificateFile; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetCACertificateFile( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetCACertificateFile; JobDirectory empty" );
+ string Data = ReadStringFromFile( JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetCACertificateFile; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
 string DaemonJob::GetState( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetState; JobDirectory empty" );
  string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
+ /* .................... */
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetState; Returned " << Data );
 }
 
@@ -385,6 +364,7 @@ string DaemonJob::GetStateTimeStamp( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetStateTimeStamp; JobDirectory empty" );
  string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
+ /* .................... */
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetStateTimeStamp; Returned " << Data );
 }
 
@@ -400,6 +380,72 @@ void DaemonJob::CleanUpJobDirectory( void )
   NORMAL_LOG( "DaemonJob::CleanUpJobDirectory; Cleaned up job from directory JobDirectory=" << JobDirectory );
 
  JobDirectory.empty();
+}
+
+// -----------------------------------------------------------------------------
+
+void DaemonJob:: SetJobSpecifics( string Specs )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+void DaemonJob::SetTargetResources( string Resources )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+void DaemonJob::SetInput( string Input )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+void DaemonJob::SetOutput( string Output )
+{
+ /* .................... */
+}
+
+// -----------------------------------------------------------------------------
+
+string ReadStringFromHashedFile( string FileName )
+{
+ fstream HashFile( ( FileName + HASHFILE_EXTENTION ).c_str(), fstream::in );
+ string Buffer, Line, TheHash;
+
+ Buffer = ReadStringFromFile( FileName );
+
+ BinHex( Hash( Buffer ), TheHash );
+
+ getline( HashFile, Line );
+
+ if( Line != TheHash )
+ {
+  Buffer.clear();
+  CRITICAL_LOG_RETURN( Buffer, "ReadStringFromHashedFile; Data read from file " << FileName << " does not match hash" );
+ }
+
+ VERBOSE_DEBUG_LOG_RETURN( Buffer, "ReadStringFromHashedFile; Data returned from file " << FileName << ": " << Buffer );
+}
+
+// -----------------------------------------------------------------------------
+
+void WriteStringToHashedFile( string String, string FileName )
+{
+ fstream File( FileName.c_str(), fstream::out );
+ fstream HashFile( ( FileName + HASHFILE_EXTENTION ).c_str(), fstream::out );
+ string  TheHash;
+
+ BinHex( Hash( String ), TheHash );
+
+ File << String;
+ HashFile << TheHash;
+
+ VERBOSE_DEBUG_LOG( "WriteStringToHashedFile; Wrote file " << FileName << " with String=" << String );
 }
 
 // -----------------------------------------------------------------------------
