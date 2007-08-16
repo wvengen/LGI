@@ -81,9 +81,9 @@ class DaemonJob
               DaemonJob( string TheJobDirectory );
               DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber );
 
-              void CleanUpJobDirectory( void );
+              void CleanUpJobDirectory( void );             // remove job directory
 
-              string GetJobDirectory( void );
+              string GetJobDirectory( void );               // retrieve data from job directory
               string GetProject( void );
               string GetThisProjectServer( void );
               string GetProjectMasterServer( void );
@@ -91,28 +91,30 @@ class DaemonJob
               string GetJobId( void );
               string GetOwners( void );
               string GetReadAccess( void );
-              string GetJobSpecifics( void );          
-              string GetTargetResources( void );       
-              string GetInput( void );                 
-              string GetOutput( void );                
-              string GetState( void );                 
-              string GetStateTimeStamp( void );        
+              string GetJobSpecifics( void );               // volatile data
+              string GetTargetResources( void );            // volatile data
+              string GetInput( void );                      // volatile data
+              string GetOutput( void );                     // volatile data
+              string GetState( void );                      // volatile data
+              string GetStateFromServer( void );            // volatile data
+              string GetStateTimeStamp( void );             // volatile data
+              string GetStateTimeStampFromServer( void );   // volatile data
               string GetKeyFile( void );
               string GetCertificateFile( void );
               string GetCACertificateFile( void );
 
-              int    SetJobSpecifics( string Specs );
-              int    SetTargetResources( string Resources ); 
-              int    SetInput( string Input );
-              int    SetOutput( string Output );
-              int    SetState( string State );
+              int  SetJobSpecifics( string Specs );       // set data in directory and post to server
+              int  SetTargetResources( string Resources ); 
+              int  SetInput( string Input );
+              int  SetOutput( string Output );
+              int  SetState( string State );
 
-              void   UpdateJobFromServer( void );
+              void UpdateJobFromServer( void );           // reset the above volatile marked data from server
 
-              int    LockJob( void );
-              int    UnLockJob( void );
-              int    SignOn( void );
-              int    SignOff( void );
+              int  LockJob( void );                       // handy for scheduling per job
+              int  UnLockJob( void );
+              int  SignOn( void );
+              int  SignOff( void );
 
        protected:
 

@@ -367,6 +367,26 @@ string DaemonJob::GetStateTimeStamp( void )
 
 // -----------------------------------------------------------------------------
 
+string DaemonJob::GetStateFromServer( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetStateFromServer; JobDirectory empty" );
+ string Data;
+ /* .................... */
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetStateFromServer; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetStateTimeStampFromServer( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetStateTimeStampFromServer; JobDirectory empty" );
+ string Data;
+ /* .................... */
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetStateTimeStampFromServer; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
 void DaemonJob::CleanUpJobDirectory( void )
 {
  if( JobDirectory.empty() ) { CRITICAL_LOG( "DaemonJob::CleanUpJobDirectory; JobDirectory empty" ); return; }
