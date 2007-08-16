@@ -38,6 +38,7 @@
 #include "binhex.h"
 #include "hash.h"
 #include "daemon_configclass.h"
+#include "resource_server_api.h"
 
 using namespace std;
 
@@ -103,17 +104,18 @@ class DaemonJob
               string GetCertificateFile( void );
               string GetCACertificateFile( void );
 
-              int  SetJobSpecifics( string Specs );       // set data in directory and post to server
+              int  SetJobSpecifics( string Specs );         // set data in directory and post to server
               int  SetTargetResources( string Resources ); 
               int  SetInput( string Input );
               int  SetOutput( string Output );
               int  SetState( string State );
+              int  UpdateJob( string State, string Resources, string Input, string Output, string Specs );           
 
-              void UpdateJobFromServer( void );           // reset the above volatile marked data from server
+              int  UpdateJobFromServer( void );            // reset the above volatile marked data from server
 
-              int  LockJob( void );                       // handy for scheduling per job
+              int  LockJob( void );                        // handy for scheduling per job
               int  UnLockJob( void );
-              int  SignOn( void );
+              int  SignUp( void );
               int  SignOff( void );
 
        protected:
