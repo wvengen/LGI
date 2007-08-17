@@ -381,7 +381,7 @@ string DaemonJob::GetStateFromServer( void )
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
  } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
  
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( Response, "DaemonJob::GetStateFromServer; Error from server Response=" << Response );
+ if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( "", "DaemonJob::GetStateFromServer; Error from server Response=" << Response );
 
  Response = Parse_XML( Parse_XML( Response, "job" ), "state" );
 
@@ -404,7 +404,7 @@ string DaemonJob::GetStateTimeStampFromServer( void )
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
  } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
 
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( Response, "DaemonJob::GetStateTimeStampFromServer; Error from server Response=" << Response );
+ if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( "", "DaemonJob::GetStateTimeStampFromServer; Error from server Response=" << Response );
 
  Response = Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" );
 
@@ -432,11 +432,14 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; JobDirectory empty" );
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
- string Response, Data;
+ string Response, Data, HexedInput, HexedOutput;
+
+ if( !Input.empty() ) BinHex( Input, HexedInput );
+ if( !Output.empty() ) BinHex( Output, HexedOutput );
 
  do
  {
-  if( Server.Resource_Update_Job( Response, GetThisProjectServer(), GetProject(), GetJobId(), State, Resources, Input, Output, Specs ) )
+  if( Server.Resource_Update_Job( Response, GetThisProjectServer(), GetProject(), GetJobId(), State, Resources, HexedInput, HexedOutput, Specs ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
  } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );

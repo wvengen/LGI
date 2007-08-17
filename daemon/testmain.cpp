@@ -69,15 +69,22 @@ int main_4( int *argc, char *argv[] )
  }
  
  ServerAPI.Resource_SignOff_Resource( Response, MyProject.Project_Master_Server(), MyProject.Project_Name() );
-
+ 
  for( i = 0; i < JobList.size(); ++i )
   JobList2.push_back( DaemonJob( JobList[ i ].GetJobDirectory() ) );
 
  for( i = 0; i < JobList.size(); ++i )
  {
-  cout << "Cleaning up job " << JobList2[ i ].GetJobId() << endl;
-  JobList2[ i ].CleanUpJobDirectory();
+  if( !JobList2[ i ].SignUp() ) cout << "Error SignUp: ";
+  cout << "Cleaning up job in db " << JobList2[ i ].GetJobId() << " server state: " << JobList2[ i ].GetStateFromServer() << "  : ";
+  if( !JobList2[ i ].LockJob() ) cout << "Error 1 ";
+  if( !JobList2[ i ].UpdateJob( "queued", "any", "mark", "somers", "no specs" ) ) cout << "Error 2 ";
+  if( !JobList2[ i ].UpdateJobFromServer() ) cout << "Error 3 ";
+  if( !JobList2[ i ].UnLockJob() ) cout << "Error 4 ";
+  if( !JobList2[ i ].SignOff() ) cout << "Error signup ";
+  JobList2[ i ].CleanUpJobDirectory(); cout << endl;
  }
+
 }
 
 
