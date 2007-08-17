@@ -683,9 +683,10 @@ int DaemonJob::RunJobRunScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobRunScript; JobDirectory empty" );
 
- if( fork() == 0 )       // fork and child is going to start the script...
+ if( fork() == 0 )   // fork and child is going to start the script...
  {
-  int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str() );
+  // int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str() );
+  int Value = execl( "/bin/sh", "sh", "-c", ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str(), NULL );
   _exit( Value );
  }
 

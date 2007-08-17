@@ -83,7 +83,7 @@ int main_4( int *argc, char *argv[] )
   if( !JobList2[ i ].UnLockJob() ) cout << "Error 4 ";
   if( !JobList2[ i ].SignOff() ) cout << "Error signup ";
   cout << " JobRunScript: " << JobList2[ i ].RunJobRunScript() << endl;
-  JobList2[ i ].CleanUpJobDirectory();
+  // JobList2[ i ].CleanUpJobDirectory();
  }
 
 }
