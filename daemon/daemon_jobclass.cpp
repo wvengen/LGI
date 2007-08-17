@@ -682,10 +682,14 @@ int DaemonJob::RunJobEpilogueScript( void )
 int DaemonJob::RunJobRunScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobRunScript; JobDirectory empty" );
- /* ................. */
- int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str() );
- /* ................. */
- NORMAL_LOG_RETURN( Value, "DamonJob::RunJobRunScript; Returned " << Value );
+
+ if( fork() == 0 )       // fork and child is going to start the script...
+ {
+  int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str() );
+  _exit( Value );
+ }
+
+ NORMAL_LOG_RETURN( 0, "DamonJob::RunJobRunScript; Script started on background" );
 }
 
 // -----------------------------------------------------------------------------

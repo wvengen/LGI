@@ -1,2 +1,3 @@
 #!/bin/sh
-/bin/true
+sleep 300
+true
