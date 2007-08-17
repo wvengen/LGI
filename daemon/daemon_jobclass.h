@@ -139,6 +139,4 @@ void   WriteStringToHashedFile( string String, string FileName );
 
 // -----------------------------------------------------------------------------
 
-
-
 #endif
