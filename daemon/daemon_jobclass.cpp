@@ -186,7 +186,7 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  // finally also dump the scripts there...
 
  TheScript = ReadStringFromFile( Application.Job_Check_Limits_Script() );
- WriteStringToHashedFile( TheHash, JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT );
+ WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT );
  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
 
  TheScript = ReadStringFromFile( Application.Job_Check_Running_Script() );
