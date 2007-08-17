@@ -118,6 +118,14 @@ class DaemonJob
               int  SignUp( void );
               int  SignOff( void );
 
+              int  RunJobCheckLimitsScript( void );         // the check scripts
+              int  RunJobCheckRunnigScript( void );
+              int  RunJobCheckFinishedScript( void );
+              int  RunJobPrologueScript( void );            // the run scripts
+              int  RunJobEpilogueScript( void );
+              int  RunJobAbortScript( void );
+              int  RunJobRunScript( void );
+
        protected:
 
        string JobDirectory;

@@ -187,24 +187,31 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
 
  TheScript = ReadStringFromFile( Application.Job_Check_Limits_Script() );
  WriteStringToHashedFile( TheHash, JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
 
  TheScript = ReadStringFromFile( Application.Job_Check_Running_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
 
  TheScript = ReadStringFromFile( Application.Job_Check_Finished_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
 
  TheScript = ReadStringFromFile( Application.Job_Prologue_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
 
  TheScript = ReadStringFromFile( Application.Job_Run_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
 
  TheScript = ReadStringFromFile( Application.Job_Epilogue_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
 
  TheScript = ReadStringFromFile( Application.Job_Abort_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
 
  // and finally write the SSL config too...
  WriteStringToHashedFile( TheConfig.Resource_Key_File(), JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE );
@@ -623,6 +630,71 @@ int DaemonJob::UpdateJobFromServer( void )
  WriteStringToFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::UpDateJobFromServer; Response=" << Response << " returned 1" );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::RunJobCheckLimitsScript( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobCheckLimitsScript; JobDirectory empty" );
+ int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).c_str() );
+ NORMAL_LOG_RETURN( Value, "DamonJob::RunJobCheckLimitsScript; Returned " << Value );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::RunJobCheckRunnigScript( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobCheckRunningScript; JobDirectory empty" );
+ int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).c_str() );
+ NORMAL_LOG_RETURN( Value, "DamonJob::RunJobCheckRunningScript; Returned " << Value );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::RunJobCheckFinishedScript( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobCheckFinishedScript; JobDirectory empty" );
+ int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT ).c_str() );
+ NORMAL_LOG_RETURN( Value, "DamonJob::RunJobCheckFinishedScript; Returned " << Value );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::RunJobPrologueScript( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobPrologueScript; JobDirectory empty" );
+ int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT ).c_str() );
+ NORMAL_LOG_RETURN( Value, "DamonJob::RunJobPrologueScript; Returned " << Value );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::RunJobEpilogueScript( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobEpilogueScript; JobDirectory empty" );
+ int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT ).c_str() );
+ NORMAL_LOG_RETURN( Value, "DamonJob::RunJobEpilogueScript; Returned " << Value );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::RunJobRunScript( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobRunScript; JobDirectory empty" );
+ /* ................. */
+ int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str() );
+ /* ................. */
+ NORMAL_LOG_RETURN( Value, "DamonJob::RunJobRunScript; Returned " << Value );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::RunJobAbortScript( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobAbortScript; JobDirectory empty" );
+ int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).c_str() );
+ NORMAL_LOG_RETURN( Value, "DamonJob::RunJobAbortScript; Returned " << Value );
 }
 
 // -----------------------------------------------------------------------------
