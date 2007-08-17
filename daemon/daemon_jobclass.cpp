@@ -697,7 +697,7 @@ int DaemonJob::RunJobRunScript( void )
   _exit( Value );
  }
 
- NORMAL_LOG_RETURN( 0, "DamonJob::RunJobRunScript; Script started on background" );
+ NORMAL_LOG_RETURN( 1, "DamonJob::RunJobRunScript; Script started on background" );
 }
 
 // -----------------------------------------------------------------------------
