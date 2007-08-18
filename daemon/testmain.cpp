@@ -1,5 +1,8 @@
 #include <cstdlib>
 
+#include <list>
+#include <map>
+
 #include "logger.h"
 #include "resource_server_api.h"
 #include "xml.h"
@@ -32,6 +35,9 @@ int main_4( int *argc, char *argv[] )
  vector<DaemonJob> JobList, JobList2;
  string Response, Response2, Attributes, Job_Id;
  int StartStop, NrOfJobs, i;
+
+ multimap<string,DaemonJob*> MyMap;
+ map<string,DaemonJob*> MySecondMap;
 
  InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
  // InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
