@@ -12,7 +12,18 @@
 #include "daemon_configclass.h"
 #include "daemon_jobclass.h"
 
-#define main_4 main
+#define main_6 main
+
+int main_6( int *argc, char *argv[] )
+{
+ multimap<string,string> MyMap;
+ MyMap.insert( pair<string,string>("a","A") );
+ MyMap.insert( pair<string,string>("a","B") );
+ MyMap.insert( pair<string,string>("b","B") );
+ MyMap.insert( pair<string,string>("b","C") );
+ 
+ cout << (*MyMap.find( "a" )).first << endl;
+}
 
 int main_5( int *argc, char *argv[] )
 { 
@@ -35,9 +46,6 @@ int main_4( int *argc, char *argv[] )
  vector<DaemonJob> JobList, JobList2;
  string Response, Response2, Attributes, Job_Id;
  int StartStop, NrOfJobs, i;
-
- multimap<string,DaemonJob*> MyMap;
- map<string,DaemonJob*> MySecondMap;
 
  InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
  // InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
