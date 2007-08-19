@@ -16,13 +16,21 @@
 
 int main_6( int *argc, char *argv[] )
 {
- multimap<string,string> MyMap;
- MyMap.insert( pair<string,string>("a","A") );
- MyMap.insert( pair<string,string>("a","B") );
- MyMap.insert( pair<string,string>("b","B") );
- MyMap.insert( pair<string,string>("b","C") );
- 
- cout << (*MyMap.find( "a" )).first << endl;
+ map< string, list< string > > MyMap;
+
+ MyMap[ "a" ].insert( MyMap[ "a" ].begin(), "teststring" );
+ MyMap[ "a" ].insert( MyMap[ "a" ].begin(), "teststring 2" );
+ MyMap[ "a" ].insert( MyMap[ "a" ].begin(), "teststring 3" );
+ MyMap[ "b" ].insert( MyMap[ "b" ].begin(), "teststring 4" );
+ MyMap[ "b" ].insert( MyMap[ "b" ].begin(), "teststring 5" );
+ MyMap[ "b" ].insert( MyMap[ "b" ].begin(), "teststring 6" );
+
+ map< string, list< string > >::iterator m;
+ list< string >::iterator s;
+
+ for( m = MyMap.begin(); m != MyMap.end(); ++m )
+  for( s = m -> second.begin(); s != m -> second.end(); ++s )
+   cout << m -> first << ": " << (*s) << endl;
 }
 
 int main_5( int *argc, char *argv[] )
