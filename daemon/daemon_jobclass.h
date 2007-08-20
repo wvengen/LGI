@@ -46,6 +46,8 @@ using namespace std;
 
 #define HASHFILE_EXTENTION                         ".hash"
 
+// all files for job handeling in job directory...
+
 #define LGI_JOBDAEMON_PROJECT_FILE                 "LGI_project"
 #define LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE     "LGI_this_project_server"
 #define LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE   "LGI_project_master_server"
@@ -59,7 +61,6 @@ using namespace std;
 #define LGI_JOBDAEMON_OUTPUT_FILE                  "LGI_output"
 #define LGI_JOBDAEMON_STATE_FILE                   "LGI_state"
 #define LGI_JOBDAEMON_STATE_TIME_STAMP_FILE        "LGI_state_time_stamp"
-
 #define LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT      "LGI_job_check_limits_script"
 #define LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT     "LGI_job_check_running_script"
 #define LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT    "LGI_job_check_finished_script"
@@ -67,10 +68,37 @@ using namespace std;
 #define LGI_JOBDAEMON_JOB_RUN_SCRIPT               "LGI_job_run_script"
 #define LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT          "LGI_job_epilogue_script"
 #define LGI_JOBDAEMON_JOB_ABORT_SCRIPT             "LGI_job_abort_script"
-
 #define LGI_JOBDAEMON_KEY_FILE                     "LGI_key_file"
 #define LGI_JOBDAEMON_CERTIFICATE_FILE             "LGI_certificate_file"
 #define LGI_JOBDAEMON_CA_CERTIFICATE_FILE          "LGI_ca_certificate_file"
+
+// check values, a bit per file...
+
+#define LGI_JOBDAEMON_PROJECT_FILE_BIT_VALUE                1 
+#define LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE_BIT_VALUE    2
+#define LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE_BIT_VALUE  4
+#define LGI_JOBDAEMON_APPLICATION_FILE_BIT_VALUE            8
+#define LGI_JOBDAEMON_JOB_ID_FILE_BIT_VALUE                 16
+#define LGI_JOBDAEMON_OWNERS_FILE_BIT_VALUE                 32
+#define LGI_JOBDAEMON_READ_ACCESS_FILE_BIT_VALUE            64
+#define LGI_JOBDAEMON_JOB_SPECIFICS_FILE_BIT_VALUE          128
+#define LGI_JOBDAEMON_TARGET_RESOURCES_FILE_BIT_VALUE       256
+#define LGI_JOBDAEMON_INPUT_FILE_BIT_VALUE                  512
+#define LGI_JOBDAEMON_OUTPUT_FILE_BIT_VALUE                 1024
+#define LGI_JOBDAEMON_STATE_FILE_BIT_VALUE                  2048
+#define LGI_JOBDAEMON_STATE_TIME_STAMP_FILE_BIT_VALUE       4096
+#define LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT_BIT_VALUE     8192
+#define LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT_BIT_VALUE    16384
+#define LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT_BIT_VALUE   32768
+#define LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT_BIT_VALUE         65536
+#define LGI_JOBDAEMON_JOB_RUN_SCRIPT_BIT_VALUE              131072
+#define LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT_BIT_VALUE         262144
+#define LGI_JOBDAEMON_JOB_ABORT_SCRIPT_BIT_VALUE            524288
+#define LGI_JOBDAEMON_KEY_FILE_BIT_VALUE                    1048576
+#define LGI_JOBDAEMON_CERTIFICATE_FILE_BIT_VALUE            2097152
+#define LGI_JOBDAEMON_CA_CERTIFICATE_FILE_BIT_VALUE         4194304
+
+#define LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER               8388607
 
 // -----------------------------------------------------------------------------
 
