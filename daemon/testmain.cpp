@@ -12,14 +12,14 @@
 #include "daemon_configclass.h"
 #include "daemon_jobclass.h"
 
-#define main_6 main
+#define main_4 main
 
 int main_6( int *argc, char *argv[] )
 {
- map< string, list< string > > MyMap;
+ map<string,list<string> > MyMap;
 
- MyMap[ "a" ].insert( MyMap[ "a" ].begin(), "teststring" );
- MyMap[ "a" ].insert( MyMap[ "a" ].begin(), "teststring 2" );
+ MyMap[ "a" ].insert( MyMap[ "a" ].begin(), "teststring 1" );
+ MyMap[ "c" ].insert( MyMap[ "c" ].begin(), "teststring 2" );
  MyMap[ "a" ].insert( MyMap[ "a" ].begin(), "teststring 3" );
  MyMap[ "b" ].insert( MyMap[ "b" ].begin(), "teststring 4" );
  MyMap[ "b" ].insert( MyMap[ "b" ].begin(), "teststring 5" );
