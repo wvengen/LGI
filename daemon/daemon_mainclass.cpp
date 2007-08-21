@@ -90,7 +90,7 @@ int Daemon::ScanDirectoryForJobs( string Directory )
 
     FileMask = ( LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER << 1 ) + 1;      // make sure we won't include it again...
 
-    if( !AddJobToDaemonLists( DaemonJob( Directory ) ) ) CRITICAL_LOG_RETURN( 0, "Daemon::ScanDirectoryForJobs; Could not add job with directory " << Directory << " into daemon lists" );
+    if( !AddJobToDaemonLists( DaemonJob( Directory ) ) ) { closedir( Dir ); CRITICAL_LOG_RETURN( 0, "Daemon::ScanDirectoryForJobs; Could not add job with directory " << Directory << " into daemon lists" ); }
    }
 
   }
