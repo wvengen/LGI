@@ -45,11 +45,14 @@ using namespace std;
 
 // -----------------------------------------------------------------------------
 
-class Daemon
+class Daemon : public DaemonConfig
       {
        public:
 
+               Daemon( string ConfigFile );
+
        protected:
+
       };
 
 // -----------------------------------------------------------------------------

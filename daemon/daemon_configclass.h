@@ -55,6 +55,8 @@ class DaemonConfig
               string Resource_Certificate_File( void );
               string Resource_Key_File( void );
               string RunDirectory( void );
+              string Owner_Allow( void );
+              string Owner_Deny( void );
               int    Number_Of_Projects( void );
 
               DaemonConfigProject Project( int Number );
@@ -79,6 +81,8 @@ class DaemonConfigProject
               int    IsValidConfigured( void );
               string Project_Name( void );
               string Project_Master_Server( void );
+              string Owner_Allow( void );
+              string Owner_Deny( void );
               int    Number_Of_Applications( void );
 
               DaemonConfigProjectApplication Application( int Number );
