@@ -3,7 +3,7 @@
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
-    | VERSION:    1.00, 14 August 2007.                       |
+    | VERSION:    1.00, 14 August 2007.                      |
     | USE:        Implements job class...                    |
     |                                                        |
    []--------------------------------------------------------[]
@@ -86,6 +86,8 @@ DaemonJob::DaemonJob( string TheJobDirectory )
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_READ_ACCESS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_STATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_STATE_TIME_STAMP_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_INPUT_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_SPECIFICS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
 
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
  if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
@@ -463,8 +465,11 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
  HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ), Data );
  WriteStringToHashedFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
 
- HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ), Data );
- WriteStringToFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+ if( !HexedOutput.empty() )      // only update output file if we posted output to server...
+ {
+  HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ), Data );
+  WriteStringToFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+ }
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::UpdateJob; Response=" << Response << " returned 1" );
 }
@@ -600,7 +605,7 @@ int DaemonJob::SignOff( void )
 
 // -----------------------------------------------------------------------------
 
-int DaemonJob::UpdateJobFromServer( void )
+int DaemonJob::UpdateJobFromServer( bool UpdateOutputToo )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; JobDirectory empty" );
 
@@ -626,8 +631,12 @@ int DaemonJob::UpdateJobFromServer( void )
  HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ), Data );
  WriteStringToHashedFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
 
- HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ), Data );
- WriteStringToFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+ // we do not update the output from server here by default...
+ if( UpdateOutputToo )
+ {
+  HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ), Data );
+  WriteStringToFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+ }
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::UpDateJobFromServer; Response=" << Response << " returned 1" );
 }

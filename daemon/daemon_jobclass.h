@@ -3,7 +3,7 @@
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
-    | VERSION:    1.00, 14 August 2007.                       |
+    | VERSION:    1.00, 14 August 2007.                      |
     | USE:        Implements job class...                    |
     |                                                        |
    []--------------------------------------------------------[]
@@ -139,7 +139,7 @@ class DaemonJob
               int  SetState( string State );
               int  UpdateJob( string State, string Resources, string Input, string Output, string Specs );           
 
-              int  UpdateJobFromServer( void );            // reset the above volatile marked data from server
+              int  UpdateJobFromServer( bool UpdateOutputToo = false ); // reset the above volatile marked data from server
 
               int  LockJob( void );                        // handy for scheduling per job
               int  UnLockJob( void );
