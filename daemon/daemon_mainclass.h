@@ -26,6 +26,8 @@
 #include <cstring>
 #include <cctype>
 #include <cstdio>
+#include <list>
+#include <map>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -53,6 +55,8 @@ class Daemon : public DaemonConfig
 
        protected:
 
+               map<string,list<DaemonJob> > Jobs;
+               map<string,int> Accounting;
       };
 
 // -----------------------------------------------------------------------------

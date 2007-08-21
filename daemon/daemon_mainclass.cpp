@@ -23,6 +23,8 @@
 
 Daemon::Daemon( string ConfigFile ) : DaemonConfig( ConfigFile )
 {
+ Jobs.clear(); Accounting.clear();
+ if( !IsValidConfigured() ) CRITICAL_LOG( "Daemon::Daemon; Configuration in file " << ConfigFile << " invalid" );
 }
 
 // -----------------------------------------------------------------------------

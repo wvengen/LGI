@@ -11,6 +11,7 @@
 #include "hash.h"
 #include "daemon_configclass.h"
 #include "daemon_jobclass.h"
+#include "daemon_mainclass.h"
 
 #define main_4 main
 
@@ -58,14 +59,14 @@ int main_4( int *argc, char *argv[] )
  InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
  // InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
  
- DaemonConfig Config( "LGI.cfg" );
+ Daemon MyDaemon( "LGI.cfg" );
 
- if( !Config.IsValidConfigured() ) CRITICAL_LOG_RETURN( 1, "Aborted because of bad config" );
+ if( !MyDaemon.IsValidConfigured() ) CRITICAL_LOG_RETURN( 1, "Aborted because of bad config" );
 
- MyProject = Config.Project( 1 );
+ MyProject = MyDaemon.Project( 1 );
  MyApplication = MyProject.Application( 1 );
 
- Resource_Server_API ServerAPI( Config.Resource_Key_File(), Config.Resource_Certificate_File(), Config.CA_Certificate_File() );
+ Resource_Server_API ServerAPI( MyDaemon.Resource_Key_File(), MyDaemon.Resource_Certificate_File(), MyDaemon.CA_Certificate_File() );
 
  ServerAPI.Resource_SignUp_Resource( Response, MyProject.Project_Master_Server(), MyProject.Project_Name() );
 
@@ -85,7 +86,7 @@ int main_4( int *argc, char *argv[] )
 
   Response2 = Parse_XML( Parse_XML( Response2, "LGI" ), "response" );
 
-  JobList.push_back( DaemonJob( Response2, Config, 1, 1 ) );
+  JobList.push_back( DaemonJob( Response2, MyDaemon, 1, 1 ) );
 
   ServerAPI.Resource_UnLock_Job( Response2, MyProject.Project_Master_Server(), MyProject.Project_Name(), Job_Id );
  }
