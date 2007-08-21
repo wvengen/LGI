@@ -24,27 +24,24 @@
 Daemon::Daemon( string ConfigFile ) : DaemonConfig( ConfigFile )
 {
  Jobs.clear(); Accounting.clear();
- if( !IsValidConfigured() ) CRITICAL_LOG( "Daemon::Daemon; Configuration in file " << ConfigFile << " invalid" );
+
+ if( !IsValidConfigured() ) { CRITICAL_LOG( "Daemon::Daemon; Configuration in file " << ConfigFile << " invalid" ); return;}
+
+ if( !ScanDirectoryForJobs( RunDirectory() ) ) { CRITICAL_LOG( "Daemon::Daemon; Error during scan of run directory " << RunDirectory() ); return; }
 }
 
 // -----------------------------------------------------------------------------
 
-int Daemon::ScanDirectoryForJobs( string Directory, bool CleanListsFirst )
+int Daemon::ScanDirectoryForJobs( string Directory )
 {
  struct dirent *Entry;
  DIR *Dir = opendir( Directory.c_str() );
  unsigned int FileMask = 0;
 
- if( CleanListsFirst && Jobs.empty() ) CRITICAL_LOG_RETURN( 0, "Daemon::ScanDirectoryForJobs; Daemon job list empty" );
-
  if( Dir == NULL ) CRITICAL_LOG_RETURN( 0, "Daemon::ScanDirectoryForJobs; Could not scan directory " << Directory );
 
- if( CleanListsFirst )
- { 
-  Jobs.clear();
-  Accounting.clear();
- }
- 
+ VERBOSE_DEBUG_LOG( "Daemon::ScanDirectoryForJobs; Scanning directory " << Directory << " for jobs" );
+
  while( ( Entry = readdir( Dir ) ) != NULL )
  {
   if( !strcmp( Entry -> d_name, "." ) ) continue;
@@ -52,7 +49,7 @@ int Daemon::ScanDirectoryForJobs( string Directory, bool CleanListsFirst )
 
   if( Entry -> d_type & DT_DIR )
   {
-   if( !ScanDirectoryForJobs( Directory + "/" + string( Entry -> d_name ), false ) ) 
+   if( !ScanDirectoryForJobs( Directory + "/" + string( Entry -> d_name ) ) ) 
    {
     closedir( Dir );
     return( 0 );
@@ -93,7 +90,7 @@ int Daemon::ScanDirectoryForJobs( string Directory, bool CleanListsFirst )
 
     FileMask = ( LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER << 1 ) + 1;      // make sure we won't include it again...
 
-    if( !AddJobToDaemonLists( DaemonJob( Directory ) ) ) CRITICAL_LOG_RETURN( 0, "Daemon::ScanDirectoryForJobs; Could not add job with directory " << Directory << " into daemin lists" );
+    if( !AddJobToDaemonLists( DaemonJob( Directory ) ) ) CRITICAL_LOG_RETURN( 0, "Daemon::ScanDirectoryForJobs; Could not add job with directory " << Directory << " into daemon lists" );
    }
 
   }
@@ -108,15 +105,14 @@ int Daemon::ScanDirectoryForJobs( string Directory, bool CleanListsFirst )
 int Daemon::AddJobToDaemonLists( DaemonJob Job )
 {
  string Project = Job.GetProject();
-
  string Ref = Project + " @ " + Job.GetThisProjectServer(); 
  
- if( !Jobs[ Ref ].empty() )          // try and find job first
+ if( !Jobs[ Ref ].empty() )          // try and find job first...
   for( list<DaemonJob>::iterator i = Jobs[ Ref ].begin(); i != Jobs[ Ref ].end(); ++i )
    if( i -> GetJobDirectory() == Job.GetJobDirectory() )
-    CRITICAL_LOG_RETURN( 0, "Daemon::AddJobToDaemonLists; Job was already added into the daemon lists" );
+    CRITICAL_LOG_RETURN( 0, "Daemon::AddJobToDaemonLists; Job with directory " << Job.GetJobDirectory() << " was already added into the daemon lists" );
  
- Jobs[ Ref ].insert( Jobs[ Ref ].end(), Job );
+ Jobs[ Ref ].insert( Jobs[ Ref ].end(), Job );  // if not found, add and account it...
 
  string Application = Job.GetApplication();
  vector<string> Owners = CommaSeparatedValues2Array( Job.GetOwners() );
@@ -128,13 +124,46 @@ int Daemon::AddJobToDaemonLists( DaemonJob Job )
   Accounting[ Owners[ i ] + ", " + Project + ", " + Application ]++;
  }
 
- DEBUG_LOG_RETURN( 1, "Daemon::AddJobToDaemonLists; Job added and accounted for" );
+ DEBUG_LOG_RETURN( 1, "Daemon::AddJobToDaemonLists; Job with directory " << Job.GetJobDirectory() << " added and accounted for" );
 }
 
 // -----------------------------------------------------------------------------
 
 int Daemon::RemoveJobFromDaemonLists( DaemonJob Job )
 {
+ if( Jobs.empty() ) CRITICAL_LOG_RETURN( 0, "Daemon::RemoveJobFromDaemonLists; Daemon lists empty" ); 
+
+ string Project = Job.GetProject();
+ string Ref = Project + " @ " + Job.GetThisProjectServer(); 
+ bool Found = false;
+ list<DaemonJob>::iterator Location;
+
+ // try and find the job first...
+ if( !Jobs[ Ref ].empty() )
+  for( Location = Jobs[ Ref ].begin(); Location != Jobs[ Ref ].end(); ++Location )
+   if( Location -> GetJobDirectory() == Job.GetJobDirectory() )
+   {
+    Found = true;
+    break;
+   }
+
+ if( !Found ) CRITICAL_LOG_RETURN( 0, "Daemon::RemoveJobFromDaemonLists; Job with directory " << Job.GetJobDirectory() << " not found in deamon lists" ); 
+
+ // update the accounting tables... 
+ string Application = Job.GetApplication();
+ vector<string> Owners = CommaSeparatedValues2Array( Job.GetOwners() );
+
+ for( int i = 0; i < Owners.size(); ++i )
+ {
+  Accounting[ Owners[ i ] ]--;
+  Accounting[ Owners[ i ] + ", " + Project ]--;
+  Accounting[ Owners[ i ] + ", " + Project + ", " + Application ]--;
+ }
+
+ // and now remove the job from the daemon lists...
+ Jobs[ Ref ].erase( Location );
+
+ DEBUG_LOG_RETURN( 1, "Daemon::RemoveJobFromDaemonLists; Job with directory " << Job.GetJobDirectory() << " removed and unaccounted for" );
 }
 
 // -----------------------------------------------------------------------------

@@ -55,7 +55,7 @@ class Daemon : public DaemonConfig
 
        protected:
                
-               int ScanDirectoryForJobs( string Directory, bool CleanListsFirst = true );
+               int ScanDirectoryForJobs( string Directory );
                int AddJobToDaemonLists( DaemonJob Job );
                int RemoveJobFromDaemonLists( DaemonJob Job );
 
