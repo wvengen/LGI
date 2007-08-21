@@ -13,7 +13,16 @@
 #include "daemon_jobclass.h"
 #include "daemon_mainclass.h"
 
-#define main_4 main
+#define main_7 main
+
+int main_7( int *argc, char *argv[] )
+{
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
+ 
+ Daemon MyDaemon( "LGI.cfg" );
+
+ if( !MyDaemon.IsValidConfigured() ) CRITICAL_LOG_RETURN( 1, "Aborted because of bad config" );
+}
 
 int main_6( int *argc, char *argv[] )
 {

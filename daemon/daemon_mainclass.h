@@ -54,9 +54,13 @@ class Daemon : public DaemonConfig
                Daemon( string ConfigFile );
 
        protected:
+               
+               int ScanDirectoryForJobs( string Directory, bool CleanListsFirst = true );
+               int AddJobToDaemonLists( DaemonJob Job );
+               int RemoveJobFromDaemonLists( DaemonJob Job );
 
-               map<string,list<DaemonJob> > Jobs;
-               map<string,int> Accounting;
+       map<string,list<DaemonJob> > Jobs;
+       map<string,int> Accounting;
       };
 
 // -----------------------------------------------------------------------------

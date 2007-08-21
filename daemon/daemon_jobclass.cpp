@@ -27,7 +27,7 @@ int UnlinkDirectoryRecursively( string Directory )
  struct dirent *Entry;
  DIR *Dir = opendir( Directory.c_str() );
 
- if( Dir == NULL ) return( 1 );
+ if( Dir == NULL ) return( 0 );
 
  while( ( Entry = readdir( Dir ) ) != NULL )
  {
@@ -38,17 +38,25 @@ int UnlinkDirectoryRecursively( string Directory )
 
   if( Entry -> d_type & DT_DIR )
   { 
-   if( UnlinkDirectoryRecursively( Name ) ) return( 1 );
+   if( UnlinkDirectoryRecursively( Name ) ) 
+   {
+    closedir( Dir );
+    return( 0 );
+   }
   }
   else
-   if( unlink( Name.c_str() ) ) return( 1 );
+   if( unlink( Name.c_str() ) )
+   {
+    closedir( Dir );
+    return( 0 );
+   }
  }
 
  closedir( Dir );
 
- if( rmdir( Directory.c_str() ) ) return( 1 );
+ if( rmdir( Directory.c_str() ) ) return( 0 );
 
- return( 0 );
+ return( 1 );
 }
 
 // -----------------------------------------------------------------------------
@@ -426,7 +434,7 @@ void DaemonJob::CleanUpJobDirectory( void )
 {
  if( JobDirectory.empty() ) { CRITICAL_LOG( "DaemonJob::CleanUpJobDirectory; JobDirectory empty" ); return; }
 
- if( UnlinkDirectoryRecursively( JobDirectory ) )
+ if( !UnlinkDirectoryRecursively( JobDirectory ) )
   CRITICAL_LOG( "DaemonJob::CleanUpJobDirectory; Error during cleanup of JobDirectory=" << JobDirectory )
  else
   NORMAL_LOG( "DaemonJob::CleanUpJobDirectory; Cleaned up job from directory JobDirectory=" << JobDirectory );
