@@ -13,11 +13,11 @@
 #include "daemon_jobclass.h"
 #include "daemon_mainclass.h"
 
-#define main_7 main
+#define main_4 main
 
 int main_7( int *argc, char *argv[] )
 {
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING|VERBOSE_DEBUG_LOGGING,"testmain.log");
  
  Daemon MyDaemon( "LGI.cfg" );
 
@@ -66,7 +66,6 @@ int main_4( int *argc, char *argv[] )
  int StartStop, NrOfJobs, i;
 
  InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
- // InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
  
  Daemon MyDaemon( "LGI.cfg" );
 
