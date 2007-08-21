@@ -1,4 +1,4 @@
-FLAGS=-O3
+FLAGS=-g
 CC=g++
 LD=g++
 

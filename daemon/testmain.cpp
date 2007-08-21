@@ -29,6 +29,27 @@ int main_7( int *argc, char *argv[] )
 
  for( map<string,int>::iterator s = MyDaemon.Accounting.begin(); s != MyDaemon.Accounting.end(); ++s )
   cout << "ACCOUTING FOR " << s -> first << " : " << s -> second << endl;
+
+ cout << " ------------- REMOVING -----------------" << endl;
+
+ for( map<string,list<DaemonJob> >::iterator s = MyDaemon.Jobs.begin(); s != MyDaemon.Jobs.end(); ++s )
+ {
+  int size = s -> second.size();
+  for( int j = 0; j < size; ++j )
+  {
+   cout << "REMOVING JOB : " << s -> second.begin() -> GetJobDirectory();
+   cout << " JOB REMOVED " << MyDaemon.RemoveJobFromDaemonLists( *(s -> second.begin()) ) << endl;
+  }
+ }
+
+ cout << " ------------- REMOVED -----------------" << endl;
+
+ for( map<string,list<DaemonJob> >::iterator s = MyDaemon.Jobs.begin(); s != MyDaemon.Jobs.end(); ++s )
+  for( list<DaemonJob>::iterator j = s -> second.begin(); j != s -> second.end(); ++j )
+   cout << "JOB: " << j -> GetJobDirectory() << endl;
+
+ for( map<string,int>::iterator s = MyDaemon.Accounting.begin(); s != MyDaemon.Accounting.end(); ++s )
+  cout << "ACCOUTING FOR " << s -> first << " : " << s -> second << endl;
 }
 
 int main_6( int *argc, char *argv[] )
