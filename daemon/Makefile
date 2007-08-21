@@ -15,7 +15,7 @@ testmain.x : ${OBJS}
 	${LD} ${FLAGS} -o $@ ${OBJS} ${LIBS}
 
 # dependancies...
-testmain.o : testmain.cpp logger.h resource_server_api.h binhex.h hash.h csv.h xml.h daemon_configclass.h daemon_jobclass.h
+testmain.o : testmain.cpp logger.h resource_server_api.h binhex.h hash.h csv.h xml.h daemon_configclass.h daemon_jobclass.h daemon_mainclass.h
 
 daemon_mainclass.o : daemon_mainclass.cpp daemon_mainclass.h daemon_jobclass.h daemon_configclass.h resource_server_api.h xml.h binhex.h csv.h hash.h
 
