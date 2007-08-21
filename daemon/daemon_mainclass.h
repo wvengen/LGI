@@ -53,7 +53,7 @@ class Daemon : public DaemonConfig
 
                Daemon( string ConfigFile );
 
-       protected:
+     //  protected:
                
                int ScanDirectoryForJobs( string Directory );
                int AddJobToDaemonLists( DaemonJob Job );

@@ -86,7 +86,7 @@ int Daemon::ScanDirectoryForJobs( string Directory )
    // if we have all the needed files...
    if( FileMask == LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER )
    {
-    DEBUG_LOG( "Daemon::ScanDirectoryForJobs; Found job directory " << Directory );
+    NORMAL_LOG( "Daemon::ScanDirectoryForJobs; Found job directory " << Directory );
 
     FileMask = ( LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER << 1 ) + 1;      // make sure we won't include it again...
 

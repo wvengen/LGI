@@ -17,11 +17,18 @@
 
 int main_7( int *argc, char *argv[] )
 {
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
  
  Daemon MyDaemon( "LGI.cfg" );
 
  if( !MyDaemon.IsValidConfigured() ) CRITICAL_LOG_RETURN( 1, "Aborted because of bad config" );
+
+ for( map<string,list<DaemonJob> >::iterator s = MyDaemon.Jobs.begin(); s != MyDaemon.Jobs.end(); ++s )
+  for( list<DaemonJob>::iterator j = s -> second.begin(); j != s -> second.end(); ++j )
+   cout << "JOB: " << j -> GetJobDirectory() << endl;
+
+ for( map<string,int>::iterator s = MyDaemon.Accounting.begin(); s != MyDaemon.Accounting.end(); ++s )
+  cout << "ACCOUTING FOR " << s -> first << " : " << s -> second << endl;
 }
 
 int main_6( int *argc, char *argv[] )
