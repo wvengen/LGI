@@ -185,26 +185,34 @@ int Daemon::CycleThroughJobs( void )
    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to " << Server -> first );
 
    if( !( ( Server -> second.begin() ) -> SignUp() ) ) continue;      // signup to project and server...
+   
+   VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to " << Server -> first );
 
    for( list<DaemonJob>::iterator Job = Server -> second.begin(); Job != Server -> second.end(); ++Job )
    {
+    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Get time stamp for job with directory " << Job -> GetJobDirectory() );
+
     string TimeStamp = Job -> GetStateTimeStampFromServer();          // get state time stamp on server of job...
 
     if( TimeStamp.empty() ) continue;
+    
+    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Obtained time stamp for job with directory " << Job -> GetJobDirectory() );
 
     if( TimeStamp != Job -> GetStateTimeStamp() )                     // server and job not synchronized...
     {
      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronizing job with directory " << Job -> GetJobDirectory() );
      if( !( Job -> LockJob() ) ) continue;                            // lock, update and unlock job...
      if( !( Job -> UpdateJobFromServer() ) ) continue;
-     Job -> UnLockJob();
+     if( !( Job -> UnLockJob() ) ) continue;
+     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronised job with directory " << Job -> GetJobDirectory() );
     }
     else
      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << Job -> GetJobDirectory() << " was up to date" );
    }
 
    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signing off from " << Server -> first );
-   ( Server -> second.begin() ) -> SignOff();                      // signoff from server...
+   if( !( ( Server -> second.begin() ) -> SignOff() ) ) continue;                      // signoff from server...
+   VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed off from " << Server -> first );
   }
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with job scripts cycle" );
@@ -231,6 +239,7 @@ int Daemon::CycleThroughJobs( void )
       if( !TempJob.UnLockJob() ) continue;
       if( !TempJob.SignOff() ) continue;
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
+      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Aborted job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
      }
     }
@@ -246,11 +255,13 @@ int Daemon::CycleThroughJobs( void )
       if( !TempJob.UnLockJob() ) continue;
       if( !TempJob.SignOff() ) continue;
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
+      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Finished job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
      }
      else                                                         // the job was not running and was not finished...
      {
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " was found inactive" );
+
       if( TempJob.RunJobPrologueScript() )                        // then run job after prologue finished...
       {
        TempJob.RunJobRunScript();
@@ -261,5 +272,5 @@ int Daemon::CycleThroughJobs( void )
    }
   }
 
- NORMAL_LOG_RETURN( 1, "Daemon::CycleThroughJobs; Cycle done" ); 
+ NORMAL_LOG_RETURN( 1, "Daemon::CycleThroughJobs; Scheduling cycle through jobs done" ); 
 }
