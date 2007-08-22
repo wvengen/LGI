@@ -661,7 +661,7 @@ int DaemonJob::RunJobCheckLimitsScript( void )
 
 // -----------------------------------------------------------------------------
 
-int DaemonJob::RunJobCheckRunnigScript( void )
+int DaemonJob::RunJobCheckRunningScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobCheckRunningScript; JobDirectory empty" );
  if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::RunJobCheckRunningScript; Script seems corrupt, refusing to run it" );

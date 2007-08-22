@@ -147,7 +147,7 @@ class DaemonJob
               int  SignOff( void );
 
               int  RunJobCheckLimitsScript( void );         // the check scripts
-              int  RunJobCheckRunnigScript( void );
+              int  RunJobCheckRunningScript( void );
               int  RunJobCheckFinishedScript( void );
               int  RunJobPrologueScript( void );            // the run scripts
               int  RunJobEpilogueScript( void );
