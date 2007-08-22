@@ -428,12 +428,34 @@ int Daemon::RequestWorkCycle( void )
 
 int Daemon::IsOwnerDenied( string Owner, DaemonConfigProject &Project, DaemonConfigProjectApplication &Application )
 {
+ vector<string> ConfigOwners = CommaSeparatedValues2Array( Owner_Deny() );
+
+ for( int i = 0; i < ConfigOwners.size(); ++i )
+  if( Owner == ConfigOwners[ i ] ) return( 1 );
+
+ vector<string> ProjectOwners = CommaSeparatedValues2Array( Project.Owner_Deny() );
+
+ for( int i = 0; i < ProjectOwners.size(); ++i )
+  if( Owner == ProjectOwners[ i ] ) return( 1 );
+
+ vector<string> ApplicationOwners = CommaSeparatedValues2Array( Application.Owner_Deny() );
+
+ for( int i = 0; i < ApplicationOwners.size(); ++i )
+  if( Owner == ApplicationOwners[ i ] ) return( 1 );
+
+ return( 0 );
 }
 
 // -----------------------------------------------------------------------------
 
 int Daemon::IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, DaemonConfigProjectApplication &Application )
 {
+ string Limit = NormalizeString( Parse_XML( Owner_Allow(), Owner ) );
+ if( !Limit.empty() )
+ {
+ }
+
+ return( 1 );
 }
 
 // -----------------------------------------------------------------------------
