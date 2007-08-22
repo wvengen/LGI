@@ -289,3 +289,101 @@ int Daemon::CycleThroughJobs( void )
 
 // -----------------------------------------------------------------------------
 
+int Daemon::RequestWorkCycle( void )
+{
+ DEBUG_LOG( "Daemon::RequestWorkCycle; Starting with request work from server cycle" );
+
+ Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File() );
+
+ for( int nP = 1; nP <= Number_Of_Projects(); ++nP )                 // cycle through all projects...
+ {
+  DaemonConfigProject TheProject;
+
+  TheProject = Project( nP );
+
+  // first signup to registered master server of this project to get all slaves... 
+
+  list<string> ServerList;
+  string Response, Attributes;
+  int    StartPos;
+
+  if( ServerAPI.Resource_SignUp_Resource( Response, TheProject.Project_Master_Server(), TheProject.Project_Name() ) != CURLE_OK ) continue;
+
+  Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
+  if( Response.empty() ) continue;
+
+  if( !Parse_XML( Response, "error" ).empty() ) continue;
+
+  int NumberOfServers = atoi( NormalizeString( Parse_XML( Response, "number_of_slave_servers" ) ).c_str() );
+
+  for( int nS = StartPos = 0; nS < NumberOfServers; nS++ )
+  {
+   string SlaveServer = Parse_XML( Response, "project_server", Attributes, StartPos );
+   if( SlaveServer.empty() ) continue; 
+   ServerList.insert( ServerList.begin(), SlaveServer );
+  }
+ 
+  Attributes = Parse_XML( Response, "project_master_server" );
+  ServerList.insert( ServerList.begin(), Attributes ); 
+  ServerList.insert( ServerList.begin(), TheProject.Project_Master_Server() ); 
+  list<string>::iterator ServerPointer = ServerList.begin();
+
+  // the list is complete and we are signed up to the first (master) server...
+
+  do
+  {
+   if( !Response.empty() )
+   {
+
+    // now check all applications for this project...
+
+    for( int nA = 1; nA <= TheProject.Number_Of_Applications(); ++nA ) 
+    {
+     DaemonConfigProjectApplication TheApplication;
+
+     TheApplication = TheProject.Application( nA );
+
+     // check if there is a system limit reached for this application...
+
+     if( system( TheApplication.Check_System_Limits_Script().c_str() ) == 0 ) 
+     {
+      DEBUG_LOG( "Daemon::RequestWorkCycle; Requesting work for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
+
+      // ...
+      // ...
+      // ...
+
+     }
+     else
+      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; System limit reached for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() );
+
+    }
+
+    // sign off from this server...
+    if( ServerAPI.Resource_SignOff_Resource( Response, (*ServerPointer), TheProject.Project_Name() ) != CURLE_OK )
+     Response.clear();
+   }
+
+   if( (++ServerPointer) != ServerList.end() )         // go to next server in list and sign up there...
+   {
+    if( ServerAPI.Resource_SignUp_Resource( Response, (*ServerPointer), TheProject.Project_Name() ) != CURLE_OK )
+     Response.clear();
+    else
+    {
+     Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+     if( !Parse_XML( Response, "error" ).empty() ) Response.clear();
+    }
+   }
+   else
+    Response.clear();
+  }
+  while( ServerPointer != ServerList.end() );
+
+ } 
+
+ NORMAL_LOG_RETURN( 1, "Daemon::RequestWorkCycle; Request for work cycle done" ); 
+}
+
+// -----------------------------------------------------------------------------
+

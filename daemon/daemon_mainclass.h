@@ -56,6 +56,7 @@ class Daemon : public DaemonConfig
                int ReadyToSchedule( void );
 
                int CycleThroughJobs( void );
+               int RequestWorkCycle( void );
 
      //  protected:
                
