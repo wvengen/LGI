@@ -353,9 +353,46 @@ int Daemon::RequestWorkCycle( void )
      {
       DEBUG_LOG( "Daemon::RequestWorkCycle; Requesting work for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
 
-      // ...
-      // ...
-      // ...
+      if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), TheApplication.Application_Name() ) != CURLE_OK ) continue;
+
+      string JobResponse = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
+      if( JobResponse.empty() ) continue;
+
+      if( !Parse_XML( JobResponse, "error" ).empty() ) continue;
+
+      int NrOfJobs = atoi( NormalizeString( Parse_XML( JobResponse, "number_of_jobs" ) ).c_str() );
+
+      for( int JobIndex = StartPos = 0; JobIndex < NrOfJobs; ++JobIndex )        // loop over jobs in response...
+      {
+       string JobData = NormalizeString( Parse_XML( JobResponse, "job", Attributes, StartPos ) );
+       if( JobData.empty() ) continue;
+
+       string Job_Id = NormalizeString( Parse_XML( JobData, "job_id" ) );
+       if( Job_Id.empty() ) continue;
+
+       // now check if any of the owners is denied serving...
+
+       int OwnerIndex;
+       vector<string> Owners = CommaSeparatedValues2Array( Parse_XML( JobResponse, "owners" ) );
+
+       for( OwnerIndex = 0; OwnerIndex < Owners.size(); ++OwnerIndex )
+       {
+        if( IsOwnerDenied( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
+        if( IsOwnerRunningToMuch( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
+       }
+
+       if( OwnerIndex == Owners.size() )      // no denials or limits reached for any of the owners...
+       {
+       
+         // ...
+         // ... 
+         // ...
+
+       }
+
+       if( ServerAPI.Resource_UnLock_Job( Response, (*ServerPointer), TheProject.Project_Name(), Job_Id ) != CURLE_OK ) JobIndex = NrOfJobs;
+      }
 
      }
      else
@@ -385,6 +422,18 @@ int Daemon::RequestWorkCycle( void )
  } 
 
  NORMAL_LOG_RETURN( 1, "Daemon::RequestWorkCycle; Request for work cycle done" ); 
+}
+
+// -----------------------------------------------------------------------------
+
+int Daemon::IsOwnerDenied( string Owner, DaemonConfigProject &Project, DaemonConfigProjectApplication &Application )
+{
+}
+
+// -----------------------------------------------------------------------------
+
+int Daemon::IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, DaemonConfigProjectApplication &Application )
+{
 }
 
 // -----------------------------------------------------------------------------

@@ -64,6 +64,9 @@ class Daemon : public DaemonConfig
                int AddJobToDaemonLists( DaemonJob Job );
                int RemoveJobFromDaemonLists( DaemonJob Job );
 
+               int IsOwnerDenied( string Owner, DaemonConfigProject &Project, DaemonConfigProjectApplication &Application );
+               int IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, DaemonConfigProjectApplication &Application );
+
        map<string,list<DaemonJob> > Jobs;
        map<string,int> Accounting;
       };
