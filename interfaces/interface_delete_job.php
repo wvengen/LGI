@@ -34,7 +34,7 @@ if( !Interface_Is_User_Allowed_To_Modify_Job( $JobSpecs, $JobUser, $JobGroups ) 
  return( LGI_Error_Response( 35, $ErrorMsgs[ 35 ], "" ) );
 
 // if the job can be actually removed...
-if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) )
+if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( $JobSpecs->state == 'aborted' ) )
 {
  Interface_Set_Spin_Lock_On_Job( $JobId );
  $queryresult = mysql_query( "DELETE FROM job_queue WHERE job_id=".$JobId );

@@ -17,7 +17,7 @@
 
 int main_7( int *argc, char *argv[] )
 {
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
  
  Daemon MyDaemon( "LGI.cfg" );
 
