@@ -339,7 +339,7 @@ int Daemon::RequestWorkCycle( void )
    if( !Response.empty() )
    {
 
-    // now check all applications for this project and server...
+    // now check all applications for this project on this server...
 
     for( int nA = 1; nA <= TheProject.Number_Of_Applications(); ++nA ) 
     {
@@ -347,7 +347,7 @@ int Daemon::RequestWorkCycle( void )
 
      TheApplication = TheProject.Application( nA );
 
-     // check if there is a system limit reached for this application...
+     // check if there is a system wide limit reached for this application...
 
      if( system( TheApplication.Check_System_Limits_Script().c_str() ) == 0 ) 
      {
@@ -360,7 +360,6 @@ int Daemon::RequestWorkCycle( void )
      }
      else
       VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; System limit reached for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() );
-
     }
 
     // sign off from this server...
