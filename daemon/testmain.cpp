@@ -17,11 +17,11 @@
 
 int main_7( int *argc, char *argv[] )
 {
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING,"testmain.log");
  
  Daemon MyDaemon( "LGI.cfg" );
 
- if( !MyDaemon.IsValidConfigured() ) CRITICAL_LOG_RETURN( 1, "Aborted because of bad config" );
+ if( !MyDaemon.ReadyToSchedule() ) CRITICAL_LOG_RETURN( 1, "Aborted because of bad config" );
 
  for( map<string,list<DaemonJob> >::iterator s = MyDaemon.Jobs.begin(); s != MyDaemon.Jobs.end(); ++s )
   for( list<DaemonJob>::iterator j = s -> second.begin(); j != s -> second.end(); ++j )
@@ -97,7 +97,7 @@ int main_4( int *argc, char *argv[] )
  
  Daemon MyDaemon( "LGI.cfg" );
 
- if( !MyDaemon.IsValidConfigured() ) CRITICAL_LOG_RETURN( 1, "Aborted because of bad config" );
+ if( !MyDaemon.ReadyToSchedule() ) CRITICAL_LOG_RETURN( 1, "Aborted because of bad config" );
 
  MyProject = MyDaemon.Project( 1 );
  MyApplication = MyProject.Application( 1 );

@@ -32,6 +32,13 @@ Daemon::Daemon( string ConfigFile ) : DaemonConfig( ConfigFile )
 
 // -----------------------------------------------------------------------------
 
+int Daemon::ReadyToSchedule( void )
+{
+ return( Jobs.empty() ? 0 : 1 );
+}
+
+// -----------------------------------------------------------------------------
+
 int Daemon::ScanDirectoryForJobs( string Directory )
 {
  struct dirent *Entry;
@@ -279,3 +286,6 @@ int Daemon::CycleThroughJobs( void )
 
  NORMAL_LOG_RETURN( 1, "Daemon::CycleThroughJobs; Scheduling cycle through jobs done" ); 
 }
+
+// -----------------------------------------------------------------------------
+

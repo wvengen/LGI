@@ -53,6 +53,8 @@ class Daemon : public DaemonConfig
 
                Daemon( string ConfigFile );
 
+               int ReadyToSchedule( void );
+
                int CycleThroughJobs( void );
 
      //  protected:
