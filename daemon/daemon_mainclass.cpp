@@ -291,11 +291,11 @@ int Daemon::CycleThroughJobs( void )
 
 int Daemon::RequestWorkCycle( void )
 {
- DEBUG_LOG( "Daemon::RequestWorkCycle; Starting with request work from server cycle" );
+ DEBUG_LOG( "Daemon::RequestWorkCycle; Starting with request work cycle" );
 
  Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File() );
 
- for( int nP = 1; nP <= Number_Of_Projects(); ++nP )                 // cycle through all projects...
+ for( int nP = 1; nP <= Number_Of_Projects(); ++nP )     // cycle through all projects...
  {
   DaemonConfigProject TheProject;
 
@@ -323,10 +323,13 @@ int Daemon::RequestWorkCycle( void )
    if( SlaveServer.empty() ) continue; 
    ServerList.insert( ServerList.begin(), SlaveServer );
   }
+
+  // now add also master server reported in the response, and the one we just asked...
  
-  Attributes = Parse_XML( Response, "project_master_server" );
-  ServerList.insert( ServerList.begin(), Attributes ); 
+  ServerList.insert( ServerList.end(), Parse_XML( Response, "project_master_server" ) ); 
+
   ServerList.insert( ServerList.begin(), TheProject.Project_Master_Server() ); 
+
   list<string>::iterator ServerPointer = ServerList.begin();
 
   // the list is complete and we are signed up to the first (master) server...
@@ -336,7 +339,7 @@ int Daemon::RequestWorkCycle( void )
    if( !Response.empty() )
    {
 
-    // now check all applications for this project...
+    // now check all applications for this project and server...
 
     for( int nA = 1; nA <= TheProject.Number_Of_Applications(); ++nA ) 
     {
