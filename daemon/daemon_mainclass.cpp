@@ -177,6 +177,8 @@ int Daemon::CycleThroughJobs( void )
 {
  if( Jobs.empty() ) CRITICAL_LOG_RETURN( 0, "Daemon::CycleThroughJobs; Daemon lists empty" ); 
 
+
+
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with update from server cycle" );
 
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end(); ++Server )
@@ -215,6 +217,9 @@ int Daemon::CycleThroughJobs( void )
    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed off from " << Server -> first );
   }
 
+
+
+
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with job scripts cycle" );
 
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end(); ++Server )
@@ -226,14 +231,14 @@ int Daemon::CycleThroughJobs( void )
  
     TempJob = (*(JobPointer++));                                  // get copy and point to next for iterator...
 
-    if( TempJob.RunJobCheckRunningScript() )                      // we are currently running this job...
+    if( TempJob.RunJobCheckRunningScript() == 0 )                 // we are currently running this job...
     {
      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " was found running" );
      if( TempJob.GetState() == "abort" )                          // do we need to abort the job...
      {
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Aborting job with directory " << TempJob.GetJobDirectory() );
-      if( !TempJob.RunJobAbortScript() ) continue;            // run abort script...
-      if( !TempJob.SignUp() ) continue;                       // update job to server...
+      if( TempJob.RunJobAbortScript() ) continue;                 // run abort script...
+      if( !TempJob.SignUp() ) continue;                           // update job to server...
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "aborted", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
@@ -245,11 +250,11 @@ int Daemon::CycleThroughJobs( void )
     }
     else
     {
-     if( TempJob.RunJobCheckFinishedScript() )                    // the job is finished...
+     if( TempJob.RunJobCheckFinishedScript() == 0 )               // the job is finished...
      {
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " was found to be finished" );
-      if( !TempJob.RunJobEpilogueScript() ) continue;           // run jobs epilogue script...
-      if( !TempJob.SignUp() ) continue;                       // update job to server...
+      if( TempJob.RunJobEpilogueScript() ) continue;              // run jobs epilogue script...
+      if( !TempJob.SignUp() ) continue;                           // update job to server...
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "finished", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
@@ -262,9 +267,9 @@ int Daemon::CycleThroughJobs( void )
      {
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " was found inactive" );
 
-      if( TempJob.RunJobPrologueScript() )                        // then run job after prologue finished...
+      if( TempJob.RunJobPrologueScript() == 0 )                   // then run job after prologue finished...
       {
-       TempJob.RunJobRunScript();
+       if( TempJob.RunJobRunScript() ) continue;
        VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " started running" );
       }
      }
