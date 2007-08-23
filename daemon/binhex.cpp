@@ -26,9 +26,12 @@ void BinHex( const string& Bin, string &Hex )
  const char HEXDIGITS[] = "0123456789ABCDEF";
  int i, Length = Bin.length();
 
- Hex.reserve( Length << 1 + 1 );
  Hex.clear();
+
+ if( Length == 0 ) return;
  
+ Hex.reserve( Length << 1 + 1 );
+
  for( i = 0; i < Length; i++ )
  {
   Hex.push_back( HEXDIGITS[ ( int )( ( Bin[ i ] >> 4 ) & 0x0F ) ] );
@@ -45,10 +48,14 @@ void HexBin( const string& Hex, string &Bin )
  int i, Length = Hex.length();
  int HighNible, LowNible;
 
- Bin.reserve( Length >> 1 + 1 );
  Bin.clear();
 
+ if( Length == 0 ) return;
+
+ Bin.reserve( Length >> 1 + 1 );
+
  i = 0;
+
  while( isspace( Hex[ i ] ) ) i++;
 
  for( ; i < Length; i += 2 )

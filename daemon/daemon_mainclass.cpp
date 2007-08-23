@@ -338,6 +338,9 @@ int Daemon::RequestWorkCycle( void )
   {
    if( !Response.empty() )
    {
+    string ExtraJobDetailsTags = "<project> " + TheProject.Project_Name()  + " </project> <this_project_server> " +
+                                 (*ServerPointer) + " </this_project_server> <project_master_server> " +
+                                 Parse_XML( Response, "project_master_server" ) + " </project_master_server> ";
 
     // now check all applications for this project on this server...
 
@@ -384,11 +387,18 @@ int Daemon::RequestWorkCycle( void )
 
        if( OwnerIndex == Owners.size() )      // no denials or limits reached for any of the owners...
        {
-       
-         // ...
-         // ... 
-         // ...
+        // create temporary job directory with the jobs response data...
+        DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, nA );
 
+        // see if job has limits from job limits script somehow...
+        if( TempJob.RunJobCheckLimitsScript() == 0 )
+        {
+         // there are no limits and job is ready to be included for running...
+         AddJobToDaemonLists( TempJob );
+
+         // set job into running state on server and through this we now also get input...
+         TempJob.UpdateJob( "running", Resource_Name(), "", "", "" );
+        }
        }
 
        if( ServerAPI.Resource_UnLock_Job( Response, (*ServerPointer), TheProject.Project_Name(), Job_Id ) != CURLE_OK ) JobIndex = NrOfJobs;
@@ -450,12 +460,27 @@ int Daemon::IsOwnerDenied( string Owner, DaemonConfigProject &Project, DaemonCon
 
 int Daemon::IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, DaemonConfigProjectApplication &Application )
 {
- string Limit = NormalizeString( Parse_XML( Owner_Allow(), Owner ) );
- if( !Limit.empty() )
- {
- }
+ string ConfigLimit = NormalizeString( Parse_XML( Owner_Allow(), Owner ) );
+ if( ConfigLimit.empty() ) ConfigLimit = NormalizeString( Parse_XML( Owner_Allow(), "any" ) );
+ 
+ string ProjectLimit = NormalizeString( Parse_XML( Project.Owner_Allow(), Owner ) );
+ if( ProjectLimit.empty() ) ProjectLimit = NormalizeString( Parse_XML( Project.Owner_Allow(), "any" ) );
 
- return( 1 );
+ string ApplicationLimit = NormalizeString( Parse_XML( Application.Owner_Allow(), Owner ) );
+ if( ApplicationLimit.empty() ) ApplicationLimit = NormalizeString( Parse_XML( Application.Owner_Allow(), "any" ) );
+
+ if( ConfigLimit.empty() && ProjectLimit.empty() && ApplicationLimit.empty() ) return( 1 );
+
+ if( !ConfigLimit.empty() ) 
+  if( atoi( ConfigLimit.c_str() ) < Accounting[ Owner ] ) return( 1 );
+
+ if( !ProjectLimit.empty() ) 
+  if( atoi( ProjectLimit.c_str() ) < Accounting[ Owner + ", " + Project.Project_Name() ] ) return( 1 );
+
+ if( !ApplicationLimit.empty() ) 
+  if( atoi( ApplicationLimit.c_str() ) < Accounting[ Owner + ", " + Project.Project_Name() + ", " + Application.Application_Name() ] ) return( 1 );
+
+ return( 0 );
 }
 
 // -----------------------------------------------------------------------------
