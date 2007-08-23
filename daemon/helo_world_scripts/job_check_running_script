@@ -1,2 +1,7 @@
 #!/bin/sh
-/bin/true
+if [ -f running ]
+then
+ exit 0
+else
+ exit 1
+fi
