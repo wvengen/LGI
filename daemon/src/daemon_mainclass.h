@@ -53,12 +53,14 @@ class Daemon : public DaemonConfig
 
                Daemon( string ConfigFile );
 
-               int ReadyToSchedule( void );
+               int RunSchedular( void );
+               int IsSchedularReady( void );
+               void StopScheduling( void );
+
+       protected:
 
                int CycleThroughJobs( void );
                int RequestWorkCycle( void );
-
-     //  protected:
                
                int ScanDirectoryForJobs( string Directory );
                int AddJobToDaemonLists( DaemonJob Job );
@@ -68,7 +70,10 @@ class Daemon : public DaemonConfig
                int IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, DaemonConfigProjectApplication &Application );
 
        map<string,list<DaemonJob> > Jobs;
-       map<string,int> Accounting;
+       map<string,int>              Accounting;
+       int                          JobsFinished,
+                                    JobsObtained,
+                                    ReadyForScheduling;
       };
 
 // -----------------------------------------------------------------------------

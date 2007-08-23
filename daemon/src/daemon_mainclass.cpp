@@ -23,18 +23,13 @@
 
 Daemon::Daemon( string ConfigFile ) : DaemonConfig( ConfigFile )
 {
- Jobs.clear(); Accounting.clear();
+ ReadyForScheduling = 0; Jobs.clear(); Accounting.clear();
 
  if( !IsValidConfigured() ) { CRITICAL_LOG( "Daemon::Daemon; Configuration in file " << ConfigFile << " invalid" ); return;}
 
  if( !ScanDirectoryForJobs( RunDirectory() ) ) { CRITICAL_LOG( "Daemon::Daemon; Error during scan of run directory " << RunDirectory() ); return; }
-}
 
-// -----------------------------------------------------------------------------
-
-int Daemon::ReadyToSchedule( void )
-{
- return( Jobs.empty() ? 0 : 1 );
+ ReadyForScheduling = 1;
 }
 
 // -----------------------------------------------------------------------------
@@ -184,8 +179,6 @@ int Daemon::CycleThroughJobs( void )
 {
  if( Jobs.empty() ) CRITICAL_LOG_RETURN( 0, "Daemon::CycleThroughJobs; Daemon lists empty" ); 
 
-
-
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with update from server cycle" );
 
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end(); ++Server )
@@ -223,9 +216,6 @@ int Daemon::CycleThroughJobs( void )
    if( !( ( Server -> second.begin() ) -> SignOff() ) ) continue;                      // signoff from server...
    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed off from " << Server -> first );
   }
-
-
-
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with job scripts cycle" );
 
@@ -269,6 +259,7 @@ int Daemon::CycleThroughJobs( void )
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Finished job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
+      JobsFinished = 1;
      }
      else                                                         // the job was not running and was not finished...
      {
@@ -292,6 +283,8 @@ int Daemon::CycleThroughJobs( void )
 int Daemon::RequestWorkCycle( void )
 {
  DEBUG_LOG( "Daemon::RequestWorkCycle; Starting with request work cycle" );
+
+ JobsObtained = 0;
 
  Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File() );
 
@@ -398,6 +391,8 @@ int Daemon::RequestWorkCycle( void )
 
          // set job into running state on server and through this we now also get input...
          TempJob.UpdateJob( "running", Resource_Name(), "", "", "" );
+
+         JobsObtained = 1;
         }
        }
 
@@ -431,7 +426,7 @@ int Daemon::RequestWorkCycle( void )
 
  } 
 
- NORMAL_LOG_RETURN( 1, "Daemon::RequestWorkCycle; Request for work cycle done" ); 
+ NORMAL_LOG_RETURN( JobsObtained, "Daemon::RequestWorkCycle; Request for work cycle done" ); 
 }
 
 // -----------------------------------------------------------------------------
@@ -494,3 +489,30 @@ int Daemon::IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, Da
 
 // -----------------------------------------------------------------------------
 
+void Daemon::StopScheduling( void )
+{
+ NORMAL_LOG( "Daemon::StopScheduling; Received stop signal" );
+ ReadyForScheduling = 0;
+}
+
+// -----------------------------------------------------------------------------
+
+int Daemon::IsSchedularReady( void )
+{
+ return( ReadyForScheduling );
+}
+
+// -----------------------------------------------------------------------------
+
+int Daemon::RunSchedular( void )
+{
+ if( !ReadyForScheduling ) CRITICAL_LOG_RETURN( ReadyForScheduling, "Daemon::RunSchedular; Daemon was not ready for schedulig" );
+
+ // ...
+ // ...
+ // ...
+
+ return( ReadyForScheduling );
+}
+
+// -----------------------------------------------------------------------------
