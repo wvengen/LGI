@@ -443,7 +443,7 @@ int Daemon::IsOwnerDenied( string Owner, DaemonConfigProject &Project, DaemonCon
  for( int i = 0; i < ConfigOwners.size(); ++i )
  {
   if( Owner == ConfigOwners[ i ] ) return( 1 );
-  if( ConfigOwners[ i ] == "any' ) return( 1 );
+  if( ConfigOwners[ i ] == "any" ) return( 1 );
  }
 
  vector<string> ProjectOwners = CommaSeparatedValues2Array( Project.Owner_Deny() );
@@ -451,7 +451,7 @@ int Daemon::IsOwnerDenied( string Owner, DaemonConfigProject &Project, DaemonCon
  for( int i = 0; i < ProjectOwners.size(); ++i )
  {
   if( Owner == ProjectOwners[ i ] ) return( 1 );
-  if( ProjectOwners[ i ] == "any' ) return( 1 );
+  if( ProjectOwners[ i ] == "any" ) return( 1 );
  }
 
  vector<string> ApplicationOwners = CommaSeparatedValues2Array( Application.Owner_Deny() );
@@ -459,7 +459,7 @@ int Daemon::IsOwnerDenied( string Owner, DaemonConfigProject &Project, DaemonCon
  for( int i = 0; i < ApplicationOwners.size(); ++i )
  {
   if( Owner == ApplicationOwners[ i ] ) return( 1 );
-  if( ApplicationOwners[ i ] == "any' ) return( 1 );
+  if( ApplicationOwners[ i ] == "any" ) return( 1 );
  }
 
  return( 0 );
