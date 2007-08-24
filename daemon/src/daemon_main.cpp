@@ -38,15 +38,6 @@ Daemon *TheDaemon = NULL;
 
 void TheSignalHandler( int S )
 {
- if( S == SIGCHLD )
- {
-  int status;
-  DEBUG_LOG( "TheSignalHandler; A child has finished" );
-  while( waitpid( WAIT_ANY, &status, WNOHANG ) );
-  signal( SIGCHLD, TheSignalHandler );
-  return;
- }
-
  if( TheDaemon != NULL ) 
  {
   CRITICAL_LOG( "TheSignalHandler; Received signal, stoping with scheduling gracefully" );
@@ -65,7 +56,6 @@ int main( int *argc, char *argv[] )
  signal( SIGQUIT, TheSignalHandler );
  signal( SIGABRT, TheSignalHandler );
  signal( SIGTERM, TheSignalHandler );
- signal( SIGCHLD, TheSignalHandler );
 
  InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING);
  
