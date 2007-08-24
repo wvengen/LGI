@@ -402,7 +402,7 @@ int Daemon::RequestWorkCycle( void )
         // now check if any of the owners is denied serving...
 
         int OwnerIndex;
-        vector<string> Owners = CommaSeparatedValues2Array( Parse_XML( JobResponse, "owners" ) );
+        vector<string> Owners = CommaSeparatedValues2Array( Parse_XML( JobData, "owners" ) );
 
         for( OwnerIndex = 0; OwnerIndex < Owners.size(); ++OwnerIndex )
         {
@@ -528,13 +528,13 @@ int Daemon::IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, Da
  if( ConfigLimit.empty() && ProjectLimit.empty() && ApplicationLimit.empty() ) return( 1 );
 
  if( !ConfigLimit.empty() ) 
-  if( atoi( ConfigLimit.c_str() ) < Accounting[ Owner ] ) return( 1 );
+  if( atoi( ConfigLimit.c_str() ) <= Accounting[ Owner ] ) return( 1 );
 
  if( !ProjectLimit.empty() ) 
-  if( atoi( ProjectLimit.c_str() ) < Accounting[ Owner + ", " + Project.Project_Name() ] ) return( 1 );
+  if( atoi( ProjectLimit.c_str() ) <= Accounting[ Owner + ", " + Project.Project_Name() ] ) return( 1 );
 
  if( !ApplicationLimit.empty() ) 
-  if( atoi( ApplicationLimit.c_str() ) < Accounting[ Owner + ", " + Project.Project_Name() + ", " + Application.Application_Name() ] ) return( 1 );
+  if( atoi( ApplicationLimit.c_str() ) <= Accounting[ Owner + ", " + Project.Project_Name() + ", " + Application.Application_Name() ] ) return( 1 );
 
  return( 0 );
 }
