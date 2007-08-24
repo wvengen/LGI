@@ -719,8 +719,8 @@ int DaemonJob::RunJobRunScript( void )
 
  if( fork() == 0 )   // fork and child is going to start the script...
  {
-  int sid = setsid();
-  setpgid( sid, sid );
+  setsid();
+  setpgid( 0, 0 );
 
   chdir( JobDirectory.c_str() );
   int Value = execl( "/bin/sh", "sh", "-c", ( "./" LGI_JOBDAEMON_JOB_RUN_SCRIPT ), NULL );
