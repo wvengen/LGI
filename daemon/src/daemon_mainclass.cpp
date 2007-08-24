@@ -178,6 +178,8 @@ int Daemon::RemoveJobFromDaemonLists( DaemonJob Job )
 int Daemon::CycleThroughJobs( void )
 {
  if( Jobs.empty() ) CRITICAL_LOG_RETURN( 0, "Daemon::CycleThroughJobs; Daemon lists empty" ); 
+    
+ JobsFinished = 0;
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with update from server cycle" );
 
@@ -573,13 +575,13 @@ int Daemon::RunSchedular( void )
     RequestDelay = 600;
    LastRequestTime = time( NULL );
   }
+  else
+   JobsObtained = 0;
 
-  if( time( NULL ) - LastUpdateTime >= 120 )       // check our jobs every 2 min...
+  if( ( time( NULL ) - LastUpdateTime >= 120 ) || ( JobsObtained ) )      // check our jobs every 2 min...
   {
    if( !Jobs.empty() )
    {
-    JobsFinished = 0;
-
     CycleThroughJobs(); 
 
     if( JobsFinished )                            // if we have jobs finished, we can request new work now... 
