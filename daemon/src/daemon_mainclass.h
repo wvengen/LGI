@@ -33,6 +33,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <time.h>
 
 #include "logger.h"
 #include "xml.h"

@@ -383,7 +383,7 @@ int Daemon::RequestWorkCycle( void )
 
        NrOfJobs = atoi( NormalizeString( Parse_XML( JobResponse, "number_of_jobs" ) ).c_str() );
        
-       VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Recieved " << NrOfJobs << " jobs from server " << (*ServerPointer) );
+       VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Received " << NrOfJobs << " jobs from server " << (*ServerPointer) );
 
        for( int JobIndex = StartPos = 0; JobIndex < NrOfJobs; ++JobIndex )        // loop over jobs in response...
        {
@@ -554,9 +554,39 @@ int Daemon::RunSchedular( void )
 {
  if( !ReadyForScheduling ) CRITICAL_LOG_RETURN( ReadyForScheduling, "Daemon::RunSchedular; Daemon was not ready for schedulig" );
 
- // ...
- // ...
- // ...
+ time_t LastRequestTime = 0;
+ time_t LastUpdateTime = 0;
+ time_t RequestDelay = 600;
+
+ do
+ {
+
+  if( time( NULL ) - LastRequestTime <= RequestDelay )
+  {
+   if( RequestWorkCycle() )             
+    RequestDelay = 120;
+   else
+    RequestDelay = 600;
+   LastRequestTime = time( NULL );
+  }
+
+  if( time( NULL ) - LastUpdateTime <= 120 )
+  {
+   if( !Jobs.empty() )
+   {
+    JobsFinished = 0;
+
+    CycleThroughJobs(); 
+
+    if( JobsFinished )               
+     RequestDelay = 120;
+   }
+   LastUpdateTime = time( NULL );
+  }
+
+  sleep( 10 );
+
+ } while( ReadyForScheduling );
 
  return( ReadyForScheduling );
 }

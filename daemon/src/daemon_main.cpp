@@ -17,6 +17,8 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+#include <signal.h>
+
 #include "logger.h"
 #include "resource_server_api.h"
 #include "xml.h"
@@ -33,15 +35,31 @@ Daemon *TheDaemon = NULL;
 
 // ----------------------------------------------------------------------
 
+void TheSignalHandler( int S )
+{
+ if( TheDaemon != NULL ) 
+ {
+  TheDaemon -> StopScheduling();
+  CRITICAL_LOG( "TheSignalHandler; Received signal, stoping with scheduling gracefully" );
+ }
+}
+
+// ----------------------------------------------------------------------
+
 int main( int *argc, char *argv[] )
 {
 
- // read passed arguments here and perhaps setup a signal handler...
+ // read passed arguments here...
 
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING,"testmain.log");
+ signal( SIGINT, TheSignalHandler );
+ signal( SIGQUIT, TheSignalHandler );
+ signal( SIGABRT, TheSignalHandler );
+ signal( SIGTERM, TheSignalHandler );
+
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING);
  
  TheDaemon = new Daemon( "LGI.cfg" );
-
+ 
  if( TheDaemon != NULL )
  {
   if( TheDaemon -> IsSchedularReady() )
@@ -49,5 +67,6 @@ int main( int *argc, char *argv[] )
   delete TheDaemon;
  }
 
+ NORMAL_LOG( "Main; Daemon finished" );
 }
 

@@ -92,7 +92,7 @@ CURLcode Resource_Server_API::PerformcURLPost( string &Response, CURL *cURLHandl
 
  }
  else
-  CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::PerformcURLPost; Recieved an invalid cURL handle, returned " << CURLE_FAILED_INIT );
+  CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::PerformcURLPost; Received an invalid cURL handle, returned " << CURLE_FAILED_INIT );
 
 }
 

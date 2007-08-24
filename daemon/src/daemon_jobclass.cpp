@@ -710,6 +710,8 @@ int DaemonJob::RunJobRunScript( void )
  if( fork() == 0 )   // fork and child is going to start the script...
  {
   // int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str() );
+
+  setsid();
   int Value = execl( "/bin/sh", "sh", "-c", ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str(), NULL );
   _exit( Value );
  }
