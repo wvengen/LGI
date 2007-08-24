@@ -749,7 +749,7 @@ int DaemonJob::RunAScript( string TheScriptFile )
 
  chdir( JobDirectory.c_str() );
 
- int Value = system( ( JobDirectory + "/" + TheScriptFile ).c_str() );
+ int Value = system( ( "./" + TheScriptFile ).c_str() );
 
  chdir( CurrentDir );
 
