@@ -243,6 +243,7 @@ int Daemon::CycleThroughJobs( void )
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       NORMAL_LOG( "Daemon::CycleThroughJobs; Aborted job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
+      JobsFinished = 1;
      }
     }
     else
@@ -559,35 +560,35 @@ int Daemon::RunSchedular( void )
 
  time_t LastRequestTime = 0;
  time_t LastUpdateTime = 0;
- time_t RequestDelay = 300;
+ time_t RequestDelay = 600;
 
  do
  {
 
-  if( time( NULL ) - LastRequestTime >= RequestDelay )
+  if( time( NULL ) - LastRequestTime >= RequestDelay )        // check for work every 10 min...
   {
-   if( RequestWorkCycle() )             
+   if( RequestWorkCycle() )                    // if we got some work, wait for 2 min. now and ask for more... 
     RequestDelay = 120;
    else
-    RequestDelay = 300;
+    RequestDelay = 600;
    LastRequestTime = time( NULL );
   }
 
-  if( time( NULL ) - LastUpdateTime >= 120 )
+  if( time( NULL ) - LastUpdateTime >= 120 )       // check our jobs every 2 min...
   {
    if( !Jobs.empty() )
    {
     JobsFinished = 0;
 
-//    CycleThroughJobs(); 
+    CycleThroughJobs(); 
 
-    if( JobsFinished )               
+    if( JobsFinished )                            // if we have jobs finished, we can request new work now... 
      RequestDelay = 120;
    }
    LastUpdateTime = time( NULL );
   }
 
-  sleep( 10 );
+  sleep( 10 );                // sleep for 10 seconds each time...
 
  } while( ReadyForScheduling );
 

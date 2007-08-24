@@ -45,7 +45,7 @@ CURL *Resource_Server_API::SetupcURLForPost( string &PostURL )
   curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CAChainFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
-  NORMAL_LOG_RETURN( cURLHandle, "Resource_Server_API::SetupcURLForPost; Obtained cURL handle for PostURL=" << PostURL );
+  DEBUG_LOG_RETURN( cURLHandle, "Resource_Server_API::SetupcURLForPost; Obtained cURL handle for PostURL=" << PostURL );
  }
 
  CRITICAL_LOG_RETURN( cURLHandle, "Resource_Server_API::SetupcURLForPost; Failed to obtain a cURL handle for PostURL=" << PostURL );
