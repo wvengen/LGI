@@ -1,9 +1,9 @@
 #!/bin/sh
 /bin/touch running
 /bin/sleep 30
-echo "hello world from " > LGI_output
+echo -n "hello world from " > LGI_output
 /bin/sleep 30
-/bin/cat LGI_this_project_server >> LGI_output
+/bin/cat LGI_target_resources >> LGI_output
 /bin/sleep 30
 /bin/touch finished
 /bin/rm running
