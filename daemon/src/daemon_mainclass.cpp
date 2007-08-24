@@ -316,21 +316,24 @@ int Daemon::RequestWorkCycle( void )
   
   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Received list of " << NumberOfServers << " servers from " << TheProject.Project_Master_Server() );
 
+  string SlaveServer;
+
   for( int nS = StartPos = 0; nS < NumberOfServers; nS++ )
   {
-   string SlaveServer = Parse_XML( Response, "project_server", Attributes, StartPos );
+   SlaveServer = NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) );
    if( SlaveServer.empty() ) continue; 
    ServerList.insert( ServerList.begin(), SlaveServer );
    VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << SlaveServer << " to server request list" );
   }
 
   // now add also master server reported in the response, and the one we just asked...
- 
-  ServerList.insert( ServerList.end(), Parse_XML( Response, "project_master_server" ) ); 
+  SlaveServer = NormalizeString( Parse_XML( Response, "project_master_server" ) ); 
+  ServerList.insert( ServerList.end(), SlaveServer ); 
   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << Parse_XML( Response, "project_master_server" ) << " to server request list" );
 
-  ServerList.insert( ServerList.begin(), TheProject.Project_Master_Server() ); 
-  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << TheProject.Project_Master_Server() << " to server request list" );
+  SlaveServer = TheProject.Project_Master_Server();
+  ServerList.insert( ServerList.begin(), SlaveServer ); 
+  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << SlaveServer << " to server request list" );
 
   list<string>::iterator ServerPointer = ServerList.begin();
 
@@ -576,7 +579,7 @@ int Daemon::RunSchedular( void )
    {
     JobsFinished = 0;
 
-    CycleThroughJobs(); 
+//    CycleThroughJobs(); 
 
     if( JobsFinished )               
      RequestDelay = 120;
