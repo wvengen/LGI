@@ -556,21 +556,21 @@ int Daemon::RunSchedular( void )
 
  time_t LastRequestTime = 0;
  time_t LastUpdateTime = 0;
- time_t RequestDelay = 600;
+ time_t RequestDelay = 300;
 
  do
  {
 
-  if( time( NULL ) - LastRequestTime <= RequestDelay )
+  if( time( NULL ) - LastRequestTime >= RequestDelay )
   {
    if( RequestWorkCycle() )             
     RequestDelay = 120;
    else
-    RequestDelay = 600;
+    RequestDelay = 300;
    LastRequestTime = time( NULL );
   }
 
-  if( time( NULL ) - LastUpdateTime <= 120 )
+  if( time( NULL ) - LastUpdateTime >= 120 )
   {
    if( !Jobs.empty() )
    {

@@ -39,8 +39,8 @@ void TheSignalHandler( int S )
 {
  if( TheDaemon != NULL ) 
  {
-  TheDaemon -> StopScheduling();
   CRITICAL_LOG( "TheSignalHandler; Received signal, stoping with scheduling gracefully" );
+  TheDaemon -> StopScheduling();
  }
 }
 
@@ -59,6 +59,8 @@ int main( int *argc, char *argv[] )
  InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING);
  
  TheDaemon = new Daemon( "LGI.cfg" );
+ 
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|DEBUG_LOGGING|VERBOSE_DEBUG_LOGGING);
  
  if( TheDaemon != NULL )
  {
