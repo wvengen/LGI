@@ -655,7 +655,9 @@ int DaemonJob::RunJobCheckLimitsScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckLimitsScript; JobDirectory empty" );
  if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckLimitsScript; Script seems corrupt, refusing to run it" );
- int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).c_str() );
+
+ int Value = RunAScript( LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT );
+
  NORMAL_LOG_RETURN( Value, "DamonJob::RunJobCheckLimitsScript; Returned " << Value );
 }
 
@@ -665,7 +667,9 @@ int DaemonJob::RunJobCheckRunningScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckRunningScript; JobDirectory empty" );
  if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckRunningScript; Script seems corrupt, refusing to run it" );
- int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).c_str() );
+
+ int Value = RunAScript( LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT );
+
  NORMAL_LOG_RETURN( Value, "DamonJob::RunJobCheckRunningScript; Returned " << Value );
 }
 
@@ -675,7 +679,9 @@ int DaemonJob::RunJobCheckFinishedScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckFinishedScript; JobDirectory empty" );
  if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckFinishedScript; Script seems corrupt, refusing to run it" );
- int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT ).c_str() );
+
+ int Value = RunAScript( LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT );
+
  NORMAL_LOG_RETURN( Value, "DamonJob::RunJobCheckFinishedScript; Returned " << Value );
 }
 
@@ -685,7 +691,9 @@ int DaemonJob::RunJobPrologueScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobPrologueScript; JobDirectory empty" );
  if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobPrologueScript; Script seems corrupt, refusing to run it" );
- int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT ).c_str() );
+
+ int Value = RunAScript( LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT );
+
  NORMAL_LOG_RETURN( Value, "DamonJob::RunJobPrologueScript; Returned " << Value );
 }
 
@@ -695,7 +703,9 @@ int DaemonJob::RunJobEpilogueScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobEpilogueScript; JobDirectory empty" );
  if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobEpilogueScript; Script seems corrupt, refusing to run it" );
- int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT ).c_str() );
+
+ int Value = RunAScript( LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT );
+
  NORMAL_LOG_RETURN( Value, "DamonJob::RunJobEpilogueScript; Returned " << Value );
 }
 
@@ -709,9 +719,8 @@ int DaemonJob::RunJobRunScript( void )
 
  if( fork() == 0 )   // fork and child is going to start the script...
  {
-  // int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str() );
-
   setsid();
+  chdir( JobDirectory.c_str() );
   int Value = execl( "/bin/sh", "sh", "-c", ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str(), NULL );
   _exit( Value );
  }
@@ -725,8 +734,26 @@ int DaemonJob::RunJobAbortScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobAbortScript; JobDirectory empty" );
  if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobAbortScript; Script seems corrupt, refusing to run it" );
- int Value = system( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).c_str() );
+
+ int Value = RunAScript( LGI_JOBDAEMON_JOB_ABORT_SCRIPT );
  NORMAL_LOG_RETURN( Value, "DamonJob::RunJobAbortScript; Returned " << Value );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::RunAScript( string TheScriptFile )
+{
+ char CurrentDir[ 1024 ];
+
+ getcwd( CurrentDir, sizeof( CurrentDir ) );
+
+ chdir( JobDirectory.c_str() );
+
+ int Value = system( ( JobDirectory + "/" + TheScriptFile ).c_str() );
+
+ chdir( CurrentDir );
+
+ return( Value );
 }
 
 // -----------------------------------------------------------------------------

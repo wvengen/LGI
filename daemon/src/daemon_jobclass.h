@@ -156,6 +156,8 @@ class DaemonJob
 
        protected:
 
+              int RunAScript( string TheScriptFile );
+
        string JobDirectory;
       };
 
