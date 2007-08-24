@@ -717,16 +717,24 @@ int DaemonJob::RunJobRunScript( void )
 
  if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobRunScript; Script seems corrupt, refusing to run it" );
 
- if( fork() == 0 )   // fork and child is going to start the script...
- {
-  setsid();
+ int first_pid, status;
+
+ if( ( first_pid = fork() ) == 0 )   // fork and let child fork again to exec script
+ {                                   // so that first forked child can exit and parent  
+  setsid();                          // can wait on it to avoid zombies...
   setpgid( 0, 0 );
 
-  chdir( JobDirectory.c_str() );
-  int Value = execl( "/bin/sh", "sh", "-c", ( "./" LGI_JOBDAEMON_JOB_RUN_SCRIPT ), NULL );
+  if( fork() == 0 )                      // this child will become a child of 'init' cause its parent quitted...
+  {
+   chdir( JobDirectory.c_str() );
+   int Value = execl( "/bin/sh", "sh", "-c", ( "./" LGI_JOBDAEMON_JOB_RUN_SCRIPT ), NULL );
+   _exit( Value );
+  }
 
-  _exit( Value );
+  _exit( 0 );                           // here we quit the parent of the above child...
  }
+
+ waitpid( first_pid, &status, 0 );      // and here we wait on the first forked child that we quited above...
 
  NORMAL_LOG_RETURN( 0, "DamonJob::RunJobRunScript; Script started on background for job with directory " << JobDirectory );
 }
