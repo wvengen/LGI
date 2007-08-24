@@ -181,7 +181,7 @@ int Daemon::CycleThroughJobs( void )
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with update from server cycle" );
 
- for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end(); ++Server )
+ for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; ++Server )
   if( !Server -> second.empty() )
   {
    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to " << Server -> first );
@@ -190,7 +190,7 @@ int Daemon::CycleThroughJobs( void )
    
    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to " << Server -> first );
 
-   for( list<DaemonJob>::iterator Job = Server -> second.begin(); Job != Server -> second.end(); ++Job )
+   for( list<DaemonJob>::iterator Job = Server -> second.begin(); Job != Server -> second.end() && ReadyForScheduling; ++Job )
    {
     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Get time stamp for job with directory " << Job -> GetJobDirectory() );
 
@@ -219,10 +219,10 @@ int Daemon::CycleThroughJobs( void )
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with job scripts cycle" );
 
- for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end(); ++Server )
+ for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; ++Server )
   if( !Server -> second.empty() )
   {
-   for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end(); )
+   for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end() && ReadyForScheduling; )
    {
     DaemonJob TempJob;
  
@@ -241,7 +241,7 @@ int Daemon::CycleThroughJobs( void )
       if( !TempJob.UnLockJob() ) continue;
       if( !TempJob.SignOff() ) continue;
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
-      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Aborted job with directory " << TempJob.GetJobDirectory() );
+      NORMAL_LOG( "Daemon::CycleThroughJobs; Aborted job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
      }
     }
@@ -257,7 +257,7 @@ int Daemon::CycleThroughJobs( void )
       if( !TempJob.UnLockJob() ) continue;
       if( !TempJob.SignOff() ) continue;
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
-      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Finished job with directory " << TempJob.GetJobDirectory() );
+      NORMAL_LOG( "Daemon::CycleThroughJobs; Finished job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
       JobsFinished = 1;
      }
@@ -288,7 +288,7 @@ int Daemon::RequestWorkCycle( void )
 
  Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File() );
 
- for( int nP = 1; nP <= Number_Of_Projects(); ++nP )     // cycle through all projects...
+ for( int nP = 1; nP <= Number_Of_Projects() && ReadyForScheduling; ++nP )     // cycle through all projects...
  {
   DaemonConfigProject TheProject;
 
@@ -300,6 +300,8 @@ int Daemon::RequestWorkCycle( void )
   string Response, Attributes;
   int    StartPos;
 
+  DEBUG_LOG( "Daemon::RequestWorkCycle; Signing up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
+
   if( ServerAPI.Resource_SignUp_Resource( Response, TheProject.Project_Master_Server(), TheProject.Project_Name() ) != CURLE_OK ) continue;
 
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
@@ -307,21 +309,28 @@ int Daemon::RequestWorkCycle( void )
   if( Response.empty() ) continue;
 
   if( !Parse_XML( Response, "error" ).empty() ) continue;
+  
+  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
 
   int NumberOfServers = atoi( NormalizeString( Parse_XML( Response, "number_of_slave_servers" ) ).c_str() );
+  
+  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Received list of " << NumberOfServers << " servers from " << TheProject.Project_Master_Server() );
 
   for( int nS = StartPos = 0; nS < NumberOfServers; nS++ )
   {
    string SlaveServer = Parse_XML( Response, "project_server", Attributes, StartPos );
    if( SlaveServer.empty() ) continue; 
    ServerList.insert( ServerList.begin(), SlaveServer );
+   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << SlaveServer << " to server request list" );
   }
 
   // now add also master server reported in the response, and the one we just asked...
  
   ServerList.insert( ServerList.end(), Parse_XML( Response, "project_master_server" ) ); 
+  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << Parse_XML( Response, "project_master_server" ) << " to server request list" );
 
   ServerList.insert( ServerList.begin(), TheProject.Project_Master_Server() ); 
+  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << TheProject.Project_Master_Server() << " to server request list" );
 
   list<string>::iterator ServerPointer = ServerList.begin();
 
@@ -337,11 +346,13 @@ int Daemon::RequestWorkCycle( void )
 
     // now check all applications for this project on this server...
 
-    for( int nA = 1; nA <= TheProject.Number_Of_Applications(); ++nA ) 
+    for( int nA = 1; nA <= TheProject.Number_Of_Applications() && ReadyForScheduling; ++nA ) 
     {
      DaemonConfigProjectApplication TheApplication;
 
      TheApplication = TheProject.Application( nA );
+  
+     VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Checking system limits for application " << TheApplication.Application_Name() );
 
      // check if there is a system wide limit reached for this application...
 
@@ -349,55 +360,84 @@ int Daemon::RequestWorkCycle( void )
      {
       DEBUG_LOG( "Daemon::RequestWorkCycle; Requesting work for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
 
-      if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), TheApplication.Application_Name() ) != CURLE_OK ) continue;
+      int NrOfJobs = 0;
+      int Limit = 10;
+      int Offset = 0;
+      int FoundJob = 0;
+      char OffsetStr[ 64 ];
+      char LimitStr[ 64 ];
 
-      string JobResponse = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-
-      if( JobResponse.empty() ) continue;
-
-      if( !Parse_XML( JobResponse, "error" ).empty() ) continue;
-
-      int NrOfJobs = atoi( NormalizeString( Parse_XML( JobResponse, "number_of_jobs" ) ).c_str() );
-
-      for( int JobIndex = StartPos = 0; JobIndex < NrOfJobs; ++JobIndex )        // loop over jobs in response...
+      do
       {
-       string JobData = NormalizeString( Parse_XML( JobResponse, "job", Attributes, StartPos ) );
-       if( JobData.empty() ) continue;
+       sprintf( OffsetStr, "%d", Offset );
+       sprintf( LimitStr, "%d", Limit );
 
-       string Job_Id = NormalizeString( Parse_XML( JobData, "job_id" ) );
-       if( Job_Id.empty() ) continue;
+       VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Performing work request with Offset=" << OffsetStr << " at server " << (*ServerPointer) );
+       if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), TheApplication.Application_Name(), OffsetStr, LimitStr ) != CURLE_OK ) continue;
 
-       // now check if any of the owners is denied serving...
+       string JobResponse = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
-       int OwnerIndex;
-       vector<string> Owners = CommaSeparatedValues2Array( Parse_XML( JobResponse, "owners" ) );
+       if( JobResponse.empty() ) continue;
 
-       for( OwnerIndex = 0; OwnerIndex < Owners.size(); ++OwnerIndex )
+       if( !Parse_XML( JobResponse, "error" ).empty() ) continue;
+
+       NrOfJobs = atoi( NormalizeString( Parse_XML( JobResponse, "number_of_jobs" ) ).c_str() );
+       
+       VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Recieved " << NrOfJobs << " jobs from server " << (*ServerPointer) );
+
+       for( int JobIndex = StartPos = 0; JobIndex < NrOfJobs; ++JobIndex )        // loop over jobs in response...
        {
-        if( IsOwnerDenied( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
-        if( IsOwnerRunningToMuch( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
-       }
+        string JobData = NormalizeString( Parse_XML( JobResponse, "job", Attributes, StartPos ) );
+        if( JobData.empty() ) continue;
 
-       if( OwnerIndex == Owners.size() )      // no denials or limits reached for any of the owners...
-       {
-        // create temporary job directory with the jobs response data...
-        DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, nA );
+        string Job_Id = NormalizeString( Parse_XML( JobData, "job_id" ) );
+        if( Job_Id.empty() ) continue;
 
-        // see if job has limits from job limits script somehow...
-        if( TempJob.RunJobCheckLimitsScript() == 0 )
+        // now check if any of the owners is denied serving...
+
+        int OwnerIndex;
+        vector<string> Owners = CommaSeparatedValues2Array( Parse_XML( JobResponse, "owners" ) );
+
+        for( OwnerIndex = 0; OwnerIndex < Owners.size(); ++OwnerIndex )
         {
-         // there are no limits and job is ready to be included for running...
-         AddJobToDaemonLists( TempJob );
-
-         // set job into running state on server and through this we now also get input...
-         TempJob.UpdateJob( "running", Resource_Name(), "", "", "" );
-
-         JobsObtained = 1;
+         if( IsOwnerDenied( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
+         if( IsOwnerRunningToMuch( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
         }
+
+        if( OwnerIndex == Owners.size() )      // no denials or limits reached for any of the owners...
+        {
+         VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No owners were denied service for job " << Job_Id );
+
+         // create temporary job directory with the jobs response data...
+         DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, nA );
+
+         // see if job has limits from job limits script somehow...
+         if( TempJob.RunJobCheckLimitsScript() == 0 )
+         {
+          VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No job limits were encountered for job " << Job_Id );
+
+          // there are no limits and job is ready to be included for running...
+          AddJobToDaemonLists( TempJob );
+
+          // set job into running state on server and through this we now also get input...
+          TempJob.UpdateJob( "running", Resource_Name(), "", "", "" );
+          
+          NORMAL_LOG( "Daemon::RequestWorkCycle; Job with directory " << TempJob.GetJobDirectory() << " accepted" );
+
+          FoundJob = JobsObtained = 1;
+         }
+         else
+          VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; A job limit was encountered for job " << Job_Id );
+          
+        }
+        else
+         VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Denied service for job " << Job_Id );
+
+        if( ServerAPI.Resource_UnLock_Job( Response, (*ServerPointer), TheProject.Project_Name(), Job_Id ) != CURLE_OK ) JobIndex = NrOfJobs;
        }
 
-       if( ServerAPI.Resource_UnLock_Job( Response, (*ServerPointer), TheProject.Project_Name(), Job_Id ) != CURLE_OK ) JobIndex = NrOfJobs;
-      }
+       Offset += Limit;
+      } while( ( NrOfJobs == Limit ) && ( !FoundJob ) && ReadyForScheduling );
 
      }
      else
@@ -407,22 +447,28 @@ int Daemon::RequestWorkCycle( void )
     // sign off from this server...
     if( ServerAPI.Resource_SignOff_Resource( Response, (*ServerPointer), TheProject.Project_Name() ) != CURLE_OK )
      Response.clear();
+
+    DEBUG_LOG( "Daemon::RequestWorkCycle; Signed off from server " << (*ServerPointer) );
    }
 
-   if( (++ServerPointer) != ServerList.end() )         // go to next server in list and sign up there...
+   if( (++ServerPointer) != ServerList.end() && ReadyForScheduling )         // go to next server in list and sign up there...
    {
+    DEBUG_LOG( "Daemon::RequestWorkCycle; Signing up to project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
+
     if( ServerAPI.Resource_SignUp_Resource( Response, (*ServerPointer), TheProject.Project_Name() ) != CURLE_OK )
      Response.clear();
     else
     {
      Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
      if( !Parse_XML( Response, "error" ).empty() ) Response.clear();
+
+     VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed up to project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
     }
    }
    else
     Response.clear();
   }
-  while( ServerPointer != ServerList.end() );
+  while( ServerPointer != ServerList.end() && ReadyForScheduling );
 
  } 
 
