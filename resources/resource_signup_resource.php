@@ -15,8 +15,8 @@ global $ErrorMsgs;
 $ResourceData = Resource_Verify( $_POST[ "project" ] );      
 
 // check if this call is valid...
-if( $ResourceData->active )
-  return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ], "" ) );
+// if( $ResourceData->active )
+//  return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ], "" ) );
 
 // remove any stale locks this resource might have...
 Resource_Remove_Stale_Locks( $ResourceData );
