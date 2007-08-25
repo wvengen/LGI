@@ -137,7 +137,9 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
   return;
  }
 
- if( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "application" ) ) != TheConfig.Project( ProjectNumber ).Application( ApplicationNumber ).Application_Name() )
+ TheScript = NormalizeString( Parse_XML( TheXML, "application" ) );
+ if( TheScript.empty() ) TheScript = NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "application" ) ); 
+ if( TheScript != TheConfig.Project( ProjectNumber ).Application( ApplicationNumber ).Application_Name() )
  {
   CRITICAL_LOG( "DaemonJob::DaemonJob; The XML response application does not match the one specified in the config" );
   return;

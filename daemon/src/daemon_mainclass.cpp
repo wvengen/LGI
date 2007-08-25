@@ -346,9 +346,6 @@ int Daemon::RequestWorkCycle( void )
   {
    if( !Response.empty() )
    {
-    string ExtraJobDetailsTags = "<project> " + TheProject.Project_Name()  + " </project> <this_project_server> " +
-                                 (*ServerPointer) + " </this_project_server> <project_master_server> " +
-                                 Parse_XML( Response, "project_master_server" ) + " </project_master_server> ";
 
     // now check all applications for this project on this server...
 
@@ -357,6 +354,11 @@ int Daemon::RequestWorkCycle( void )
      DaemonConfigProjectApplication TheApplication;
 
      TheApplication = TheProject.Application( nA );
+
+     string ExtraJobDetailsTags = "<project> " + TheProject.Project_Name()  + " </project> <this_project_server> " +
+                                  (*ServerPointer) + " </this_project_server> <project_master_server> " +
+                                  Parse_XML( Response, "project_master_server" ) + " </project_master_server> " +
+                                  "<application> " + TheApplication.Application_Name() + " </application> ";
   
      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Checking system limits for application " << TheApplication.Application_Name() );
 
