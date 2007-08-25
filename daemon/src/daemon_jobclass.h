@@ -164,9 +164,9 @@ class DaemonJob
 
 // -----------------------------------------------------------------------------
 
-int    UnlinkDirectoryRecursively( string Directory );
-string ReadStringFromHashedFile( string FileName );
-void   WriteStringToHashedFile( string String, string FileName );
+int  UnlinkDirectoryRecursively( string Directory );
+int  ReadStringFromHashedFile( string FileName, string &Data );
+void WriteStringToHashedFile( string String, string FileName );
 
 // -----------------------------------------------------------------------------
 

@@ -539,7 +539,7 @@ string ReadStringFromFile( string FileName )
  else
   Buffer.clear();
 
- VERBOSE_DEBUG_LOG_RETURN( Buffer, "ReadStringFromFile; Data returned from file " << FileName << ": " << Buffer );
+ VERBOSE_DEBUG_LOG_RETURN( Buffer, "ReadStringFromFile; Data returned from file " << FileName << ": '" << Buffer << "'" );
 }
 
 // -----------------------------------------------------------------------------

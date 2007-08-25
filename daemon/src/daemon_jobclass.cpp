@@ -84,30 +84,32 @@ DaemonJob::DaemonJob( string TheJobDirectory )
 
  // now check if some critical files should be present and untouched...
 
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_PROJECT_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_APPLICATION_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_TARGET_RESOURCES_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_ID_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_OWNERS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_READ_ACCESS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_STATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_STATE_TIME_STAMP_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_INPUT_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_SPECIFICS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ string Data;
 
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_RUN_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_ABORT_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_PROJECT_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_APPLICATION_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_TARGET_RESOURCES_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_ID_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_OWNERS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_READ_ACCESS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_STATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_STATE_TIME_STAMP_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_SPECIFICS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_INPUT_FILE << " seems corrupt in " << TheJobDirectory ); return; }
 
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_KEY_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
- if( ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE ).empty() ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CA_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_RUN_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_ABORT_SCRIPT << " seems corrupt in " << TheJobDirectory ); return; }
+
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_KEY_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CA_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
 
  // all files are there and are okay... accept the job directory...
 
@@ -243,7 +245,7 @@ string DaemonJob::GetJobDirectory( void )
 string DaemonJob::GetProject( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetProject; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetProject; Returned " << Data );
 }
 
@@ -252,7 +254,7 @@ string DaemonJob::GetProject( void )
 string DaemonJob::GetThisProjectServer( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetThisProjectServer; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetThisProjectServer; Returned " << Data );
 }
 
@@ -261,7 +263,7 @@ string DaemonJob::GetThisProjectServer( void )
 string DaemonJob::GetProjectMasterServer( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetProjectMasterServer; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetProjectMasterServer; Returned " << Data );
 }
 
@@ -270,7 +272,7 @@ string DaemonJob::GetProjectMasterServer( void )
 string DaemonJob::GetApplication( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetApplication; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetApplication; Returned " << Data );
 }
 
@@ -279,7 +281,7 @@ string DaemonJob::GetApplication( void )
 string DaemonJob::GetTargetResources( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetTargetResources; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetTargetResources; Returned " << Data );
 }
 
@@ -288,7 +290,7 @@ string DaemonJob::GetTargetResources( void )
 string DaemonJob::GetJobId( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetJobId; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetJobId; Returned " << Data );
 }
 
@@ -297,7 +299,7 @@ string DaemonJob::GetJobId( void )
 string DaemonJob::GetOwners( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetOwners; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetOwners; Returned " << Data );
 }
 
@@ -306,7 +308,7 @@ string DaemonJob::GetOwners( void )
 string DaemonJob::GetReadAccess( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetReadAccess; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetReadAccess; Returned " << Data );
 }
 
@@ -315,7 +317,7 @@ string DaemonJob::GetReadAccess( void )
 string DaemonJob::GetJobSpecifics( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetJobSpecifics; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetJobSpecifics; Returned " << Data );
 }
 
@@ -324,7 +326,7 @@ string DaemonJob::GetJobSpecifics( void )
 string DaemonJob::GetInput( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetInput; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetInput; Returned " << Data );
 }
 
@@ -342,7 +344,7 @@ string DaemonJob::GetOutput( void )
 string DaemonJob::GetKeyFile( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetKeyFile; JobDirectory empty" );
- string Data = ReadStringFromFile( JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetKeyFile; Returned " << Data );
 }
 
@@ -351,7 +353,7 @@ string DaemonJob::GetKeyFile( void )
 string DaemonJob::GetCertificateFile( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetCertificateFile; JobDirectory empty" );
- string Data = ReadStringFromFile( JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetCertificateFile; Returned " << Data );
 }
 
@@ -360,7 +362,7 @@ string DaemonJob::GetCertificateFile( void )
 string DaemonJob::GetCACertificateFile( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetCACertificateFile; JobDirectory empty" );
- string Data = ReadStringFromFile( JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetCACertificateFile; Returned " << Data );
 }
 
@@ -369,7 +371,7 @@ string DaemonJob::GetCACertificateFile( void )
 string DaemonJob::GetState( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetState; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetState; Returned " << Data );
 }
 
@@ -378,7 +380,7 @@ string DaemonJob::GetState( void )
 string DaemonJob::GetStateTimeStamp( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetStateTimeStamp; JobDirectory empty" );
- string Data = ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetStateTimeStamp; Returned " << Data );
 }
 
@@ -654,7 +656,7 @@ int DaemonJob::UpdateJobFromServer( bool UpdateOutputToo )
 int DaemonJob::RunJobCheckLimitsScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckLimitsScript; JobDirectory empty" );
- if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckLimitsScript; Script seems corrupt, refusing to run it" );
+ string Data; if( !ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT, Data ) ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckLimitsScript; Script seems corrupt, refusing to run it" );
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT );
 
@@ -666,7 +668,7 @@ int DaemonJob::RunJobCheckLimitsScript( void )
 int DaemonJob::RunJobCheckRunningScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckRunningScript; JobDirectory empty" );
- if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckRunningScript; Script seems corrupt, refusing to run it" );
+ string Data; if( !ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT, Data ) ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckRunningScript; Script seems corrupt, refusing to run it" );
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT );
 
@@ -678,7 +680,7 @@ int DaemonJob::RunJobCheckRunningScript( void )
 int DaemonJob::RunJobCheckFinishedScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckFinishedScript; JobDirectory empty" );
- if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckFinishedScript; Script seems corrupt, refusing to run it" );
+ string Data; if( !ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT, Data ) ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobCheckFinishedScript; Script seems corrupt, refusing to run it" );
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT );
 
@@ -690,7 +692,7 @@ int DaemonJob::RunJobCheckFinishedScript( void )
 int DaemonJob::RunJobPrologueScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobPrologueScript; JobDirectory empty" );
- if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobPrologueScript; Script seems corrupt, refusing to run it" );
+ string Data; if( !ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT, Data ) ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobPrologueScript; Script seems corrupt, refusing to run it" );
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT );
 
@@ -702,7 +704,7 @@ int DaemonJob::RunJobPrologueScript( void )
 int DaemonJob::RunJobEpilogueScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobEpilogueScript; JobDirectory empty" );
- if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobEpilogueScript; Script seems corrupt, refusing to run it" );
+ string Data; if( !ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT, Data ) ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobEpilogueScript; Script seems corrupt, refusing to run it" );
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT );
 
@@ -715,7 +717,7 @@ int DaemonJob::RunJobRunScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobRunScript; JobDirectory empty" );
 
- if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobRunScript; Script seems corrupt, refusing to run it" );
+ string Data; if( !ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT, Data ) ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobRunScript; Script seems corrupt, refusing to run it" );
 
  int first_pid, status;
 
@@ -744,7 +746,7 @@ int DaemonJob::RunJobRunScript( void )
 int DaemonJob::RunJobAbortScript( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobAbortScript; JobDirectory empty" );
- if( ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).empty() ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobAbortScript; Script seems corrupt, refusing to run it" );
+ string Data; if( !ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT, Data ) ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobAbortScript; Script seems corrupt, refusing to run it" );
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_ABORT_SCRIPT );
  NORMAL_LOG_RETURN( Value, "DamonJob::RunJobAbortScript; Returned " << Value << " for job with directory " << JobDirectory );
@@ -769,24 +771,24 @@ int DaemonJob::RunAScript( string TheScriptFile )
 
 // -----------------------------------------------------------------------------
 
-string ReadStringFromHashedFile( string FileName )
+int ReadStringFromHashedFile( string FileName, string &Data )
 {
  fstream HashFile( ( FileName + HASHFILE_EXTENTION ).c_str(), fstream::in );
- string Buffer, Line, TheHash;
+ string Line, TheHash;
 
- Buffer = ReadStringFromFile( FileName );
+ Data = ReadStringFromFile( FileName );
 
- BinHex( Hash( Buffer ), TheHash );
+ BinHex( Hash( Data ), TheHash );
 
  getline( HashFile, Line );
 
  if( Line != TheHash )
  {
-  Buffer.clear();
-  CRITICAL_LOG_RETURN( Buffer, "ReadStringFromHashedFile; Data read from file " << FileName << " does not match hash" );
+  Data.clear();
+  CRITICAL_LOG_RETURN( 0, "ReadStringFromHashedFile; Data read from file " << FileName << " does not match hash" );
  }
 
- VERBOSE_DEBUG_LOG_RETURN( Buffer, "ReadStringFromHashedFile; Data returned from file " << FileName << ": " << Buffer );
+ VERBOSE_DEBUG_LOG_RETURN( 1, "ReadStringFromHashedFile; Data returned from file " << FileName << ": '" << Data << "'" );
 }
 
 // -----------------------------------------------------------------------------
