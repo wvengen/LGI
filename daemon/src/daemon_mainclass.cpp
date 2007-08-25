@@ -358,7 +358,8 @@ int Daemon::RequestWorkCycle( void )
      string ExtraJobDetailsTags = "<project> " + TheProject.Project_Name()  + " </project> <this_project_server> " +
                                   (*ServerPointer) + " </this_project_server> <project_master_server> " +
                                   Parse_XML( Response, "project_master_server" ) + " </project_master_server> " +
-                                  "<application> " + TheApplication.Application_Name() + " </application> ";
+                                  "<application> " + TheApplication.Application_Name() + " </application> " +
+                                  "<state> queued </state> ";
   
      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Checking system limits for application " << TheApplication.Application_Name() );
 
