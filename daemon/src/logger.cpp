@@ -26,7 +26,7 @@ int     LoggerMode = NORMAL_LOGGING | CRITICAL_LOGGING;
 
 // ------------------------------------------------------------------------------
 
-void InitializeLogger( int Mode, char *FileName )
+void InitializeLogger( int Mode, const char *FileName )
 {
  LoggerMode = Mode;
  if( !LoggerStream.good() ) LoggerStream.clear();

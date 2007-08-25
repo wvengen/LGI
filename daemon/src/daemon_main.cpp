@@ -47,19 +47,69 @@ void TheSignalHandler( int S )
 
 // ----------------------------------------------------------------------
 
-int main( int *argc, char *argv[] )
+void PrintHelp( char *ExeName )
 {
+ cout << endl << ExeName << " [options] configfile" << endl << endl;
+ cout << "options:" << endl << endl;
+ cout << "-q           log only critical messages" << endl;
+ cout << "-n           log normal messages (default)" << endl;
+ cout << "-v           also log debug messages" << endl;
+ cout << "-vv          also log verbose debug messages" << endl;
+ cout << "-l file      use specified logfile, default is standard output" << endl << endl;
+}
 
+// ----------------------------------------------------------------------
+
+int main( int argc, char *argv[] )
+{
+ int    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING, ConfigFileSet = 0;
+ string LogFile( "/dev/stdout" );
+ string ConfigFile( "LGI.cfg" );
+
+ // check arguments here...
+
+ if( argc <= 1 )
+ {
+  PrintHelp( argv[ 0 ] );
+  return( 1 );
+ }
+ 
  // read passed arguments here...
+
+ for( int i = 1; i < argc; ++i )
+ {
+  if( !strcmp( argv[ i ], "-q" ) ) {
+   LogLevel = CRITICAL_LOGGING;
+  } else if( !strcmp( argv[ i ], "-n" ) ) {
+   LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING;
+  } else if( !strcmp( argv[ i ], "-v" ) ) {
+   LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING | DEBUG_LOGGING;
+  } else if( !strcmp( argv[ i ], "-vv" ) ) {
+   LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING | DEBUG_LOGGING | VERBOSE_DEBUG_LOGGING;
+  } else if( !strcmp( argv[ i ], "-l" ) ) {
+   LogFile = string( argv[ ++i ] );
+  } else {
+   ConfigFile = string( argv[ i ] );
+   ConfigFileSet = 1;
+  };
+ }
+
+ if( !ConfigFileSet ) 
+ {
+  PrintHelp( argv[ 0 ] );
+  return( 1 );
+ }
+
+ // setup signal handlers...
 
  signal( SIGINT, TheSignalHandler );
  signal( SIGQUIT, TheSignalHandler );
  signal( SIGABRT, TheSignalHandler );
  signal( SIGTERM, TheSignalHandler );
 
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING);
+ InitializeLogger( LogLevel, LogFile.c_str() );
  
- TheDaemon = new Daemon( "LGI.cfg" );
+ TheDaemon = new Daemon( ConfigFile );
  
  if( TheDaemon != NULL )
  {

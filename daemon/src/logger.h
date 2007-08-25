@@ -54,7 +54,7 @@ extern int     LoggerMode;
 
 // ------------------------------------------------------------------------------
 
-void InitializeLogger( int Mode = NORMAL_LOGGING | CRITICAL_LOGGING, char *FileName = DEFAULT_LOGGER_FILE );
+void InitializeLogger( int Mode = NORMAL_LOGGING | CRITICAL_LOGGING, const char *FileName = DEFAULT_LOGGER_FILE );
 char *LoggerTime( void );
 
 // ------------------------------------------------------------------------------
