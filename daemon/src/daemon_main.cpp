@@ -57,7 +57,7 @@ int main( int *argc, char *argv[] )
  signal( SIGABRT, TheSignalHandler );
  signal( SIGTERM, TheSignalHandler );
 
- InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING|VERBOSE_DEBUG_LOGGING);
+ InitializeLogger(CRITICAL_LOGGING|NORMAL_LOGGING);
  
  TheDaemon = new Daemon( "LGI.cfg" );
  
