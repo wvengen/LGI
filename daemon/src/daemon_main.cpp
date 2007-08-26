@@ -51,18 +51,21 @@ void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " [options] configfile" << endl << endl;
  cout << "options:" << endl << endl;
- cout << "-q           log only critical messages" << endl;
- cout << "-n           log normal messages (default)" << endl;
- cout << "-v           also log debug messages" << endl;
- cout << "-vv          also log verbose debug messages" << endl;
- cout << "-l file      use specified logfile, default is standard output" << endl << endl;
+ cout << "-d           daemonize and run in background." << endl;
+ cout << "-q           log only critical messages." << endl;
+ cout << "-n           log normal messages. this is the default." << endl;
+ cout << "-v           also log debug messages." << endl;
+ cout << "-vv          also log verbose debug messages." << endl;
+ cout << "-l file      use specified logfile. default is to log to standard output." << endl << endl;
 }
 
 // ----------------------------------------------------------------------
 
 int main( int argc, char *argv[] )
 {
- int    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING, ConfigFileSet = 0;
+ int    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING;
+ int    ConfigFileSet = 0;
+ int    Daemonize = 0;
  string LogFile( "/dev/stdout" );
  string ConfigFile( "LGI.cfg" );
 
@@ -88,6 +91,8 @@ int main( int argc, char *argv[] )
    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING | DEBUG_LOGGING | VERBOSE_DEBUG_LOGGING;
   } else if( !strcmp( argv[ i ], "-l" ) ) {
    LogFile = string( argv[ ++i ] );
+  } else if( !strcmp( argv[ i ], "-d" ) ) {
+   Daemonize = 1;
   } else {
    ConfigFile = string( argv[ i ] );
    ConfigFileSet = 1;
@@ -110,14 +115,32 @@ int main( int argc, char *argv[] )
  InitializeLogger( LogLevel, LogFile.c_str() );
  
  TheDaemon = new Daemon( ConfigFile );
- 
+
  if( TheDaemon != NULL )
  {
   if( TheDaemon -> IsSchedularReady() )
-   while( TheDaemon -> RunSchedular() );
-  delete TheDaemon;
+  {
+   if( Daemonize )
+   {
+    if( fork() == 0 )
+    {
+     setsid();
+     while( TheDaemon -> RunSchedular() );
+     delete TheDaemon;
+     NORMAL_LOG( "Main; Daemon finished normally" );
+     _exit( 0 );
+    }
+   }
+   else
+   {
+    while( TheDaemon -> RunSchedular() );
+    delete TheDaemon;
+    NORMAL_LOG( "Main; Daemon finished normally" );
+   }
+  }
+  else
+   CRITICAL_LOG_RETURN( 1, "Main; Daemon stopped" );
  }
-
- NORMAL_LOG( "Main; Daemon finished" );
+ 
+ return( 0 );
 }
-
