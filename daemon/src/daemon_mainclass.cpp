@@ -280,7 +280,7 @@ int Daemon::CycleThroughJobs( void )
  
  // now see which lists are empty, so we can remove them...
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; )
-  if( !Server -> second.empty() )
+  if( Server -> second.empty() )
    Jobs.erase( Server++ );
   else
    ++Server;
