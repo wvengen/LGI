@@ -25,7 +25,7 @@ if( !$ResourceData->active )
   return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
 
 // query for the job specs...
-$ResourceQuery = mysql_query( "SELECT * FROM active_resources WHERE resource_name=".$RecourceName );
+$ResourceQuery = mysql_query( "SELECT * FROM active_resources WHERE resource_name='".$ResourceName."'" );
 
 if( mysql_num_rows( $ResourceQuery ) != 1 )
 {
