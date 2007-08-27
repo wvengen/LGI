@@ -52,5 +52,6 @@ $ErrorMsgs[ 39 ] = "Resource is not listed as a project-server in the database";
 $ErrorMsgs[ 40 ] = "Compulsory version field was not posted"; 
 $ErrorMsgs[ 41 ] = "Update fields not correctly posted"; 
 $ErrorMsgs[ 42 ] = "Trying to inactivate an already inactive marked resource"; 
+$ErrorMsgs[ 43 ] = "Compulsory resource_name field was not posted"; 
 
 ?>

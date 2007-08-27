@@ -343,3 +343,27 @@ int Resource_Server_API::Resource_Job_State( string &Response, string ServerURL,
 
 // ------------------------------------------------------------------------------
 
+int Resource_Server_API::Resource_Request_Resource_Data( string &Response, string ServerURL, string Project, string Resource_Name )
+{
+ DEBUG_LOG( "Resource_Server_API::Resource_Request_Resource_Data; ServerURL=" << ServerURL << ", Project=" << Project << ", Resource_Name=" << Resource_Name );
+
+ string PostURL = ServerURL + "/resources/resource_request_resource_data.php";
+ CURL *cURLHandle = SetupcURLForPost( PostURL );
+
+ if( cURLHandle != NULL )
+ {
+  struct curl_httppost *PostList = NULL;
+  struct curl_httppost *LastItem = NULL;
+
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "resource_name", CURLFORM_PTRCONTENTS, Resource_Name.c_str(), CURLFORM_END );
+
+  CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
+
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Resource_Server_API::Resource_Request_Resource_Data; returned " << cURLResult );
+ }
+ else
+  CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Resource_Server_API::Resource_Request_Resource_Data; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
+
+}
+
+// ------------------------------------------------------------------------------
