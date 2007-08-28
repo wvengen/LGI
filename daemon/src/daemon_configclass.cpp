@@ -218,8 +218,9 @@ DaemonConfigProject::DaemonConfigProject( DaemonConfig &TheConfig, int TheProjec
   VERBOSE_DEBUG_LOG( "DaemonConfigProject::DaemonConfigProject; Cached project data with ProjectCache=" << ProjectCache );
  
   if( !ProjectCache.empty() )
-   if( sscanf( Attributes.c_str(), "number=%d", &FoundNumber ) != 1 )
-    CRITICAL_LOG( "DaemonConfigProject::DaemonConfigProject; Error in project tag with Attributes=" << Attributes );
+   if( sscanf( Attributes.c_str(), "number='%d'", &FoundNumber ) != 1 )
+    if( sscanf( Attributes.c_str(), "number=\"%d\"", &FoundNumber ) != 1 )
+     CRITICAL_LOG( "DaemonConfigProject::DaemonConfigProject; Error in project tag with Attributes=" << Attributes );
 
  } while ( ( StartPos < ResourceCache.length() ) && ( FoundNumber != TheProjectNumber ) );
 
@@ -354,8 +355,9 @@ DaemonConfigProjectApplication::DaemonConfigProjectApplication( DaemonConfigProj
   VERBOSE_DEBUG_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; Cached application data with ApplicationCache=" << ApplicationCache );
 
   if( !ApplicationCache.empty() )
-   if( sscanf( Attributes.c_str(), "number=%d", &FoundNumber ) != 1 )
-    CRITICAL_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; Error in application tag with Attributes=" << Attributes );
+   if( sscanf( Attributes.c_str(), "number='%d'", &FoundNumber ) != 1 )
+    if( sscanf( Attributes.c_str(), "number=\"%d\"", &FoundNumber ) != 1 )
+     CRITICAL_LOG( "DaemonConfigProjectApplication::DaemonConfigProjectApplication; Error in application tag with Attributes=" << Attributes );
 
  } while ( ( StartPos < TheProject.ProjectCache.length() ) && ( FoundNumber != TheApplicationNumber ) );
 
