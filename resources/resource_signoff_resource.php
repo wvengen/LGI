@@ -39,7 +39,7 @@ $Response .= " <number_of_slave_servers> ".$NumberOfServers." </number_of_slave_
 for( $i = 1; $i <= $NumberOfServers; $i++ )
 {
  $Server = mysql_fetch_object( $queryresult );
- $Response .= " <project_server number=".$i."> ".$Server->url." </project_server>";
+ $Response .= " <project_server number='".$i."'> ".$Server->url." </project_server>";
 }
 
 mysql_free_result( $queryresult );

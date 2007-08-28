@@ -75,7 +75,7 @@ if( $NrOfPossibleJobs >= 1 )
 
    // build job record for this job...
    $ActualNrOfJobs += 1; 
-   $ResponseJobs .= " <job number=".$ActualNrOfJobs."> <job_id> ".$JobSpecs->job_id." </job_id> "; 
+   $ResponseJobs .= " <job number='".$ActualNrOfJobs."'> <job_id> ".$JobSpecs->job_id." </job_id> "; 
    $ResponseJobs .= " <target_resources> ".$JobSpecs->target_resources." </target_resources> "; 
    $ResponseJobs .= " <owners> ".$JobSpecs->owners." </owners> "; 
    $ResponseJobs .= " <read_access> ".$JobSpecs->read_access." </read_access> "; 

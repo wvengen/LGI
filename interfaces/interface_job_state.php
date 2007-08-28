@@ -89,7 +89,7 @@ if( !$DetailMode )
 
     // and build it's response...
     $NrOfJobsReported++;
-    $JobResponses .= " <job number=".$NrOfJobsReported."> <job_id> ".$JobData->job_id." </job_id>";
+    $JobResponses .= " <job number='".$NrOfJobsReported."'> <job_id> ".$JobData->job_id." </job_id>";
     $JobResponses .= " <state> ".$JobData->state." </state> <state_time_stamp> ".$JobData->state_time_stamp." </state_time_stamp>";
     $JobResponses .= " <application> ".$JobData->application." </application> </job>";
    }
@@ -112,7 +112,7 @@ else
   return( LGI_Error_Response( 34, $ErrorMsgs[ 34 ], "" ) );
 
  // finally send out the data in the response... 
- $Response .= " <number_of_jobs> 1 </number_of_jobs> <job number=1>";
+ $Response .= " <number_of_jobs> 1 </number_of_jobs> <job number='1'>";
  $Response .= " <job_id> ".$JobSpecs->job_id." </job_id> ";
  $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources> ";
  $Response .= " <owners> ".$JobSpecs->owners." </owners> ";

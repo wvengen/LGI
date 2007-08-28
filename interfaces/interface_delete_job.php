@@ -53,7 +53,7 @@ else
 $Response =  " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <project_server> ".$Config[ "SERVER_URL" ]." </project_server>";
 $Response .= " <user> ".$JobUser." </user> <groups> ".$JobGroups." </groups>";
-$Response .= " <number_of_jobs> 1 </number_of_jobs> <job number=1>";
+$Response .= " <number_of_jobs> 1 </number_of_jobs> <job number='1'>";
 $Response .= " <job_id> ".$JobSpecs->job_id." </job_id> ";
 $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources> ";
 $Response .= " <application> ".$JobSpecs->application." </application> ";
