@@ -21,24 +21,38 @@
 
 // -----------------------------------------------------------------------------
 
-string Hash( string S )
+string Hash( string S, string StartHash )
 {
  string TheHash( "0123456789ABCDEF" );
- int r, i, n1, n2;
+ int b, r, i, n1, n2, StartIndex, EndIndex, NrBlocks;
  char s;
 
- for( r = 0; r < 16; ++r )
-  for( i = 0; i < S.length(); ++i )
-  {
-   n1 = ( int )( S[ i ] >> 4 ) & 0x0F;
-   n2 = ( int )( S[ i ] ) & 0x0F;
+ if( ( !StartHash.empty() ) && ( StartHash.size() == 16 ) )
+  TheHash = StartHash;
 
-   s = TheHash[ n1 ];
-   TheHash[ n1 ] = TheHash[ n2 ];
-   TheHash[ n2 ] = s;
+ NrBlocks = ( S.length() / HASH_BLOCK_SIZE ) + 1;           
 
-   TheHash[ r ] ^= ( char )( S[ i ] + i );
-  }
+ for( b = 0; b < NrBlocks; ++b )             // run through string in blocks of size HASH_BLOCK_SIZE
+ {
+  StartIndex = b * HASH_BLOCK_SIZE;
+  EndIndex = ( b + 1 ) * HASH_BLOCK_SIZE;
+
+  if( StartIndex >= S.length() ) continue;                 // check the bounds
+  if( EndIndex >= S.length() ) EndIndex = S.length();
+
+  for( r = 0; r < 16; ++r )                        // run through block
+   for( i = StartIndex; i < EndIndex; ++i )
+   {
+    n1 = ( int )( S[ i ] >> 4 ) & 0x0F;
+    n2 = ( int )( S[ i ] ) & 0x0F;
+
+    s = TheHash[ n1 ];
+    TheHash[ n1 ] = TheHash[ n2 ];
+    TheHash[ n2 ] = s;
+
+    TheHash[ r ] ^= ( char )( S[ i ] + i );
+   }
+ }
 
  return( TheHash );
 }
