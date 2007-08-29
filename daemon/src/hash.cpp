@@ -50,7 +50,7 @@ string Hash( string S, string StartHash )
     TheHash[ n1 ] = TheHash[ n2 ];
     TheHash[ n2 ] = s;
 
-    TheHash[ r ] ^= ( char )( S[ i ] + i );
+    TheHash[ r ] ^= ( char )( S[ i ] + ( i - StartIndex ) );
    }
  }
 
