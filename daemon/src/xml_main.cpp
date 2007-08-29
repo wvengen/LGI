@@ -3,8 +3,8 @@
    []--------------------------------------------------------[]
     |                                                        |
     | ATHOR:      M.F.Somers                                 |
-    | VERSION:    1.00, 24 August 2007.                      |
-    | USE:        Implements main for scheduler...           |
+    | VERSION:    1.00, 29 August 2007.                      |
+    | USE:        Implements main for xml tool...            |
     |                                                        |
    []--------------------------------------------------------[]
 
