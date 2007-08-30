@@ -2,7 +2,7 @@ FLAGS=-O2
 CC=g++
 LD=g++
 
-# default compile rune...
+# default compile run...
 %.o : %.cpp
 	${CC} ${FLAGS} -c $<
 
