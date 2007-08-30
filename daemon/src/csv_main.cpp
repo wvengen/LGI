@@ -57,6 +57,7 @@ void PrintHelp( char *ExeName )
  cout << "-s char      set seperator character. default is ','." << endl;
  cout << "-n           output number of values." << endl;
  cout << "-l           output list of values. this is the default." << endl;
+ cout << "-e number    output item number." << endl;
  cout << "-nl          output number and list of values." << endl << endl;
 }
 
@@ -69,6 +70,7 @@ int main( int argc, char *argv[] )
  fstream Output( "/dev/stdout", fstream::out | fstream::binary );
  string  CVSList;
  int     PrintNumberOption = 0;
+ int     PrintItemOption = 0;
  int     PrintListOption = 0;
  char    Separator = ',';
 
@@ -89,6 +91,8 @@ int main( int argc, char *argv[] )
     return( 0 );
   } else if( !strcmp( argv[ i ], "-n" ) ) {
     PrintNumberOption = 1;
+  } else if( !strcmp( argv[ i ], "-e" ) ) {
+    PrintItemOption = atoi( argv[ ++i ] );
   } else if( !strcmp( argv[ i ], "-l" ) ) {
     PrintListOption = 1;
   } else if( !strcmp( argv[ i ], "-nl" ) ) {
@@ -101,7 +105,7 @@ int main( int argc, char *argv[] )
   };
  }
 
- if( !PrintNumberOption && !PrintListOption ) PrintListOption = 1;
+ if( !PrintNumberOption && !PrintListOption && !PrintItemOption ) PrintListOption = 1;
 
  if( CVSList.empty() )
   CVSList = ReadStringFromFile( Input );
@@ -116,6 +120,9 @@ int main( int argc, char *argv[] )
   for( int i = 0; i < ValueList.size(); ++i )
    Output << ValueList[ i ] << endl;
  }
+
+ if( ( PrintItemOption > 0 ) && ( PrintItemOption <= ValueList.size() ) )
+  Output << ValueList[ PrintItemOption - 1 ] << endl;
 
  return( 0 );
 }
