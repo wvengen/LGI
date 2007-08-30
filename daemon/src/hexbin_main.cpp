@@ -38,9 +38,10 @@ void PrintHelp( char *ExeName )
 
 int main( int argc, char *argv[] )
 {
+ char Buffer[ 1024 ];
  fstream Input( "/dev/stdin", fstream::in | fstream::binary );
  fstream Output( "/dev/stdout", fstream::out | fstream::binary );
- string  Bin, Hex, Line;
+ string  Bin;
 
  // read passed arguments here...
 
@@ -60,25 +61,17 @@ int main( int argc, char *argv[] )
   };
  }
 
- Hex.reserve( 1024 );
- Hex.clear();
+ Bin.reserve( 512 );
 
- getline( Input, Line );
  while( Input )
  {
-  Hex.append( Line );
-  Hex.push_back( '\n' );
-  getline( Input, Line );
+  Input.read( Buffer, 1024 );
+  if( Input.gcount() )
+  {
+   HexBin( string( Buffer, Input.gcount() ), Bin );
+   Output << Bin;
+  }
  }
 
- if( Hex.length() >= 1 )
-  Hex = Hex.substr( 0, Hex.length() - 1 );
- else
-  Hex.clear();
-
- HexBin( Hex, Bin );
-
- Output << Bin;
-  
  return( 0 );
 }

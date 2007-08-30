@@ -522,24 +522,19 @@ string DaemonConfigProjectApplication::Job_Abort_Script( void )
 
 string ReadStringFromFile( string FileName )
 {
- fstream File( FileName.c_str(), fstream::in );
- string Buffer, Line;
+ char TempBuffer[ 1024 ];
+ fstream File( FileName.c_str(), fstream::in | fstream::binary );
+ string Buffer;
 
- Buffer.reserve( 1024 );
+ Buffer.reserve( 4096 );
  Buffer.clear();
 
- getline( File, Line );
  while( File )
  {
-  Buffer.append( Line );
-  Buffer.push_back( '\n' );
-  getline( File, Line );
+  File.read( TempBuffer, 1024 );
+  if( File.gcount() ) 
+   Buffer.append( string( TempBuffer, File.gcount() ) );
  }
-
- if( Buffer.length() >= 1 )
-  Buffer = Buffer.substr( 0, Buffer.length() - 1 );
- else
-  Buffer.clear();
 
  VERBOSE_DEBUG_LOG_RETURN( Buffer, "ReadStringFromFile; Data returned from file " << FileName << ": '" << Buffer << "'" );
 }
@@ -548,7 +543,7 @@ string ReadStringFromFile( string FileName )
 
 void WriteStringToFile( string String, string FileName )
 {
- fstream File( FileName.c_str(), fstream::out );
+ fstream File( FileName.c_str(), fstream::out | fstream::binary );
 
  File << String;
 

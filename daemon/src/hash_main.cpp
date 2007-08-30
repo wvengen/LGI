@@ -39,9 +39,10 @@ void PrintHelp( char *ExeName )
 
 int main( int argc, char *argv[] )
 {
+ char Buffer[ HASH_BLOCK_SIZE ];
  fstream Input( "/dev/stdin", fstream::in | fstream::binary );
  fstream Output( "/dev/stdout", fstream::out | fstream::binary );
- string  Bin, TheHash, Line;
+ string  TheHash, TheHexedHash;
 
  // read passed arguments here...
 
@@ -61,26 +62,18 @@ int main( int argc, char *argv[] )
   };
  }
 
- Bin.reserve( 1024 );
- Bin.clear();
+ TheHash.clear();
 
- getline( Input, Line );
  while( Input )
  {
-  Bin.append( Line );
-  Bin.push_back( '\n' );
-  getline( Input, Line );
+  Input.read( Buffer, HASH_BLOCK_SIZE );
+  if( Input.gcount() )
+   TheHash = Hash( string( Buffer, Input.gcount() ), TheHash );
  }
 
- if( Bin.length() >= 1 )
-  Bin = Bin.substr( 0, Bin.length() - 1 );
- else
-  Bin.clear();
+ BinHex( TheHash, TheHexedHash );
 
- TheHash = Hash( Bin );
- BinHex( TheHash, Line );
+ Output << TheHexedHash << endl;
 
- Output << Line;
-  
  return( 0 );
 }

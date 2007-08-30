@@ -22,6 +22,27 @@
 #include <string>
 
 #include "xml.h"
+#include "csv.h"
+
+// ----------------------------------------------------------------------
+
+string ReadStringFromFile( fstream &File )
+{
+ char TempBuffer[ 1024 ];
+ string Buffer;
+
+ Buffer.reserve( 4096 );
+ Buffer.clear();
+
+ while( File )
+ {
+  File.read( TempBuffer, 1024 );
+  if( File.gcount() )
+   Buffer.append( string( TempBuffer, File.gcount() ) );
+ }
+
+ return( Buffer );
+}
 
 // ----------------------------------------------------------------------
 
@@ -40,7 +61,7 @@ int main( int argc, char *argv[] )
 {
  fstream Input( "/dev/stdin", fstream::in | fstream::binary );
  fstream Output( "/dev/stdout", fstream::out | fstream::binary );
- string  Tag, Buffer, Line;
+ string  Tag;
 
  // read passed arguments here...
 
@@ -68,23 +89,7 @@ int main( int argc, char *argv[] )
   return( 1 );
  }
 
- Buffer.reserve( 1024 );
- Buffer.clear();
-
- getline( Input, Line );
- while( Input )
- {
-  Buffer.append( Line );
-  Buffer.push_back( '\n' );
-  getline( Input, Line );
- }
-
- if( Buffer.length() >= 1 )
-  Buffer = Buffer.substr( 0, Buffer.length() - 1 );
- else
-  Buffer.clear();
-
- Output << Parse_XML( Buffer, Tag );
+ Output << NormalizeString( Parse_XML( ReadStringFromFile( Input ), Tag ) ) << endl;
   
  return( 0 );
 }
