@@ -69,7 +69,7 @@ int main( int argc, char *argv[] )
   if( Input.gcount() )
   {
    BinHex( string( Buffer, Input.gcount() ), Hex );
-   Output << Hex << endl;
+   Output << Hex;
   }
  } 
 
