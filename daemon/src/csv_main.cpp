@@ -57,8 +57,9 @@ void PrintHelp( char *ExeName )
  cout << "-s char      set seperator character. default is ','." << endl;
  cout << "-n           output number of values." << endl;
  cout << "-l           output list of values. this is the default." << endl;
- cout << "-e number    output item number." << endl;
- cout << "-nl          output number and list of values." << endl << endl;
+ cout << "-e  number   output item number." << endl;
+ cout << "-nl          output number and list of values." << endl;
+ cout << "-nle number  output number, list of values and specific item." << endl << endl;
 }
 
 // ----------------------------------------------------------------------
@@ -98,6 +99,10 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-nl" ) ) {
     PrintNumberOption = 1;
     PrintListOption = 1;
+  } else if( !strcmp( argv[ i ], "-nle" ) ) {
+    PrintNumberOption = 1;
+    PrintListOption = 1;
+    PrintItemOption = atoi( argv[ ++i ] );
   } else if( !strcmp( argv[ i ], "-s" ) ) {
     Separator = argv[ ++i ][ 0 ];
   } else {
