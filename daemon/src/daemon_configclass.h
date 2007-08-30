@@ -50,8 +50,6 @@ class DaemonConfig
 
               int    IsValidConfigured( void );
               string CA_Certificate_File( void );
-              string Resource_Name( void );
-              string Resource_URL( void );
               string Resource_Certificate_File( void );
               string Resource_Key_File( void );
               string RunDirectory( void );

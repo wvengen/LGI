@@ -42,7 +42,8 @@ if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )
 
 // header of the response...
 $Response = "<start> ".$JobIdStart." </start> <limit> ".$JobIdLimit." </limit>";
-$Response .= " <resource> ".$ResourceData->resource_name." </resource> <project> ".Get_Selected_MySQL_DataBase()." </project>";
+$Response .= " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
+$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
 $Response .= " <resource_active> ".$ResourceData->active." </resource_active>";
 $Response .= " <application> ".$Application." </application>";

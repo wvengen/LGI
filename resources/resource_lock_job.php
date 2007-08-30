@@ -34,7 +34,8 @@ $LockSpecs = mysql_fetch_object( $LockQuery );
 mysql_free_result( $LockQuery );
 
 // build response for this lock...
-$Response = " <resource> ".$ResourceData->resource_name." </resource> <project> ".Get_Selected_MySQL_DataBase()." </project>";
+$Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
+$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
 $Response .= " <resource_active> ".$ResourceData->active." </resource_active>";
 $Response .= " <job_id> ".$JobId." </job_id> ";

@@ -436,7 +436,7 @@ int Daemon::RequestWorkCycle( void )
           AddJobToDaemonLists( TempJob );
 
           // set job into running state on server and through this we now also get input...
-          TempJob.UpdateJob( "running", Resource_Name(), "", "", "" );
+          TempJob.UpdateJob( "running", Parse_XML( JobResponse, "resource" ), "", "", "" );
           
           NORMAL_LOG( "Daemon::RequestWorkCycle; Job with directory " << TempJob.GetJobDirectory() << " accepted" );
 

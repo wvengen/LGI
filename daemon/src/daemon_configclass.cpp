@@ -50,8 +50,6 @@ int DaemonConfig::IsValidConfigured( void )
  if( Resource_Certificate_File().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Resource_Certificate_File() empty" );
  if( ReadStringFromFile( Resource_Certificate_File() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Cannot read form file " << Resource_Certificate_File() );
 
- if( Resource_Name().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Resource_Name() empty" );
- if( Resource_URL().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Resource_URL() empty" );
  if( RunDirectory().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; RunDirectory() empty" );
  if( Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Owner_Allow() empty" );
  if( Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfig::IsValidConfigured; Warning: Owner_Deny() empty" );
@@ -72,28 +70,6 @@ string DaemonConfig::CA_Certificate_File( void )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::CA_Certificate_File; No data in ca_certificate_file tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::CA_Certificate_File; Returned " << Data );
-}
-
-// -----------------------------------------------------------------------------
-
-string DaemonConfig::Resource_Name( void )
-{
- string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "resource_name" ) );
- if( Data.empty() )
-  CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_Name; No data in resource_name tag found" )
- else
-  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_Name; Returned " << Data );
-}
-
-// -----------------------------------------------------------------------------
-
-string DaemonConfig::Resource_URL( void )
-{
- string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "resource_url" ) );
- if( Data.empty() )
-  CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_URL; No data in resource_url tag found" )
- else
-  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_URL; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
