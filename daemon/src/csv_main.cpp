@@ -80,20 +80,42 @@ int main( int argc, char *argv[] )
  for( int i = 1; i < argc; ++i )
  {
   if( !strcmp( argv[ i ], "-i" ) ) {
-    Input.close();
-    Input.open( argv[ ++i ], fstream::in | fstream::binary );
-    if( !Input ) { Output << "input error" << endl; return( 1 ); }
+    if( argv[ ++i ] ) 
+    {
+     Input.close();
+     Input.open( argv[ i ], fstream::in | fstream::binary );
+     if( !Input ) { Output << "input error on file " << argv[ i ] << endl; return( 1 ); }
+    }
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
   } else if( !strcmp( argv[ i ], "-o" ) ) {
-    Output.close();
-    Output.open( argv[ ++i ], fstream::out | fstream::binary );
-    if( !Output ) return( 1 );
+    if( argv[ ++i ] ) 
+    {
+     Output.close();
+     Output.open( argv[ i ], fstream::out | fstream::binary );
+     if( !Output ) return( 1 );
+    }
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
   } else if( !strcmp( argv[ i ], "-h" ) ) {
     PrintHelp( argv[ 0 ] );
     return( 0 );
   } else if( !strcmp( argv[ i ], "-n" ) ) {
     PrintNumberOption = 1;
   } else if( !strcmp( argv[ i ], "-e" ) ) {
-    PrintItemOption = atoi( argv[ ++i ] );
+    if( argv[ ++i ] )
+     PrintItemOption = atoi( argv[ i ] );
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
   } else if( !strcmp( argv[ i ], "-l" ) ) {
     PrintListOption = 1;
   } else if( !strcmp( argv[ i ], "-nl" ) ) {
@@ -102,9 +124,21 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-nle" ) ) {
     PrintNumberOption = 1;
     PrintListOption = 1;
-    PrintItemOption = atoi( argv[ ++i ] );
+    if( argv[ ++i ] )
+     PrintItemOption = atoi( argv[ i ] );
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
   } else if( !strcmp( argv[ i ], "-s" ) ) {
-    Separator = argv[ ++i ][ 0 ];
+    if( argv[ ++i ] )
+     Separator = argv[ i ][ 0 ];
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
   } else {
     CVSList.append( string( argv[ i ] ) );
   };

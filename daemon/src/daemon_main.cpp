@@ -90,7 +90,13 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-vv" ) ) {
    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING | DEBUG_LOGGING | VERBOSE_DEBUG_LOGGING;
   } else if( !strcmp( argv[ i ], "-l" ) ) {
-   LogFile = string( argv[ ++i ] );
+   if( argv[ ++i ] )
+    LogFile = string( argv[ i ] );
+   else
+   {
+    PrintHelp( argv[ 0 ] );
+    return( 1 );
+   }
   } else if( !strcmp( argv[ i ], "-d" ) ) {
    Daemonize = 1;
   } else {
