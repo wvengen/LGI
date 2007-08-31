@@ -65,6 +65,7 @@ void PrintHelp( char *ExeName )
 
 int main( int argc, char *argv[] )
 {
+ DaemonJob Job;
  int Command = 0;
 
  // check number of arguments first...
@@ -86,13 +87,14 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-j" ) ) {
     if( argv[ ++i ] ) 
     {
-     DaemonJob Job( ( string( argv[ i ] ) ) );
+     DaemonJob TempJob( ( string( argv[ i ] ) ) );
 
-     if( Job.GetJobDirectory().empty() ) {
+     if( TempJob.GetJobDirectory().empty() ) {
       cout << "directory " << argv[ i ] << " not a valid job directory" << endl;
       return( 1 );
      }
 
+     Job = TempJob;
      KeyFile = Job.GetKeyFile();
      CertificateFile = Job.GetCertificateFile();
      CACertificateFile = Job.GetCACertificateFile();
@@ -196,10 +198,11 @@ int main( int argc, char *argv[] )
  // if no options passed try local directory as jobdirectory...
  if( KeyFile.empty() && CertificateFile.empty() && CACertificateFile.empty() && ServerURL.empty() && Project.empty() )
  {
-  DaemonJob Job( "." );
+  DaemonJob TempJob( "." );
 
-  if( !Job.GetJobDirectory().empty() )
+  if( !TempJob.GetJobDirectory().empty() )
   {
+   Job = TempJob;
    KeyFile = Job.GetKeyFile();
    CertificateFile = Job.GetCertificateFile();
    CACertificateFile = Job.GetCACertificateFile();
@@ -222,6 +225,12 @@ int main( int argc, char *argv[] )
  if( !Command )
  {
   PrintHelp( argv[ 0 ] );
+  return( 1 );
+ }
+
+ if( ( Command == CMD_SERVE ) && Job.GetJobDirectory().empty() )
+ {
+  cout << "no valid job directory specified for serve command" << endl;
   return( 1 );
  }
 
