@@ -35,13 +35,13 @@ void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " [options] command" << endl << endl;
  cout << "commands:" << endl << endl;
- cout << "serve                               run program as server serving file transfer request jobs." << endl;
+ cout << "serve                               run program as server serving file transfer request jobs from a job directory." << endl;
  cout << "remove file                         remove specified file." << endl;
  cout << "move sourcefile destinationfile     move specified file to specified destination." << endl;
  cout << "copy sourcefile destinationfile     copy specified file to specified destination." << endl << endl;
  cout << "options:" << endl << endl;
  cout << "-h                                  show this help." << endl;
- cout << "-j jobdir                           specify job directory to use. if not specified try current directory or specify following options." << endl;
+ cout << "-j jobdirectory                     specify job directory to use. if not specified try current directory or specify the following options." << endl;
  cout << "-k keyfile                          specify key file." << endl;
  cout << "-c certificatefile                  specify certificate file." << endl;
  cout << "-ca cacertificatefile               specify ca certificate file." << endl;
