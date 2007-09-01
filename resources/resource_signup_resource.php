@@ -12,7 +12,7 @@ require_once( '../inc/Resources.inc' );
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ] );      
+$ResourceData = Resource_Verify( $_POST[ "project" ], false );      
 
 // check if this call is valid...
 if( $ResourceData->active )

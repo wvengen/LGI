@@ -12,17 +12,13 @@ require_once( '../inc/Resources.inc' );
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ] );
+$ResourceData = Resource_Verify( $_POST[ "project" ], false );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || !is_numeric( $_POST[ "job_id" ] ) )
  return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ], "" ) );
 else
  $JobId = $_POST[ "job_id" ];
-
-// check if this call is valid...
-if( !$ResourceData->active )
-  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
 
 // query for the job specs...
 $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobId );

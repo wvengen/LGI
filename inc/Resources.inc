@@ -16,10 +16,12 @@ require_once( '../inc/Utils.inc' );
 
 // -------------------------------------------------------------------- 
 
-function Resource_Verify( $Project )
+function Resource_Verify( $Project, $UpdateTimeStamp )
 {
  global $ErrorMsgs;
  global $Config;
+
+ if( !isset( $UpdateTimeStamp ) ) $UpdateTimeStamp = true;
 
  // first see if valid client certificate was used in the connection...
  if( SSL_Verify_Client() ) return( 2 );
@@ -68,7 +70,8 @@ function Resource_Verify( $Project )
   return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "" ) );
 
  // update time_stamp of resource...
- $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
+ if( $UpdateTimeStamp )
+  $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
 
  return( $Data );
 }

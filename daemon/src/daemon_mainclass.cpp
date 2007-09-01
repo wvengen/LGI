@@ -318,7 +318,7 @@ int Daemon::RequestWorkCycle( void )
 
   if( Response.empty() ) continue;
 
-  if( !Parse_XML( Response, "error" ).empty() ) { CRITICAL_LOG( "Daemon::RequestWorkCycle; Error signing up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) ); continue; }
+  if( !Parse_XML( Response, "error" ).empty() ) { DEBUG_LOG( "Daemon::RequestWorkCycle; Unable to sign up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) ); continue; }
   
   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
 
@@ -476,7 +476,7 @@ int Daemon::RequestWorkCycle( void )
     else
     {
      Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-     if( !Parse_XML( Response, "error" ).empty() ) { CRITICAL_LOG( "Daemon::RequestWorkCycle; Error signing up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) ); Response.clear(); } 
+     if( !Parse_XML( Response, "error" ).empty() ) { DEBUG_LOG( "Daemon::RequestWorkCycle; Unable to sign up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) ); Response.clear(); } 
 
      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed up to project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
     }
