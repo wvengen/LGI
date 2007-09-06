@@ -186,11 +186,7 @@ int Daemon::CycleThroughJobs( void )
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; ++Server )
   if( !Server -> second.empty() )
   {
-   VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to " << Server -> first );
-
-   if( !( ( Server -> second.begin() ) -> SignUp() ) ) continue;      // signup to project and server...
-   
-   VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to " << Server -> first );
+   int SignedUp = 0;
 
    for( list<DaemonJob>::iterator Job = Server -> second.begin(); Job != Server -> second.end() && ReadyForScheduling; ++Job )
    {
@@ -204,6 +200,14 @@ int Daemon::CycleThroughJobs( void )
 
     if( TimeStamp != Job -> GetStateTimeStamp() )                     // server and job not synchronized...
     {
+     if( !SignedUp )
+     {
+      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to " << Server -> first );
+      if( !( ( Server -> second.begin() ) -> SignUp() ) ) continue;      // signup to project and server...
+      SignedUp = 1;
+      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to " << Server -> first );
+     }
+
      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronizing job with directory " << Job -> GetJobDirectory() );
      if( !( Job -> LockJob() ) ) continue;                            // lock, update and unlock job...
      if( !( Job -> UpdateJobFromServer() ) ) continue;
@@ -214,9 +218,12 @@ int Daemon::CycleThroughJobs( void )
      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << Job -> GetJobDirectory() << " was up to date" );
    }
 
-   VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signing off from " << Server -> first );
-   if( !( ( Server -> second.begin() ) -> SignOff() ) ) continue;                      // signoff from server...
-   VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed off from " << Server -> first );
+   if( SignedUp )
+   {
+    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signing off from " << Server -> first );
+    if( !( ( Server -> second.begin() ) -> SignOff() ) ) continue;                      // signoff from server...
+    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed off from " << Server -> first );
+   }
   }
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with job scripts cycle" );
@@ -224,6 +231,8 @@ int Daemon::CycleThroughJobs( void )
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; ++Server )
   if( !Server -> second.empty() )
   {
+   int SignedUp = 0;
+
    for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end() && ReadyForScheduling; )
    {
     DaemonJob TempJob;
@@ -237,11 +246,14 @@ int Daemon::CycleThroughJobs( void )
      {
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Aborting job with directory " << TempJob.GetJobDirectory() );
       if( TempJob.RunJobAbortScript() ) continue;                 // run abort script...
-      if( !TempJob.SignUp() ) continue;                           // update job to server...
+      if( !SignedUp )
+      {
+       if( !TempJob.SignUp() ) continue;                           // update job to server...
+       SignedUp = 1;
+      }
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "aborted", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
-      if( !TempJob.SignOff() ) continue;
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       NORMAL_LOG( "Daemon::CycleThroughJobs; Aborted job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
@@ -254,11 +266,14 @@ int Daemon::CycleThroughJobs( void )
      {
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " was found to be finished" );
       if( TempJob.RunJobEpilogueScript() ) continue;              // run jobs epilogue script...
-      if( !TempJob.SignUp() ) continue;                           // update job to server...
+      if( !SignedUp )
+      {
+       if( !TempJob.SignUp() ) continue;                           // update job to server...
+       SignedUp = 1;
+      }
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "finished", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
-      if( !TempJob.SignOff() ) continue;
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       NORMAL_LOG( "Daemon::CycleThroughJobs; Finished job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
@@ -276,6 +291,9 @@ int Daemon::CycleThroughJobs( void )
      }
     } 
    }
+
+   if( SignedUp )
+    Server -> second.begin() -> SignOff(); 
   }
  
  // now see which lists are empty, so we can remove them...
