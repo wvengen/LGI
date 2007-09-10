@@ -36,6 +36,7 @@ Daemon::Daemon( string ConfigFile ) : DaemonConfig( ConfigFile )
 
 int Daemon::ScanDirectoryForJobs( string Directory )
 {
+ struct stat FileStat;
  struct dirent *Entry;
  DIR *Dir = opendir( Directory.c_str() );
  unsigned int FileMask = 0;
@@ -49,9 +50,12 @@ int Daemon::ScanDirectoryForJobs( string Directory )
   if( !strcmp( Entry -> d_name, "." ) ) continue;
   if( !strcmp( Entry -> d_name, ".." ) ) continue;
 
-  if( Entry -> d_type & DT_DIR )
+  string FilePath = Directory + "/" + string( Entry -> d_name );
+  if( stat( FilePath.c_str(), &FileStat ) ) continue;
+
+  if( S_ISDIR( FileStat.st_mode ) )              // check if it is a directory...
   {
-   if( !ScanDirectoryForJobs( Directory + "/" + string( Entry -> d_name ) ) ) 
+   if( !ScanDirectoryForJobs( FilePath ) ) 
    {
     closedir( Dir );
     return( 0 );

@@ -25,6 +25,7 @@ int UnlinkDirectoryRecursively( string Directory )
 {
  string Name;
  struct dirent *Entry;
+ struct stat FileStat;
  DIR *Dir = opendir( Directory.c_str() );
 
  if( Dir == NULL ) return( 0 );
@@ -36,7 +37,9 @@ int UnlinkDirectoryRecursively( string Directory )
 
   Name = Directory + "/" + string( Entry -> d_name );
 
-  if( Entry -> d_type & DT_DIR )
+  if( stat( Name.c_str(), &FileStat ) ) continue;
+
+  if( S_ISDIR( FileStat.st_mode ) )                        // check if it is a directory...
   { 
    if( UnlinkDirectoryRecursively( Name ) ) 
    {
