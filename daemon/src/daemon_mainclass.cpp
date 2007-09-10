@@ -178,7 +178,7 @@ int Daemon::RemoveJobFromDaemonLists( DaemonJob Job )
 int Daemon::CycleThroughJobs( void )
 {
  if( Jobs.empty() ) CRITICAL_LOG_RETURN( 0, "Daemon::CycleThroughJobs; Daemon lists empty" ); 
-    
+ 
  JobsFinished = 0;
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with update from server cycle" );
@@ -202,7 +202,7 @@ int Daemon::CycleThroughJobs( void )
     {
      if( !SignedUp )
      {
-      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to " << Server -> first );
+      DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to " << Server -> first );
       if( !( ( Server -> second.begin() ) -> SignUp() ) ) continue;      // signup to project and server...
       SignedUp = 1;
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to " << Server -> first );
@@ -220,17 +220,21 @@ int Daemon::CycleThroughJobs( void )
 
    if( SignedUp )
    {
-    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signing off from " << Server -> first );
+    DEBUG_LOG( "Daemon::CycleThroughJobs; Signing off from " << Server -> first );
     if( !( ( Server -> second.begin() ) -> SignOff() ) ) continue;                      // signoff from server...
     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed off from " << Server -> first );
    }
   }
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with job scripts cycle" );
+ 
+ Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File() );
+ string ServerURL, Project, Response;
 
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; ++Server )
   if( !Server -> second.empty() )
   {
+   int SignedUp = 0;
 
    for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end() && ReadyForScheduling; )
    {
@@ -244,12 +248,19 @@ int Daemon::CycleThroughJobs( void )
      if( TempJob.GetState() == "aborting" )                       // do we need to abort the job...
      {
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Aborting job with directory " << TempJob.GetJobDirectory() );
-      if( TempJob.RunJobAbortScript() ) continue;                 // run abort script...
-      if( !TempJob.SignUp() ) continue;                           // update job to server...
+      if( TempJob.RunJobAbortScript() ) continue;                 // run abort script... and update job to server...
+      if( !SignedUp )
+      {
+       DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to server " << ServerURL << " for project " << Project );
+       if( !TempJob.SignUp() ) continue;                          // sign up if needed...
+       SignedUp = 1;
+       ServerURL = TempJob.GetThisProjectServer();
+       Project = TempJob.GetProject();
+       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to server " << ServerURL << " for project " << Project );
+      }
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "aborted", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
-      if( !TempJob.SignOff() ) continue;                         
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       NORMAL_LOG( "Daemon::CycleThroughJobs; Aborted job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
@@ -261,12 +272,19 @@ int Daemon::CycleThroughJobs( void )
      if( TempJob.RunJobCheckFinishedScript() == 0 )               // the job is finished...
      {
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " was found to be finished" );
-      if( TempJob.RunJobEpilogueScript() ) continue;              // run jobs epilogue script...
-      if( !TempJob.SignUp() ) continue;                           // update job to server...
+      if( TempJob.RunJobEpilogueScript() ) continue;              // run jobs epilogue script... update job to server...
+      if( !SignedUp ) 
+      { 
+       DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to server " << ServerURL << " for project " << Project );
+       if( !TempJob.SignUp() ) continue;                         // sign up if needed...
+       SignedUp = 1;
+       ServerURL = TempJob.GetThisProjectServer();
+       Project = TempJob.GetProject();
+       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to server " << ServerURL << " for project " << Project );
+      }
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "finished", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
-      if( !TempJob.SignOff() ) continue;                          
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       NORMAL_LOG( "Daemon::CycleThroughJobs; Finished job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
@@ -283,6 +301,23 @@ int Daemon::CycleThroughJobs( void )
       }
      }
     } 
+   }
+
+   if( SignedUp )      // sign off from server if needed...
+   {
+    DEBUG_LOG( "Daemon::CycleThroughJobs; Signing of from server " << ServerURL << " for project " << Project );
+
+    do
+    {
+     if( ServerAPI.Resource_SignOff_Resource( Response, ServerURL, Project ) )
+     {
+      CRITICAL_LOG( "Daemon::CycleThroughJobs; Could not post to server " << ServerURL );
+      break;
+     }
+     Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+    } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+
+    if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG( "Daemon::CycleThroughJobs; Error from server Response=" << Response );
    }
 
   }
@@ -313,7 +348,7 @@ int Daemon::RequestWorkCycle( void )
 
   TheProject = Project( nP );
 
-  // first signup to registered master server of this project to get all slaves... 
+  // first signup to registered master server of this project to get all slaves... if this fails somehow, try the next...
 
   list<string> ServerList;
   string Response, Attributes;
@@ -327,7 +362,7 @@ int Daemon::RequestWorkCycle( void )
 
   if( Response.empty() ) continue;
 
-  if( !Parse_XML( Response, "error" ).empty() ) { DEBUG_LOG( "Daemon::RequestWorkCycle; Unable to sign up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) ); continue; }
+  if( !Parse_XML( Response, "error" ).empty() ) { CRITICAL_LOG( "Daemon::RequestWorkCycle; Unable to sign up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() << " : " << Parse_XML( Parse_XML( Response, "error" ), "message" ) ); continue; }
   
   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
 
@@ -470,10 +505,12 @@ int Daemon::RequestWorkCycle( void )
     }
 
     // sign off from this server...
+    DEBUG_LOG( "Daemon::RequestWorkCycle; Signing off from server " << (*ServerPointer) );
+
     if( ServerAPI.Resource_SignOff_Resource( Response, (*ServerPointer), TheProject.Project_Name() ) != CURLE_OK )
      Response.clear();
 
-    DEBUG_LOG( "Daemon::RequestWorkCycle; Signed off from server " << (*ServerPointer) );
+    VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed off from server " << (*ServerPointer) );
    }
 
    if( (++ServerPointer) != ServerList.end() && ReadyForScheduling )         // go to next server in list and sign up there...
