@@ -69,7 +69,7 @@ hash.o : hash.cpp hash.h
 
 # clean up...
 clean :
-	rm ${OBJS} LGI_daemon xml binhex hexbin hash csv LGI_filetransfer
+	rm -rf ${OBJS} LGI_daemon xml binhex hexbin hash csv LGI_filetransfer
 
 # install...
 uninstall :
