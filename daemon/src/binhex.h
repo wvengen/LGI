@@ -2,7 +2,7 @@
     |                       binhex.h                         |
    []--------------------------------------------------------[]
     |                                                        |
-    | ATHOR:      M.F.Somers                                 |
+    | AUTHOR:     M.F.Somers                                 |
     | VERSION:    1.00, 2 August 2007.                       |
     | USE:        Implements binhex and hebin...             |
     |                                                        |

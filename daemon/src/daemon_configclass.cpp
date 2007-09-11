@@ -2,7 +2,7 @@
     |                 daemon_configclass.cpp                 |
    []--------------------------------------------------------[]
     |                                                        |
-    | ATHOR:      M.F.Somers                                 |
+    | AUTHOR:     M.F.Somers                                 |
     | VERSION:    1.00, 2 August 2007.                       |
     | USE:        Implements config file class...            |
     |                                                        |

@@ -2,7 +2,7 @@
     |                   daemon_main.cpp                      |
    []--------------------------------------------------------[]
     |                                                        |
-    | ATHOR:      M.F.Somers                                 |
+    | AUTHOR:     M.F.Somers                                 |
     | VERSION:    1.00, 24 August 2007.                      |
     | USE:        Implements main for scheduler...           |
     |                                                        |

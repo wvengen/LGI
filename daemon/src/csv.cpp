@@ -2,7 +2,7 @@
     |                      csv.cpp                           |
    []--------------------------------------------------------[]
     |                                                        |
-    | ATHOR:      M.F.Somers                                 |
+    | AUTHOR:     M.F.Somers                                 |
     | VERSION:    1.00, 14 August 2007.                      |
     | USE:        Implements a csv parser...                 |
     |                                                        |

@@ -1,5 +1,16 @@
 <?php
 
+// []--------------------------------------------------------[]
+//  |                      Servers.inc                       |
+// []--------------------------------------------------------[]
+//  |                                                        |
+//  | AUTHOR:     M.F.Somers                                 |
+//  | VERSION:    1.00, August 2007.                         |
+//  | USE:        Subroutines of server API...               |
+//  |                                                        |
+// []--------------------------------------------------------[]
+//
+//
 // Copyright (C) 2007 M.F. Somers, Theoretical Chemistry Group, Leiden University
 //
 // This is free software; you can redistribute it and/or modify it under the terms of

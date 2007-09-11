@@ -2,7 +2,7 @@
     |                 daemon_mainclass.h                     |
    []--------------------------------------------------------[]
     |                                                        |
-    | ATHOR:      M.F.Somers                                 |
+    | AUTHOR:     M.F.Somers                                 |
     | VERSION:    1.00, 20 August 2007.                      |
     | USE:        Implements main scheduler class...         |
     |                                                        |

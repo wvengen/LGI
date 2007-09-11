@@ -1,5 +1,16 @@
 <?php
 
+// []--------------------------------------------------------[]
+//  |               resource_update_job.php                  |
+// []--------------------------------------------------------[]
+//  |                                                        |
+//  | AUTHOR:     M.F.Somers                                 |
+//  | VERSION:    1.00, August 2007.                         |
+//  | USE:        Update job in project DB...                |
+//  |                                                        |
+// []--------------------------------------------------------[]
+//
+//
 // Copyright (C) 2007 M.F. Somers, Theoretical Chemistry Group, Leiden University
 //
 // This is free software; you can redistribute it and/or modify it under the terms of

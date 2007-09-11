@@ -1,5 +1,16 @@
 <?php
 
+// []--------------------------------------------------------[]
+//  |            interface_project_server_list.php           |
+// []--------------------------------------------------------[]
+//  |                                                        |
+//  | AUTHOR:     M.F.Somers                                 |
+//  | VERSION:    1.00, August 2007.                         |
+//  | USE:        List project servers from project DB...    |
+//  |                                                        |
+// []--------------------------------------------------------[]
+//
+//
 // Copyright (C) 2007 M.F. Somers, Theoretical Chemistry Group, Leiden University
 //
 // This is free software; you can redistribute it and/or modify it under the terms of

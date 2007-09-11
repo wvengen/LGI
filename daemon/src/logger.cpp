@@ -2,7 +2,7 @@
     |                      logger.cpp                        |
    []--------------------------------------------------------[]
     |                                                        |
-    | ATHOR:      M.F.Somers                                 |
+    | AUTHOR:     M.F.Somers                                 |
     | VERSION:    1.00, 10 July 2007.                        |
     | USE:        Implements a basic logging mechanism...    |
     |                                                        |

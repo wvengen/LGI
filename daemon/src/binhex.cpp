@@ -2,7 +2,7 @@
     |                      binhex.cpp                        |
    []--------------------------------------------------------[]
     |                                                        |
-    | ATHOR:      M.F.Somers                                 |
+    | AUTHOR:     M.F.Somers                                 |
     | VERSION:    1.00, 2 August 2007.                       |
     | USE:        Implements binhex and hexbin...            |
     |                                                        |
@@ -46,7 +46,7 @@ void HexBin( const string& Hex, string &Bin )
 {
  const string HEXDIGITS = "0123456789ABCDEF";
  int i, Length = Hex.length();
- int HighNible, LowNible;
+ int HighNibble, LowNibble;
 
  Bin.clear();
 
@@ -60,9 +60,9 @@ void HexBin( const string& Hex, string &Bin )
 
  for( ; i < Length; i += 2 )
  {
-  HighNible = HEXDIGITS.find( Hex[ i ], 0 );
-  LowNible = HEXDIGITS.find( Hex[ i + 1 ], 0 );
-  Bin.push_back( ( ( HighNible << 4 ) | LowNible ) & 0xFF );
+  HighNibble = HEXDIGITS.find( Hex[ i ], 0 );
+  LowNibble = HEXDIGITS.find( Hex[ i + 1 ], 0 );
+  Bin.push_back( ( ( HighNibble << 4 ) | LowNibble ) & 0xFF );
  }
 
 }

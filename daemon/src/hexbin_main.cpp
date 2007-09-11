@@ -2,7 +2,7 @@
     |                    hexbin_main.cpp                     |
    []--------------------------------------------------------[]
     |                                                        |
-    | ATHOR:      M.F.Somers                                 |
+    | AUTHOR:     M.F.Somers                                 |
     | VERSION:    1.00, 29 August 2007.                      |
     | USE:        Implements main for hexbin tool...         |
     |                                                        |

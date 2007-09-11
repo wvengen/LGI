@@ -2,7 +2,7 @@
     |                resource_server_api.h                   |
    []--------------------------------------------------------[]
     |                                                        |
-    | ATHOR:      M.F.Somers                                 |
+    | AUTHOR:     M.F.Somers                                 |
     | VERSION:    1.00, 10 July 2007.                        |
     | USE:        Implements the resource daemon API to the  |
     |             project server using cURL...               |
