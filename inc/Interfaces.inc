@@ -30,6 +30,7 @@ require_once( '../inc/Utils.inc' );
 function Interface_Verify( $Project, $User, $Groups )
 {
  global $ErrorMsgs;
+ global $Config;
 
  // first see if valid client certificate was used in the connection ...
  if( SSL_Verify_Client() ) return( 2 );
@@ -71,12 +72,14 @@ function Interface_Verify( $Project, $User, $Groups )
   $Groups = substr( $NewGroupList, 2 );
  }
 
+ // if it was not posted, use default value for this server...
+
+ if( !isset( $Project ) || ( $Project == "" ) )
+  $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
+
  // now check if certificate has any allowed projects listed...
  if( $CommonNameArray[ 0 ] >= 3 )
  {
-  // if it was not posted, use default value for this server...
-  if( !isset( $Project ) || ( $Project == "" ) )
-   $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
 
   // check if allowed...
   if( FoundInCommaSeparatedField( $CommonNameArray[ 3 ], $Project, "," ) )
@@ -88,8 +91,7 @@ function Interface_Verify( $Project, $User, $Groups )
  {
   // otherwise just try the possibly posted Project...
 
-  if( isset( $Project ) && ( $Project != "" ) )
-    Select_MySQL_DataBase( $Project );
+  Select_MySQL_DataBase( $Project );
  }
 
 }
