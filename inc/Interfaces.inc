@@ -41,6 +41,10 @@ function Interface_Verify( $Project, $User, $Groups )
  if( !isset( $User ) || ( $User == "" ) )
   return( LGI_Error_Response( 32, $ErrorMsgs[ 32 ], "" ) );
 
+ // if it was not posted, use default value for this server...
+ if( !isset( $Project ) || ( $Project == "" ) )
+  $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
+
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
  $CommonName = $CommonNameArray[ 1 ];
@@ -72,15 +76,9 @@ function Interface_Verify( $Project, $User, $Groups )
   $Groups = substr( $NewGroupList, 2 );
  }
 
- // if it was not posted, use default value for this server...
-
- if( !isset( $Project ) || ( $Project == "" ) )
-  $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
-
  // now check if certificate has any allowed projects listed...
  if( $CommonNameArray[ 0 ] >= 3 )
  {
-
   // check if allowed...
   if( FoundInCommaSeparatedField( $CommonNameArray[ 3 ], $Project, "," ) )
    Select_MySQL_DataBase( $Project );

@@ -37,6 +37,10 @@ function Resource_Verify( $Project, $UpdateTimeStamp )
  // first see if valid client certificate was used in the connection...
  if( SSL_Verify_Client() ) return( 2 );
 
+ // if it was not posted, use default value for this server...
+ if( !isset( $Project ) || ( $Project == "" ) )
+  $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
+
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
  $CommonName = mysql_escape_string( $CommonNameArray[ 1 ] );
@@ -44,10 +48,6 @@ function Resource_Verify( $Project, $UpdateTimeStamp )
  // check if certificate has any allowed projects listed...
  if( $CommonNameArray[ 0 ] >= 2 )  
  {
-  // if it was not posted, use default value for this server...
-  if( !isset( $Project ) || ( $Project == "" ) )
-   $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
-
   // check if allowed...
   if( FoundInCommaSeparatedField( $CommonNameArray[ 2 ], $Project, "," ) ) 
    Select_MySQL_DataBase( $Project ); 
