@@ -507,7 +507,7 @@ int Daemon::RequestWorkCycle( void )
        }
 
        Offset += Limit;
-      } while( ( NrOfJobs == Limit ) && ( !FoundJob ) && ReadyForScheduling );
+      } while( ( NrOfJobs >= ( Limit >> 1 ) ) && ( !FoundJob ) && ReadyForScheduling );
 
      }
      else
