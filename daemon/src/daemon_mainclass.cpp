@@ -374,8 +374,6 @@ int Daemon::RequestWorkCycle( void )
   
   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Received list of " << NumberOfServers << " servers from " << TheProject.Project_Master_Server() );
 
-  if( NumberOfServers <= 0 ) continue;
-
   string SlaveServer;
 
   for( int nS = StartPos = 0; nS < NumberOfServers; nS++ )
