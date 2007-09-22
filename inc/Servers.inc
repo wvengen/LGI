@@ -228,11 +228,11 @@ function Server_Check_For_InActive_Resources( )
    $ResourceID = mysql_fetch_object( $TheResources );
    $ResourceID = $ResourceID->resource_id;
 
-   // reset active flag...
-   $queryresult = mysql_query( "UPDATE active_resources SET active=0 WHERE resource_id=".$ResourceID );
-
-   // and remove any locks of this resource...
+   // remove any locks of this resource...
    Server_Remove_Stale_Locks_Of_Resource( $ResourceID );
+
+   // and reset active flag...
+   $queryresult = mysql_query( "UPDATE active_resources SET active=0 WHERE resource_id=".$ResourceID );
   }
  
  mysql_free_result( $TheResources );
