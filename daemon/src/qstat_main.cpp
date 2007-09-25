@@ -214,11 +214,11 @@ int main( int argc, char *argv[] )
  if( ServerURL.empty() ) Flag = 1;
  if( User.empty() ) Flag = 1;
  if( Groups.empty() ) Flag = 1;
- if( !Job_Id.empty() & ListServers ) Flag = 1;
- if( !Application.empty() & ListServers ) Flag = 1;
- if( !State.empty() & ListServers ) Flag = 1;
- if( !Job_Id.empty() & !Application.empty() ) Flag = 1;
- if( !Job_Id.empty() & !State.empty() ) Flag = 1;
+ if( !Job_Id.empty() && ListServers ) Flag = 1;
+ if( !Application.empty() && ListServers ) Flag = 1;
+ if( !State.empty() && ListServers ) Flag = 1;
+ if( !Job_Id.empty() && !Application.empty() ) Flag = 1;
+ if( !Job_Id.empty() && !State.empty() ) Flag = 1;
 
  if( Flag )
  {
@@ -254,7 +254,6 @@ int main( int argc, char *argv[] )
     return( 1 );
    }
 
-   cout << "--- Project server list requested ---" << endl << endl;
    cout << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
    cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
    
@@ -264,8 +263,6 @@ int main( int argc, char *argv[] )
  
    for( int i = 1; i <= Count; ++i )
     cout << "Project slave server  : " << NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) ) << endl;
-
-   cout << endl << "--- End of project server list ---" << endl;
   }
 
   return( 0 );
