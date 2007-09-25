@@ -29,7 +29,7 @@
 
 // ----------------------------------------------------------------------
 
-string KeyFile, CertificateFile, CACertificateFile, ServerURL, 
+string KeyFile, CertificateFile, CACertificateFile, ServerURL, Response,
        Project, State, Application, User, Groups, Job_Id, ConfigDir;
 int OutputInXML = 0;
 int ListServers = 0;
@@ -76,6 +76,7 @@ int main( int argc, char *argv[] )
  Groups = ReadStringFromFile( ConfigDir + "/groups" );
  ServerURL = ReadStringFromFile( ConfigDir + "/defaultserver" );
  Project = ReadStringFromFile( ConfigDir + "/defaultproject" );
+
  if( !ReadStringFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
  if( !ReadStringFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
  if( !ReadStringFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
@@ -209,9 +210,74 @@ int main( int argc, char *argv[] )
   return( 1 );
  }
 
- // ...
- // ...
- // ...
+ // remove newlines from possible file reading...
+ while( User[ User.size() - 1 ] == '\n' ) User = User.substr( 0, User.size() - 1 );
+ while( Groups[ Groups.size() - 1 ] == '\n' ) Groups = Groups.substr( 0, Groups.size() - 1 );
+ while( Project[ Project.size() - 1 ] == '\n' ) Project = Project.substr( 0, Project.size() - 1 );
+ while( ServerURL[ ServerURL.size() - 1 ] == '\n' ) ServerURL = ServerURL.substr( 0, ServerURL.size() - 1 );
+
+ // now start qstating the server...
+ Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );
+
+ if( ListServers )            // should we list servers...
+ {
+
+  if( ( Flag = ServerAPI.Interface_Project_Server_List( Response, ServerURL, Project, User, Groups ) ) != CURLE_OK )
+  {
+   cout << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl;
+   return( 1 );
+  }
+
+  Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
+  if( OutputInXML )
+  {
+   cout << Response << endl;                // just dump the XML if requested...
+
+   if( !Parse_XML( Response, "error" ).empty() ) return( 1 );
+  }
+  else
+  {
+   if( !Parse_XML( Response, "error" ).empty() ) 
+   {
+    cout << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl;
+    return( 1 );
+   }
+
+   cout << "--- Project server list requested ---" << endl << endl;
+   cout << "This project server   :         " << NormalizeString( ServerURL ) << endl << endl;
+   cout << "Project master server :         " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl << endl;
+   
+   int Count = atoi( NormalizeString( Parse_XML( Response, "number_of_slave_servers" ) ).c_str() );
+   int StartPos = 0;
+   string Attributes;
+ 
+   for( int i = 1; i <= Count; ++i )
+    cout << "Project slave server :         " << NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) ) << endl;
+   if( Count ) cout << endl;
+
+   cout << "--- End of project server list ---" << endl << endl;
+  }
+ }
+
+ if( Job_Id.empty() )      // did we ask for details...
+ {
+  if( OutputInXML )
+  {
+  }
+  else
+  {
+  }
+ }
+ else                    // when details were requested...
+ {
+  if( OutputInXML )
+  {
+  }
+  else
+  {
+  }
+ }
 
  return( 0 );
 }
