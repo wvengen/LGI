@@ -208,12 +208,17 @@ int main( int argc, char *argv[] )
 
  int Flag = 0;
 
- if( KeyFile.empty() ) Flag = 1;
+ if( KeyFile.empty() ) Flag = 1;                  // check combo's of all options...
  if( CertificateFile.empty() ) Flag = 1;
  if( CACertificateFile.empty() ) Flag = 1;
  if( ServerURL.empty() ) Flag = 1;
  if( User.empty() ) Flag = 1;
  if( Groups.empty() ) Flag = 1;
+ if( !Job_Id.empty() & ListServers ) Flag = 1;
+ if( !Application.empty() & ListServers ) Flag = 1;
+ if( !State.empty() & ListServers ) Flag = 1;
+ if( !Job_Id.empty() & !Application.empty() ) Flag = 1;
+ if( !Job_Id.empty() & !State.empty() ) Flag = 1;
 
  if( Flag )
  {
@@ -250,19 +255,17 @@ int main( int argc, char *argv[] )
    }
 
    cout << "--- Project server list requested ---" << endl << endl;
-   cout << "This project          :         " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
-   cout << "This project server   :         " << NormalizeString( ServerURL ) << endl << endl;
-   cout << "Project master server :         " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl << endl;
+   cout << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+   cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
    
    int Count = atoi( NormalizeString( Parse_XML( Response, "number_of_slave_servers" ) ).c_str() );
    int StartPos = 0;
    string Attributes;
  
    for( int i = 1; i <= Count; ++i )
-    cout << "Project slave server :         " << NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) ) << endl;
-   if( Count ) cout << endl;
+    cout << "Project slave server  : " << NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) ) << endl;
 
-   cout << "--- End of project server list ---" << endl << endl;
+   cout << endl << "--- End of project server list ---" << endl;
   }
 
   return( 0 );
@@ -313,9 +316,24 @@ int main( int argc, char *argv[] )
     return( 1 );
    }
 
-   // ...
-   // ...
-   // ...
+   // show the details of the job...
+
+   cout << "Project               : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+   cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
+   cout << "Project server        : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
+   cout << "User                  : " << NormalizeString( Parse_XML( Response, "user" ) ) << endl;
+   cout << "Groups                : " << NormalizeString( Parse_XML( Response, "groups" ) ) << endl;
+ 
+   cout << "Job id                : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << endl;
+   cout << "Job state             : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) << endl;
+   cout << "Job application       : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "application" ) ) << endl;
+   cout << "Job specifics         : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_specifics" ) ) << endl;
+   cout << "Target resources      : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "target_resources" ) ) << endl;
+   cout << "Job owners            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "owners" ) ) << endl;
+   cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
+   cout << "Time stamp            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ) << endl;
+   cout << "Input                 : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ) << endl;
+   cout << "Output                : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ) << endl;
 
   }
  }
