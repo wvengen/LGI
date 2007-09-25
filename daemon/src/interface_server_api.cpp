@@ -1,0 +1,227 @@
+/* []--------------------------------------------------------[]
+    |               interface_server_api.cpp                 |
+   []--------------------------------------------------------[]
+    |                                                        |
+    | AUTHOR:     M.F.Somers                                 |
+    | VERSION:    1.00, 10 July 2007.                        |
+    | USE:        Implements the interface API to the        |
+    |             project server using cURL...               |
+    |                                                        |
+   []--------------------------------------------------------[]
+
+*/
+
+// Copyright (C) 2007 M.F. Somers, Theoretical Chemistry Group, Leiden University
+//
+// This is free software; you can redistribute it and/or modify it under the terms of
+// the GNU General Public License as published by the Free Software Foundation.
+//
+// http://www.gnu.org/licenses/gpl.txt
+
+#include "interface_server_api.h"
+
+// ------------------------------------------------------------------------------
+
+Interface_Server_API::Interface_Server_API( string KeyFile, string CertificateFile, string CAFile )
+{
+ DEBUG_LOG( "Interface_Server_API::Interface_Server_API; KeyFile=" << KeyFile << ", CertificateFile=" << CertificateFile << ", CAFile=" << CAFile );
+
+ PrivateKeyFile = KeyFile;
+ PublicCertificateFile = CertificateFile;
+ CAChainFile = CAFile;
+}
+
+// ------------------------------------------------------------------------------
+
+CURL *Interface_Server_API::SetupcURLForPost( string &PostURL )
+{
+ CURL *cURLHandle = curl_easy_init(); 
+
+ if( cURLHandle != NULL )
+ {
+  curl_easy_setopt( cURLHandle, CURLOPT_URL, PostURL.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLCERT, PublicCertificateFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, PrivateKeyFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CAChainFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+  DEBUG_LOG_RETURN( cURLHandle, "Interface_Server_API::SetupcURLForPost; Obtained cURL handle for PostURL=" << PostURL );
+ }
+
+ CRITICAL_LOG_RETURN( cURLHandle, "Interface_Server_API::SetupcURLForPost; Failed to obtain a cURL handle for PostURL=" << PostURL );
+}
+
+// ------------------------------------------------------------------------------
+
+size_t Interface_Server_API::WriteToStringCallBack( void *ptr, size_t size, size_t nmemb, void *stream )
+{
+ string *PointerToString = (string *)( stream );
+
+ (*PointerToString).append( (char *)( ptr ), size * nmemb );
+
+ return( size * nmemb );
+}
+
+// ------------------------------------------------------------------------------
+
+CURLcode Interface_Server_API::PerformcURLPost( string &Response, CURL *cURLHandle, curl_httppost *PostList )
+{
+
+ if( cURLHandle != NULL )
+ {
+  Response.reserve( 8192 );    
+  Response.clear();
+
+  curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, &Response );
+  curl_easy_setopt( cURLHandle, CURLOPT_WRITEFUNCTION, WriteToStringCallBack );
+  if( PostList != NULL ) curl_easy_setopt( cURLHandle, CURLOPT_HTTPPOST, PostList );
+
+  CURLcode cURLResult = curl_easy_perform( cURLHandle );
+
+  curl_easy_cleanup( cURLHandle );
+  if( PostList != NULL ) curl_formfree( PostList );
+
+  if( cURLResult != CURLE_OK )
+   CRITICAL_LOG_RETURN( cURLResult, "Interface_Server_API::PerformcURLPost; Could not perform post, returned " << cURLResult )
+  else
+  {
+   DEBUG_LOG( "Interface_Server_API::PerformcURLPost; Performed post" ); 
+   VERBOSE_DEBUG_LOG( "Interface_Server_API::PerformcURLPost; Response=" << Response );
+   return( cURLResult );
+  }
+
+ }
+ else
+  CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Interface_Server_API::PerformcURLPost; Received an invalid cURL handle, returned " << CURLE_FAILED_INIT );
+
+}
+
+// ------------------------------------------------------------------------------
+
+int Interface_Server_API::Interface_Project_Server_List( string &Response, string ServerURL, string Project, string User, string Groups )
+{
+ DEBUG_LOG( "Interface_Server_API::Interface_Project_Server_List; ServerURL=" << ServerURL << ", Project=" << Project << ", User=" << User << ", Groups=" << Groups );
+
+ string PostURL = ServerURL + "/interfaces/interface_project_server_list.php";
+ CURL *cURLHandle = SetupcURLForPost( PostURL );
+
+ if( cURLHandle != NULL )
+ {
+  struct curl_httppost *PostList = NULL;
+  struct curl_httppost *LastItem = NULL;
+
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "user", CURLFORM_PTRCONTENTS, User.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "groups", CURLFORM_PTRCONTENTS, Groups.c_str(), CURLFORM_END );
+
+  CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
+
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Interface_Server_API::Interface_Project_Server_List; returned " << cURLResult );
+ }
+ else
+  CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Interface_Server_API::Interface_Project_Server_List; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
+
+}
+
+// ------------------------------------------------------------------------------
+
+int Interface_Server_API::Interface_Job_State( string &Response, string ServerURL, string Project, string User, string Groups, string Job_Id, string State, string Application, string Start, string Limit )
+{
+ DEBUG_LOG( "Interface_Server_API::Interface_Job_State; ServerURL=" << ServerURL << ", Project=" << Project << ", User=" << User << ", Groups=" << Groups  << ", Job_Id=" << Job_Id << ", State=" << State << ", Application=" << Application << ", Start=" << Start << ", Limit= " << Limit );
+
+ string PostURL = ServerURL + "/interfaces/interface_job_state.php";
+ CURL *cURLHandle = SetupcURLForPost( PostURL );
+
+ if( cURLHandle != NULL )
+ {
+  struct curl_httppost *PostList = NULL;
+  struct curl_httppost *LastItem = NULL;
+
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "user", CURLFORM_PTRCONTENTS, User.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "groups", CURLFORM_PTRCONTENTS, Groups.c_str(), CURLFORM_END );
+ 
+  if( !Job_Id.empty() )
+   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_id", CURLFORM_PTRCONTENTS, Job_Id.c_str(), CURLFORM_END );
+  else
+  {
+   if( !State.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "state", CURLFORM_PTRCONTENTS, State.c_str(), CURLFORM_END );
+   if( !Application.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "application", CURLFORM_PTRCONTENTS, Application.c_str(), CURLFORM_END );
+   if( !Start.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "start", CURLFORM_PTRCONTENTS, Start.c_str(), CURLFORM_END );
+   if( !Limit.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "limit", CURLFORM_PTRCONTENTS, Limit.c_str(), CURLFORM_END );
+  }
+
+  CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
+
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Interface_Server_API::Interface_Job_State; returned " << cURLResult );
+ }
+ else
+  CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Interface_Server_API::Interface_Job_State; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
+
+}
+
+// ------------------------------------------------------------------------------
+
+int Interface_Server_API::Interface_Delete_Job( string &Response, string ServerURL, string Project, string User, string Groups, string Job_Id )
+{
+ DEBUG_LOG( "Interface_Server_API::Interface_Delete_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", User=" << User << ", Groups=" << Groups  << ", Job_Id=" << Job_Id );
+
+ string PostURL = ServerURL + "/interfaces/interface_delete_job.php";
+ CURL *cURLHandle = SetupcURLForPost( PostURL );
+
+ if( cURLHandle != NULL )
+ {
+  struct curl_httppost *PostList = NULL;
+  struct curl_httppost *LastItem = NULL;
+
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "user", CURLFORM_PTRCONTENTS, User.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "groups", CURLFORM_PTRCONTENTS, Groups.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_id", CURLFORM_PTRCONTENTS, Job_Id.c_str(), CURLFORM_END );
+
+  CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
+
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Interface_Server_API::Interface_Delete_Job; returned " << cURLResult );
+ }
+ else
+  CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Interface_Server_API::Interface_Delete_Job; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
+
+}
+
+// ------------------------------------------------------------------------------
+
+int Interface_Server_API::Interface_Submit_Job( string &Response, string ServerURL, string Project, string User, string Groups, string Application, string Target_Resources, string Job_Specifics, string Input, string Read_Access, string Owners, string Output )
+{
+ DEBUG_LOG( "Interface_Server_API::Interface_Submit_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", User=" << User << ", Groups=" << Groups  << ", Application=" << Application << ", Target_Resources=" << Target_Resources << ", Job_Specifics=" << Job_Specifics << ", Input=" << Input << ", Read_Access= " << Read_Access << ", Owners=" << Owners << ", Output=" << Output );
+
+ string PostURL = ServerURL + "/interfaces/interface_submit_job.php";
+ CURL *cURLHandle = SetupcURLForPost( PostURL );
+
+ if( cURLHandle != NULL )
+ {
+  struct curl_httppost *PostList = NULL;
+  struct curl_httppost *LastItem = NULL;
+
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "user", CURLFORM_PTRCONTENTS, User.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "groups", CURLFORM_PTRCONTENTS, Groups.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "application", CURLFORM_PTRCONTENTS, Application.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "target_resources", CURLFORM_PTRCONTENTS, Target_Resources.c_str(), CURLFORM_END );
+
+  if( !Job_Specifics.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_specifics", CURLFORM_PTRCONTENTS, Job_Specifics.c_str(), CURLFORM_END );
+  if( !Input.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "input", CURLFORM_PTRCONTENTS, Input.c_str(), CURLFORM_END );
+  if( !Read_Access.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "read_access", CURLFORM_PTRCONTENTS, Read_Access.c_str(), CURLFORM_END );
+  if( !Owners.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "owners", CURLFORM_PTRCONTENTS, Owners.c_str(), CURLFORM_END );
+  if( !Output.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "output", CURLFORM_PTRCONTENTS, Output.c_str(), CURLFORM_END );
+
+  CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
+
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Interface_Server_API::Interface_Submit_Job; returned " << cURLResult );
+ }
+ else
+  CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Interface_Server_API::Interface_Submit_Job; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
+
+}
+
+// ------------------------------------------------------------------------------

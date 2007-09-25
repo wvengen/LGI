@@ -8,7 +8,7 @@ LD=g++
 
 # some defines...
 LIBS=-lcurl
-OBJS=logger.o resource_server_api.o xml.o csv.o hash.o binhex.o daemon_configclass.o daemon_jobclass.o daemon_mainclass.o daemon_main.o xml_main.o binhex_main.o hexbin_main.o hash_main.o csv_main.o filetransfer_main.o
+OBJS=logger.o resource_server_api.o xml.o csv.o hash.o binhex.o daemon_configclass.o daemon_jobclass.o daemon_mainclass.o daemon_main.o xml_main.o binhex_main.o hexbin_main.o hash_main.o csv_main.o filetransfer_main.o interface_server_api.o
 
 # all targets...
 all : LGI_daemon xml binhex hexbin hash csv LGI_filetransfer
@@ -61,10 +61,16 @@ daemon_configclass.o : daemon_configclass.cpp daemon_configclass.h xml.h binhex.
 
 resource_server_api.o : resource_server_api.cpp resource_server_api.h
 
+interface_server_api.o : interface_server_api.cpp interface_server_api.h
+
 logger.o : logger.cpp logger.h
+
 xml.o : xml.cpp xml.h
+
 csv.o : csv.cpp csv.h
+
 binhex.o : binhex.cpp binhex.h
+
 hash.o : hash.cpp hash.h
 
 # clean up...
