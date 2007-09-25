@@ -268,24 +268,78 @@ int main( int argc, char *argv[] )
   return( 0 );
  }
 
- if( Job_Id.empty() )      // did we ask for details...
+
+
+
+ if( Job_Id.empty() )      // did we ask for general job list...
  {
-  if( OutputInXML )
+  int TotalNrOfJobs = 0;
+  int NrOfJobs = 0;
+  int Limit = 10;
+  int Offset = 0;
+  char OffsetStr[ 64 ];
+  char LimitStr[ 64 ];
+
+  do
   {
+   sprintf( OffsetStr, "%d", Offset );
+   sprintf( LimitStr, "%d", Limit );
 
-   // ...
-   // ...
-   // ...
+   if( ( Flag = ServerAPI.Interface_Job_State( Response, ServerURL, Project, User, Groups, Job_Id, State, Application, OffsetStr, LimitStr ) ) != CURLE_OK )
+   {
+    cout << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl;
+    return( 1 );
+   }
 
-  }
-  else
-  {
+   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
-   // ...
-   // ...
-   // ...
+   if( !Parse_XML( Response, "error" ).empty() )
+   {
+    if( OutputInXML )
+     cout << Response << endl;
+    else
+     cout << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl;
+    return( 1 );
+   }
 
-  }
+   NrOfJobs = atoi( NormalizeString( Parse_XML( Response, "number_of_jobs" ) ).c_str() );
+   TotalNrOfJobs += NrOfJobs;
+
+   if( NrOfJobs )
+   {
+    if( OutputInXML )
+    {
+     // ...
+     // ...
+     // ...
+     cout << Response << endl;
+    }
+    else
+    {
+     // ...
+     // ...
+     // ...
+    }
+   }
+   else
+   {
+    if( OutputInXML )
+    {
+     // ...
+     // ...
+     // ...
+    }
+    else
+    {
+     // ...
+     // ...
+     // ...
+    }
+   }
+
+   Offset += Limit;
+  } while( NrOfJobs );
+
  }
  else                    // when details were requested...
  {
