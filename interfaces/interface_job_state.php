@@ -50,11 +50,19 @@ if( !$DetailMode )
 {
  // see if state field was posted...
  if( isset( $_POST[ "state" ] ) && ( $_POST[ "state" ] != "" ) )
-  $Response .= " <state> ".$_POST[ "state" ]." </state>";
+  $JobState = $_POST[ "state" ];
+ else
+  $JobState = "any";
+
+ $Response .= " <state> ".$JobState." </state>";
 
  // see if application field was posted...
  if( isset( $_POST[ "application" ] ) && ( $_POST[ "application" ] != "" ) )
-  $Response .= " <application> ".$_POST[ "application" ]." </application>";
+  $JobApplication = $_POST[ "application" ];
+ else
+  $JobApplication = "any";
+
+ $Response .= " <application> ".$JobApplication." </application>";
 
  // see if start field was posted...
  if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && is_numeric( $_POST[ "start" ] ) ) 
@@ -81,7 +89,7 @@ if( !$DetailMode )
  for( $i = 1; $i <= $PossibleJobOwnersArray[ 0 ]; $i++ )
  {
   // do the specific query for this owner...
-  $queryresult = mysql_query( Interface_Make_Query_For_Work_For_Owner( $PossibleJobOwnersArray[ $i ], $_POST[ "state" ], $_POST[ "application" ], $JobStart, $JobLimit ) );
+  $queryresult = mysql_query( Interface_Make_Query_For_Work_For_Owner( $PossibleJobOwnersArray[ $i ], $JobState, $JobApplication, $JobStart, $JobLimit ) );
   
   $NrOfResults = mysql_num_rows( $queryresult );
 
@@ -102,6 +110,10 @@ if( !$DetailMode )
     $NrOfJobsReported++;
     $JobResponses .= " <job number='".$NrOfJobsReported."'> <job_id> ".$JobData->job_id." </job_id>";
     $JobResponses .= " <state> ".$JobData->state." </state> <state_time_stamp> ".$JobData->state_time_stamp." </state_time_stamp>";
+    $JobResponses .= " <target_resources> ".$JobData->target_resources." </target_resources> ";
+    $JobResponses .= " <owners> ".$JobData->owners." </owners> ";
+    $JobResponses .= " <read_acces> ".$JobData->read_access." </read_access> ";
+    $JobResponses .= " <job_specifics> ".$JobData->job_specifics." </job_specifics> ";
     $JobResponses .= " <application> ".$JobData->application." </application> </job>";
    }
 

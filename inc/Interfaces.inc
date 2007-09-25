@@ -391,12 +391,12 @@ function Interface_Make_Query_For_Work_For_Owner( $Owner, $State, $Application, 
 
  $RegExpUser = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
 
- $Query = "SELECT job_id,state,application,state_time_stamp FROM job_queue WHERE owners REGEXP '".$RegExpUser."' OR read_access REGEXP '".$RegExpUser."'";
+ $Query = "SELECT job_id,state,application,state_time_stamp,target_resources,owners,read_access,job_specifics FROM job_queue WHERE owners REGEXP '".$RegExpUser."' OR read_access REGEXP '".$RegExpUser."'";
 
- if( isset( $State ) && ( $State != "" ) )
+ if( isset( $State ) && ( $State != "" ) && ( $State != "any" ) )
   $Query .= " AND state='".$State."'";
 
- if( isset( $Application ) && ( $Application != "" ) )
+ if( isset( $Application ) && ( $Application != "" ) && ( $Application != "any" ) )
   $Query .= " AND application='".$Application."'";
 
  $Query .= " ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start;

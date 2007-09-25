@@ -264,18 +264,51 @@ int main( int argc, char *argv[] )
  {
   if( OutputInXML )
   {
+
+   // ...
+   // ...
+   // ...
+
   }
   else
   {
+
+   // ...
+   // ...
+   // ...
+
   }
  }
  else                    // when details were requested...
  {
+
+  // request details of specific job...
+  if( ( Flag = ServerAPI.Interface_Job_State( Response, ServerURL, Project, User, Groups, Job_Id, "", "", "", "" ) ) != CURLE_OK )
+  {
+   cout << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl;
+   return( 1 );
+  }
+  
+  Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
   if( OutputInXML )
   {
+   cout << Response << endl;
+
+   if( !Parse_XML( Response, "error" ).empty() ) return( 1 );
   }
   else
   {
+   if( !Parse_XML( Response, "error" ).empty() ) 
+   {
+    cout << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl;
+    return( 1 );
+   }
+
+   // ...
+   // ...
+   // ...
+
   }
  }
 
