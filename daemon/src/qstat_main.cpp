@@ -22,7 +22,6 @@
 
 #include "logger.h"
 #include "interface_server_api.h"
-#include "daemon_configclass.h"
 #include "xml.h"
 #include "csv.h"
 #include "binhex.h"
@@ -36,6 +35,18 @@ int ListServers = 0;
 
 // ----------------------------------------------------------------------
 
+string ReadLineFromFile( string FileName )
+{
+ fstream File( FileName.c_str(), fstream::in );
+ string Line;
+
+ if( !File ) return( Line );
+ getline( File, Line );
+ return( Line );
+}
+
+// ----------------------------------------------------------------------
+
 void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " [options] [job_id]" << endl << endl;
@@ -44,7 +55,7 @@ void PrintHelp( char *ExeName )
  cout << "-a application             specify application to query about. default is any." << endl;
  cout << "-s state                   specify job state to query about. default is any." << endl;
  cout << "-x                         output in XML format." << endl;
- cout << "-l                         report porject server list in output." << endl;
+ cout << "-l                         report project server list." << endl;
  cout << "-c directory               specify configuration directory to read. default is ~/.LGI. use the options below to overrule those settings." << endl; 
  cout << "-P project                 specify project name. if not specified, the default project of the server is assumed." << endl; 
  cout << "-S serverurl               specify project server to query." << endl;
@@ -72,14 +83,14 @@ int main( int argc, char *argv[] )
  // setup default values from default configuration directory...
  ConfigDir = string( getenv( "HOME" ) ) + "/.LGI";
 
- User = ReadStringFromFile( ConfigDir + "/user" );
- Groups = ReadStringFromFile( ConfigDir + "/groups" );
- ServerURL = ReadStringFromFile( ConfigDir + "/defaultserver" );
- Project = ReadStringFromFile( ConfigDir + "/defaultproject" );
+ User = ReadLineFromFile( ConfigDir + "/user" );
+ Groups = ReadLineFromFile( ConfigDir + "/groups" );
+ ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
+ Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
 
- if( !ReadStringFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
- if( !ReadStringFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
- if( !ReadStringFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+ if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
+ if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
+ if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
 
  // read passed arguments here...
  for( int i = 1; i < argc; ++i )
@@ -96,13 +107,13 @@ int main( int argc, char *argv[] )
     {
      ConfigDir = string( argv[ i ] );
 
-     User = ReadStringFromFile( ConfigDir + "/user" );
-     Groups = ReadStringFromFile( ConfigDir + "/groups" );
-     ServerURL = ReadStringFromFile( ConfigDir + "/defaultserver" );
-     Project = ReadStringFromFile( ConfigDir + "/defaultproject" );
-     if( !ReadStringFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
-     if( !ReadStringFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
-     if( !ReadStringFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+     User = ReadLineFromFile( ConfigDir + "/user" );
+     Groups = ReadLineFromFile( ConfigDir + "/groups" );
+     ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
+     Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
+     if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
+     if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
+     if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
     }
     else
     {
@@ -210,12 +221,6 @@ int main( int argc, char *argv[] )
   return( 1 );
  }
 
- // remove newlines from possible file reading...
- while( User[ User.size() - 1 ] == '\n' ) User = User.substr( 0, User.size() - 1 );
- while( Groups[ Groups.size() - 1 ] == '\n' ) Groups = Groups.substr( 0, Groups.size() - 1 );
- while( Project[ Project.size() - 1 ] == '\n' ) Project = Project.substr( 0, Project.size() - 1 );
- while( ServerURL[ ServerURL.size() - 1 ] == '\n' ) ServerURL = ServerURL.substr( 0, ServerURL.size() - 1 );
-
  // now start qstating the server...
  Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );
 
@@ -245,6 +250,7 @@ int main( int argc, char *argv[] )
    }
 
    cout << "--- Project server list requested ---" << endl << endl;
+   cout << "This project          :         " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
    cout << "This project server   :         " << NormalizeString( ServerURL ) << endl << endl;
    cout << "Project master server :         " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl << endl;
    
@@ -258,6 +264,8 @@ int main( int argc, char *argv[] )
 
    cout << "--- End of project server list ---" << endl << endl;
   }
+
+  return( 0 );
  }
 
  if( Job_Id.empty() )      // did we ask for details...

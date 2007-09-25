@@ -22,7 +22,6 @@
 
 #include "logger.h"
 #include "interface_server_api.h"
-#include "daemon_configclass.h"
 #include "xml.h"
 #include "csv.h"
 #include "binhex.h"
@@ -31,6 +30,18 @@
 
 string KeyFile, CertificateFile, CACertificateFile, ServerURL, 
        Project, State, Application, User, Groups, Job_Id, ConfigDir;
+
+// ----------------------------------------------------------------------
+
+string ReadLineFromFile( string FileName )
+{
+ fstream File( FileName.c_str(), fstream::in );
+ string Line;
+
+ if( !File ) return( Line );
+ getline( File, Line );
+ return( Line );
+}
 
 // ----------------------------------------------------------------------
 
@@ -66,13 +77,13 @@ int main( int argc, char *argv[] )
  // setup default values from default configuration directory...
  ConfigDir = string( getenv( "HOME" ) ) + "/.LGI";
 
- User = ReadStringFromFile( ConfigDir + "/user" );
- Groups = ReadStringFromFile( ConfigDir + "/groups" );
- ServerURL = ReadStringFromFile( ConfigDir + "/defaultserver" );
- Project = ReadStringFromFile( ConfigDir + "/defaultproject" );
- if( !ReadStringFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
- if( !ReadStringFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
- if( !ReadStringFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+ User = ReadLineFromFile( ConfigDir + "/user" );
+ Groups = ReadLineFromFile( ConfigDir + "/groups" );
+ ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
+ Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
+ if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
+ if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
+ if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
 
  // read passed arguments here...
  for( int i = 1; i < argc; ++i )
@@ -85,13 +96,13 @@ int main( int argc, char *argv[] )
     {
      ConfigDir = string( argv[ i ] );
 
-     User = ReadStringFromFile( ConfigDir + "/user" );
-     Groups = ReadStringFromFile( ConfigDir + "/groups" );
-     ServerURL = ReadStringFromFile( ConfigDir + "/defaultserver" );
-     Project = ReadStringFromFile( ConfigDir + "/defaultproject" );
-     if( !ReadStringFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
-     if( !ReadStringFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
-     if( !ReadStringFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+     User = ReadLineFromFile( ConfigDir + "/user" );
+     Groups = ReadLineFromFile( ConfigDir + "/groups" );
+     ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
+     Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
+     if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
+     if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
+     if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
     }
     else
     {
@@ -183,12 +194,6 @@ int main( int argc, char *argv[] )
   PrintHelp( argv[ 0 ] );
   return( 1 );
  }
-
- // remove newlines from possible file reading...
- while( User[ User.size() - 1 ] == '\n' ) User = User.substr( 0, User.size() - 1 );
- while( Groups[ Groups.size() - 1 ] == '\n' ) Groups = Groups.substr( 0, Groups.size() - 1 );
- while( Project[ Project.size() - 1 ] == '\n' ) Project = Project.substr( 0, Project.size() - 1 );
- while( ServerURL[ ServerURL.size() - 1 ] == '\n' ) ServerURL = ServerURL.substr( 0, ServerURL.size() - 1 );
 
  // ...
  // ...

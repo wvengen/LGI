@@ -34,11 +34,11 @@ LGI_daemon : logger.o resource_server_api.o xml.o csv.o hash.o binhex.o daemon_c
 LGI_filetransfer : logger.o resource_server_api.o xml.o csv.o hash.o binhex.o daemon_configclass.o daemon_jobclass.o filetransfer_main.o
 	${LD} ${FLAGS} -o $@ logger.o resource_server_api.o xml.o csv.o hash.o binhex.o daemon_configclass.o daemon_jobclass.o filetransfer_main.o ${LIBS}
 
-LGI_qstat : logger.o interface_server_api.o xml.o csv.o binhex.o daemon_configclass.o qstat_main.o
-	${LD} ${FLAGS} -o $@ logger.o interface_server_api.o xml.o csv.o binhex.o daemon_configclass.o qstat_main.o ${LIBS}
+LGI_qstat : logger.o interface_server_api.o xml.o csv.o binhex.o qstat_main.o
+	${LD} ${FLAGS} -o $@ logger.o interface_server_api.o xml.o csv.o binhex.o qstat_main.o ${LIBS}
 
-LGI_qdel : logger.o interface_server_api.o xml.o csv.o binhex.o daemon_configclass.o qdel_main.o
-	${LD} ${FLAGS} -o $@ logger.o interface_server_api.o xml.o csv.o binhex.o daemon_configclass.o qdel_main.o ${LIBS}
+LGI_qdel : logger.o interface_server_api.o xml.o csv.o binhex.o qdel_main.o
+	${LD} ${FLAGS} -o $@ logger.o interface_server_api.o xml.o csv.o binhex.o qdel_main.o ${LIBS}
 
 LGI_qsub : logger.o interface_server_api.o xml.o csv.o binhex.o hash.o resource_server_api.o daemon_jobclass.o daemon_configclass.o qsub_main.o
 	${LD} ${FLAGS} -o $@ logger.o interface_server_api.o resource_server_api.o daemon_jobclass.o daemon_configclass.o xml.o csv.o binhex.o hash.o qsub_main.o ${LIBS}
@@ -56,9 +56,9 @@ csv_main.o : csv_main.cpp csv.h
 
 filetransfer_main.o : filetransfer_main.cpp logger.h resource_server_api.h binhex.h hash.h csv.h xml.h daemon_configclass.h daemon_jobclass.h
 
-qstat_main.o : qstat_main.cpp logger.h interface_server_api.h binhex.h csv.h xml.h daemon_configclass.h
+qstat_main.o : qstat_main.cpp logger.h interface_server_api.h binhex.h csv.h xml.h
 
-qdel_main.o : qdel_main.cpp logger.h interface_server_api.h binhex.h csv.h xml.h daemon_configclass.h
+qdel_main.o : qdel_main.cpp logger.h interface_server_api.h binhex.h csv.h xml.h
 
 qsub_main.o : qsub_main.cpp logger.h interface_server_api.h resource_server_api.h daemon_jobclass.h daemon_configclass.h binhex.h csv.h xml.h hash.h
 
