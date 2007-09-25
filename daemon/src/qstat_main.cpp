@@ -303,7 +303,6 @@ int main( int argc, char *argv[] )
    }
 
    NrOfJobs = atoi( NormalizeString( Parse_XML( Response, "number_of_jobs" ) ).c_str() );
-   TotalNrOfJobs += NrOfJobs;
 
    if( NrOfJobs )
    {
@@ -337,6 +336,7 @@ int main( int argc, char *argv[] )
     }
    }
 
+   TotalNrOfJobs += NrOfJobs;
    Offset += Limit;
   } while( NrOfJobs );
 
