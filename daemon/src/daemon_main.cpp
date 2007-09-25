@@ -51,6 +51,7 @@ void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " [options] configfile" << endl << endl;
  cout << "options:" << endl << endl;
+ cout << "-h           this help." << endl;
  cout << "-d           daemonize and run in background." << endl;
  cout << "-q           log only critical messages." << endl;
  cout << "-n           log normal messages. this is the default." << endl;
@@ -99,6 +100,9 @@ int main( int argc, char *argv[] )
    }
   } else if( !strcmp( argv[ i ], "-d" ) ) {
    Daemonize = 1;
+  } else if( !strcmp( argv[ i ], "-h" ) ) {
+    PrintHelp( argv[ 0 ] );
+    return( 0 );
   } else {
    ConfigFile = string( argv[ i ] );
    ConfigFileSet = 1;

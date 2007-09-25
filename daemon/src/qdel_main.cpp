@@ -1,5 +1,5 @@
 /* []--------------------------------------------------------[]
-    |                      qdel_main.cpp                     |
+    |                     qdel_main.cpp                      |
    []--------------------------------------------------------[]
     |                                                        |
     | AUTHOR:     M.F.Somers                                 |
@@ -22,26 +22,31 @@
 
 #include "logger.h"
 #include "interface_server_api.h"
+#include "daemon_configclass.h"
 #include "xml.h"
 #include "csv.h"
 #include "binhex.h"
 
 // ----------------------------------------------------------------------
 
-string KeyFile, CertificateFile, CACertificateFile, ServerURL, Project;
+string KeyFile, CertificateFile, CACertificateFile, ServerURL, 
+       Project, State, Application, User, Groups, Job_Id, ConfigDir;
 
 // ----------------------------------------------------------------------
 
 void PrintHelp( char *ExeName )
 {
- cout << endl << ExeName << " [options] " << endl << endl;
+ cout << endl << ExeName << " [options] job_id" << endl << endl;
  cout << "options:" << endl << endl;
- cout << "-h                                  show this help." << endl;
- cout << "-k keyfile                          specify key file." << endl;
- cout << "-c certificatefile                  specify certificate file." << endl;
- cout << "-ca cacertificatefile               specify ca certificate file." << endl;
- cout << "-s serverurl                        specify project server url." << endl;
- cout << "-p project                          specify project name." << endl << endl;
+ cout << "-h                         show this help." << endl;
+ cout << "-c directory               specify configuration directory to read. default is ~/.LGI. use the options below to overrule those settings." << endl; 
+ cout << "-P project                 specify project name. if not specified, the default project of the server is assumed." << endl; 
+ cout << "-S serverurl               specify project server to query." << endl;
+ cout << "-U user                    specify username." << endl;
+ cout << "-G groups                  specify groups." << endl;
+ cout << "-K keyfile                 specify key file." << endl;
+ cout << "-C certificatefile         specify certificate file." << endl;
+ cout << "-CA cacertificatefile      specify ca certificate file." << endl << endl;
 }
 
 // ----------------------------------------------------------------------
@@ -58,13 +63,42 @@ int main( int argc, char *argv[] )
  // turn logging facilities off...
  InitializeLogger( 0 );
 
+ // setup default values from default configuration directory...
+ ConfigDir = string( getenv( "HOME" ) ) + "/.LGI";
+
+ User = ReadStringFromFile( ConfigDir + "/user" );
+ Groups = ReadStringFromFile( ConfigDir + "/groups" );
+ ServerURL = ReadStringFromFile( ConfigDir + "/defaultserver" );
+ Project = ReadStringFromFile( ConfigDir + "/defaultproject" );
+ if( !ReadStringFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
+ if( !ReadStringFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
+ if( !ReadStringFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+
  // read passed arguments here...
  for( int i = 1; i < argc; ++i )
  {
   if( !strcmp( argv[ i ], "-h" ) ) {
     PrintHelp( argv[ 0 ] );
     return( 0 );
-  } else if( !strcmp( argv[ i ], "-k" ) ) {
+  } else if( !strcmp( argv[ i ], "-c" ) ) {
+    if( argv[ ++i ] )
+    {
+     ConfigDir = string( argv[ i ] );
+
+     User = ReadStringFromFile( ConfigDir + "/user" );
+     Groups = ReadStringFromFile( ConfigDir + "/groups" );
+     ServerURL = ReadStringFromFile( ConfigDir + "/defaultserver" );
+     Project = ReadStringFromFile( ConfigDir + "/defaultproject" );
+     if( !ReadStringFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
+     if( !ReadStringFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
+     if( !ReadStringFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+    }
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
+  } else if( !strcmp( argv[ i ], "-K" ) ) {
     if( argv[ ++i ] )
      KeyFile = string( argv[ i ] );
     else
@@ -72,7 +106,7 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-c" ) ) {
+  } else if( !strcmp( argv[ i ], "-C" ) ) {
     if( argv[ ++i ] )
      CertificateFile = string( argv[ i ] );
     else
@@ -80,7 +114,7 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-ca" ) ) {
+  } else if( !strcmp( argv[ i ], "-CA" ) ) {
     if( argv[ ++i ] )
      CACertificateFile = string( argv[ i ] );
     else
@@ -88,7 +122,7 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-s" ) ) {
+  } else if( !strcmp( argv[ i ], "-S" ) ) {
     if( argv[ ++i ] )
      ServerURL = string( argv[ i ] );
     else
@@ -96,7 +130,23 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-p" ) ) {
+  } else if( !strcmp( argv[ i ], "-U" ) ) {
+    if( argv[ ++i ] )
+     User = string( argv[ i ] );
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
+  } else if( !strcmp( argv[ i ], "-G" ) ) {
+    if( argv[ ++i ] )
+     Groups = string( argv[ i ] );
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
+  } else if( !strcmp( argv[ i ], "-P" ) ) {
     if( argv[ ++i ] )
      Project = string( argv[ i ] );
     else
@@ -105,8 +155,16 @@ int main( int argc, char *argv[] )
      return( 1 );
     }
   } else {
-    PrintHelp( argv[ 0 ] );
-    return( 1 );
+    int Dummy;
+
+    if( sscanf( argv[ i ], "%d", &Dummy ) == 1 )
+     Job_Id = string( argv[ i ] );
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
+
   };
  }
 
@@ -116,7 +174,9 @@ int main( int argc, char *argv[] )
  if( CertificateFile.empty() ) Flag = 1;
  if( CACertificateFile.empty() ) Flag = 1;
  if( ServerURL.empty() ) Flag = 1;
- if( Project.empty() ) Flag = 1;
+ if( User.empty() ) Flag = 1;
+ if( Groups.empty() ) Flag = 1;
+ if( Job_Id.empty() ) Flag = 1;
 
  if( Flag )
  {

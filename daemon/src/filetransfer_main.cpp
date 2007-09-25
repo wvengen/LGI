@@ -54,11 +54,11 @@ void PrintHelp( char *ExeName )
  cout << "options:" << endl << endl;
  cout << "-h                                  show this help." << endl;
  cout << "-j jobdirectory                     specify job directory to use. if not specified try current directory or specify the following options." << endl;
- cout << "-k keyfile                          specify key file." << endl;
- cout << "-c certificatefile                  specify certificate file." << endl;
- cout << "-ca cacertificatefile               specify ca certificate file." << endl;
- cout << "-s serverurl                        specify project server url." << endl;
- cout << "-p project                          specify project name." << endl << endl;
+ cout << "-K keyfile                          specify key file." << endl;
+ cout << "-C certificatefile                  specify certificate file." << endl;
+ cout << "-CA cacertificatefile               specify ca certificate file." << endl;
+ cout << "-S serverurl                        specify project server url." << endl;
+ cout << "-P project                          specify project name." << endl << endl;
 }
 
 // ----------------------------------------------------------------------
@@ -106,7 +106,7 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-k" ) ) {
+  } else if( !strcmp( argv[ i ], "-K" ) ) {
     if( argv[ ++i ] )
      KeyFile = string( argv[ i ] );
     else
@@ -114,7 +114,7 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-c" ) ) {
+  } else if( !strcmp( argv[ i ], "-C" ) ) {
     if( argv[ ++i ] )
      CertificateFile = string( argv[ i ] );
     else
@@ -122,7 +122,7 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-ca" ) ) {
+  } else if( !strcmp( argv[ i ], "-CA" ) ) {
     if( argv[ ++i ] )
      CACertificateFile = string( argv[ i ] );
     else
@@ -130,7 +130,7 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-s" ) ) {
+  } else if( !strcmp( argv[ i ], "-S" ) ) {
     if( argv[ ++i ] )
      ServerURL = string( argv[ i ] );
     else
@@ -138,7 +138,7 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-p" ) ) {
+  } else if( !strcmp( argv[ i ], "-P" ) ) {
     if( argv[ ++i ] )
      Project = string( argv[ i ] );
     else
@@ -220,7 +220,6 @@ int main( int argc, char *argv[] )
  if( CertificateFile.empty() ) Command = 0;
  if( CACertificateFile.empty() ) Command = 0;
  if( ServerURL.empty() ) Command = 0;
- if( Project.empty() ) Command = 0;
 
  if( !Command )
  {
