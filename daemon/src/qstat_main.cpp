@@ -293,6 +293,8 @@ int main( int argc, char *argv[] )
 
    Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
+   if( Response.empty() ) return( 1 );
+
    if( !Parse_XML( Response, "error" ).empty() )
    {
     if( OutputInXML )
@@ -352,6 +354,7 @@ int main( int argc, char *argv[] )
   }
   
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+  if( Response.empty() ) return( 1 );
 
   if( OutputInXML )
   {
