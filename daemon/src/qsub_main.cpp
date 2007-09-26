@@ -132,6 +132,8 @@ int main( int argc, char *argv[] )
     PrintHelp( argv[ 0 ] );
     return( 0 );
   } else if( !strcmp( argv[ i ], "-c" ) ) {
+    if( argv[ ++i ] ) 
+    {
      ConfigDir = string( argv[ i ] );
 
      if( !ReadLineFromFile( ConfigDir + "/user" ).empty() ) User = ReadLineFromFile( ConfigDir + "/user" );
@@ -143,6 +145,12 @@ int main( int argc, char *argv[] )
      if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
 
      ResourceMode = 0;
+    }
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
   } else if( !strcmp( argv[ i ], "-j" ) ) {
     if( argv[ ++i ] ) 
     {
@@ -269,11 +277,8 @@ int main( int argc, char *argv[] )
     if( argv[ ++i ] )
     {
      Input = string( argv[ i ] );
-
-     // ...
-     // ...
-     // ...
-
+     Response = ReadStringFromFile( Input );
+     BinHex( Response, Input );
     }
     else
     {
@@ -308,18 +313,57 @@ int main( int argc, char *argv[] )
  {
   Resource_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
 
-  // ...
-  // ...
-  // ...
-
+  Flag = ServerAPI.Resource_SignUp_Resource( Response, ServerURL, Project );
+  if( ( Flag == CURLE_OK ) && ( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ).empty() ) )
+  {
+   Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, Application, "queued", Owners, Target_Resources, Read_Access, Job_Specifics, Input, "" );
+   Flag |= ServerAPI.Resource_SignOff_Resource( Output, ServerURL, Project );
+  }
  }
  else
  {
   Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
 
-  
-
+  Flag = ServerAPI.Interface_Submit_Job( Response, ServerURL, Project, User, Groups, Application, Target_Resources, Job_Specifics, Input, Read_Access, Owners, "" );
  }
+
+ if( Flag != CURLE_OK )
+ {
+  cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+  return( 1 );
+ }
+
+ Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
+ if( Response.empty() ) return( 1 );
+
+ if( !Parse_XML( Response, "error" ).empty() )
+ {
+  cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+  return( 1 );
+ }
+
+ // dump job details we received back from response...
+
+ time_t TimeStamp = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ).c_str() );
+ char *TimeStampStr = ctime( &TimeStamp );
+ TimeStampStr[ 24 ] = '\0';
+ 
+ cout << endl << "Job has been submitted. Some details: " << endl << endl;
+ cout << "Project               : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+ cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
+ cout << "Project server        : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
+ cout << "User                  : " << NormalizeString( Parse_XML( Response, "user" ) ) << endl;
+ cout << "Groups                : " << NormalizeString( Parse_XML( Response, "groups" ) ) << endl;
+
+ cout << "Job id                : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << endl;
+ cout << "Job state             : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) << endl;
+ cout << "Job application       : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "application" ) ) << endl;
+ cout << "Job specifics         : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_specifics" ) ) << endl;
+ cout << "Target resources      : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "target_resources" ) ) << endl;
+ cout << "Job owners            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "owners" ) ) << endl;
+ cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
+ cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl << endl;
 
  return( 0 );
 }
