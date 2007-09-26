@@ -406,6 +406,10 @@ int main( int argc, char *argv[] )
 
    // show the details of the job...
 
+   time_t TimeStamp = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ).c_str() );
+   char *TimeStampStr = ctime( &TimeStamp );
+   TimeStampStr[ 24 ] = '\0';
+
    cout << endl << "Project               : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
    cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
    cout << "Project server        : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
@@ -419,7 +423,7 @@ int main( int argc, char *argv[] )
    cout << "Target resources      : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "target_resources" ) ) << endl;
    cout << "Job owners            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "owners" ) ) << endl;
    cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
-   cout << "Time stamp            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ) << endl;
+   cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl;
    cout << "Input                 : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ) << endl;
    cout << "Output                : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ) << endl << endl;
 
