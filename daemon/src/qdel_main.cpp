@@ -28,7 +28,7 @@
 
 // ----------------------------------------------------------------------
 
-string KeyFile, CertificateFile, CACertificateFile, ServerURL, 
+string KeyFile, CertificateFile, CACertificateFile, ServerURL, Response,
        Project, State, Application, User, Groups, Job_Id, ConfigDir;
 
 // ----------------------------------------------------------------------
@@ -96,10 +96,10 @@ int main( int argc, char *argv[] )
     {
      ConfigDir = string( argv[ i ] );
 
-     User = ReadLineFromFile( ConfigDir + "/user" );
-     Groups = ReadLineFromFile( ConfigDir + "/groups" );
-     ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
-     Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
+     if( !ReadLineFromFile( ConfigDir + "/user" ).empty() ) User = ReadLineFromFile( ConfigDir + "/user" );
+     if( !ReadLineFromFile( ConfigDir + "/groups" ).empty() ) Groups = ReadLineFromFile( ConfigDir + "/groups" );
+     if( !ReadLineFromFile( ConfigDir + "/defaultserver" ).empty() ) ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
+     if( !ReadLineFromFile( ConfigDir + "/defaultproject" ).empty() ) Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
      if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
      if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
      if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
@@ -195,9 +195,44 @@ int main( int argc, char *argv[] )
   return( 1 );
  }
 
- // ...
- // ...
- // ...
+ // now start contacting the server...
+ Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );
 
- return( 0 );
+ // try and delete job from server...
+ if( ( Flag = ServerAPI.Interface_Delete_Job( Response, ServerURL, Project, User, Groups, Job_Id ) ) != CURLE_OK )
+ {
+  cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+  return( 1 );
+ }
+
+ // now show response obtained...
+ Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
+ if( Response.empty() ) return( 1 );
+
+ if( !Parse_XML( Response, "error" ).empty() )
+ {
+  cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) )<< endl << endl;
+  return( 1 );
+ }
+
+ // check if deleted okay ....
+ if( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) == "deleted" )
+ {
+  cout << endl << "Job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " deleted from project ";
+  cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl << endl;
+  return( 0 );
+ }
+
+ if( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) == "aborting" )
+ {
+  cout << endl << "Aborting job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " in project ";
+  cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl << endl;
+  return( 0 );
+ }
+
+ cout << endl << "Could not abort or delete job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " from project ";
+ cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl << endl;
+
+ return( 1 );
 }
