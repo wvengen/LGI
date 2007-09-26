@@ -1,2 +1,3 @@
 #!/bin/sh
+/home/mark/temp/LGI/daemon/src/LGI_qsub -a hello_world
 /bin/true
