@@ -230,7 +230,7 @@ int main( int argc, char *argv[] )
 
   if( ( Flag = ServerAPI.Interface_Project_Server_List( Response, ServerURL, Project, User, Groups ) ) != CURLE_OK )
   {
-   cout << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl;
+   cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
    return( 1 );
   }
 
@@ -248,7 +248,7 @@ int main( int argc, char *argv[] )
   {
    if( !Parse_XML( Response, "error" ).empty() ) 
    {
-    cout << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl;
+    cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
     return( 1 );
    }
 
@@ -297,7 +297,7 @@ int main( int argc, char *argv[] )
 
    if( ( Flag = ServerAPI.Interface_Job_State( Response, ServerURL, Project, User, Groups, Job_Id, State, Application, OffsetStr, LimitStr ) ) != CURLE_OK )
    {
-    cout << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl;
+    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
     return( 1 );
    }
 
@@ -310,7 +310,7 @@ int main( int argc, char *argv[] )
     if( OutputInXML )
      cout << Response << endl;
     else
-     cout << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl;
+     cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
     return( 1 );
    }
 
@@ -382,7 +382,7 @@ int main( int argc, char *argv[] )
   // request details of specific job...
   if( ( Flag = ServerAPI.Interface_Job_State( Response, ServerURL, Project, User, Groups, Job_Id, "", "", "", "" ) ) != CURLE_OK )
   {
-   cout << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl;
+   cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
    return( 1 );
   }
   
@@ -400,7 +400,7 @@ int main( int argc, char *argv[] )
   {
    if( !Parse_XML( Response, "error" ).empty() ) 
    {
-    cout << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl;
+    cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
     return( 1 );
    }
 
