@@ -103,10 +103,10 @@ int main( int argc, char *argv[] )
     {
      ConfigDir = string( argv[ i ] );
 
-     User = ReadLineFromFile( ConfigDir + "/user" );
-     Groups = ReadLineFromFile( ConfigDir + "/groups" );
-     ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
-     Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
+     if( !ReadLineFromFile( ConfigDir + "/user" ).empty() ) User = ReadLineFromFile( ConfigDir + "/user" );
+     if( !ReadLineFromFile( ConfigDir + "/groups" ).empty() ) Groups = ReadLineFromFile( ConfigDir + "/groups" );
+     if( !ReadLineFromFile( ConfigDir + "/defaultserver" ).empty() ) ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
+     if( !ReadLineFromFile( ConfigDir + "/defaultproject" ).empty() ) Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
      if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
      if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
      if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
