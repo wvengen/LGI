@@ -99,7 +99,10 @@ int main( int argc, char *argv[] )
     if( Tag.empty() )
      Tag = string( argv[ i ] );
     else
+    {
+     if( !Attribute.empty() ) Attribute = Attribute + ",";
      Attribute = Attribute + string( argv[ i ] );
+    }
   };
  }
 
