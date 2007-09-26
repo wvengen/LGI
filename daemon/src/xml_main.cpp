@@ -48,7 +48,7 @@ string ReadStringFromFile( fstream &File )
 
 void PrintHelp( char *ExeName )
 {
- cout << endl << ExeName << " [options] tag" << endl << endl;
+ cout << endl << ExeName << " [options] tag [attribute]" << endl << endl;
  cout << "options:" << endl << endl;
  cout << "-h           this help." << endl;
  cout << "-i file      specify input file. default is standard input." << endl;
@@ -61,7 +61,8 @@ int main( int argc, char *argv[] )
 {
  fstream Input( "/dev/stdin", fstream::in | fstream::binary );
  fstream Output( "/dev/stdout", fstream::out | fstream::binary );
- string  Tag;
+ string  Data, Tag, Attribute, DataFound, AttributesFound;
+ int StartPos = 0;
 
  // read passed arguments here...
 
@@ -95,7 +96,10 @@ int main( int argc, char *argv[] )
     PrintHelp( argv[ 0 ] );
     return( 0 );
   } else {
-    Tag = string( argv[ i ] );
+    if( Tag.empty() )
+     Tag = string( argv[ i ] );
+    else
+     Attribute = Attribute + string( argv[ i ] );
   };
  }
 
@@ -105,7 +109,18 @@ int main( int argc, char *argv[] )
   return( 1 );
  }
 
- Output << NormalizeString( Parse_XML( ReadStringFromFile( Input ), Tag ) ) << endl;
-  
- return( 0 );
+ Data = ReadStringFromFile( Input );
+ do
+ {
+  DataFound = NormalizeString( Parse_XML( Data, Tag, AttributesFound, StartPos ) );
+  if( Attribute.empty() ) break;
+ } while( ( !DataFound.empty() ) && ( AttributesFound != Attribute ) );
+
+ if( !DataFound.empty() )
+ {
+  Output << DataFound << endl;
+  return( 0 );
+ }
+
+ return( 1 );
 }

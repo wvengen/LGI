@@ -40,7 +40,7 @@ string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop )
    
    BeginTagEnd = BeginTagStart = Index + 1;                                                                    // BeginTagStart marks the start of the tag 
 
-   while( BeginTagEnd < XMLLength  && XML[ BeginTagEnd ] != ' ' && XML[ BeginTagEnd ] != '>' ) ++BeginTagEnd;  // BeginTagEnd marks the '>' or the ' ' 
+   while( ( BeginTagEnd < XMLLength ) && ( XML[ BeginTagEnd ] != ' '  ) && ( XML[ BeginTagEnd ] != '>' ) ) ++BeginTagEnd;  // BeginTagEnd marks the '>' or the ' ' 
 
    if( BeginTagEnd >= XMLLength ) { StartStop = XMLLength; Attributes = Empty; return( Empty ); }            
 
@@ -51,20 +51,24 @@ string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop )
    {
     AttributeStart = BeginTagEnd + 1;                                                     
     
-    while( AttributeStart < XMLLength  && XML[ AttributeStart ] == ' ' ) ++AttributeStart;       // AttributeStart marks start of attribute
+    while( ( AttributeStart < XMLLength ) && ( XML[ AttributeStart ] == ' ' ) ) ++AttributeStart;       // AttributeStart marks start of attribute
 
     if( AttributeStart >= XMLLength ) { StartStop = XMLLength; Attributes = Empty; return( Empty ); }
 
     AttributeEnd = AttributeStart + 1;
 
-    while( AttributeEnd < XMLLength  && XML[ AttributeEnd ] != '>' ) ++AttributeEnd;             // AttributeEnd marks the '>' of the tag
+    while( ( AttributeEnd < XMLLength ) && ( XML[ AttributeEnd ] != '>' ) ) ++AttributeEnd;             // AttributeEnd marks the '>' of the tag
 
     if( AttributeEnd >= XMLLength ) { StartStop = XMLLength; Attributes = Empty; return( Empty ); }
    }
    else
     AttributeStart = AttributeEnd = BeginTagEnd;
 
-   EndTagStart = XML.find( "</" + FoundTag + ">", AttributeEnd + 1 ) + 2;               // EndTagStart marks start of the end tag
+   EndTagStart = XML.find( "</" + FoundTag + ">", AttributeEnd + 1 );               // EndTagStart marks start of the end tag
+
+   if( EndTagStart == string::npos ) { StartStop = XMLLength; Attributes = Empty; return( Empty ); }
+
+   EndTagStart += 2;
 
    if( EndTagStart >= XMLLength ) { StartStop = XMLLength; Attributes = Empty; return( Empty ); }
 

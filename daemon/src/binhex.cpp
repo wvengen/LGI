@@ -61,7 +61,9 @@ void HexBin( const string& Hex, string &Bin )
  for( ; i < Length; i += 2 )
  {
   HighNibble = HEXDIGITS.find( Hex[ i ], 0 );
+  if( HighNibble == string::npos ) return;
   LowNibble = HEXDIGITS.find( Hex[ i + 1 ], 0 );
+  if( LowNibble == string::npos ) return;
   Bin.push_back( ( ( HighNibble << 4 ) | LowNibble ) & 0xFF );
  }
 

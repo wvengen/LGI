@@ -20,6 +20,9 @@
 #include <signal.h>
 #include <sys/wait.h>
 
+#include <iostream>
+#include <iomanip>
+
 #include "logger.h"
 #include "interface_server_api.h"
 #include "xml.h"
@@ -70,13 +73,6 @@ void PrintHelp( char *ExeName )
 
 int main( int argc, char *argv[] )
 {
- // check number of arguments first...
- if( argc < 2 )
- {
-  PrintHelp( argv[ 0 ] );
-  return( 1 );
- }
-
  // turn logging facilities off...
  InitializeLogger( 0 );
 
@@ -240,6 +236,8 @@ int main( int argc, char *argv[] )
 
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
+  if( Response.empty() ) return( 1 );
+
   if( OutputInXML )
   {
    cout << Response << endl;                // just dump the XML if requested...
@@ -254,7 +252,7 @@ int main( int argc, char *argv[] )
     return( 1 );
    }
 
-   cout << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+   cout << endl << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
    cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
    
    int Count = atoi( NormalizeString( Parse_XML( Response, "number_of_slave_servers" ) ).c_str() );
@@ -263,6 +261,8 @@ int main( int argc, char *argv[] )
  
    for( int i = 1; i <= Count; ++i )
     cout << "Project slave server  : " << NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) ) << endl;
+
+   cout << endl;
   }
 
   return( 0 );
@@ -279,6 +279,16 @@ int main( int argc, char *argv[] )
   int Offset = 0;
   char OffsetStr[ 64 ];
   char LimitStr[ 64 ];
+
+  if( !OutputInXML )                       // output header of list...
+  {
+   cout << endl << "------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+   cout << " " << setw( 4 ) << "#" << " | " << setw( 6 ) << "job_id" << " | ";
+   cout << setw( 12 ) << "state" << " | " << setw( 36 ) << "target_resources" << " | ";
+   cout << setw( 16 ) << "application" << " | " << setw( 24 ) << "time_stamp" << " | ";
+   cout << setw( 12 ) << "owners" << " |  specs" << endl;
+   cout << "------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+  }
 
   do
   {
@@ -308,33 +318,56 @@ int main( int argc, char *argv[] )
 
    if( NrOfJobs )
    {
-    if( OutputInXML )
+    string Attribute, Job;
+    int StartPos = 0;
+
+    for( int i = 1; i <= NrOfJobs; ++i ) 
     {
-     // ...
-     // ...
-     // ...
-     cout << Response << endl;
-    }
-    else
-    {
-     // ...
-     // ...
-     // ...
+     Job = Parse_XML( Response, "job", Attribute, StartPos );
+
+     if( OutputInXML )                                        // output only the jobs tags and adjust the numbering...
+      cout << "<job number='" << ( i + Offset ) << "'> " << Job << " </job> ";
+     else
+     {
+      time_t TimeStamp = atoi( NormalizeString( Parse_XML( Job, "state_time_stamp" ) ).c_str() );
+      char *TimeStampStr = ctime( &TimeStamp );
+      TimeStampStr[ 24 ] = '\0';
+ 
+      cout << " " << setw( 4 ) << ( i + Offset ) << " | ";
+      cout << setw( 6 ) << NormalizeString( Parse_XML( Job, "job_id" ) ) << " | ";
+      cout << setw( 12 ) << NormalizeString( Parse_XML( Job, "state" ) ) << " | "; 
+      cout << setw( 36 ) << NormalizeString( Parse_XML( Job, "target_resources" ) ) << " | ";
+      cout << setw( 16 ) << NormalizeString( Parse_XML( Job, "application" ) ) << " | ";
+      cout << setw( 24 ) << TimeStampStr << " | ";
+      cout << setw( 12 ) << NormalizeString( Parse_XML( Job, "owners" ) ) << " | ";
+      cout << setw( 12 ) << NormalizeString( Parse_XML( Job, "job_specifics" ) ) << endl;
+     }
+
     }
    }
    else
    {
     if( OutputInXML )
     {
-     // ...
-     // ...
-     // ...
+     // output the other fields of the response now...
+
+     cout << "<project> " << NormalizeString( Parse_XML( Response, "project" ) ) << " </project> ";
+     cout << "<project_master_server> " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << " </project_master_server> ";
+     cout << "<project_server> " << NormalizeString( Parse_XML( Response, "project_server" ) ) << " </project_server> ";
+     cout << "<user> " << NormalizeString( Parse_XML( Response, "user" ) ) << " </user> ";
+     cout << "<groups> " << NormalizeString( Parse_XML( Response, "groups" ) ) << " </groups> ";
+     cout << "<state> " << NormalizeString( Parse_XML( Response, "state" ) ) << " </state> ";
+     cout << "<application> " << NormalizeString( Parse_XML( Response, "application" ) ) << " </application> ";
+     cout << "<number_of_jobs> " << TotalNrOfJobs << " </number_of_jobs> " << endl;
+
     }
     else
     {
-     // ...
-     // ...
-     // ...
+     cout << "------------------------------------------------------------------------------------------------------------------------------------------------------" << endl << endl;
+     cout << "Number of jobs listed : " << TotalNrOfJobs << endl;
+     cout << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+     cout << "This project server   : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
+     cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl << endl;
     }
    }
 
@@ -354,6 +387,7 @@ int main( int argc, char *argv[] )
   }
   
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
   if( Response.empty() ) return( 1 );
 
   if( OutputInXML )
@@ -372,7 +406,7 @@ int main( int argc, char *argv[] )
 
    // show the details of the job...
 
-   cout << "Project               : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+   cout << endl << "Project               : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
    cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
    cout << "Project server        : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
    cout << "User                  : " << NormalizeString( Parse_XML( Response, "user" ) ) << endl;
@@ -387,7 +421,7 @@ int main( int argc, char *argv[] )
    cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
    cout << "Time stamp            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ) << endl;
    cout << "Input                 : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ) << endl;
-   cout << "Output                : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ) << endl;
+   cout << "Output                : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ) << endl << endl;
 
   }
  }

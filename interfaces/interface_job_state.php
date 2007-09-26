@@ -112,7 +112,7 @@ if( !$DetailMode )
     $JobResponses .= " <state> ".$JobData->state." </state> <state_time_stamp> ".$JobData->state_time_stamp." </state_time_stamp>";
     $JobResponses .= " <target_resources> ".$JobData->target_resources." </target_resources> ";
     $JobResponses .= " <owners> ".$JobData->owners." </owners> ";
-    $JobResponses .= " <read_acces> ".$JobData->read_access." </read_access> ";
+    $JobResponses .= " <read_access> ".$JobData->read_access." </read_access> ";
     $JobResponses .= " <job_specifics> ".$JobData->job_specifics." </job_specifics> ";
     $JobResponses .= " <application> ".$JobData->application." </application> </job>";
    }
