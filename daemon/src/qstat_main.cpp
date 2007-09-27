@@ -340,7 +340,7 @@ int main( int argc, char *argv[] )
       cout << setw( 16 ) << NormalizeString( Parse_XML( Job, "application" ) ) << " | ";
       cout << setw( 24 ) << TimeStampStr << " | ";
       cout << setw( 12 ) << NormalizeString( Parse_XML( Job, "owners" ) ) << " | ";
-      cout << setw( 12 ) << NormalizeString( Parse_XML( Job, "job_specifics" ) ) << endl;
+      cout << NormalizeString( Parse_XML( Job, "job_specifics" ) ) << endl;
      }
 
     }
