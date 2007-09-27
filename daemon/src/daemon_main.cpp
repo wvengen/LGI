@@ -47,6 +47,18 @@ void TheSignalHandler( int S )
 
 // ----------------------------------------------------------------------
 
+string ReadLineFromFile( string FileName )
+{
+ fstream File( FileName.c_str(), fstream::in );
+ string Line;
+
+ if( !File ) return( Line );
+ getline( File, Line );
+ return( Line );
+}
+
+// ----------------------------------------------------------------------
+
 void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " [options] configfile" << endl << endl;
@@ -105,6 +117,12 @@ int main( int argc, char *argv[] )
     return( 0 );
   } else {
    ConfigFile = string( argv[ i ] );
+   string Data = ReadStringFromFile( ConfigFile );
+   if( Data.empty() )
+   {
+    cout << endl << "Could not read from configuration file " << ConfigFile << endl << endl;
+    return( 1 );
+   }
    ConfigFileSet = 1;
   };
  }
