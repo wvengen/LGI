@@ -58,22 +58,22 @@ void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " -a application [options] " << endl << endl;
  cout << "options:" << endl << endl;
- cout << "-h                                  show this help." << endl;
- cout << "-a application                      specify the application." << endl;
- cout << "-t targetresources                  specify the target resources." << endl;
- cout << "-s jobspecs                         specify the job specifics." << endl;
- cout << "-o owners                           specify the job owners." << endl;
- cout << "-i inputfile                        specify the job input file." << endl;
- cout << "-r readaccesslist                   specify the job readaccess list." << endl;
- cout << "-c directory                        specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
- cout << "-j jobdirectory                     specify job directory to use. if not specified try current directory or specify the following options." << endl;
- cout << "-K keyfile                          specify key file." << endl;
- cout << "-C certificatefile                  specify certificate file." << endl;
- cout << "-CA cacertificatefile               specify ca certificate file." << endl;
- cout << "-S serverurl                        specify project server url." << endl;
- cout << "-U user                             specify username." << endl;
- cout << "-G groups                           specify groups." << endl;
- cout << "-P project                          specify project name." << endl << endl;
+ cout << "-h                      show this help." << endl;
+ cout << "-a application          specify the application." << endl;
+ cout << "-t targetresources      specify the target resources." << endl;
+ cout << "-s jobspecs             specify the job specifics." << endl;
+ cout << "-o owners               specify the job owners." << endl;
+ cout << "-i inputfile            specify the job input file." << endl;
+ cout << "-r readaccesslist       specify the job readaccess list." << endl;
+ cout << "-c directory            specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
+ cout << "-j jobdirectory         specify job directory to use. if not specified try current directory or specify the following options." << endl;
+ cout << "-K keyfile              specify key file." << endl;
+ cout << "-C certificatefile      specify certificate file." << endl;
+ cout << "-CA cacertificatefile   specify ca certificate file." << endl;
+ cout << "-S serverurl            specify project server url." << endl;
+ cout << "-U user                 specify username." << endl;
+ cout << "-G groups               specify groups." << endl;
+ cout << "-P project              specify project name." << endl << endl;
 }
 
 // ----------------------------------------------------------------------
