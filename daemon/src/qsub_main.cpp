@@ -344,26 +344,28 @@ int main( int argc, char *argv[] )
  }
 
  // dump job details we received back from response...
-
- time_t TimeStamp = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ).c_str() );
- char *TimeStampStr = ctime( &TimeStamp );
- TimeStampStr[ 24 ] = '\0';
+ if( !ResourceMode )
+ {
+  time_t TimeStamp = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ).c_str() );
+  char *TimeStampStr = ctime( &TimeStamp );
+  TimeStampStr[ 24 ] = '\0';
  
- cout << endl << "Job has been submitted. Some details: " << endl << endl;
- cout << "Project               : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
- cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
- cout << "Project server        : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
- cout << "User                  : " << NormalizeString( Parse_XML( Response, "user" ) ) << endl;
- cout << "Groups                : " << NormalizeString( Parse_XML( Response, "groups" ) ) << endl;
+  cout << endl << "Job has been submitted. Some details: " << endl << endl;
+  cout << "Project               : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+  cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
+  cout << "Project server        : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
+  cout << "User                  : " << NormalizeString( Parse_XML( Response, "user" ) ) << endl;
+  cout << "Groups                : " << NormalizeString( Parse_XML( Response, "groups" ) ) << endl;
 
- cout << "Job id                : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << endl;
- cout << "Job state             : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) << endl;
- cout << "Job application       : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "application" ) ) << endl;
- cout << "Job specifics         : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_specifics" ) ) << endl;
- cout << "Target resources      : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "target_resources" ) ) << endl;
- cout << "Job owners            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "owners" ) ) << endl;
- cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
- cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl << endl;
+  cout << "Job id                : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << endl;
+  cout << "Job state             : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) << endl;
+  cout << "Job application       : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "application" ) ) << endl;
+  cout << "Job specifics         : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_specifics" ) ) << endl;
+  cout << "Target resources      : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "target_resources" ) ) << endl;
+  cout << "Job owners            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "owners" ) ) << endl;
+  cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
+  cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl << endl;
+ }
 
  return( 0 );
 }
