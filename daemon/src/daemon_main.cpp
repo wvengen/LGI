@@ -132,9 +132,10 @@ int main( int argc, char *argv[] )
   {
    if( Daemonize )
    {
-    if( fork() == 0 )
+    if( daemon( 1, 0 ) == 0 )
     {
      setsid();
+     setpgid( 0, 0 );
      while( TheDaemon -> RunSchedular() );
      delete TheDaemon;
      NORMAL_LOG( "Main; Daemon finished normally" );
