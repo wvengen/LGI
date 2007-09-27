@@ -32,6 +32,10 @@
 
 // ----------------------------------------------------------------------
 
+#define LGI_ALREADY_SIGNED_UP_CODE 8
+
+// ----------------------------------------------------------------------
+
 int ResourceMode = 0;                       // default to user mode...
 
 string KeyFile, CertificateFile, CACertificateFile, 
@@ -308,19 +312,32 @@ int main( int argc, char *argv[] )
  }
 
  // now act accordingly... first see if we are in user mode or not...
-
  if( ResourceMode )
  {
   Resource_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
 
+  // first try to sign on...
   Flag = ServerAPI.Resource_SignUp_Resource( Response, ServerURL, Project );
-  if( ( Flag == CURLE_OK ) && ( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ).empty() ) )
+
+  int SignUpErrorCode = atoi( NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ), "number" ) ).c_str() );
+
+  // if we were signed on already, keep trying to submit and do not sign of in that case...
+  if( ( Flag == CURLE_OK ) && ( ( SignUpErrorCode == 0 ) || ( SignUpErrorCode == LGI_ALREADY_SIGNED_UP_CODE ) )  )
   {
    Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, Application, "queued", Owners, Target_Resources, Read_Access, Job_Specifics, Input, "" );
-   Flag |= ServerAPI.Resource_SignOff_Resource( Output, ServerURL, Project );
+
+   if( ( Flag == CURLE_OK ) && ( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ).empty() ) )
+   {
+    string Job_Id = NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "job" ), "job_id" ) );
+
+    if( !Job_Id.empty() ) Flag |= ServerAPI.Resource_UnLock_Job( Output, ServerURL, Project, Job_Id );
+   }
+  
+   // now only sign off if we did sign on... 
+   if( SignUpErrorCode != LGI_ALREADY_SIGNED_UP_CODE ) Flag |= ServerAPI.Resource_SignOff_Resource( Output, ServerURL, Project );
   }
  }
- else
+ else    // when the submit is in user mode...
  {
   Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
 
