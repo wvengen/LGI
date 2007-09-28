@@ -319,7 +319,7 @@ int Daemon::CycleThroughJobs( void )
       break;
      }
      Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-    } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+    } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == LGI_SERVER_BACKOFF_ERROR_NR );
 
     if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG( "Daemon::CycleThroughJobs; Error from server Response=" << Response );
    }

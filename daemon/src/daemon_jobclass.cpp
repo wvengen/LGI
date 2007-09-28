@@ -405,15 +405,17 @@ string DaemonJob::GetStateFromServer( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
+ int ErrorNumber = 0;
 
  do
  {
   if( Server.Resource_Job_State( Response, GetThisProjectServer(), GetProject(), GetJobId() ) )
    CRITICAL_LOG_RETURN( Response, "DaemonJob::GetStateFromServer; Could not read from server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
- } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+  ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+ } while( ErrorNumber == LGI_SERVER_BACKOFF_ERROR_NR );
  
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( "", "DaemonJob::GetStateFromServer; Error from server Response=" << Response );
+ if( ErrorNumber ) CRITICAL_LOG_RETURN( "", "DaemonJob::GetStateFromServer; Error from server Response=" << Response );
 
  Response = Parse_XML( Parse_XML( Response, "job" ), "state" );
 
@@ -428,15 +430,17 @@ string DaemonJob::GetStateTimeStampFromServer( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
+ int ErrorNumber = 0;
 
  do
  {
   if( Server.Resource_Job_State( Response, GetThisProjectServer(), GetProject(), GetJobId() ) )
    CRITICAL_LOG_RETURN( Response, "DaemonJob::GetStateTimeStampFromServer; Could not read from server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
- } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+  ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+ } while( ErrorNumber == LGI_SERVER_BACKOFF_ERROR_NR );
 
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( "", "DaemonJob::GetStateTimeStampFromServer; Error from server Response=" << Response );
+ if( ErrorNumber ) CRITICAL_LOG_RETURN( "", "DaemonJob::GetStateTimeStampFromServer; Error from server Response=" << Response );
 
  Response = Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" );
 
@@ -465,6 +469,7 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response, Data, HexedInput, HexedOutput;
+ int ErrorNumber = 0;
 
  if( !Input.empty() ) BinHex( Input, HexedInput );
  if( !Output.empty() ) BinHex( Output, HexedOutput );
@@ -474,9 +479,10 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
   if( Server.Resource_Update_Job( Response, GetThisProjectServer(), GetProject(), GetJobId(), State, Resources, HexedInput, HexedOutput, Specs ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
- } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+  ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+ } while( ErrorNumber == LGI_SERVER_BACKOFF_ERROR_NR );
 
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; Error from server " << GetThisProjectServer() << " Response=" << Response );
+ if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; Error from server " << GetThisProjectServer() << " Response=" << Response );
 
  // Dump obtained details of job into correct files...
 
@@ -550,15 +556,17 @@ int DaemonJob::LockJob( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
+ int ErrorNumber = 0;
 
  do
  {
   if( Server.Resource_Lock_Job( Response, GetThisProjectServer(), GetProject(), GetJobId() ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::LockJob; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
- } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+  ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+ } while( ErrorNumber == LGI_SERVER_BACKOFF_ERROR_NR );
 
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::LockJob; Error from server Response=" << Response );
+ if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::LockJob; Error from server Response=" << Response );
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::LockJob; Response=" << Response << " returned 1" );
 }
@@ -571,15 +579,17 @@ int DaemonJob::UnLockJob( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
+ int ErrorNumber = 0;
 
  do
  {
   if( Server.Resource_UnLock_Job( Response, GetThisProjectServer(), GetProject(), GetJobId() ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::UnLockJob; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
- } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+  ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+ } while( ErrorNumber == LGI_SERVER_BACKOFF_ERROR_NR );
 
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UnLockJob; Error from server Response=" << Response );
+ if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UnLockJob; Error from server Response=" << Response );
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::UnLockJob; Response=" << Response << " returned 1" );
 }
@@ -592,15 +602,17 @@ int DaemonJob::SignUp( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
+ int ErrorNumber = 0;
 
  do
  {
   if( Server.Resource_SignUp_Resource( Response, GetThisProjectServer(), GetProject() ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::SignUp; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
- } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+  ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+ } while( ErrorNumber == LGI_SERVER_BACKOFF_ERROR_NR );
 
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignUp; Error from server Response=" << Response );
+ if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignUp; Error from server Response=" << Response );
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::SignUp; Response=" << Response << " returned 1" );
 }
@@ -613,15 +625,17 @@ int DaemonJob::SignOff( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
+ int ErrorNumber = 0;
 
  do
  {
   if( Server.Resource_SignOff_Resource( Response, GetThisProjectServer(), GetProject() ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::SignOff; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
- } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+  ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+ } while( ErrorNumber == LGI_SERVER_BACKOFF_ERROR_NR );
 
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignOff; Error from server Response=" << Response );
+ if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignOff; Error from server Response=" << Response );
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::SignOff; Response=" << Response << " returned 1" );
 }
@@ -634,15 +648,17 @@ int DaemonJob::UpdateJobFromServer( bool UpdateOutputToo )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response, Data;
+ int ErrorNumber = 0;
 
  do
  {
   if( Server.Resource_Request_Job_Details( Response, GetThisProjectServer(), GetProject(), GetJobId() ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
- } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == SERVER_BACK_OF_ERROR_NR );
+  ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+ } while( ErrorNumber == LGI_SERVER_BACKOFF_ERROR_NR );
 
- if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; Error from server Response=" << Response );
+ if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; Error from server Response=" << Response );
 
  // Dump obtained details of job into correct files...
 

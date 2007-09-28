@@ -32,10 +32,6 @@
 
 // ----------------------------------------------------------------------
 
-#define LGI_ALREADY_SIGNED_UP_CODE 8
-
-// ----------------------------------------------------------------------
-
 int ResourceMode = 0;                       // default to user mode...
 
 string KeyFile, CertificateFile, CACertificateFile, 
@@ -322,7 +318,7 @@ int main( int argc, char *argv[] )
   int SignUpErrorCode = atoi( NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ), "number" ) ).c_str() );
 
   // if we were signed on already, keep trying to submit and do not sign of in that case...
-  if( ( Flag == CURLE_OK ) && ( ( SignUpErrorCode == 0 ) || ( SignUpErrorCode == LGI_ALREADY_SIGNED_UP_CODE ) )  )
+  if( ( Flag == CURLE_OK ) && ( ( SignUpErrorCode == 0 ) || ( SignUpErrorCode == LGI_ALREADY_SIGNED_UP_ERROR_NR ) )  )
   {
    Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, Application, "queued", Owners, Target_Resources, Read_Access, Job_Specifics, Input, "" );
 
@@ -334,7 +330,7 @@ int main( int argc, char *argv[] )
    }
   
    // now only sign off if we did sign on... 
-   if( SignUpErrorCode != LGI_ALREADY_SIGNED_UP_CODE ) Flag |= ServerAPI.Resource_SignOff_Resource( Output, ServerURL, Project );
+   if( SignUpErrorCode != LGI_ALREADY_SIGNED_UP_ERROR_NR ) Flag |= ServerAPI.Resource_SignOff_Resource( Output, ServerURL, Project );
   }
  }
  else    // when the submit is in user mode...

@@ -31,7 +31,8 @@ using namespace std;
 
 // ------------------------------------------------------------------------------
 
-#define SERVER_BACK_OF_ERROR_NR 1
+#define LGI_SERVER_BACKOFF_ERROR_NR     1
+#define LGI_ALREADY_SIGNED_UP_ERROR_NR  8
 
 // ------------------------------------------------------------------------------
 
