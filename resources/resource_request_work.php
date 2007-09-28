@@ -24,7 +24,7 @@ global $ErrorMsgs;
 global $Config;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ] );
+$ResourceData = Resource_Verify( $_POST[ "project" ], true );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "application" ] ) || ( $_POST[ "application" ] == "" ) )
