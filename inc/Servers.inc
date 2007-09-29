@@ -187,11 +187,11 @@ function Server_Check_And_Perform_Updates( )
 
 // -------------------------------------------------------------------- 
 
-function Server_Remove_Stale_Locks_Of_Resource( $ResourceID )
+function Server_Remove_Stale_Locks_Of_Resource( $ResourceID, $SessionID )
 {
 
  // get list of locks of this resource...
- $TheLocks = mysql_query( "SELECT lock_id,job_id FROM running_locks WHERE resource_id=".$ResourceID );
+ $TheLocks = mysql_query( "SELECT lock_id,job_id FROM running_locks WHERE resource_id=".$ResourceID." AND session_id=".$SessionID );
  $NumberOfLocks = mysql_num_rows( $TheLocks );
 
  if( $NumberOfLocks >= 1 )
@@ -213,29 +213,30 @@ function Server_Remove_Stale_Locks_Of_Resource( $ResourceID )
 
 // --------------------------------------------------------------------
 
-function Server_Check_For_InActive_Resources( )
+function Server_Check_For_InActive_Resource_Sessions( )
 {
  global $Config;
 
  // get a list of apparently inactive resources...
- $TheResources = mysql_query( "SELECT resource_id FROM active_resources WHERE active=1 AND last_call_time<=(UNIX_TIMESTAMP()-".$Config[ "LGI_INACTIVITY_VALUE" ].")" );
- $NumberOfResources = mysql_num_rows( $TheResources );
+ $TheSessions = mysql_query( "SELECT session_id,resource_id FROM running_sessions WHERE session_time_stamp<=(UNIX_TIMESTAMP()-".$Config[ "LGI_INACTIVITY_VALUE" ].")" );
+ $NumberOfSessions = mysql_num_rows( $TheSessions );
 
- if( $NumberOfResources >= 1 )
-  for( $r = 0; $r < $NumberOfResources; $r++ )
+ if( $NumberOfSessions >= 1 )
+  for( $s = 0; $s < $NumberOfSessions; $s++ )
   {
-   // get id of apparently inactive resource...
-   $ResourceID = mysql_fetch_object( $TheResources );
+   // get id's of apparently inactive resource session...
+   $ResourceID = mysql_fetch_object( $TheSessions );
+   $SessionID = $ResourceID->session_id;
    $ResourceID = $ResourceID->resource_id;
 
    // remove any locks of this resource...
-   Server_Remove_Stale_Locks_Of_Resource( $ResourceID );
+   Server_Remove_Stale_Locks_Of_Resource( $ResourceID, $SessionID );
 
-   // and reset active flag...
-   $queryresult = mysql_query( "UPDATE active_resources SET active=0 WHERE resource_id=".$ResourceID );
+   // and remove session entry...
+   $queryresult = mysql_query( "DELETE FROM running_sessions WHERE session_id=".$SessionID );
   }
  
- mysql_free_result( $TheResources );
+ mysql_free_result( $TheSessions );
 
  return( 0 );
 }

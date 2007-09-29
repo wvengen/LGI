@@ -21,7 +21,7 @@
 global $Config;
 
 $Config[ "SERVER_URL" ]            = "https://fwnc7003.leidenuniv.nl/LGI";     // the URL of this project server
-$Config[ "SERVER_NAME" ]           = "mark@fwnc7003.leidenuniv.nl";            // the unique name of this project server
+$Config[ "SERVER_NAME" ]           = "mark@fwnc7003.wks.gorlaeus.net";         // the unique name of this project server
 
 $Config[ "SERVER_SSL_CERTIFICATE_FILE" ]     = "../certificates/fwnc7003.crt";      // the certificate of this server
 $Config[ "SERVER_SSL_KEY" ]                  = "../certificates/fwnc7003.key";      // the certificate key file of this server
@@ -35,7 +35,7 @@ $Config[ "MYSQL_DEFAULT_DATABASE" ]      = "LGI";                  // what DB to
 
 $Config[ "LGI_TIMEOUT_VALUE" ]           = 10;                     // default timeout in seconds for back-off
 $Config[ "LGI_SPIN_LOCK_ATTEMPTS" ]      = 30;                     // number of attempt to get a spin-lock before failing for interfaces
-$Config[ "LGI_INACTIVITY_VALUE" ]        = 3600;                   // default timeout in seconds before resource is considered inactive
+$Config[ "LGI_INACTIVITY_VALUE" ]        = 1800;                   // default timeout in seconds before resource session is considered inactive
 
 $Config[ "DEFAULT_WORK_REQUEST_LIMIT" ]  = 10;                     // the default request limit for resources
 $Config[ "DEFAULT_JOB_STATUS_LIMIT" ]    = 20;                     // the default request limit for interfaces
