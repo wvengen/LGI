@@ -312,26 +312,51 @@ int main( int argc, char *argv[] )
  {
   Resource_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
 
-  // first try to sign on...
+  // first try to sign up...
   Flag = ServerAPI.Resource_SignUp_Resource( Response, ServerURL, Project );
-
-  int SignUpErrorCode = atoi( NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ), "number" ) ).c_str() );
-
-  // if we were signed on already, keep trying to submit and do not sign of in that case...
-  if( ( Flag == CURLE_OK ) && ( ( SignUpErrorCode == 0 ) || ( SignUpErrorCode == LGI_ALREADY_SIGNED_UP_ERROR_NR ) )  )
+  if( Flag != CURLE_OK )
   {
-   Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, Application, "queued", Owners, Target_Resources, Read_Access, Job_Specifics, Input, "" );
-
-   if( ( Flag == CURLE_OK ) && ( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ).empty() ) )
-   {
-    string Job_Id = NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "job" ), "job_id" ) );
-
-    if( !Job_Id.empty() ) Flag |= ServerAPI.Resource_UnLock_Job( Output, ServerURL, Project, Job_Id );
-   }
-  
-   // now only sign off if we did sign on... 
-   if( SignUpErrorCode != LGI_ALREADY_SIGNED_UP_ERROR_NR ) Flag |= ServerAPI.Resource_SignOff_Resource( Output, ServerURL, Project );
+   cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+   return( 1 );
   }
+
+  int ErrorCode = atoi( NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ), "number" ) ).c_str() );
+  if( ErrorCode ) 
+  {
+   cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+   return( 1 );
+  }
+
+  // we are signed on and have a session running now...
+
+  string SessionID = NormalizeString( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "session_id" ) );
+
+  Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, SessionID, Application, "queued", Owners, Target_Resources, Read_Access, Job_Specifics, Input, "" );
+  if( Flag != CURLE_OK )
+   cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+  else
+  {
+   ErrorCode = atoi( NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ), "number" ) ).c_str() );
+   if( ErrorCode ) 
+    cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+  }
+
+  // if we did submit the job, this signoff will unlock it automatically...
+  Flag = ServerAPI.Resource_SignOff_Resource( Output, ServerURL, Project, SessionID );
+  if( Flag != CURLE_OK )
+  {
+   cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+   return( 1 );
+  }
+
+  ErrorCode = atoi( NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Output, "LGI" ), "response" ), "error" ), "number" ) ).c_str() );
+  if( ErrorCode ) 
+  {
+   cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Output, "error" ), "message" ) ) << endl << endl;
+   return( 1 );
+  }
+
+  return( 0 );           // all went well....
  }
  else    // when the submit is in user mode...
  {

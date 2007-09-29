@@ -191,6 +191,7 @@ int Daemon::CycleThroughJobs( void )
   if( !Server -> second.empty() )
   {
    int SignedUp = 0;
+   string SessionID;
 
    for( list<DaemonJob>::iterator Job = Server -> second.begin(); Job != Server -> second.end() && ReadyForScheduling; ++Job )
    {
@@ -206,13 +207,15 @@ int Daemon::CycleThroughJobs( void )
     {
      if( !SignedUp )
      {
-      DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to " << Server -> first );
-      if( !( ( Server -> second.begin() ) -> SignUp() ) ) continue;      // signup to project and server...
+      DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to " << Server -> first );    // signup to project and server...
+      if( !( ( Server -> second.begin() ) -> SignUp() ) ) continue;                     
       SignedUp = 1;
-      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to " << Server -> first );
+      SessionID = ( Server -> second.begin() ) -> GetSessionID();
+      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to " << Server -> first << " with session id " << SessionID );
      }
 
-     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronizing job with directory " << Job -> GetJobDirectory() );
+     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronizing job with directory " << Job -> GetJobDirectory() << " using session id " << SessionID );
+     Job -> SetSessionID( SessionID );
      if( !( Job -> LockJob() ) ) continue;                            // lock, update and unlock job...
      if( !( Job -> UpdateJobFromServer() ) ) continue;
      if( !( Job -> UnLockJob() ) ) continue;
@@ -239,6 +242,7 @@ int Daemon::CycleThroughJobs( void )
   if( !Server -> second.empty() )
   {
    int SignedUp = 0;
+   string SessionID;
 
    for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end() && ReadyForScheduling; )
    {
@@ -258,10 +262,12 @@ int Daemon::CycleThroughJobs( void )
        DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to server " << ServerURL << " for project " << Project );
        if( !TempJob.SignUp() ) continue;                          // sign up if needed...
        SignedUp = 1;
+       SessionID = TempJob.GetSessionID();
        ServerURL = TempJob.GetThisProjectServer();
        Project = TempJob.GetProject();
-       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to server " << ServerURL << " for project " << Project );
+       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to server " << ServerURL << " for project " << Project << " with session id " << SessionID );
       }
+      TempJob.SetSessionID( SessionID );
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "aborted", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
@@ -282,10 +288,12 @@ int Daemon::CycleThroughJobs( void )
        DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to server " << ServerURL << " for project " << Project );
        if( !TempJob.SignUp() ) continue;                         // sign up if needed...
        SignedUp = 1;
+       SessionID = TempJob.GetSessionID();
        ServerURL = TempJob.GetThisProjectServer();
        Project = TempJob.GetProject();
-       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to server " << ServerURL << " for project " << Project );
+       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to server " << ServerURL << " for project " << Project << " with session id " << SessionID );
       }
+      TempJob.SetSessionID( SessionID );
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "finished", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
@@ -309,19 +317,20 @@ int Daemon::CycleThroughJobs( void )
 
    if( SignedUp )      // sign off from server if needed...
    {
-    DEBUG_LOG( "Daemon::CycleThroughJobs; Signing of from server " << ServerURL << " for project " << Project );
+    DEBUG_LOG( "Daemon::CycleThroughJobs; Signing of from server " << ServerURL << " for project " << Project << " with session id " << SessionID );
 
     do
     {
-     if( ServerAPI.Resource_SignOff_Resource( Response, ServerURL, Project ) )
+     if( ServerAPI.Resource_SignOff_Resource( Response, ServerURL, Project, SessionID ) )
      {
       CRITICAL_LOG( "Daemon::CycleThroughJobs; Could not post to server " << ServerURL );
       break;
      }
      Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-    } while( atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() ) == LGI_SERVER_BACKOFF_ERROR_NR );
+     SignedUp = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+    } while( SignedUp == LGI_SERVER_BACKOFF_ERROR_NR );
 
-    if( !Parse_XML( Response, "error" ).empty() ) CRITICAL_LOG( "Daemon::CycleThroughJobs; Error from server Response=" << Response );
+    if( SignedUp ) CRITICAL_LOG( "Daemon::CycleThroughJobs; Error from server Response=" << Response );
    }
 
   }
@@ -355,7 +364,7 @@ int Daemon::RequestWorkCycle( void )
   // first signup to registered master server of this project to get all slaves... if this fails somehow, try the next...
 
   list<string> ServerList;
-  string Response, Attributes;
+  string Response, Attributes, SessionID;
   int    StartPos;
 
   DEBUG_LOG( "Daemon::RequestWorkCycle; Signing up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
@@ -367,8 +376,10 @@ int Daemon::RequestWorkCycle( void )
   if( Response.empty() ) continue;
 
   if( !Parse_XML( Response, "error" ).empty() ) { CRITICAL_LOG( "Daemon::RequestWorkCycle; Unable to sign up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() << " : " << Parse_XML( Parse_XML( Response, "error" ), "message" ) ); continue; }
+
+  SessionID = NormalizeString( Parse_XML( Response, "session_id" ) );
   
-  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
+  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() << " with session id " << SessionID );
 
   int NumberOfServers = atoi( NormalizeString( Parse_XML( Response, "number_of_slave_servers" ) ).c_str() );
   
@@ -428,7 +439,7 @@ int Daemon::RequestWorkCycle( void )
 
      if( system( TheApplication.Check_System_Limits_Script().c_str() ) == 0 ) 
      {
-      DEBUG_LOG( "Daemon::RequestWorkCycle; Requesting work for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
+      DEBUG_LOG( "Daemon::RequestWorkCycle; Requesting work for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() << " at server " << (*ServerPointer) << " with session id " << SessionID );
 
       int NrOfJobs = 0;
       int Limit = 10;
@@ -443,7 +454,7 @@ int Daemon::RequestWorkCycle( void )
        sprintf( LimitStr, "%d", Limit );
 
        VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Performing work request with Offset=" << OffsetStr << " at server " << (*ServerPointer) );
-       if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), TheApplication.Application_Name(), OffsetStr, LimitStr ) != CURLE_OK ) continue;
+       if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, TheApplication.Application_Name(), OffsetStr, LimitStr ) != CURLE_OK ) continue;
 
        string JobResponse = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
@@ -490,7 +501,9 @@ int Daemon::RequestWorkCycle( void )
           AddJobToDaemonLists( TempJob );
 
           // set job into running state on server and through this we now also get input...
+          TempJob.SetSessionID( SessionID );
           TempJob.UpdateJob( "running", NormalizeString( Parse_XML( JobResponse, "resource" ) ), "", "", "" );
+          TempJob.SetSessionID( "" );
           
           NORMAL_LOG( "Daemon::RequestWorkCycle; Job with directory " << TempJob.GetJobDirectory() << " accepted" );
 
@@ -503,7 +516,7 @@ int Daemon::RequestWorkCycle( void )
         else
          VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Denied service for job " << Job_Id );
 
-        if( ServerAPI.Resource_UnLock_Job( Response, (*ServerPointer), TheProject.Project_Name(), Job_Id ) != CURLE_OK ) JobIndex = NrOfJobs;
+        if( ServerAPI.Resource_UnLock_Job( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, Job_Id ) != CURLE_OK ) JobIndex = NrOfJobs;
        }
 
        Offset += Limit;
@@ -515,9 +528,9 @@ int Daemon::RequestWorkCycle( void )
     }
 
     // sign off from this server...
-    DEBUG_LOG( "Daemon::RequestWorkCycle; Signing off from server " << (*ServerPointer) );
+    DEBUG_LOG( "Daemon::RequestWorkCycle; Signing off from server " << (*ServerPointer) << " with session id " << SessionID );
 
-    if( ServerAPI.Resource_SignOff_Resource( Response, (*ServerPointer), TheProject.Project_Name() ) != CURLE_OK )
+    if( ServerAPI.Resource_SignOff_Resource( Response, (*ServerPointer), TheProject.Project_Name(), SessionID ) != CURLE_OK )
      Response.clear();
 
     VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed off from server " << (*ServerPointer) );
@@ -528,17 +541,32 @@ int Daemon::RequestWorkCycle( void )
     DEBUG_LOG( "Daemon::RequestWorkCycle; Signing up to project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
 
     if( ServerAPI.Resource_SignUp_Resource( Response, (*ServerPointer), TheProject.Project_Name() ) != CURLE_OK )
+    {
      Response.clear();
+     SessionID.clear();
+    }
     else
     {
      Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-     if( !Parse_XML( Response, "error" ).empty() ) { DEBUG_LOG( "Daemon::RequestWorkCycle; Unable to sign up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) ); Response.clear(); } 
-
-     VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed up to project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
+     if( !Parse_XML( Response, "error" ).empty() )
+     {
+      DEBUG_LOG( "Daemon::RequestWorkCycle; Unable to sign up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) );
+      Response.clear();
+      SessionID.clear();
+     } 
+     else
+     {
+      SessionID = NormalizeString( Parse_XML( Response, "session_id" ) );
+      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed up to project " << TheProject.Project_Name() << " at server " << (*ServerPointer) << " with session id " << SessionID );
+     }
     }
    }
    else
+   {
     Response.clear();
+    SessionID.clear();
+   }
+
   }
   while( ServerPointer != ServerList.end() && ReadyForScheduling );
 
