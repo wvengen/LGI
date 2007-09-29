@@ -16,7 +16,6 @@ CREATE TABLE active_resources (
   last_call_time int(10) unsigned NOT NULL default '0',
   project_server int(10) unsigned NOT NULL default '0',
   url text NOT NULL,
-  active int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (resource_id)
 ) TYPE=MyISAM;
 
@@ -55,7 +54,6 @@ CREATE TABLE groups_denied (
 -- Dumping data for table `groups_denied`
 --
 
-
 --
 -- Table structure for table `job_queue`
 --
@@ -81,6 +79,22 @@ CREATE TABLE job_queue (
 --
 
 --
+-- Table structure for table `running_sessions`
+--
+
+DROP TABLE IF EXISTS running_sessions;
+CREATE TABLE running_sessions (
+  session_id int(10) unsigned NOT NULL auto_increment,
+  resource_id int(10) unsigned NOT NULL default '0',
+  session_time_stamp int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (session_id)
+) TYPE=MyISAM;
+
+--
+-- Dumping data for table `running_sessions`
+--
+
+--
 -- Table structure for table `running_locks`
 --
 
@@ -90,13 +104,13 @@ CREATE TABLE running_locks (
   job_id int(10) unsigned NOT NULL default '0',
   resource_id int(10) unsigned NOT NULL default '0',
   lock_time int(10) unsigned NOT NULL default '0',
+  session_id int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (lock_id)
 ) TYPE=MyISAM;
 
 --
 -- Dumping data for table `running_locks`
 --
-
 
 --
 -- Table structure for table `updates`
@@ -113,7 +127,6 @@ CREATE TABLE updates (
 --
 -- Dumping data for table `updates`
 --
-
 
 --
 -- Table structure for table `users_allowed`

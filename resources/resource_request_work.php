@@ -24,7 +24,11 @@ global $ErrorMsgs;
 global $Config;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ], true );
+$ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
+
+// check if this call is valid...
+if( Resource_Verify_Session( $ResourceData ) )
+  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "application" ] ) || ( $_POST[ "application" ] == "" ) )
@@ -43,10 +47,6 @@ if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" ) && is_numeric( $_P
 else
  $JobIdLimit = $Config[ "DEFAULT_WORK_REQUEST_LIMIT" ];
 
-// check if this call is valid...
-if( !$ResourceData->active )
-  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
-
 // check if this resource has any jobs locked...
 if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )
  return( LGI_Error_Response( 17, $ErrorMsgs[ 17 ], "" ) ); 
@@ -56,7 +56,7 @@ $Response = "<start> ".$JobIdStart." </start> <limit> ".$JobIdLimit." </limit>";
 $Response .= " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
 $Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
-$Response .= " <resource_active> ".$ResourceData->active." </resource_active>";
+$Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 $Response .= " <application> ".$Application." </application>";
 
 // start the work query...
@@ -87,12 +87,12 @@ if( $NrOfPossibleJobs >= 1 )
 
    // build job record for this job...
    $ActualNrOfJobs += 1; 
-   $ResponseJobs .= " <job number='".$ActualNrOfJobs."'> <job_id> ".$JobSpecs->job_id." </job_id> "; 
-   $ResponseJobs .= " <target_resources> ".$JobSpecs->target_resources." </target_resources> "; 
-   $ResponseJobs .= " <owners> ".$JobSpecs->owners." </owners> "; 
-   $ResponseJobs .= " <read_access> ".$JobSpecs->read_access." </read_access> "; 
-   $ResponseJobs .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp> "; 
-   $ResponseJobs .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job> "; 
+   $ResponseJobs .= " <job number='".$ActualNrOfJobs."'> <job_id> ".$JobSpecs->job_id." </job_id>"; 
+   $ResponseJobs .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>"; 
+   $ResponseJobs .= " <owners> ".$JobSpecs->owners." </owners>"; 
+   $ResponseJobs .= " <read_access> ".$JobSpecs->read_access." </read_access>"; 
+   $ResponseJobs .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>"; 
+   $ResponseJobs .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>"; 
 
    mysql_free_result( $JobQuery );
   } 
@@ -100,7 +100,7 @@ if( $NrOfPossibleJobs >= 1 )
 
  // free query and make final response... 
  mysql_free_result( $TheWorkQuery );
- $Response .= " <number_of_jobs> ".$ActualNrOfJobs." </number_of_jobs> ".$ResponseJobs;
+ $Response .= " <number_of_jobs> ".$ActualNrOfJobs." </number_of_jobs>".$ResponseJobs;
 } 
 else
 {

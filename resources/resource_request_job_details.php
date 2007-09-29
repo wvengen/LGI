@@ -24,17 +24,17 @@ require_once( '../inc/Utils.inc' );
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ], true );
+$ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
+
+// check if this call is valid...
+if( Resource_Verify_Session( $ResourceData ) )
+ return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || ! is_numeric( $_POST[ "job_id" ] ) )
  return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ], "" ) );
 else
  $JobId = $_POST[ "job_id" ];
-
-// check if this call is valid...
-if( !$ResourceData->active )
-  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
 
 // check if this resource has this job locked...
 if( !Resource_Has_Job_Locked( $ResourceData, $JobId ) )
@@ -49,17 +49,17 @@ mysql_free_result( $JobQuery );
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
 $Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
-$Response .= " <resource_active> ".$ResourceData->active." </resource_active>";
-$Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id> "; 
-$Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources> "; 
-$Response .= " <owners> ".$JobSpecs->owners." </owners> "; 
-$Response .= " <read_access> ".$JobSpecs->read_access." </read_access> "; 
-$Response .= " <application> ".$JobSpecs->application." </application> "; 
-$Response .= " <state> ".$JobSpecs->state." </state> "; 
-$Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp> "; 
-$Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> "; 
-$Response .= " <input> ".binhex( $JobSpecs->input )." </input> "; 
-$Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job> "; 
+$Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
+$Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id>"; 
+$Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>"; 
+$Response .= " <owners> ".$JobSpecs->owners." </owners>"; 
+$Response .= " <read_access> ".$JobSpecs->read_access." </read_access>"; 
+$Response .= " <application> ".$JobSpecs->application." </application>"; 
+$Response .= " <state> ".$JobSpecs->state." </state>"; 
+$Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>"; 
+$Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>"; 
+$Response .= " <input> ".binhex( $JobSpecs->input )." </input>"; 
+$Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job>"; 
 
 // return the response...
 return( LGI_Response( $Response, "" ) );

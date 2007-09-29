@@ -27,12 +27,81 @@ require_once( '../inc/Utils.inc' );
 
 // -------------------------------------------------------------------- 
 
-function Resource_Verify( $Project, $UpdateTimeStamp )
+function Resource_Verify_Session( &$ResourceData )
+{
+ global $ErrorMsgs;
+
+ // check if variable was set correctly...
+ if( !isset( $ResourceData -> SessionID ) || ( $ResourceData -> SessionID == "" ) || !is_numeric( $ResourceData -> SessionID ) )
+  return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ], "" ) );
+
+ // get session id for this resource from running_sessions...
+ $query = mysql_query( "SELECT session_id FROM running_sessions WHERE session_id=".$ResourceData->SessionID." AND resource_id=".$ResourceData->resource_id );
+
+ // if not found... bugger out...
+ if( mysql_num_rows( $query ) != 1 )
+ {
+  mysql_free_result( $query );
+  return( 1 );
+ }
+
+ mysql_free_result( $query );
+
+ // update session_time_stamp...
+ $query = mysql_query( "UPDATE running_sessions SET session_time_stamp=UNIX_TIMESTAMP() WHERE session_id=".$ResourceData->SessionID );
+
+ return( 0 );
+}
+
+// -------------------------------------------------------------------- 
+
+function Resource_Setup_Session( &$ResourceData )
+{
+ global $ErrorMsgs;
+
+ // insert entry into running_sessions table...
+ $queryresult = mysql_query( "INSERT INTO running_sessions SET resource_id=".$ResourceData->resource_id.",session_time_stamp=UNIX_TIMESTAMP()" );
+
+ // get inserted id...
+ $query = mysql_query( "SELECT session_id FROM running_sessions WHERE session_id=LAST_INSERT_ID() AND resource_id=".$ResourceData->resource_id );
+
+ if( mysql_num_rows( $query ) != 1 )
+  return( LGI_Error_Response( 44, $ErrorMsgs[ 44 ], "" ) );
+
+ $querydata = mysql_fetch_object( $query );
+
+ mysql_free_result( $query );
+
+ // and set value into structure...
+ $ResourceData -> SessionID = $querydata -> session_id;
+
+ return( 0 );
+}
+
+// --------------------------------------------------------------------
+
+function Resource_Kill_Session( &$ResourceData )
+{
+ global $ErrorMsgs;
+
+ if( Resource_Verify_Session( $ResourceData ) )
+  return( LGI_Error_Response( 42, $ErrorMsgs[ 42 ], "" ) );
+
+ // just remove entry from the table...
+ $query = mysql_query( "DELETE FROM running_sessions WHERE session_id=".$ResourceData->SessionID );
+
+ // invalidate data in structure...
+ unset( $ResourceData -> SessionID );
+
+ return( 0 );
+}
+
+// --------------------------------------------------------------------
+
+function Resource_Verify( $Project, $SessionID )
 {
  global $ErrorMsgs;
  global $Config;
-
- if( !isset( $UpdateTimeStamp ) ) $UpdateTimeStamp = true;
 
  // first see if valid client certificate was used in the connection...
  if( SSL_Verify_Client() ) return( 2 );
@@ -40,7 +109,7 @@ function Resource_Verify( $Project, $UpdateTimeStamp )
  // if it was not posted, use default value for this server...
  if( !isset( $Project ) || ( $Project == "" ) )
   $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
-
+ 
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
  $CommonName = mysql_escape_string( $CommonNameArray[ 1 ] );
@@ -81,8 +150,10 @@ function Resource_Verify( $Project, $UpdateTimeStamp )
   return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "" ) );
 
  // update time_stamp of resource...
- if( $UpdateTimeStamp )
-  $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
+ $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
+
+ // pass through the SessionID into the resource data structure...
+ if( isset( $SessionID ) && is_numeric( $SessionID ) ) $Data -> SessionID = $SessionID;
 
  return( $Data );
 }
@@ -93,11 +164,11 @@ function Resource_Check_For_Job_Locks( $ResourceData )
 {
  global $ErrorMsgs;
 
- if( !$ResourceData->active )
+ if( Resource_Verify_Session( $ResourceData ) )
   return( LGI_Error_Response( 9, $ErrorMsgs[ 9 ], "" ) );
 
  // count the number of locks this resource has...
- $TheNumberOfLocks = mysql_fetch_object(mysql_query( "SELECT COUNT(lock_id) AS N FROM running_locks WHERE resource_id=".$ResourceData->resource_id )); 
+ $TheNumberOfLocks = mysql_fetch_object(mysql_query( "SELECT COUNT(lock_id) AS N FROM running_locks WHERE resource_id=".$ResourceData->resource_id." AND session_id=".$ResourceData->SessionID )); 
  
  return( $TheNumberOfLocks->N ); 
 }
@@ -108,11 +179,11 @@ function Resource_Has_Job_Locked( $ResourceData, $JobId )
 {
  global $ErrorMsgs;
 
- if( !$ResourceData->active )
+ if( Resource_Verify_Session( $ResourceData ) )
   return( LGI_Error_Response( 10, $ErrorMsgs[ 10 ], "" ) );
 
  // get lock data from running_locks table...
- $queryresult = mysql_query( "SELECT lock_id FROM running_locks WHERE job_id=".$JobId." AND resource_id=".$ResourceData->resource_id );
+ $queryresult = mysql_query( "SELECT lock_id FROM running_locks WHERE job_id=".$JobId." AND resource_id=".$ResourceData->resource_id." AND session_id=".$ResourceData->SessionID );
 
  if( mysql_num_rows( $queryresult ) == 1 )
   $HasLocked = 1; 
@@ -130,7 +201,7 @@ function Resource_Lock_Job( $ResourceData, $JobId )
 {
  global $ErrorMsgs;
 
- if( !$ResourceData->active )
+ if( Resource_Verify_Session( $ResourceData ) )
   return( LGI_Error_Response( 11, $ErrorMsgs[ 11 ], "" ) );
 
  // check for lock data from running_locks table...
@@ -172,7 +243,7 @@ function Resource_Lock_Job( $ResourceData, $JobId )
  if( $CurrentLockState->lock_state == 1 ) 
  {
   // yup we got the lock, insert into running_locks table...
-  $queryresult = mysql_query( "INSERT INTO running_locks SET job_id=".$JobId.",resource_id=".$ResourceData->resource_id.",lock_time=UNIX_TIMESTAMP()" );
+  $queryresult = mysql_query( "INSERT INTO running_locks SET job_id=".$JobId.",resource_id=".$ResourceData->resource_id.",lock_time=UNIX_TIMESTAMP(),session_id=".$ResourceData->SessionID );
   return( 0 );
  }
  else
@@ -191,11 +262,11 @@ function Resource_UnLock_Job( $ResourceData, $JobId )
 {
  global $ErrorMsgs;
 
- if( !$ResourceData->active )
+ if( Resource_Verify_Session( $ResourceData ) )
   return( LGI_Error_Response( 10, $ErrorMsgs[ 10 ], "" ) );
 
  // get lock data from running_locks table...
- $queryresult = mysql_query( "SELECT lock_id,job_id,resource_id FROM running_locks WHERE job_id=".$JobId );
+ $queryresult = mysql_query( "SELECT lock_id,job_id,resource_id,session_id FROM running_locks WHERE job_id=".$JobId );
 
  if( mysql_num_rows( $queryresult ) > 1 )
   return( LGI_Error_Response( 12, $ErrorMsgs[ 12 ], "" ) ); 
@@ -207,9 +278,9 @@ function Resource_UnLock_Job( $ResourceData, $JobId )
  $TheLockData = mysql_fetch_object( $queryresult );
  mysql_free_result( $queryresult );
  
- if( $TheLockData -> resource_id != $ResourceData -> resource_id )
+ if( ( $TheLockData -> resource_id != $ResourceData -> resource_id ) || ( $TheLockData -> session_id != $ResourceData -> SessionID ) )
   return( LGI_Error_Response( 14, $ErrorMsgs[ 14 ], "" ) );
-
+ 
  // first unlock the job in the job_queue table...
  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobId );
 
@@ -225,11 +296,11 @@ function Resource_Remove_Stale_Locks( $ResourceData )
 {
  global $ErrorMsgs;
 
- if( $ResourceData->active )
+ if( Resource_Verify_Session( $ResourceData, $SessionID ) )
   return( LGI_Error_Response( 7, $ErrorMsgs[ 7 ], "" ) );
 
  // get list of locks of this resource...
- $TheLocks = mysql_query( "SELECT lock_id,job_id FROM running_locks WHERE resource_id=".$ResourceData->resource_id ); 
+ $TheLocks = mysql_query( "SELECT lock_id,job_id FROM running_locks WHERE resource_id=".$ResourceData->resource_id." AND session_id=".$ResourceData->SessionID ); 
  $NumberOfLocks = mysql_num_rows( $TheLocks );
 
  if( $NumberOfLocks >= 1 )
@@ -245,40 +316,6 @@ function Resource_Remove_Stale_Locks( $ResourceData )
   }
 
  mysql_free_result( $TheLocks );
-
- return( 0 );
-}
-
-// -------------------------------------------------------------------- 
-
-function Resource_Mark_As_Active( &$ResourceData )
-{
- global $ErrorMsgs;
-
- if( $ResourceData->active )
-  return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ], "" ) );
-
- // set active flag and update time stamp...
- $queryresult = mysql_query( "UPDATE active_resources SET active=1,last_call_time=UNIX_TIMESTAMP() WHERE resource_id=".$ResourceData->resource_id );
-
- $ResourceData->active = 1;
-
- return( 0 );
-}
-
-// --------------------------------------------------------------------
-
-function Resource_Mark_As_InActive( &$ResourceData )
-{
- global $ErrorMsgs;
-
- if( !$ResourceData->active )
-  return( LGI_Error_Response( 42, $ErrorMsgs[ 42 ], "" ) );
-
- // set active flag and update time stamp...
- $queryresult = mysql_query( "UPDATE active_resources SET active=0,last_call_time=UNIX_TIMESTAMP() WHERE resource_id=".$ResourceData->resource_id );
-
- $ResourceData->active = 0;
 
  return( 0 );
 }

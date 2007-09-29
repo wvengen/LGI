@@ -23,17 +23,10 @@ require_once( '../inc/Resources.inc' );
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ], false );      
+$ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 
-// check if this call is valid...
-if( $ResourceData->active )
-  return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ], "" ) );
-
-// remove any stale locks this resource might have...
-Resource_Remove_Stale_Locks( $ResourceData );
-
-// now mark the current resource as active...
-Resource_Mark_As_Active( $ResourceData );
+// now create a new session for this resource...
+Resource_Setup_Session( $ResourceData );
 
 // start building the response of this api-call...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
@@ -55,7 +48,7 @@ for( $i = 1; $i <= $NumberOfServers; $i++ )
 
 mysql_free_result( $queryresult );
 
-$Response .= " <resource_active> ".$ResourceData->active." </resource_active>";
+$Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 
 // and return the response...
 LGI_Response( $Response, "" );

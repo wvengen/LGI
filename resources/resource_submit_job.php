@@ -24,7 +24,11 @@ require_once( '../inc/Utils.inc' );
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ], true );
+$ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
+
+// check if this call is valid...
+if( Resource_Verify_Session( $ResourceData ) )
+  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
 
 // check if compulsory post variables were set...
 if( !isset( $_POST[ "state" ] ) || ( $_POST[ "state" ] == "" ) )
@@ -46,10 +50,6 @@ if( !isset( $_POST[ "target_resources" ] ) || ( $_POST[ "target_resources" ] == 
  return( LGI_Error_Response( 27, $ErrorMsgs[ 27 ], "" ) );
 else
  $JobTargetResources = NormalizeCommaSeparatedField( $_POST[ "target_resources" ], "," );
-
-// check if this call is valid...
-if( !$ResourceData->active )
-  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
 
 // check if this resource has any jobs locked...
 if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )
@@ -151,16 +151,16 @@ $queryresult = mysql_query( "INSERT INTO running_locks SET job_id=".$JobSpecs->j
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
 $Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
-$Response .= " <resource_active> ".$ResourceData->active." </resource_active>";
-$Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id> ";
-$Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources> ";
-$Response .= " <owners> ".$JobSpecs->owners." </owners> ";
-$Response .= " <read_access> ".$JobSpecs->read_access." </read_access> ";
-$Response .= " <application> ".$JobSpecs->application." </application> ";
-$Response .= " <state> ".$JobSpecs->state." </state> ";
-$Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp> ";
-$Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> ";
-$Response .= " <input> ".binhex( $JobSpecs->input )." </input> ";
+$Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
+$Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id>";
+$Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
+$Response .= " <owners> ".$JobSpecs->owners." </owners>";
+$Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
+$Response .= " <application> ".$JobSpecs->application." </application>";
+$Response .= " <state> ".$JobSpecs->state." </state>";
+$Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";
+$Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
+$Response .= " <input> ".binhex( $JobSpecs->input )." </input>";
 $Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job>";
 
 // return the response...

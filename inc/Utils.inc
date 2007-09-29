@@ -33,7 +33,9 @@ function hexbin( $hex )
  for( ; $i < $Length; $i += 2 )
  {
   $HighNibble = strpos( $HEXDIGITS, $hex[ $i ] );
+  if( $HighNibble === FALSE ) return( "" );
   $LowNibble  = strpos( $HEXDIGITS, $hex[ $i + 1 ] );
+  if( $LowNibble === FALSE ) return( "" );
   $Byte       = ( $HighNibble << 4 ) | $LowNibble;
   $bin       .= chr( $Byte );
  }
@@ -182,7 +184,11 @@ function Parse_XML( $XML, $Tag, &$Attributes )
    else
     $AttributeStart = $AttributeEnd = $BeginTagEnd;
 
-   $EndTagStart = strpos( $XML, "</".$FoundTag.">", $AttributeEnd + 1 ) + 2;
+   $EndTagStart = strpos( $XML, "</".$FoundTag.">", $AttributeEnd + 1 );
+
+   if( $EndTagStart === FALSE ) return( $Empty );
+
+   $EndTagStart = $EndTagStart + 2;
 
    if( $EndTagStart >= $XMLLength ) return( $Empty );
 
