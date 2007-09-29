@@ -31,20 +31,20 @@ $JobGroups = NormalizeCommaSeparatedField( $_POST[ "groups" ], "," );
 $JobUser = $_POST[ "user" ];
 
 // start building the response of this api-call...
-$Response = "<user> ".$JobUser." </user> <groups> ".$JobGroups." </groups> ";
-$Response .= "<project> ".Get_Selected_MySQL_DataBase()." </project> ";
-$Response .= "<project_master_server> ".Get_Master_Server_URL()." </project_master_server> ";
+$Response = "<user> ".$JobUser." </user> <groups> ".$JobGroups." </groups>";
+$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
+$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server>";
 
 $queryresult = mysql_query( "SELECT url FROM active_resources WHERE project_server=2" );
 
 $NumberOfServers = mysql_num_rows( $queryresult );
 
-$Response .= "<number_of_slave_servers> ".$NumberOfServers." </number_of_slave_servers> ";
+$Response .= " <number_of_slave_servers> ".$NumberOfServers." </number_of_slave_servers>";
 
 for( $i = 1; $i <= $NumberOfServers; $i++ )
 {
  $Server = mysql_fetch_object( $queryresult );
- $Response .= " <project_server number='".$i."'> ".$Server->url." </project_server> ";
+ $Response .= " <project_server number='".$i."'> ".$Server->url." </project_server>";
 }
 
 mysql_free_result( $queryresult );
