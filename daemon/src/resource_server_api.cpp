@@ -124,9 +124,9 @@ int Resource_Server_API::Resource_SignUp_Resource( string &Response, string Serv
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_SignOff_Resource( string &Response, string ServerURL, string Project )
+int Resource_Server_API::Resource_SignOff_Resource( string &Response, string ServerURL, string Project, string SessionID )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_SignOff_Resource; ServerURL=" << ServerURL << ", Project=" << Project );
+ DEBUG_LOG( "Resource_Server_API::Resource_SignOff_Resource; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID );
 
  string PostURL = ServerURL + "/resources/resource_signoff_resource.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -136,6 +136,7 @@ int Resource_Server_API::Resource_SignOff_Resource( string &Response, string Ser
   struct curl_httppost *PostList = NULL;
   struct curl_httppost *LastItem = NULL;
 
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "session_id", CURLFORM_PTRCONTENTS, SessionID.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
@@ -149,9 +150,9 @@ int Resource_Server_API::Resource_SignOff_Resource( string &Response, string Ser
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_Request_Work( string &Response, string ServerURL, string Project, string Application, string Start, string Limit )
+int Resource_Server_API::Resource_Request_Work( string &Response, string ServerURL, string Project, string SessionID, string Application, string Start, string Limit )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_Request_Work; ServerURL=" << ServerURL << ", Project=" << Project <<", Application=" << Application << ", Start=" << Start << ", Limit=" << Limit );
+ DEBUG_LOG( "Resource_Server_API::Resource_Request_Work; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Application=" << Application << ", Start=" << Start << ", Limit=" << Limit );
 
  string PostURL = ServerURL + "/resources/resource_request_work.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -161,6 +162,7 @@ int Resource_Server_API::Resource_Request_Work( string &Response, string ServerU
   struct curl_httppost *PostList = NULL;
   struct curl_httppost *LastItem = NULL;
 
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "session_id", CURLFORM_PTRCONTENTS, SessionID.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "application", CURLFORM_PTRCONTENTS, Application.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "start", CURLFORM_PTRCONTENTS, Start.c_str(), CURLFORM_END );
@@ -177,9 +179,9 @@ int Resource_Server_API::Resource_Request_Work( string &Response, string ServerU
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_Request_Job_Details( string &Response, string ServerURL, string Project, string Job_Id )
+int Resource_Server_API::Resource_Request_Job_Details( string &Response, string ServerURL, string Project, string SessionID, string Job_Id )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_Request_Job_Details; ServerURL=" << ServerURL << ", Project=" << Project << ", Job_Id=" << Job_Id );
+ DEBUG_LOG( "Resource_Server_API::Resource_Request_Job_Details; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Job_Id=" << Job_Id );
 
  string PostURL = ServerURL + "/resources/resource_request_job_details.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -189,6 +191,7 @@ int Resource_Server_API::Resource_Request_Job_Details( string &Response, string 
   struct curl_httppost *PostList = NULL;
   struct curl_httppost *LastItem = NULL;
 
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "session_id", CURLFORM_PTRCONTENTS, SessionID.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_id", CURLFORM_PTRCONTENTS, Job_Id.c_str(), CURLFORM_END );
 
@@ -203,9 +206,9 @@ int Resource_Server_API::Resource_Request_Job_Details( string &Response, string 
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_Lock_Job( string &Response, string ServerURL, string Project, string Job_Id )
+int Resource_Server_API::Resource_Lock_Job( string &Response, string ServerURL, string Project, string SessionID, string Job_Id )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_Lock_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", Job_Id=" << Job_Id );
+ DEBUG_LOG( "Resource_Server_API::Resource_Lock_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Job_Id=" << Job_Id );
 
  string PostURL = ServerURL + "/resources/resource_lock_job.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -215,6 +218,7 @@ int Resource_Server_API::Resource_Lock_Job( string &Response, string ServerURL, 
   struct curl_httppost *PostList = NULL;
   struct curl_httppost *LastItem = NULL;
 
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "session_id", CURLFORM_PTRCONTENTS, SessionID.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_id", CURLFORM_PTRCONTENTS, Job_Id.c_str(), CURLFORM_END );
 
@@ -229,9 +233,9 @@ int Resource_Server_API::Resource_Lock_Job( string &Response, string ServerURL, 
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_UnLock_Job( string &Response, string ServerURL, string Project, string Job_Id )
+int Resource_Server_API::Resource_UnLock_Job( string &Response, string ServerURL, string Project, string SessionID, string Job_Id )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_UnLock_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", Job_Id=" << Job_Id );
+ DEBUG_LOG( "Resource_Server_API::Resource_UnLock_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Job_Id=" << Job_Id );
 
  string PostURL = ServerURL + "/resources/resource_unlock_job.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -241,6 +245,7 @@ int Resource_Server_API::Resource_UnLock_Job( string &Response, string ServerURL
   struct curl_httppost *PostList = NULL;
   struct curl_httppost *LastItem = NULL;
 
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "session_id", CURLFORM_PTRCONTENTS, SessionID.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_id", CURLFORM_PTRCONTENTS, Job_Id.c_str(), CURLFORM_END );
 
@@ -255,9 +260,9 @@ int Resource_Server_API::Resource_UnLock_Job( string &Response, string ServerURL
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_Update_Job( string &Response, string ServerURL, string Project, string Job_Id, string State, string Target_Resources, string Input, string Output, string Job_Specifics )
+int Resource_Server_API::Resource_Update_Job( string &Response, string ServerURL, string Project, string SessionID, string Job_Id, string State, string Target_Resources, string Input, string Output, string Job_Specifics )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_Update_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", Job_Id=" << Job_Id << ", State=" << State << ", Target_Resources=" << Target_Resources << ", Input=" << Input << ", Output=" << Output << ", Job_Specifics=" << Job_Specifics );
+ DEBUG_LOG( "Resource_Server_API::Resource_Update_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Job_Id=" << Job_Id << ", State=" << State << ", Target_Resources=" << Target_Resources << ", Input=" << Input << ", Output=" << Output << ", Job_Specifics=" << Job_Specifics );
 
  string PostURL = ServerURL + "/resources/resource_update_job.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -267,6 +272,7 @@ int Resource_Server_API::Resource_Update_Job( string &Response, string ServerURL
   struct curl_httppost *PostList = NULL;
   struct curl_httppost *LastItem = NULL;
 
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "session_id", CURLFORM_PTRCONTENTS, SessionID.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_id", CURLFORM_PTRCONTENTS, Job_Id.c_str(), CURLFORM_END );
   if( !State.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "state", CURLFORM_PTRCONTENTS, State.c_str(), CURLFORM_END );
@@ -285,9 +291,9 @@ int Resource_Server_API::Resource_Update_Job( string &Response, string ServerURL
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL, string Project, string Application, string State, string Owners, string Target_Resources, string Read_Access, string Job_Specifics, string Input, string Output )
+int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL, string Project, string SessionID, string Application, string State, string Owners, string Target_Resources, string Read_Access, string Job_Specifics, string Input, string Output )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_Submit_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", Application=" << Application << ", State=" << State << ", Owners=" << Owners << ", Target_Resources=" << Target_Resources << ", Read_Access=" << Read_Access << ", Input=" << Input << ", Output=" << Output << ", Job_Specifics=" << Job_Specifics );
+ DEBUG_LOG( "Resource_Server_API::Resource_Submit_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Application=" << Application << ", State=" << State << ", Owners=" << Owners << ", Target_Resources=" << Target_Resources << ", Read_Access=" << Read_Access << ", Input=" << Input << ", Output=" << Output << ", Job_Specifics=" << Job_Specifics );
 
  string PostURL = ServerURL + "/resources/resource_submit_job.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -297,6 +303,7 @@ int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL
   struct curl_httppost *PostList = NULL;
   struct curl_httppost *LastItem = NULL;
 
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "session_id", CURLFORM_PTRCONTENTS, SessionID.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "application", CURLFORM_PTRCONTENTS, Application.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "state", CURLFORM_PTRCONTENTS, State.c_str(), CURLFORM_END );

@@ -466,6 +466,7 @@ void DaemonJob::CleanUpJobDirectory( void )
 int DaemonJob::UpdateJob( string State, string Resources, string Input, string Output, string Specs )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; JobDirectory empty" );
+ if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; SessionID empty" );
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response, Data, HexedInput, HexedOutput;
@@ -476,7 +477,7 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
 
  do
  {
-  if( Server.Resource_Update_Job( Response, GetThisProjectServer(), GetProject(), GetJobId(), State, Resources, HexedInput, HexedOutput, Specs ) )
+  if( Server.Resource_Update_Job( Response, GetThisProjectServer(), GetProject(), SessionID, GetJobId(), State, Resources, HexedInput, HexedOutput, Specs ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
   ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
@@ -553,6 +554,7 @@ int DaemonJob::SetOutput( string Output )
 int DaemonJob::LockJob( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::LockJob; JobDirectory empty" );
+ if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::LockJob; SessionID empty" );
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
@@ -560,7 +562,7 @@ int DaemonJob::LockJob( void )
 
  do
  {
-  if( Server.Resource_Lock_Job( Response, GetThisProjectServer(), GetProject(), GetJobId() ) )
+  if( Server.Resource_Lock_Job( Response, GetThisProjectServer(), GetProject(), SessionID, GetJobId() ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::LockJob; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
   ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
@@ -576,6 +578,7 @@ int DaemonJob::LockJob( void )
 int DaemonJob::UnLockJob( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UnLockJob; JobDirectory empty" );
+ if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UnLockJob; SessionID empty" );
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
@@ -583,7 +586,7 @@ int DaemonJob::UnLockJob( void )
 
  do
  {
-  if( Server.Resource_UnLock_Job( Response, GetThisProjectServer(), GetProject(), GetJobId() ) )
+  if( Server.Resource_UnLock_Job( Response, GetThisProjectServer(), GetProject(), SessionID, GetJobId() ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::UnLockJob; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
   ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
@@ -599,6 +602,7 @@ int DaemonJob::UnLockJob( void )
 int DaemonJob::SignUp( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignUp; JobDirectory empty" );
+ if( !SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignUp; SessionID not empty" );
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
@@ -614,6 +618,8 @@ int DaemonJob::SignUp( void )
 
  if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignUp; Error from server Response=" << Response );
 
+ SessionID = NormalizeString( Parse_XML( Response, "session_id" ) );
+
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::SignUp; Response=" << Response << " returned 1" );
 }
 
@@ -622,6 +628,7 @@ int DaemonJob::SignUp( void )
 int DaemonJob::SignOff( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignOff; JobDirectory empty" );
+ if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignOff; SessionID empty" );
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
@@ -629,13 +636,15 @@ int DaemonJob::SignOff( void )
 
  do
  {
-  if( Server.Resource_SignOff_Resource( Response, GetThisProjectServer(), GetProject() ) )
+  if( Server.Resource_SignOff_Resource( Response, GetThisProjectServer(), GetProject(), SessionID ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::SignOff; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
   ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
  } while( ErrorNumber == LGI_SERVER_BACKOFF_ERROR_NR );
 
  if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignOff; Error from server Response=" << Response );
+
+ SessionID.clear();
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::SignOff; Response=" << Response << " returned 1" );
 }
@@ -645,6 +654,7 @@ int DaemonJob::SignOff( void )
 int DaemonJob::UpdateJobFromServer( bool UpdateOutputToo )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; JobDirectory empty" );
+ if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; SessionID empty" );
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response, Data;
@@ -652,7 +662,7 @@ int DaemonJob::UpdateJobFromServer( bool UpdateOutputToo )
 
  do
  {
-  if( Server.Resource_Request_Job_Details( Response, GetThisProjectServer(), GetProject(), GetJobId() ) )
+  if( Server.Resource_Request_Job_Details( Response, GetThisProjectServer(), GetProject(), SessionID, GetJobId() ) )
    CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; Could not post to server " << GetThisProjectServer() );
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
   ErrorNumber = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
@@ -770,6 +780,20 @@ int DaemonJob::RunJobRunScript( void )
  NORMAL_LOG_RETURN( 0, "DamonJob::RunJobRunScript; Script started on background for job with directory " << JobDirectory );
 }
 
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetSessionID( void )
+{
+ return( SessionID );
+}
+
+// -----------------------------------------------------------------------------
+
+void DaemonJob::SetSessionID( string ID )
+{
+ SessionID = ID;
+}
+ 
 // -----------------------------------------------------------------------------
 
 int DaemonJob::RunJobAbortScript( void )

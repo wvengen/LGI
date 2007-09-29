@@ -133,6 +133,9 @@ class DaemonJob
               string GetCertificateFile( void );
               string GetCACertificateFile( void );
 
+              string GetSessionID( void );
+              void   SetSessionID( string ID );
+
               int  SetJobSpecifics( string Specs );         // set data in directory and post to server
               int  SetTargetResources( string Resources ); 
               int  SetInput( string Input );
@@ -159,7 +162,7 @@ class DaemonJob
 
               int RunAScript( string TheScriptFile );
 
-       string JobDirectory;
+       string JobDirectory, SessionID;
       };
 
 // -----------------------------------------------------------------------------
