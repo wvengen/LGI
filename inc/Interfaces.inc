@@ -253,7 +253,7 @@ function Interface_Count_Owners_Jobs_In_Queue( $Owner, $Application, &$TotalNrOf
  $TheRegExpression = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
 
  // query for number of 'running' jobs in job_queue of given owner and application..
- $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE owners REGEXP '".$TheRegExpression."' AND application='".$Application."' AND state='running'" );
+ $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE owners REGEXP '".$TheRegExpression."' AND application='".$Application."' AND ( state='running' OR state='queued' )" );
  $querydata = mysql_fetch_object( $queryresult );
 
  $NrOfRunningJobs = $querydata -> N;
