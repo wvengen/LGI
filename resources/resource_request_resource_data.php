@@ -25,10 +25,6 @@ global $ErrorMsgs;
 // check if resource is known to the project and certified correctly...
 $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 
-// check if this call is valid...
-// if( Resource_Verify_Session( $ResourceData ) )
-//  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
-
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "resource_name" ] ) || ( $_POST[ "resource_name" ] == "" ) )
  return( LGI_Error_Response( 43, $ErrorMsgs[ 43 ], "" ) );
@@ -51,7 +47,6 @@ mysql_free_result( $ResourceQuery );
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
 $Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
-// $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 $Response .= " <requested_resource_data> <resource_name> ".$ResourceSpecs->resource_name." </resource_name>";
 $Response .= " <client_certificate> ".binhex( $ResourceSpecs->client_certificate )." </client_certificate>";
 $Response .= " <resource_url> ".$ResourceSpecs->url." </url>";

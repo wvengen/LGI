@@ -40,7 +40,7 @@ if( !Resource_Has_Job_Locked( $ResourceData, $JobId ) )
  return( LGI_Error_Response( 14, $ErrorMsgs[ 14 ], "" ) ); 
 
 // query for the lock specs...
-$LockQuery = mysql_query( "SELECT lock_id,job_id,lock_time,session_id FROM running_locks WHERE job_id=".$JobId );
+$LockQuery = mysql_query( "SELECT lock_id,job_id,lock_time,session_id,resource_id FROM running_locks WHERE job_id=".$JobId );
 $LockSpecs = mysql_fetch_object( $LockQuery );
 
 // now try to unlock the job... return an error response if we failed somehow...
@@ -57,7 +57,8 @@ $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_mas
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 $Response .= " <job_id> ".$JobId." </job_id>";
 $Response .= " <lock> <lock_id> ".$LockSpecs->lock_id." </lock_id> <job_id> ".$LockSpecs->job_id." </job_id>";
-$Response .= " <unlock_time> ".$LockSpecs->lock_time." </unlock_time> <session_id> ".$LockSpecs->session_id." </session_id> </lock>";
+$Response .= " <unlock_time> ".$LockSpecs->lock_time." </unlock_time> <session_id> ".$LockSpecs->session_id." </session_id>";
+$Response .= " <resource_id> ".$LockSpecs->resource_id." </resource_id> </lock>";
 
 mysql_free_result( $LockQuery );
 

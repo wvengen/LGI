@@ -40,7 +40,7 @@ if( Resource_Lock_Job( $ResourceData, $JobId ) )
  return( LGI_Error_Response( 22, $ErrorMsgs[ 22 ], "" ) ); 
 
 // query for the lock specs...
-$LockQuery = mysql_query( "SELECT lock_id,job_id,lock_time,session_id FROM running_locks WHERE job_id=".$JobId );
+$LockQuery = mysql_query( "SELECT lock_id,job_id,lock_time,session_id,resource_id FROM running_locks WHERE job_id=".$JobId );
 $LockSpecs = mysql_fetch_object( $LockQuery );
 mysql_free_result( $LockQuery );
 
@@ -51,7 +51,8 @@ $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_mas
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 $Response .= " <job_id> ".$JobId." </job_id>";
 $Response .= " <lock> <lock_id> ".$LockSpecs->lock_id." </lock_id> <job_id> ".$LockSpecs->job_id." </job_id>";
-$Response .= " <lock_time> ".$LockSpecs->lock_time." </lock_time> <session_id> ".$LockSpecs->session_id." </session_id> </lock>";
+$Response .= " <lock_time> ".$LockSpecs->lock_time." </lock_time> <session_id> ".$LockSpecs->session_id." </session_id>";
+$Response .= " <resource_id> ".$LockSpecs->session_id." </resource_id> </lock>";
 
 // return the response...
 return( LGI_Response( $Response, "" ) );
