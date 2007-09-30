@@ -493,15 +493,15 @@ function Resource_Count_Owners_Jobs_In_Queue( $Owner, $Application, &$TotalNrOfJ
 
  $TheRegExpression = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
 
- // query for number of 'running' jobs in job_queue of given owner and application..
- $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE owners REGEXP '".$TheRegExpression."' AND application='".$Application."' AND state='running'" );
+ // query for number of 'running' or 'queued' jobs in job_queue of given owner and application..
+ $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE owners REGEXP '".$TheRegExpression."' AND application='".$Application."' AND ( state='running' OR state='queued' )" );
  $querydata = mysql_fetch_object( $queryresult );
 
  $NrOfRunningJobs = $querydata -> N;
 
  mysql_free_result( $queryresult );
 
- // query for number of 'running' jobs in job_queue of given owner and application..
+ // query for total number of jobs in job_queue of given owner and application..
  $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE owners REGEXP '".$TheRegExpression."' AND application='".$Application."'" );
  $querydata = mysql_fetch_object( $queryresult );
 
