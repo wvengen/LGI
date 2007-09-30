@@ -208,6 +208,7 @@ int Daemon::CycleThroughJobs( void )
      if( !SignedUp )
      {
       DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to " << Server -> first );    // signup to project and server...
+      ( Server -> second.begin() ) -> SetSessionID( "" );
       if( !( ( Server -> second.begin() ) -> SignUp() ) ) continue;                     
       SignedUp = 1;
       SessionID = ( Server -> second.begin() ) -> GetSessionID();
@@ -219,6 +220,7 @@ int Daemon::CycleThroughJobs( void )
      if( !( Job -> LockJob() ) ) continue;                            // lock, update and unlock job...
      if( !( Job -> UpdateJobFromServer() ) ) continue;
      if( !( Job -> UnLockJob() ) ) continue;
+     Job -> SetSessionID( "" );
      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronised job with directory " << Job -> GetJobDirectory() );
     }
     else
@@ -229,6 +231,7 @@ int Daemon::CycleThroughJobs( void )
    {
     DEBUG_LOG( "Daemon::CycleThroughJobs; Signing off from " << Server -> first );
     if( !( ( Server -> second.begin() ) -> SignOff() ) ) continue;                      // signoff from server...
+    ( Server -> second.begin() ) -> SetSessionID( "" );
     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed off from " << Server -> first );
    }
   }
@@ -260,6 +263,7 @@ int Daemon::CycleThroughJobs( void )
       if( !SignedUp )
       {
        DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to server " << ServerURL << " for project " << Project );
+       TempJob.SetSessionID( "" );
        if( !TempJob.SignUp() ) continue;                          // sign up if needed...
        SignedUp = 1;
        SessionID = TempJob.GetSessionID();
@@ -271,6 +275,7 @@ int Daemon::CycleThroughJobs( void )
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "aborted", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
+      TempJob.SetSessionID( "" );
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       NORMAL_LOG( "Daemon::CycleThroughJobs; Aborted job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
@@ -286,6 +291,7 @@ int Daemon::CycleThroughJobs( void )
       if( !SignedUp ) 
       { 
        DEBUG_LOG( "Daemon::CycleThroughJobs; Signing up to server " << ServerURL << " for project " << Project );
+       TempJob.SetSessionID( "" );
        if( !TempJob.SignUp() ) continue;                         // sign up if needed...
        SignedUp = 1;
        SessionID = TempJob.GetSessionID();
@@ -297,6 +303,7 @@ int Daemon::CycleThroughJobs( void )
       if( !TempJob.LockJob() ) continue;
       if( !TempJob.UpdateJob( "finished", "", "", TempJob.GetOutput(), "" ) ) continue;
       if( !TempJob.UnLockJob() ) continue;
+      TempJob.SetSessionID( "" );
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       NORMAL_LOG( "Daemon::CycleThroughJobs; Finished job with directory " << TempJob.GetJobDirectory() );
       TempJob.CleanUpJobDirectory();
