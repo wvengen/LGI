@@ -230,6 +230,7 @@ int Daemon::CycleThroughJobs( void )
    if( SignedUp )
    {
     DEBUG_LOG( "Daemon::CycleThroughJobs; Signing off from " << Server -> first );
+    ( Server -> second.begin() ) -> SetSessionID( SessionID );
     if( !( ( Server -> second.begin() ) -> SignOff() ) ) continue;                      // signoff from server...
     ( Server -> second.begin() ) -> SetSessionID( "" );
     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed off from " << Server -> first );
