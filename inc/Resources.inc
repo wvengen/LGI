@@ -87,6 +87,9 @@ function Resource_Kill_Session( &$ResourceData )
  if( Resource_Verify_Session( $ResourceData ) )
   return( LGI_Error_Response( 42, $ErrorMsgs[ 42 ], "" ) );
 
+ // remove any stale locks this resource might have of this session...
+ Resource_Remove_Stale_Locks( $ResourceData );
+
  // just remove entry from the table...
  $query = mysql_query( "DELETE FROM running_sessions WHERE session_id=".$ResourceData->SessionID );
 

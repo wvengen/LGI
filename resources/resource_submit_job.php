@@ -145,7 +145,7 @@ $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
 
 // insert a lock into the running_locks table for this inserted job...
-$queryresult = mysql_query( "INSERT INTO running_locks SET job_id=".$JobSpecs->job_id.",resource_id=".$ResourceData->resource_id.",lock_time=UNIX_TIMESTAMP()" );
+$queryresult = mysql_query( "INSERT INTO running_locks SET job_id=".$JobSpecs->job_id.",resource_id=".$ResourceData->resource_id.",lock_time=UNIX_TIMESTAMP(),session_id=".$ResourceData->SessionID );
 
 // and build response for this job submition...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
