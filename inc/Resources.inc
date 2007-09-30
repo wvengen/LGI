@@ -296,7 +296,7 @@ function Resource_Remove_Stale_Locks( $ResourceData )
 {
  global $ErrorMsgs;
 
- if( Resource_Verify_Session( $ResourceData, $SessionID ) )
+ if( Resource_Verify_Session( $ResourceData ) )
   return( LGI_Error_Response( 7, $ErrorMsgs[ 7 ], "" ) );
 
  // get list of locks of this resource...
