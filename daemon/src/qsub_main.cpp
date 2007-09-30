@@ -320,39 +320,44 @@ int main( int argc, char *argv[] )
    return( 1 );
   }
 
-  int ErrorCode = atoi( NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ), "number" ) ).c_str() );
-  if( ErrorCode ) 
+  Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+  if( Response.empty() ) return( 1 );
+  Flag = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+  if( Flag ) 
   {
    cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
    return( 1 );
   }
 
   // we are signed on and have a session running now...
-
-  string SessionID = NormalizeString( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "session_id" ) );
+  string SessionID = NormalizeString( Parse_XML( Response, "session_id" ) );
 
   Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, SessionID, Application, "queued", Owners, Target_Resources, Read_Access, Job_Specifics, Input, "" );
   if( Flag != CURLE_OK )
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
   else
   {
-   ErrorCode = atoi( NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Response, "LGI" ), "response" ), "error" ), "number" ) ).c_str() );
-   if( ErrorCode ) 
+   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+   if( Response.empty() ) return( 1 );
+   Flag = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+   if( Flag ) 
     cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
   }
 
   // if we did submit the job, this signoff will unlock it automatically...
-  Flag = ServerAPI.Resource_SignOff_Resource( Output, ServerURL, Project, SessionID );
+  Flag = ServerAPI.Resource_SignOff_Resource( Response, ServerURL, Project, SessionID );
   if( Flag != CURLE_OK )
   {
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
    return( 1 );
   }
 
-  ErrorCode = atoi( NormalizeString( Parse_XML( Parse_XML( Parse_XML( Parse_XML( Output, "LGI" ), "response" ), "error" ), "number" ) ).c_str() );
-  if( ErrorCode ) 
+  Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+  if( Response.empty() ) return( 1 );
+  Flag = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+  if( Flag ) 
   {
-   cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Output, "error" ), "message" ) ) << endl << endl;
+   cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
    return( 1 );
   }
 
@@ -363,27 +368,22 @@ int main( int argc, char *argv[] )
   Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
 
   Flag = ServerAPI.Interface_Submit_Job( Response, ServerURL, Project, User, Groups, Application, Target_Resources, Job_Specifics, Input, Read_Access, Owners, "" );
- }
+  if( Flag != CURLE_OK )
+  {
+   cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+   return( 1 );
+  }
 
- if( Flag != CURLE_OK )
- {
-  cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
-  return( 1 );
- }
+  Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+  if( Response.empty() ) return( 1 );
+  Flag = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
+  if( Flag )
+  {
+   cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+   return( 1 );
+  }
 
- Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-
- if( Response.empty() ) return( 1 );
-
- if( !Parse_XML( Response, "error" ).empty() )
- {
-  cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
-  return( 1 );
- }
-
- // dump job details we received back from response...
- if( !ResourceMode )
- {
+  // dump job details we received back from response...
   time_t TimeStamp = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ).c_str() );
   char *TimeStampStr = ctime( &TimeStamp );
   TimeStampStr[ 24 ] = '\0';
@@ -403,7 +403,9 @@ int main( int argc, char *argv[] )
   cout << "Job owners            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "owners" ) ) << endl;
   cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
   cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl << endl;
+
+  return( 0 );
  }
 
- return( 0 );
+ return( 1 );
 }
