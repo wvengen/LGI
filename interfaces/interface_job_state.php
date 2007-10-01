@@ -86,42 +86,36 @@ if( !$DetailMode )
  $JobResponses = "";
  $JobIdArray[ 0 ] = 0;
 
- for( $i = 1; $i <= $PossibleJobOwnersArray[ 0 ]; $i++ )
- {
-  // do the specific query for this owner...
-  $queryresult = mysql_query( Interface_Make_Query_For_Work_For_Owner( $PossibleJobOwnersArray[ $i ], $JobState, $JobApplication, $JobStart, $JobLimit ) );
+ // do the specific query for this owner array...
+ $queryresult = mysql_query( Interface_Make_Query_For_Work_For_Owners( $PossibleJobOwnersArray, $JobState, $JobApplication, $JobStart, $JobLimit ) );
   
-  $NrOfResults = mysql_num_rows( $queryresult );
+ $NrOfResults = mysql_num_rows( $queryresult );
 
-  // we have some jobs in the table to report... 
-  if( $NrOfResults >= 1 ) 
-   for( $job = 0; ( $job < $NrOfResults ) && ( $NrOfJobsReported < $JobLimit ); $job++ )
-   {
-    $JobData = mysql_fetch_object( $queryresult );
+ // we have some jobs in the table to report... 
+ if( $NrOfResults >= 1 ) 
+  for( $job = 0; ( $job < $NrOfResults ) && ( $NrOfJobsReported < $JobLimit ); $job++ )
+  {
+   $JobData = mysql_fetch_object( $queryresult );
 
-    // check if we have already reported this job...
-    if( Interface_Found_Id_In_List( $JobIdArray, $JobData->job_id ) ) continue;
+   // check if we have already reported this job...
+   if( Interface_Found_Id_In_List( $JobIdArray, $JobData->job_id ) ) continue;
 
-    // add this found job into our report list...
-    $JobIdArray[ 0 ]++;
-    $JobIdArray[ $JobIdArray[ 0 ] ] = $JobData->job_id;
+   // add this found job into our report list...
+   $JobIdArray[ 0 ]++;
+   $JobIdArray[ $JobIdArray[ 0 ] ] = $JobData->job_id;
 
-    // and build it's response...
-    $NrOfJobsReported++;
-    $JobResponses .= " <job number='".$NrOfJobsReported."'> <job_id> ".$JobData->job_id." </job_id>";
-    $JobResponses .= " <state> ".$JobData->state." </state> <state_time_stamp> ".$JobData->state_time_stamp." </state_time_stamp>";
-    $JobResponses .= " <target_resources> ".$JobData->target_resources." </target_resources>";
-    $JobResponses .= " <owners> ".$JobData->owners." </owners>";
-    $JobResponses .= " <read_access> ".$JobData->read_access." </read_access>";
-    $JobResponses .= " <job_specifics> ".$JobData->job_specifics." </job_specifics>";
-    $JobResponses .= " <application> ".$JobData->application." </application> </job>";
-   }
+   // and build it's response...
+   $NrOfJobsReported++;
+   $JobResponses .= " <job number='".$NrOfJobsReported."'> <job_id> ".$JobData->job_id." </job_id>";
+   $JobResponses .= " <state> ".$JobData->state." </state> <state_time_stamp> ".$JobData->state_time_stamp." </state_time_stamp>";
+   $JobResponses .= " <target_resources> ".$JobData->target_resources." </target_resources>";
+   $JobResponses .= " <owners> ".$JobData->owners." </owners>";
+   $JobResponses .= " <read_access> ".$JobData->read_access." </read_access>";
+   $JobResponses .= " <job_specifics> ".$JobData->job_specifics." </job_specifics>";
+   $JobResponses .= " <application> ".$JobData->application." </application> </job>";
+  }
 
-  // stop if we hit the limit...
-  if( $NrOfJobsReported >= $JobLimit ) break;
-
-  mysql_free_result( $queryresult );
- }
+ mysql_free_result( $queryresult );
 
  $Response .= " <number_of_jobs> ".$NrOfJobsReported." </number_of_jobs> ".$JobResponses;
 }

@@ -23,7 +23,7 @@ require_once( '../inc/Resources.inc' );
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
+$ResourceData = Resource_Verify( $_POST[ "project" ], "" );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || !is_numeric( $_POST[ "job_id" ] ) )

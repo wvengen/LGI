@@ -68,9 +68,9 @@ $Response .= " <number_of_jobs> 1 </number_of_jobs> <job number='1'>";
 $Response .= " <job_id> ".$JobSpecs->job_id." </job_id>";
 $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
 $Response .= " <application> ".$JobSpecs->application." </application>";
-$Response .= " <owners> ".$JobData->owners." </owners>";
-$Response .= " <read_access> ".$JobData->read_access." </read_access>";
-$Response .= " <job_specifics> ".$JobData->job_specifics." </job_specifics>";
+$Response .= " <owners> ".$JobSpecs->owners." </owners>";
+$Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
+$Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
 $Response .= " <state> ".$JobState." </state> <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp> </job>";
 
 // return the response...
