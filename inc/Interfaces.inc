@@ -392,7 +392,7 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
 
  $Owner = mysql_escape_string( $OwnerArray[ 1 ] );
  $RegExpUser = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
- $Query .= " ( owners REGEXP '".$RegExpUser."' ) OR ( read_access REGEXP '".$RegExpUser."' )";
+ $Query .= "( ( owners REGEXP '".$RegExpUser."' ) OR ( read_access REGEXP '".$RegExpUser."' )";
  for( $o = 2; $o <= $OwnerArray[ 0 ]; $o++ )
  {
   $Owner = mysql_escape_string( $OwnerArray[ $o ] );
@@ -401,12 +401,12 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
  }
 
  if( isset( $State ) && ( $State != "" ) && ( $State != "any" ) )
-  $Query .= " AND state='".$State."'";
+  $Query .= " ) AND ( state='".$State."'";
 
  if( isset( $Application ) && ( $Application != "" ) && ( $Application != "any" ) )
-  $Query .= " AND application='".$Application."'";
+  $Query .= " ) AND ( application='".$Application."'";
 
- $Query .= " ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start;
+ $Query .= " ) ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start;
 
  return( $Query );
 }
