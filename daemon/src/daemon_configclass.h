@@ -56,6 +56,7 @@ class DaemonConfig
               string Owner_Allow( void );
               string Owner_Deny( void );
               int    Number_Of_Projects( void );
+              int    Job_Limit( void );
 
               DaemonConfigProject Project( int Number );
 
@@ -82,6 +83,7 @@ class DaemonConfigProject
               string Owner_Allow( void );
               string Owner_Deny( void );
               int    Number_Of_Applications( void );
+              int    Job_Limit( void );
 
               DaemonConfigProjectApplication Application( int Number );
               
@@ -98,21 +100,22 @@ class DaemonConfigProjectApplication
       {
        public:
               
-               DaemonConfigProjectApplication();
-               DaemonConfigProjectApplication( DaemonConfigProject &TheProject, int TheApplicationNumber = 0 );
+              DaemonConfigProjectApplication();
+              DaemonConfigProjectApplication( DaemonConfigProject &TheProject, int TheApplicationNumber = 0 );
 
-               int    IsValidConfigured( void );
-               string Application_Name( void );
-               string Owner_Allow( void );
-               string Owner_Deny( void );
-               string Check_System_Limits_Script( void );
-               string Job_Check_Limits_Script( void );
-               string Job_Check_Running_Script( void );
-               string Job_Check_Finished_Script( void );
-               string Job_Prologue_Script( void );
-               string Job_Run_Script( void );
-               string Job_Epilogue_Script( void );
-               string Job_Abort_Script( void );
+              int    IsValidConfigured( void );
+              string Application_Name( void );
+              string Owner_Allow( void );
+              string Owner_Deny( void );
+              string Check_System_Limits_Script( void );
+              string Job_Check_Limits_Script( void );
+              string Job_Check_Running_Script( void );
+              string Job_Check_Finished_Script( void );
+              string Job_Prologue_Script( void );
+              string Job_Run_Script( void );
+              string Job_Epilogue_Script( void );
+              string Job_Abort_Script( void );
+              int    Job_Limit( void );
 
        protected:
 

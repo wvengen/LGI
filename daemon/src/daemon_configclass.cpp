@@ -53,7 +53,8 @@ int DaemonConfig::IsValidConfigured( void )
  if( RunDirectory().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; RunDirectory() empty" );
  if( Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Owner_Allow() empty" );
  if( Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfig::IsValidConfigured; Warning: Owner_Deny() empty" );
- if( !Number_Of_Projects() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Number_Of_Projects() returned 0" );
+ if( Number_Of_Projects() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Number_Of_Projects() returned 0 or less" );
+ if( Job_Limit() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Limit() returned 0 or less" );
 
  for( int p = 1; p <= Number_Of_Projects(); ++p )
   if( !Project( p ).IsValidConfigured() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Project not configured correctly for project number " << p );
@@ -140,6 +141,17 @@ int DaemonConfig::Number_Of_Projects( void )
 
 // -----------------------------------------------------------------------------
 
+int DaemonConfig::Job_Limit( void )
+{
+ string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "job_limit" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( 0, "DaemonConfig::Job_Limit; No data in job_limit tag found" )
+ else
+  VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfig::Job_Limit; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
 DaemonConfigProject DaemonConfig::Project( int Number )
 {
  DaemonConfigProject EmptyProject;
@@ -216,7 +228,8 @@ int DaemonConfigProject::IsValidConfigured( void )
  if( Project_Master_Server().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Project_Master_Server() empty" );
  if( Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Owner_Allow() empty" );
  if( Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfigProject::IsValidConfigured; Warning: Owner_Deny() empty" );
- if( !Number_Of_Applications() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Number_Of_Applications()returned 0" );
+ if( Number_Of_Applications() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Number_Of_Applications()returned 0 or less" );
+ if( Job_Limit() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Job_Limit()returned 0 or less" );
 
  for( int a = 1; a <= Number_Of_Applications(); ++a )
   if( !Application( a ).IsValidConfigured() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Application not configured corrctly for application number " << a );
@@ -277,6 +290,17 @@ int DaemonConfigProject::Number_Of_Applications( void )
   CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::Number_Of_Applications; No data in number_of_applications tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProject::Number_Of_Applications; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonConfigProject::Job_Limit( void )
+{
+ string Data = NormalizeString( Parse_XML( ProjectCache, "job_limit" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::Job_Limit; No data in job_limit tag found" )
+ else
+  VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProject::Job_Limit; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -352,6 +376,7 @@ int DaemonConfigProjectApplication::IsValidConfigured( void )
  if( Application_Name().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Application_Name() empty" );
  if( Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Owner_Allow() empty" );
  if( Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfigProjectApplication::IsValidConfigured; Warning: Owner_Deny() empty" );
+ if( Job_Limit() <= 0 ) CRITICAL_LOG( "DaemonConfigProjectApplication::IsValidConfigured; Job_Limit() returned 0 or less" );
 
  if( Check_System_Limits_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Check_System_Limits_Script() empty" );
  if( Job_Check_Limits_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Job_Check_Limits_Script() empty" );
@@ -404,6 +429,17 @@ string DaemonConfigProjectApplication::Owner_Deny( void )
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; No data in owner_deny tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonConfigProjectApplication::Job_Limit( void )
+{
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "job_limit" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::Job_Limit; No data in job_limit tag found" )
+ else
+  VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProjectApplication::Job_Limit; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------

@@ -133,6 +133,9 @@ int Daemon::AddJobToDaemonLists( DaemonJob Job )
   Accounting[ Owners[ i ] ]++;
   Accounting[ Owners[ i ] + ", " + Project ]++;
   Accounting[ Owners[ i ] + ", " + Project + ", " + Application ]++;
+  Accounting[ "; TOTALS;" ]++;
+  Accounting[ "; TOTALS; " + Project ]++;
+  Accounting[ "; TOTALS; " + Project + "; " + Application ]++;
  }
 
  DEBUG_LOG_RETURN( 1, "Daemon::AddJobToDaemonLists; Job with directory " << Job.GetJobDirectory() << " added and accounted for" );
@@ -169,6 +172,9 @@ int Daemon::RemoveJobFromDaemonLists( DaemonJob Job )
   Accounting[ Owners[ i ] ]--;
   Accounting[ Owners[ i ] + ", " + Project ]--;
   Accounting[ Owners[ i ] + ", " + Project + ", " + Application ]--;
+  Accounting[ "; TOTALS;" ]--;
+  Accounting[ "; TOTALS; " + Project ]--;
+  Accounting[ "; TOTALS; " + Project + "; " + Application ]--;
  }
 
  // and now remove the job from the daemon lists...
@@ -212,6 +218,7 @@ int Daemon::CycleThroughJobs( void )
       if( !( ( Server -> second.begin() ) -> SignUp() ) ) continue;                     
       SignedUp = 1;
       SessionID = ( Server -> second.begin() ) -> GetSessionID();
+      ( Server -> second.begin() ) -> SetSessionID( "" );
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to " << Server -> first << " with session id " << SessionID );
      }
 
@@ -270,6 +277,7 @@ int Daemon::CycleThroughJobs( void )
        SessionID = TempJob.GetSessionID();
        ServerURL = TempJob.GetThisProjectServer();
        Project = TempJob.GetProject();
+       TempJob.SetSessionID( "" );
        VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to server " << ServerURL << " for project " << Project << " with session id " << SessionID );
       }
       TempJob.SetSessionID( SessionID );
@@ -298,6 +306,7 @@ int Daemon::CycleThroughJobs( void )
        SessionID = TempJob.GetSessionID();
        ServerURL = TempJob.GetThisProjectServer();
        Project = TempJob.GetProject();
+       TempJob.SetSessionID( "" );
        VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to server " << ServerURL << " for project " << Project << " with session id " << SessionID );
       }
       TempJob.SetSessionID( SessionID );
@@ -361,6 +370,8 @@ int Daemon::RequestWorkCycle( void )
 
  JobsObtained = 0;
 
+ if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) NORMAL_LOG_RETURN( JobsObtained, "Daemon::RequestWorkCycle; Total job limit reached, not requesting any work" );
+
  Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File() );
 
  for( int nP = 1; nP <= Number_Of_Projects() && ReadyForScheduling; ++nP )     // cycle through all projects...
@@ -368,6 +379,10 @@ int Daemon::RequestWorkCycle( void )
   DaemonConfigProject TheProject;
 
   TheProject = Project( nP );
+
+  // check if limits are reached... 
+  if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) continue;
+  if( TheProject.Job_Limit() <= Accounting[ "; TOTALS; " + TheProject.Project_Name() ] ) continue;
 
   // first signup to registered master server of this project to get all slaves... if this fails somehow, try the next...
 
@@ -434,6 +449,11 @@ int Daemon::RequestWorkCycle( void )
      DaemonConfigProjectApplication TheApplication;
 
      TheApplication = TheProject.Application( nA );
+  
+     // check if limits are reached... 
+     if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) continue;
+     if( TheProject.Job_Limit() <= Accounting[ "; TOTALS; " + TheProject.Project_Name() ] ) continue;
+     if( TheApplication.Job_Limit() <= Accounting[ "; TOTALS; " + TheProject.Project_Name() + "; " + TheApplication.Application_Name() ] ) continue;
 
      string ExtraJobDetailsTags = "<project> " + TheProject.Project_Name()  + " </project> <this_project_server> " +
                                   (*ServerPointer) + " </this_project_server> <project_master_server> " +
@@ -489,6 +509,12 @@ int Daemon::RequestWorkCycle( void )
 
         for( OwnerIndex = 0; OwnerIndex < Owners.size(); ++OwnerIndex )
         {
+         // check if limits are reached... 
+         if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) break;
+         if( TheProject.Job_Limit() <= Accounting[ "; TOTALS; " + TheProject.Project_Name() ] ) break;
+         if( TheApplication.Job_Limit() <= Accounting[ "; TOTALS; " + TheProject.Project_Name() + "; " + TheApplication.Application_Name() ] ) break;
+
+         // check if owner specific limits are reached... 
          if( IsOwnerDenied( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
          if( IsOwnerRunningToMuch( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
         }
@@ -618,6 +644,12 @@ int Daemon::IsOwnerDenied( string Owner, DaemonConfigProject &Project, DaemonCon
 
 int Daemon::IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, DaemonConfigProjectApplication &Application )
 {
+ // check total limits first...
+ if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) return( 1 );
+ if( Project.Job_Limit() <= Accounting[ "; TOTALS; " + Project.Project_Name() ] ) return( 1 );
+ if( Application.Job_Limit() <= Accounting[ "; TOTALS; " + Project.Project_Name() + "; " + Application.Application_Name() ] ) return( 1 );
+
+ // now check also owner limits that might exists...
  string ConfigLimit = NormalizeString( Parse_XML( Owner_Allow(), Owner ) );
  if( ConfigLimit.empty() ) ConfigLimit = NormalizeString( Parse_XML( Owner_Allow(), "any" ) );
  
@@ -627,6 +659,7 @@ int Daemon::IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, Da
  string ApplicationLimit = NormalizeString( Parse_XML( Application.Owner_Allow(), Owner ) );
  if( ApplicationLimit.empty() ) ApplicationLimit = NormalizeString( Parse_XML( Application.Owner_Allow(), "any" ) );
 
+ // if no limits for this owners, then default to denial...
  if( ConfigLimit.empty() && ProjectLimit.empty() && ApplicationLimit.empty() ) return( 1 );
 
  if( !ConfigLimit.empty() ) 
