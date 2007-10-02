@@ -401,10 +401,20 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
  }
 
  if( isset( $State ) && ( $State != "" ) && ( $State != "any" ) )
-  $Query .= " ) AND ( state='".$State."'";
+ {
+  if( $State[ 0 ] == "!" )
+   $Query .= " ) AND ( state!='".substr($State,1)."'";
+  else
+   $Query .= " ) AND ( state='".$State."'";
+ }
 
  if( isset( $Application ) && ( $Application != "" ) && ( $Application != "any" ) )
-  $Query .= " ) AND ( application='".$Application."'";
+ {
+  if( $Application[ 0 ] == "!" )
+   $Query .= " ) AND ( application!='".substr($Application,1)."'";
+  else
+   $Query .= " ) AND ( application='".$Application."'";
+ }
 
  $Query .= " ) ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start;
 
