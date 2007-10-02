@@ -164,7 +164,7 @@ function Server_Check_And_Perform_Updates( )
     if( $UpdateFlag >= 1 )
     {
      $UpdateVersion = Parse_XML( $UpdateData, "update_version", $Attributes );
-     $UpdateServers = mysql_escape_string( Parse_XML( $UpdateData, "target_servers", $Attributes ) );
+     $UpdateServers = Parse_XML( $UpdateData, "target_servers", $Attributes );
      $UpdateQuery   = hexbin( Parse_XML( $UpdateData, "update_query", $Attributes ) );
 
      // perform the update on the DB if needed...
@@ -172,7 +172,7 @@ function Server_Check_And_Perform_Updates( )
       $mysqlresult = mysql_query( $UpdateQuery );
 
      // insert this update into the DB...
-     mysql_query( "INSERT INTO updates SET version=".$UpdateVersion.", servers='".$UpdateServers."', update_query='".mysql_escape_string( $UpdateQuery )."'" );
+     mysql_query( "INSERT INTO updates SET version=".$UpdateVersion.", servers='".mysql_escape_string( $UpdateServers )."', update_query='".mysql_escape_string( $UpdateQuery )."'" );
     }
    }
    else
@@ -218,7 +218,7 @@ function Server_Check_For_InActive_Resource_Sessions( )
  global $Config;
 
  // get a list of apparently inactive resources...
- $TheSessions = mysql_query( "SELECT session_id,resource_id FROM running_sessions WHERE session_time_stamp<=(UNIX_TIMESTAMP()-".$Config[ "LGI_INACTIVITY_VALUE" ].")" );
+ $TheSessions = mysql_query( "SELECT session_id,resource_id FROM running_sessions WHERE session_time_stamp<=(UNIX_TIMESTAMP()-".mysql_escape_string( $Config[ "LGI_INACTIVITY_VALUE" ] ).")" );
  $NumberOfSessions = mysql_num_rows( $TheSessions );
 
  if( $NumberOfSessions >= 1 )

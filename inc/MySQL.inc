@@ -41,15 +41,15 @@ function Setup_MySQL_Connection( )
  // Check if we have setup already ...
  if( $MySQLSetup_Flag ) return( 0 );
 
- $Host = $Config[ "MYSQL_URL" ];
- $User = $Config[ "MYSQL_USER" ];
- $Passwd = $Config[ "MYSQL_PASSWD" ];
+ $Host = mysql_escape_string( $Config[ "MYSQL_URL" ] );
+ $User = mysql_escape_string( $Config[ "MYSQL_USER" ] );
+ $Passwd = mysql_escape_string( $Config[ "MYSQL_PASSWD" ] );
 
  // Connect ...
  if( !mysql_pconnect( $Host, $User, $Passwd ) )
   return( LGI_Error_Response( 3, $ErrorMsgs[ 3 ], "" ) );
 
- $DataBase = $Config[ "MYSQL_DEFAULT_DATABASE" ];
+ $DataBase = mysql_escape_string( $Config[ "MYSQL_DEFAULT_DATABASE" ] );
 
  // Select default database ...
  if( isset( $DataBase ) )

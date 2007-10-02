@@ -47,7 +47,7 @@ function Interface_Verify( $Project, $User, $Groups )
 
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
- $CommonName = $CommonNameArray[ 1 ];
+ $CommonName = mysql_escape_string( $CommonNameArray[ 1 ] );
 
  // check common name against posted username...
  if( $CommonName != $User )

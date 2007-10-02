@@ -45,7 +45,7 @@ else
 if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" ) && is_numeric( $_POST[ "limit" ] ) )
  $JobIdLimit = $_POST[ "limit" ];
 else
- $JobIdLimit = $Config[ "DEFAULT_WORK_REQUEST_LIMIT" ];
+ $JobIdLimit = mysql_escape_string( $Config[ "DEFAULT_WORK_REQUEST_LIMIT" ] );
 
 // check if this resource has any jobs locked...
 if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )
