@@ -1,5 +1,5 @@
 #!/bin/sh
-/bin/touch running
+/bin/cat /proc/self/status | /bin/grep -e "^PPid" | /usr/bin/cut -f2 > running
 /bin/sleep 10
 echo -n "Hello_World from " > LGI_output
 /bin/sleep 10
@@ -8,6 +8,6 @@ echo -n "Hello_World from " > LGI_output
 echo -n " submitted from " >> LGI_output
 /bin/sleep 10
 /bin/cat LGI_input >> LGI_output
-/bin/sleep 10
+/bin/sleep 300
 /bin/touch finished
 /bin/rm running

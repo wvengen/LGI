@@ -1,2 +1,6 @@
 #!/bin/sh
-/bin/false
+PID=`/bin/cat running`
+kill $PID
+/bin/touch finished
+/bin/rm running
+/bin/true
