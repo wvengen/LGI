@@ -1,13 +1,15 @@
 #!/bin/sh
 /bin/cat /proc/self/status | /bin/grep -e "^PPid" | /usr/bin/cut -f2 > running
+
 /bin/sleep 10
 echo -n "Hello_World from " > LGI_output
-/bin/sleep 10
+/bin/sleep 20
 /bin/cat LGI_target_resources >> LGI_output
-/bin/sleep 10
+/bin/sleep 40
 echo -n " submitted from " >> LGI_output
-/bin/sleep 10
+/bin/sleep 80
 /bin/cat LGI_input >> LGI_output
-/bin/sleep 300
+/bin/sleep 160
+
 /bin/touch finished
 /bin/rm running

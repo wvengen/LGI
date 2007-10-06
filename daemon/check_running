@@ -1,10 +1,12 @@
 #!/bin/sh
-export LGI_ROOT=${HOME}/LGI/daemon
+export LGI_ROOT=${HOME}/temp/LGI/daemon
 
 if [ -f ${LGI_ROOT}/LGI.pid ]
 then
- export PID=`cat ${LGI_ROOT}/LGI.pid`
- export SPID=`ps -p ${PID} -o pid=`
+
+ PID=`cat ${LGI_ROOT}/LGI.pid`
+ SPID=`ps -p ${PID} -o pid=`
+
  echo Checking for PID ${PID}...
  if [ "${SPID}" == "" ]
  then
@@ -14,8 +16,11 @@ then
  else
     echo "LGI daemon still running..."
  fi
+
 else
+
  echo No LGI.pid found, starting the daemon...
  ${LGI_ROOT}/src/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
  ps -C LGI_daemon -o pid= > ${LGI_ROOT}/LGI.pid
+
 fi
