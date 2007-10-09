@@ -22,7 +22,6 @@ require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Utils.inc' );
 
 global $ErrorMsgs;
-global $Config;
 
 // check if resource is known to the project and certified correctly...
 Interface_Verify( $_POST[ "project" ], $_POST[ "user" ], $_POST[ "groups" ] );
@@ -177,7 +176,7 @@ mysql_free_result( $JobQuery );
 
 // and build response for this job submition...
 $Response =  " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <project_server> ".$Config[ "SERVER_URL" ]." </project_server>";
+$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <project_server> ".Get_Server_URL()." </project_server>";
 $Response .= " <user> ".$JobUser." </user> <groups> ".$JobGroups." </groups>";
 $Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id>";
 $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";

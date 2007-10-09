@@ -96,6 +96,15 @@ function Interface_Verify( $Project, $User, $Groups )
 
 // -------------------------------------------------------------------- 
 
+function Get_Server_URL( )
+{
+ global $Config;
+
+ return( $Config[ "SERVER_URL" ] );
+}
+
+// -------------------------------------------------------------------- 
+
 function Get_Master_Server_URL( )
 {
  global $ErrorMsgs;
@@ -291,7 +300,6 @@ function Interface_Is_Target_Resource_Known( $Resource )
 
 function Interface_Clear_Spin_Lock_On_Job( $JobID )
 {
- global $Config;
  global $ErrorMsgs;
 
  $queryresult = mysql_query( "SELECT lock_state FROM job_queue WHERE job_id=".$JobID." AND lock_state>=1" );

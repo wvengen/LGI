@@ -24,7 +24,6 @@ require_once( '../inc/Errors.inc' );
 
 global $MySQLSetup_Flag;
 global $MySQLCurrentProjectDatabase;
-global $Config;
 
 $MySQLSetup_Flag = 0;
 $MySQLCurrentProjectDatabase = "";

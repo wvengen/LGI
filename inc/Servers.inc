@@ -128,6 +128,8 @@ function Get_Master_Server_URL( )
 
 function Server_Check_And_Perform_Updates( )
 {
+ global $Config;
+
  // get all project servers we know of...
  $ServerListQuery = mysql_query( "SELECT url FROM active_resources WHERE project_server>=1" );
  $NrOfServers = mysql_num_rows( $ServerListQuery );
@@ -216,7 +218,7 @@ function Server_Remove_Stale_Locks_Of_Resource( $ResourceID, $SessionID )
 function Server_Check_For_InActive_Resource_Sessions( )
 {
  global $Config;
-
+ 
  // get a list of apparently inactive resources...
  $TheSessions = mysql_query( "SELECT session_id,resource_id FROM running_sessions WHERE session_time_stamp<=(UNIX_TIMESTAMP()-".mysql_escape_string( $Config[ "LGI_INACTIVITY_VALUE" ] ).")" );
  $NumberOfSessions = mysql_num_rows( $TheSessions );
