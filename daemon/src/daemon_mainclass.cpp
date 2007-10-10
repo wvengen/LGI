@@ -88,6 +88,7 @@ int Daemon::ScanDirectoryForJobs( string Directory )
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_KEY_FILE ) ) FileMask |= LGI_JOBDAEMON_KEY_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_CERTIFICATE_FILE ) ) FileMask |= LGI_JOBDAEMON_CERTIFICATE_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_CA_CERTIFICATE_FILE ) ) FileMask |= LGI_JOBDAEMON_CA_CERTIFICATE_FILE_BIT_VALUE;
+   if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE ) ) FileMask |= LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE_BIT_VALUE;
 
    // if we have all the needed files...
    if( FileMask == LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER )

@@ -376,7 +376,8 @@ int DaemonConfigProjectApplication::IsValidConfigured( void )
  if( Application_Name().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Application_Name() empty" );
  if( Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Owner_Allow() empty" );
  if( Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfigProjectApplication::IsValidConfigured; Warning: Owner_Deny() empty" );
- if( Job_Limit() <= 0 ) CRITICAL_LOG( "DaemonConfigProjectApplication::IsValidConfigured; Job_Limit() returned 0 or less" );
+ if( Job_Limit() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Job_Limit() returned 0 or less" );
+ if( Max_Output_Size() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Max_Output_Size() returned 0 or less" );
 
  if( Check_System_Limits_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Check_System_Limits_Script() empty" );
  if( Job_Check_Limits_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Job_Check_Limits_Script() empty" );
@@ -440,6 +441,17 @@ int DaemonConfigProjectApplication::Job_Limit( void )
   CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::Job_Limit; No data in job_limit tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProjectApplication::Job_Limit; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonConfigProjectApplication::Max_Output_Size( void )
+{
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "max_output_size" ) );
+ if( Data.empty() )
+  CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::Max_OutputSize; No data in max_output_size tag found" )
+ else
+  VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProjectApplication::Max_Output_Size; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -532,7 +544,7 @@ string DaemonConfigProjectApplication::Job_Abort_Script( void )
 
 // -----------------------------------------------------------------------------
 
-string ReadStringFromFile( string FileName )
+string ReadStringFromFile( string FileName, int MaxSize )
 {
  char TempBuffer[ 1024 ];
  fstream File( FileName.c_str(), fstream::in | fstream::binary );
@@ -544,9 +556,10 @@ string ReadStringFromFile( string FileName )
  while( File )
  {
   File.read( TempBuffer, 1024 );
-  if( File.gcount() ) 
-   Buffer.append( string( TempBuffer, File.gcount() ) );
+  if( File.gcount() ) Buffer.append( string( TempBuffer, File.gcount() ) );
+  if( ( MaxSize > 0 ) && ( Buffer.size() >= MaxSize ) ) break;
  }
+ if( ( MaxSize > 0 ) && ( Buffer.size() > MaxSize ) ) Buffer.erase( MaxSize );
 
  VERBOSE_DEBUG_LOG_RETURN( Buffer, "ReadStringFromFile; Data returned from file " << FileName << ": '" << Buffer << "'" );
 }

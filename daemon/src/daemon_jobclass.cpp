@@ -113,6 +113,7 @@ DaemonJob::DaemonJob( string TheJobDirectory )
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_KEY_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CA_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
 
  // all files are there and are okay... accept the job directory...
 
@@ -208,7 +209,7 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  HexBin( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "output" ) ), TheScript );
  WriteStringToFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
 
- // finally also dump the scripts there...
+ // then dump the scripts there...
 
  TheScript = ReadStringFromFile( Application.Job_Check_Limits_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT );
@@ -238,10 +239,15 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT );
  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
 
- // and finally write the SSL config too...
+ // write the SSL config too...
  WriteStringToHashedFile( TheConfig.Resource_Key_File(), JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE );
  WriteStringToHashedFile( TheConfig.Resource_Certificate_File(), JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE );
  WriteStringToHashedFile( TheConfig.CA_Certificate_File(), JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE );
+
+ // and finally dump max output file size too..
+ char TempBuffer[ 64 ];
+ sprintf( TempBuffer, "%d", Application.Max_Output_Size() );
+ WriteStringToHashedFile( string( TempBuffer ), JobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE );
 
  NORMAL_LOG( "DaemonJob::DaemonJob; Job with JobDirectory=" << JobDirectory << " has been setup" );
 }
@@ -348,7 +354,7 @@ string DaemonJob::GetInput( void )
 string DaemonJob::GetOutput( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetOutput; JobDirectory empty" );
- string Data = ReadStringFromFile( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+ string Data = ReadStringFromFile( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE, GetMaxOutputSize() );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetOutput; Returned " << Data );
 }
 
@@ -359,6 +365,15 @@ string DaemonJob::GetKeyFile( void )
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetKeyFile; JobDirectory empty" );
  string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetKeyFile; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonJob::GetMaxOutputSize( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::GetMaxOutputSize; JobDirectory empty" );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE, Data );
+ VERBOSE_DEBUG_LOG_RETURN( atoi( NormalizeString( Data ).c_str() ), "DaemonJob::GetMaxOutputSize; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -473,7 +488,11 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
  int ErrorNumber = 0;
 
  if( !Input.empty() ) BinHex( Input, HexedInput );
- if( !Output.empty() ) BinHex( Output, HexedOutput );
+ if( !Output.empty() )                                    // check the size of the output here and cut it off if needed...
+ {
+  if( Output.size() > GetMaxOutputSize() ) Output.erase( GetMaxOutputSize() );
+  BinHex( Output, HexedOutput );
+ }
 
  do
  {

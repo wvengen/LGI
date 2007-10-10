@@ -72,10 +72,11 @@ using namespace std;
 #define LGI_JOBDAEMON_KEY_FILE                     "LGI_key_file"
 #define LGI_JOBDAEMON_CERTIFICATE_FILE             "LGI_certificate_file"
 #define LGI_JOBDAEMON_CA_CERTIFICATE_FILE          "LGI_ca_certificate_file"
+#define LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE         "LGI_max_output_size"
 
 // check values, a bit per file...
 
-#define LGI_JOBDAEMON_PROJECT_FILE_BIT_VALUE                1 
+#define LGI_JOBDAEMON_PROJECT_FILE_BIT_VALUE                1
 #define LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE_BIT_VALUE    2
 #define LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE_BIT_VALUE  4
 #define LGI_JOBDAEMON_APPLICATION_FILE_BIT_VALUE            8
@@ -98,8 +99,9 @@ using namespace std;
 #define LGI_JOBDAEMON_KEY_FILE_BIT_VALUE                    1048576
 #define LGI_JOBDAEMON_CERTIFICATE_FILE_BIT_VALUE            2097152
 #define LGI_JOBDAEMON_CA_CERTIFICATE_FILE_BIT_VALUE         4194304
+#define LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE_BIT_VALUE        8388608
 
-#define LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER               8388607
+#define LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER               16777215
 
 // -----------------------------------------------------------------------------
 
@@ -157,6 +159,8 @@ class DaemonJob
               int  RunJobEpilogueScript( void );
               int  RunJobAbortScript( void );
               int  RunJobRunScript( void );
+              
+              int  GetMaxOutputSize( void );
 
        protected:
 

@@ -116,6 +116,7 @@ class DaemonConfigProjectApplication
               string Job_Epilogue_Script( void );
               string Job_Abort_Script( void );
               int    Job_Limit( void );
+              int    Max_Output_Size( void );
 
        protected:
 
@@ -124,7 +125,7 @@ class DaemonConfigProjectApplication
 
 // -----------------------------------------------------------------------------
 
-string ReadStringFromFile( string FileName );
+string ReadStringFromFile( string FileName, int MaxSize = -1 );
 void   WriteStringToFile( string String, string FileName );
 
 // -----------------------------------------------------------------------------
