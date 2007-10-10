@@ -559,7 +559,11 @@ string ReadStringFromFile( string FileName, int MaxSize )
   if( File.gcount() ) Buffer.append( string( TempBuffer, File.gcount() ) );
   if( ( MaxSize > 0 ) && ( Buffer.size() >= MaxSize ) ) break;
  }
- if( ( MaxSize > 0 ) && ( Buffer.size() > MaxSize ) ) Buffer.erase( MaxSize );
+ if( ( MaxSize > 0 ) && ( Buffer.size() > MaxSize ) ) 
+ {
+  Buffer.erase( MaxSize );
+  CRITICAL_LOG_RETURN( Buffer, "ReadStringFromFile; Data of file " << FileName << " truncated to " << MaxSize << " bytes" );
+ }
 
  VERBOSE_DEBUG_LOG_RETURN( Buffer, "ReadStringFromFile; Data returned from file " << FileName << ": '" << Buffer << "'" );
 }

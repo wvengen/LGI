@@ -490,7 +490,11 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
  if( !Input.empty() ) BinHex( Input, HexedInput );
  if( !Output.empty() )                                    // check the size of the output here and cut it off if needed...
  {
-  if( Output.size() > GetMaxOutputSize() ) Output.erase( GetMaxOutputSize() );
+  if( Output.size() > GetMaxOutputSize() )
+  { 
+   Output.erase( GetMaxOutputSize() );
+   CRITICAL_LOG( "DaemonJob::UpdateJob; Output truncated to " << GetMaxOutputSize() << " bytes" );
+  }
   BinHex( Output, HexedOutput );
  }
 
