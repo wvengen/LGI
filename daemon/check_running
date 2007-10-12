@@ -4,7 +4,7 @@ export LGI_ROOT=${HOME}/temp/LGI/daemon
 if [ -f ${LGI_ROOT}/LGI.pid ]
 then
 
- PID=`cat ${LGI_ROOT}/LGI.pid`
+ PID=`tail -n1 ${LGI_ROOT}/LGI.pid`
  SPID=`ps -p ${PID} -o pid=`
 
  echo Checking for PID ${PID}...
@@ -12,7 +12,7 @@ then
  then
     echo "LGI daemon not running anymore, restarting..."
     ${LGI_ROOT}/src/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
-    ps -C LGI_daemon -o pid= > ${LGI_ROOT}/LGI.pid
+    ps -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
  else
     echo "LGI daemon still running..."
  fi
@@ -21,6 +21,6 @@ else
 
  echo No LGI.pid found, starting the daemon...
  ${LGI_ROOT}/src/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
- ps -C LGI_daemon -o pid= > ${LGI_ROOT}/LGI.pid
+ ps -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
 
 fi
