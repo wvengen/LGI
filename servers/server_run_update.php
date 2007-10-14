@@ -56,12 +56,20 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
 
   // do we need to start an update cycle...
   if( $UpdateVersion > $MaxVersion->max + 1 )
-   return( LGI_Response( Server_Check_And_Perform_Updates(), "" ) );
+  {
+   Server_Check_And_Perform_Updates();
+   mysql_free_result( $mysqlresult );
+   $mysqlresult = mysql_query( "SELECT MAX(version) AS max FROM updates" );
+   $MaxVersion = mysql_fetch_object( $mysqlresult );
+   mysql_free_result( $mysqlresult );
+   $Response .= "<update> <did_update_cyle> 1 </did_update_cyle> <update_version> ".$MaxVersion->max." </update_version> </update>";
+   return( LGI_Response( $Response, "" ) );
+  }
 
   // if we already have this update...
   if( $UpdateVersion <= $MaxVersion->max )
   {
-   $Response .= "<update> <update_version> ".$MaxVersion->max." </update_version> </update>";
+   $Response .= "<update> <did_update_cyle> 0 </did_update_cyle> <update_version> ".$MaxVersion->max." </update_version> </update>";
    return( LGI_Response( $Response, "" ) );
   }
  }
@@ -82,17 +90,26 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
  if( mysql_num_rows( $mysqlresult ) == 1 )
  {
   $UpdateData = mysql_fetch_object( $mysqlresult );
-  $Response .= "<update> <update_version> ".$UpdateData->max." </update_version> </update>";
+  $Response .= "<update> <did_update_cyle> 0 </did_update_cyle> <update_version> ".$UpdateData->max." </update_version> </update>";
  }
  else
-  $Response .= "<update> <update_version> -1 </update_version> </update>";
+  $Response .= "<update> <did_update_cyle> 0 </did_update_cyle> <update_version> -1 </update_version> </update>";
 
  mysql_free_result( $mysqlresult );
  return( LGI_Response( $Response, "" ) );
 }
 
 // this is an update cycle being initiated by another server...
-$Response = Server_Check_And_Perform_Updates( );
+Server_Check_And_Perform_Updates();
+
+$mysqlresult = mysql_query( "SELECT MAX(version) AS max FROM updates" );
+$MaxVersion = mysql_fetch_object( $mysqlresult );
+mysql_free_result( $mysqlresult );
+$Response = "<project> ".Get_Selected_MySQL_DataBase()." </project> ";
+$Response .= "<project_master_server> ".Get_Master_Server_URL()." </project_master_server> ";
+$Response .= "<this_project_server> ".$ServerData->resource_name." </this_project_server> ";
+$Response .= "<project_server> ".Get_Server_URL()." </project_server> ";
+$Response .= "<update> <did_update_cyle> 1 </did_update_cyle> <update_version> ".$MaxVersion->max." </update_version> </update>";
 
 return( LGI_Response( $Response, "" ) );
 ?>
