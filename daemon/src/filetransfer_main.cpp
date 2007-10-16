@@ -64,11 +64,11 @@ void PrintHelp( char *ExeName )
  cout << "commands:" << endl << endl;
  cout << "serve                               run program as server serving file transfer request jobs from a job directory." << endl;
  cout << "remove file                         remove specified file." << endl;
- cout << "move sourcefile destinationfile     move specified file to specified destination." << endl;
- cout << "copy sourcefile destinationfile     copy specified file to specified destination." << endl << endl;
+ cout << "move sourcefile destinationfile     move specified file to specified destination. either source or destination needs to be local." << endl;
+ cout << "copy sourcefile destinationfile     copy specified file to specified destination. either source of destination needs to be local." << endl << endl;
  cout << "options:" << endl << endl;
  cout << "-h                                  show this help." << endl;
- cout << "-c directory                        specify the configuration directory to read. default is ~/.LGI. specify options below tooverrule." << endl;
+ cout << "-c directory                        specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
  cout << "-j jobdirectory                     specify job directory to use. if not specified try current directory or specify the following options." << endl;
  cout << "-K keyfile                          specify key file." << endl;
  cout << "-C certificatefile                  specify certificate file." << endl;
