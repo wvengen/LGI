@@ -85,13 +85,6 @@ int main( int argc, char *argv[] )
 {
  DaemonJob Job;
 
- // check number of arguments first...
- if( argc < 2 )
- {
-  PrintHelp( argv[ 0 ] );
-  return( 1 );
- }
-
  // turn logging facilities off...
  InitializeLogger( 0 );
 
