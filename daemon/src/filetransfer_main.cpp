@@ -295,7 +295,9 @@ int main( int argc, char *argv[] )
  if( CACertificateFile.empty() ) Flag = 1;
  if( ServerURL.empty() ) Flag = 1;
  if( User.empty() && ( !ResourceMode ) ) Flag = 1;
+ if( !User.empty() && ResourceMode ) Flag = 1;
  if( Groups.empty() && ( !ResourceMode ) ) Flag = 1;
+ if( !Groups.empty() && ResourceMode ) Flag = 1;
  if( !Command ) Flag = 1;
 
  if( Flag )
