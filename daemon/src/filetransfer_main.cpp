@@ -65,7 +65,7 @@ void PrintHelp( char *ExeName )
  cout << "serve                               run program as server serving file transfer request jobs from a job directory." << endl;
  cout << "remove file                         remove specified file." << endl;
  cout << "move sourcefile destinationfile     move specified file to specified destination. either source or destination needs to be local." << endl;
- cout << "copy sourcefile destinationfile     copy specified file to specified destination. either source of destination needs to be local." << endl << endl;
+ cout << "copy sourcefile destinationfile     copy specified file to specified destination. either source or destination needs to be local." << endl << endl;
  cout << "options:" << endl << endl;
  cout << "-h                                  show this help." << endl;
  cout << "-c directory                        specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
