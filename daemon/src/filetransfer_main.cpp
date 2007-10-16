@@ -38,8 +38,23 @@
 
 // ----------------------------------------------------------------------
 
+int Command = CMD_SERVE, ResourceMode = 0;                   
+
 string KeyFile, CertificateFile, CACertificateFile, 
-       ServerURL, Project, SourceFile, DestinationFile;
+       ServerURL, Project, User, Groups, SourceFile,
+       DestinationFile;
+
+// ----------------------------------------------------------------------
+
+string ReadLineFromFile( string FileName )
+{
+ fstream File( FileName.c_str(), fstream::in );
+ string Line;
+
+ if( !File ) return( Line );
+ getline( File, Line );
+ return( Line );
+}
 
 // ----------------------------------------------------------------------
 
@@ -53,10 +68,13 @@ void PrintHelp( char *ExeName )
  cout << "copy sourcefile destinationfile     copy specified file to specified destination." << endl << endl;
  cout << "options:" << endl << endl;
  cout << "-h                                  show this help." << endl;
+ cout << "-c directory                        specify the configuration directory to read. default is ~/.LGI. specify options below tooverrule." << endl;
  cout << "-j jobdirectory                     specify job directory to use. if not specified try current directory or specify the following options." << endl;
  cout << "-K keyfile                          specify key file." << endl;
  cout << "-C certificatefile                  specify certificate file." << endl;
  cout << "-CA cacertificatefile               specify ca certificate file." << endl;
+ cout << "-U user                             specify username." << endl;
+ cout << "-G groups                           specify groups." << endl;
  cout << "-S serverurl                        specify project server url." << endl;
  cout << "-P project                          specify project name." << endl << endl;
 }
@@ -66,7 +84,6 @@ void PrintHelp( char *ExeName )
 int main( int argc, char *argv[] )
 {
  DaemonJob Job;
- int Command = 0;
 
  // check number of arguments first...
  if( argc < 2 )
@@ -77,6 +94,39 @@ int main( int argc, char *argv[] )
 
  // turn logging facilities off...
  InitializeLogger( 0 );
+
+ // try and read current job directory first as a default...
+ DaemonJob TempJob( "." );
+ if( !TempJob.GetJobDirectory().empty() )
+ {
+  Job = TempJob;
+  KeyFile = Job.GetKeyFile();
+  CertificateFile = Job.GetCertificateFile();
+  CACertificateFile = Job.GetCACertificateFile();
+  ServerURL = Job.GetThisProjectServer();
+  Project = Job.GetProject();
+
+  ResourceMode = 1;
+  Command = CMD_SERVE;
+ }
+
+ // if that didn't work, try and read default config from ~/.LGI...
+ if( !ResourceMode )
+ {
+  string ConfigDir = string( getenv( "HOME" ) ) + "/.LGI";
+
+  User = ReadLineFromFile( ConfigDir + "/user" );
+  Groups = ReadLineFromFile( ConfigDir + "/groups" );
+  ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
+  Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
+
+  if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
+  if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
+  if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+
+  ResourceMode = 0;
+  Command = 0;
+ }
 
  // read passed arguments here...
  for( int i = 1; i < argc; ++i )
@@ -100,6 +150,28 @@ int main( int argc, char *argv[] )
      CACertificateFile = Job.GetCACertificateFile();
      ServerURL = Job.GetThisProjectServer();
      Project = Job.GetProject();
+
+     ResourceMode = 1;
+    }
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
+  } else if( !strcmp( argv[ i ], "-c" ) ) {
+    if( argv[ ++i ] )
+    {
+     string ConfigDir = string( argv[ i ] );
+
+     if( !ReadLineFromFile( ConfigDir + "/user" ).empty() ) User = ReadLineFromFile( ConfigDir + "/user" );
+     if( !ReadLineFromFile( ConfigDir + "/groups" ).empty() ) Groups = ReadLineFromFile( ConfigDir + "/groups" );
+     if( !ReadLineFromFile( ConfigDir + "/defaultserver" ).empty() ) ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
+     if( !ReadLineFromFile( ConfigDir + "/defaultproject" ).empty() ) Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
+     if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
+     if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
+     if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+
+     ResourceMode = 0;
     }
     else
     {
@@ -146,19 +218,42 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "serve" ) ) {
-    Command = CMD_SERVE;
-  } else if( !strcmp( argv[ i ], "remove" ) ) {
-    Command = CMD_REMOVE;
+  } else if( !strcmp( argv[ i ], "-U" ) ) {
     if( argv[ ++i ] )
+     User = string( argv[ i ] );
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
+  } else if( !strcmp( argv[ i ], "-G" ) ) {
+    if( argv[ ++i ] )
+     Groups = string( argv[ i ] );
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
+  } else if( !strcmp( argv[ i ], "serve" ) ) {
+    if( ResourceMode )
+     Command = CMD_SERVE;
+    else
+    {
+     PrintHelp( argv[ 0 ] );
+     return( 1 );
+    }
+  } else if( !strcmp( argv[ i ], "remove" ) ) {
+    if( argv[ ++i ] )
+    {
+     Command = CMD_REMOVE;
      SourceFile = DestinationFile = string( argv[ i ] );
+    }
     else
     {
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
   } else if( !strcmp( argv[ i ], "move" ) ) {
-    Command = CMD_MOVE;
     if( argv[ ++i ] )
      SourceFile = string( argv[ i ] );
     else
@@ -167,14 +262,16 @@ int main( int argc, char *argv[] )
      return( 1 );
     }
     if( argv[ ++i ] )
+    {
+     Command = CMD_MOVE;
      DestinationFile = string( argv[ i ] );
+    }
     else
     {
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
   } else if( !strcmp( argv[ i ], "copy" ) ) {
-    Command = CMD_COPY;
     if( argv[ ++i ] )
      SourceFile = string( argv[ i ] );
     else
@@ -183,7 +280,10 @@ int main( int argc, char *argv[] )
      return( 1 );
     }
     if( argv[ ++i ] )
+    {
+     Command = CMD_COPY;
      DestinationFile = string( argv[ i ] );
+    }
     else
     {
      PrintHelp( argv[ 0 ] );
@@ -195,41 +295,19 @@ int main( int argc, char *argv[] )
   };
  }
 
- // if no options passed try local directory as jobdirectory...
- if( KeyFile.empty() && CertificateFile.empty() && CACertificateFile.empty() && ServerURL.empty() && Project.empty() )
- {
-  DaemonJob TempJob( "." );
+ int Flag = 0;
 
-  if( !TempJob.GetJobDirectory().empty() )
-  {
-   Job = TempJob;
-   KeyFile = Job.GetKeyFile();
-   CertificateFile = Job.GetCertificateFile();
-   CACertificateFile = Job.GetCACertificateFile();
-   ServerURL = Job.GetThisProjectServer();
-   Project = Job.GetProject();
-  }
-  else
-  {
-   cout << "current directory not a valid job directory" << endl;
-   return( 1 );
-  }
- }
+ if( KeyFile.empty() ) Flag = 1;
+ if( CertificateFile.empty() ) Flag = 1;
+ if( CACertificateFile.empty() ) Flag = 1;
+ if( ServerURL.empty() ) Flag = 1;
+ if( User.empty() && ( !ResourceMode ) ) Flag = 1;
+ if( Groups.empty() && ( !ResourceMode ) ) Flag = 1;
+ if( !Command ) Flag = 1;
 
- if( KeyFile.empty() ) Command = 0;
- if( CertificateFile.empty() ) Command = 0;
- if( CACertificateFile.empty() ) Command = 0;
- if( ServerURL.empty() ) Command = 0;
-
- if( !Command )
+ if( Flag )
  {
   PrintHelp( argv[ 0 ] );
-  return( 1 );
- }
-
- if( ( Command == CMD_SERVE ) && Job.GetJobDirectory().empty() )
- {
-  cout << "no valid job directory specified for serve command" << endl;
   return( 1 );
  }
 
