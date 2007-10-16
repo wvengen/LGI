@@ -16,7 +16,7 @@ CREATE TABLE active_resources (
   last_call_time int(10) unsigned NOT NULL default '0',
   project_server int(10) unsigned NOT NULL default '0',
   url text NOT NULL,
-  PRIMARY KEY  (resource_id)
+  PRIMARY KEY  (resource_id), UNIQUE (resource_name(128))
 ) TYPE=MyISAM;
 
 --
