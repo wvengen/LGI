@@ -62,22 +62,22 @@ void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " [options] command" << endl << endl;
  cout << "commands:" << endl << endl;
- cout << "serve                               run program as server serving file transfer request jobs from a job directory." << endl;
- cout << "remove file                         remove specified file." << endl;
- cout << "move sourcefile destinationfile     move specified file to specified destination. either source or destination needs to be local." << endl;
- cout << "copy sourcefile destinationfile     copy specified file to specified destination. either source or destination needs to be local." << endl << endl;
+ cout << "serve                          run program as server serving file transfer request jobs from a job directory." << endl;
+ cout << "remove file                    remove specified file." << endl;
+ cout << "move sourcefile destination    move specified file to specified destination. either source or destination needs to be local." << endl;
+ cout << "copy sourcefile destination    copy specified file to specified destination. either source or destination needs to be local." << endl << endl;
  cout << "options:" << endl << endl;
- cout << "-h                                  show this help." << endl;
- cout << "-c directory                        specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
- cout << "-j jobdirectory                     specify job directory to use. if not specified try current directory or specify the following options." << endl;
- cout << "-K keyfile                          specify key file." << endl;
- cout << "-C certificatefile                  specify certificate file." << endl;
- cout << "-CA cacertificatefile               specify ca certificate file." << endl;
- cout << "-U user                             specify username." << endl;
- cout << "-G groups                           specify groups." << endl;
- cout << "-S serverurl                        specify project server url." << endl;
- cout << "-P project                          specify project name." << endl;
- cout << "-m                                  switch user or resource mode." << endl << endl;
+ cout << "-h                             show this help." << endl;
+ cout << "-c directory                   specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
+ cout << "-j jobdirectory                specify job directory to use. if not specified try current directory or specify the following options." << endl;
+ cout << "-K keyfile                     specify key file." << endl;
+ cout << "-C certificatefile             specify certificate file." << endl;
+ cout << "-CA cacertificatefile          specify ca certificate file." << endl;
+ cout << "-U user                        specify username." << endl;
+ cout << "-G groups                      specify groups." << endl;
+ cout << "-S serverurl                   specify project server url." << endl;
+ cout << "-P project                     specify project name." << endl;
+ cout << "-m                             switch user or resource mode." << endl << endl;
 }
 
 // ----------------------------------------------------------------------
@@ -312,6 +312,35 @@ int main( int argc, char *argv[] )
   PrintHelp( argv[ 0 ] );
   return( 1 );
  }
+
+ // check if source and destination are okay... 
+ if( ( Command & ( CMD_MOVE | CMD_COPY ) ) )
+ {
+  if( ( SourceFile.find( ':' ) != string::npos ) && ( DestinationFile.find( ':' ) != string::npos ) )
+  {
+   cout << endl << "ERROR: both sourcefile and destination are remote." << endl << endl;
+   return( 1 );
+  }
+
+  if( ( SourceFile.find( ':' ) == string::npos ) && ( DestinationFile.find( ':' ) == string::npos ) )
+  {
+   cout << endl << "ERROR: both source and destination are local; use normal mv, cp or rm commands." << endl << endl;
+   return( 1 );
+  }
+
+  if( ( DestinationFile.find( ':' ) != string::npos ) && ( DestinationFile[ DestinationFile.size() - 1 ] != ':' ) )
+  {
+   cout << endl << "ERROR: destination cannot be a fully qualified remote file name." << endl << endl;
+   return( 1 );
+  }
+ } 
+
+ if( SourceFile[ SourceFile.size() - 1 ] == ':' )
+ {
+  cout << endl << "ERROR: source is not a fully qualified remote file name." << endl << endl;
+  return( 1 );
+ }
+ 
 
  // ...
  // ...
