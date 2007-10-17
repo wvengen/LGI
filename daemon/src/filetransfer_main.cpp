@@ -335,7 +335,7 @@ int main( int argc, char *argv[] )
   }
  } 
 
- if( SourceFile[ SourceFile.size() - 1 ] == ':' )
+ if( ( Command & ( CMD_REMOVE | CMD_MOVE | CMD_COPY ) ) && ( SourceFile[ SourceFile.size() - 1 ] == ':' ) )
  {
   cout << endl << "ERROR: source is not a fully qualified remote file name." << endl << endl;
   return( 1 );
