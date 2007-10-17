@@ -76,7 +76,8 @@ void PrintHelp( char *ExeName )
  cout << "-U user                             specify username." << endl;
  cout << "-G groups                           specify groups." << endl;
  cout << "-S serverurl                        specify project server url." << endl;
- cout << "-P project                          specify project name." << endl << endl;
+ cout << "-P project                          specify project name." << endl;
+ cout << "-m                                  switch user or resource mode." << endl << endl;
 }
 
 // ----------------------------------------------------------------------
@@ -213,7 +214,10 @@ int main( int argc, char *argv[] )
     }
   } else if( !strcmp( argv[ i ], "-U" ) ) {
     if( argv[ ++i ] )
+    {
      User = string( argv[ i ] );
+     ResourceMode = 0;
+    }
     else
     {
      PrintHelp( argv[ 0 ] );
@@ -221,12 +225,17 @@ int main( int argc, char *argv[] )
     }
   } else if( !strcmp( argv[ i ], "-G" ) ) {
     if( argv[ ++i ] )
+    {
      Groups = string( argv[ i ] );
+     ResourceMode = 0;
+    }
     else
     {
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
+  } else if( !strcmp( argv[ i ], "-m" ) ) {
+    ResourceMode = !ResourceMode;
   } else if( !strcmp( argv[ i ], "serve" ) ) {
     if( ResourceMode )
      Command = CMD_SERVE;
@@ -295,9 +304,7 @@ int main( int argc, char *argv[] )
  if( CACertificateFile.empty() ) Flag = 1;
  if( ServerURL.empty() ) Flag = 1;
  if( User.empty() && ( !ResourceMode ) ) Flag = 1;
- if( !User.empty() && ResourceMode ) Flag = 1;
  if( Groups.empty() && ( !ResourceMode ) ) Flag = 1;
- if( !Groups.empty() && ResourceMode ) Flag = 1;
  if( !Command ) Flag = 1;
 
  if( Flag )
