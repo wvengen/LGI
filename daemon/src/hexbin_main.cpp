@@ -50,7 +50,8 @@ int main( int argc, char *argv[] )
   if( !strcmp( argv[ i ], "-i" ) ) {
     if( argv[ ++i ] )
     {
-     Input.close();
+     if( !Input.good() ) Input.clear();
+     if( Input.is_open() ) Input.close();
      Input.open( argv[ i ], fstream::in | fstream::binary );
      if( !Input ) { Output << "input error on file " << argv[ i ] << endl; return( 1 ); }
     }
@@ -62,7 +63,8 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-o" ) ) {
     if( argv[ ++i ] )
     {
-     Output.close();
+     if( !Output.good() ) Output.clear();
+     if( Output.is_open() ) Output.close();
      Output.open( argv[ i ], fstream::out | fstream::binary );
      if( !Output ) return( 1 );
     }
