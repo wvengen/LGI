@@ -27,7 +27,7 @@ require_once( '../inc/Utils.inc' );
 
 // -------------------------------------------------------------------- 
 
-function Interface_Verify( $Project, $User, $Groups )
+function Interface_Verify( $Project, $User, $Groups, $ExitOnError = true )
 {
  global $ErrorMsgs;
  global $Config;
@@ -36,10 +36,10 @@ function Interface_Verify( $Project, $User, $Groups )
  if( SSL_Verify_Client() ) return( 2 );
 
  if( !isset( $Groups ) || ( $Groups == "" ) )
-  return( LGI_Error_Response( 31, $ErrorMsgs[ 31 ], "" ) );
+  return( LGI_Error_Response( 31, $ErrorMsgs[ 31 ], "", $ExitOnError ) );
 
  if( !isset( $User ) || ( $User == "" ) )
-  return( LGI_Error_Response( 32, $ErrorMsgs[ 32 ], "" ) );
+  return( LGI_Error_Response( 32, $ErrorMsgs[ 32 ], "", $ExitOnError ) );
 
  // if it was not posted, use default value for this server...
  if( !isset( $Project ) || ( $Project == "" ) )
@@ -51,7 +51,7 @@ function Interface_Verify( $Project, $User, $Groups )
 
  // check common name against posted username...
  if( $CommonName != $User )
-  return( LGI_Error_Response( 30, $ErrorMsgs[ 30 ], "" ) );
+  return( LGI_Error_Response( 30, $ErrorMsgs[ 30 ], "", $ExitOnError ) );
 
  // check if certificate has any allowed groups listed...
  if( $CommonNameArray[ 0 ] >= 2 )
@@ -70,7 +70,7 @@ function Interface_Verify( $Project, $User, $Groups )
 
   // check if any posted group is allowed...
   if( !$FoundAGroup )
-   return( LGI_Error_Response( 38, $ErrorMsgs[ 38 ], "" ) );
+   return( LGI_Error_Response( 38, $ErrorMsgs[ 38 ], "", $ExitOnError ) );
   
   // now only use the groups that are also allowed by the certificate...
   $Groups = substr( $NewGroupList, 2 );
@@ -83,7 +83,7 @@ function Interface_Verify( $Project, $User, $Groups )
   if( FoundInCommaSeparatedField( $CommonNameArray[ 3 ], $Project, "," ) )
    Select_MySQL_DataBase( $Project );
   else
-    return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ], "" ) );
+    return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ], "", $ExitOnError ) );
  }
  else
  {
@@ -105,14 +105,14 @@ function Get_Server_URL( )
 
 // -------------------------------------------------------------------- 
 
-function Get_Master_Server_URL( )
+function Get_Master_Server_URL( $ExitOnError = true )
 {
  global $ErrorMsgs;
 
  $queryresult = mysql_query( "SELECT url FROM active_resources WHERE project_server=1" );
 
  if( mysql_num_rows( $queryresult ) != 1 )
-  return( LGI_Error_Response( 6, $ErrorMsgs[ 6 ], "" ) );
+  return( LGI_Error_Response( 6, $ErrorMsgs[ 6 ], "", $ExitOnError ) );
 
  $MasterServer = mysql_fetch_object( $queryresult );
 
@@ -314,7 +314,7 @@ function Interface_Clear_Spin_Lock_On_Job( $JobID )
 
 // -------------------------------------------------------------------- 
 
-function Interface_Set_Spin_Lock_On_Job( $JobID )
+function Interface_Set_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
 {
  global $Config;
  global $ErrorMsgs;
@@ -327,7 +327,7 @@ function Interface_Set_Spin_Lock_On_Job( $JobID )
 
   // if the update couldn't be done, the job wasn't there...
   if( !$queryresult )
-   return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "" ) );
+   return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "", $ExitOnError ) );
 
   // check the value, which is now 1 or bigger...
   $queryresult = mysql_query( "SELECT lock_state FROM job_queue WHERE job_id=".$JobID );
@@ -343,7 +343,7 @@ function Interface_Set_Spin_Lock_On_Job( $JobID )
 
   // if the update couldn't be done, the job wasn't there...
   if( !$queryresult )
-   return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "" ) );
+   return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "", $ExitOnError ) );
 
   $Count++;
   sleep( 1 );
@@ -355,7 +355,7 @@ function Interface_Set_Spin_Lock_On_Job( $JobID )
 
 // -------------------------------------------------------------------- 
 
-function Interface_Wait_For_Cleared_Spin_Lock_On_Job( $JobID )
+function Interface_Wait_For_Cleared_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
 {
  global $Config;
  global $ErrorMsgs;
@@ -370,7 +370,7 @@ function Interface_Wait_For_Cleared_Spin_Lock_On_Job( $JobID )
   if( mysql_num_rows( $queryresult ) <= 0 )
   {
    mysql_free_result( $queryresult );
-   return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "" ) );
+   return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "", $ExitOnError ) );
   }
 
   $JobSpecs = mysql_fetch_object( $queryresult );
@@ -385,7 +385,7 @@ function Interface_Wait_For_Cleared_Spin_Lock_On_Job( $JobID )
  }
 
  // lock spin has timed-out... so we are to busy...
- return( LGI_BackOff_Response( ) );
+ return( LGI_BackOff_Response( $ExitOnError ) );
 }
 
 // -------------------------------------------------------------------- 

@@ -23,31 +23,32 @@ require_once( '../inc/Errors.inc' );
 
 // -------------------------------------------------------------------- 
 
-function LGI_Response( $DataTags, $ExtraInfoTags )
+function LGI_Response( $DataTags, $ExtraInfoTags, $Exit = true )
 {
  global $Config;
 
  $ExtraInfoTags = "<CA_certificate> ".$Config["SERVER_SSL_CA_CERTIFICATE_URL"]." </CA_certificate> ".$ExtraInfoTags;
 
- exit( "<LGI> ".$ExtraInfoTags." <response> ".$DataTags." </response> </LGI>" ); 
-
- return( 0 );
+ if( $Exit )
+  exit( "<LGI> ".$ExtraInfoTags." <response> ".$DataTags." </response> </LGI>" ); 
+ else
+  return( 0 );
 }
 
 // -------------------------------------------------------------------- 
 
-function LGI_Error_Response( $ErrorNo, $ErrorMessage, $ExtraInfoTags )
+function LGI_Error_Response( $ErrorNo, $ErrorMessage, $ExtraInfoTags, $Exit = true )
 {
  $ErrorTags = "<number> ".$ErrorNo." </number> <message> ".$ErrorMessage." </message> ";
 
- LGI_Response( "<error> ".$ErrorTags." </error>", $ExtraInfoTags ); 
+ LGI_Response( "<error> ".$ErrorTags." </error>", $ExtraInfoTags, $Exit ); 
 
  return( $ErrorNo );
 }
 
 // --------------------------------------------------------------------
 
-function LGI_BackOff_Response( )
+function LGI_BackOff_Response( $Exit = true )
 {
  global $Config;
  global $ErrorMsgs;
@@ -55,7 +56,7 @@ function LGI_BackOff_Response( )
  $ErrorMessage =  "<error> <number> 1 </number> <message> ".$ErrorMsgs[ 1 ]." </message>";
  $ErrorMessage .= " <timeout> ".$Config["LGI_TIMEOUT_VALUE"]." </timeout> </error> ";
 
- LGI_Response( $ErrorMessage, "" );
+ LGI_Response( $ErrorMessage, "", $Exit );
 
  return( 1 );
 }
