@@ -29,11 +29,15 @@ require_once( '../inc/Utils.inc' );
 
 function Resource_Verify_Session( &$ResourceData )
 {
+ global $Config;
  global $ErrorMsgs;
 
  // check if variable was set correctly...
  if( !isset( $ResourceData -> SessionID ) || ( $ResourceData -> SessionID == "" ) || !is_numeric( $ResourceData -> SessionID ) )
   return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ], "" ) );
+
+ if( strlen( $ResourceData -> SessionID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+  return( LGI_Error_Response( 62, $ErrorMsgs[ 62 ], "" ) );
 
  // get session id for this resource from running_sessions...
  $query = mysql_query( "SELECT session_id FROM running_sessions WHERE session_id=".$ResourceData->SessionID." AND resource_id=".$ResourceData->resource_id );
@@ -103,15 +107,21 @@ function Resource_Kill_Session( &$ResourceData )
 
 function Resource_Verify( $Project, $SessionID )
 {
- global $ErrorMsgs;
  global $Config;
+ global $ErrorMsgs;
 
  // first see if valid client certificate was used in the connection...
- if( SSL_Verify_Client() ) return( 2 );
+ if( SSL_Verify_Client() )
+  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "" ) );
 
  // if it was not posted, use default value for this server...
  if( !isset( $Project ) || ( $Project == "" ) )
   $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
+ else
+ {
+  if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+   return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ], "" ) );
+ }
  
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
@@ -156,7 +166,12 @@ function Resource_Verify( $Project, $SessionID )
  $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
 
  // pass through the SessionID into the resource data structure...
- if( isset( $SessionID ) && is_numeric( $SessionID ) ) $Data -> SessionID = $SessionID;
+ if( isset( $SessionID ) && is_numeric( $SessionID ) ) 
+ {
+  if( strlen( $SessionID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+   return( LGI_Error_Response( 62, $ErrorMsgs[ 62 ], "" ) );
+  $Data -> SessionID = $SessionID;
+ }
 
  return( $Data );
 }

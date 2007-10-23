@@ -18,6 +18,7 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Utils.inc' );
 
@@ -34,6 +35,8 @@ $JobUser = $_POST[ "user" ];
 // check if job_id was posted...
 if( isset( $_POST[ "job_id" ] ) && ( $_POST[ "job_id" ] != "" ) && is_numeric( $_POST[ "job_id" ] ) )
 {
+ if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ], "" ) );
  $JobId = $_POST[ "job_id" ];
  $DetailMode = 1;
 }
@@ -50,7 +53,11 @@ if( !$DetailMode )
 {
  // see if state field was posted...
  if( isset( $_POST[ "state" ] ) && ( $_POST[ "state" ] != "" ) )
+ {
+  if( strlen( $_POST[ "state" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+   return( LGI_Error_Response( 45, $ErrorMsgs[ 45 ], "" ) );
   $JobState = $_POST[ "state" ];
+ }
  else
   $JobState = "any";
 
@@ -58,7 +65,11 @@ if( !$DetailMode )
 
  // see if application field was posted...
  if( isset( $_POST[ "application" ] ) && ( $_POST[ "application" ] != "" ) )
+ {
+  if( strlen( $_POST[ "application" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+   return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ], "" ) );
   $JobApplication = $_POST[ "application" ];
+ }
  else
   $JobApplication = "any";
 
@@ -66,13 +77,21 @@ if( !$DetailMode )
 
  // see if start field was posted...
  if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && is_numeric( $_POST[ "start" ] ) ) 
+ {
+  if( strlen( $_POST[ "start" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+   return( LGI_Error_Response( 48, $ErrorMsgs[ 48 ], "" ) );
   $JobStart = $_POST[ "start" ];
+ }
  else
   $JobStart = 0;
 
  // see if limit field was posted...
  if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" )  && is_numeric( $_POST[ "limit" ] ) )
+ {
+  if( strlen( $_POST[ "limit" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+   return( LGI_Error_Response( 49, $ErrorMsgs[ 49 ], "" ) );
   $JobLimit = $_POST[ "limit" ];
+ }
  else
   $JobLimit = $Config[ "DEFAULT_JOB_STATUS_LIMIT" ];
 

@@ -18,9 +18,11 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Utils.inc' );
 
+global $Config;
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
@@ -32,7 +34,11 @@ $JobUser = $_POST[ "user" ];
 
 // check if job_id was posted...
 if( isset( $_POST[ "job_id" ] ) && ( $_POST[ "job_id" ] != "" ) && is_numeric( $_POST[ "job_id" ] ) )
+{
+ if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ], "" ) );
  $JobId = $_POST[ "job_id" ];
+}
 else
  return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ], "" ) );
 

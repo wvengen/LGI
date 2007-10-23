@@ -18,9 +18,11 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Servers.inc' );
 require_once( '../inc/Utils.inc' );
 
+global $Config;
 global $ErrorMsgs;
 
 // check if server is known to the project and certified correctly...
@@ -30,7 +32,11 @@ $ServerData = Server_Verify( $_POST[ "project" ] );
 if( !isset( $_POST[ "version" ] ) || ( $_POST[ "version" ] == "" ) || !is_numeric( $_POST[ "version" ] ) )
  return( LGI_Error_Response( 40, $ErrorMsgs[ 40 ], "" ) );
 else
+{
+ if( strlen( $_POST[ "version" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+  return( LGI_Error_Response( 59, $ErrorMsgs[ 59 ], "" ) );
  $ServerVersionNumber = $_POST[ "version" ];
+}
 
 // build response header...
 $Response = "<project> ".Get_Selected_MySQL_DataBase()." </project> ";

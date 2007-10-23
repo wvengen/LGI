@@ -18,10 +18,11 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Resources.inc' );
 
-global $ErrorMsgs;
 global $Config;
+global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
 $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
@@ -34,16 +35,28 @@ if( Resource_Verify_Session( $ResourceData ) )
 if( !isset( $_POST[ "application" ] ) || ( $_POST[ "application" ] == "" ) )
  return( LGI_Error_Response( 18, $ErrorMsgs[ 18 ], "" ) );
 else
+{
+ if( strlen( $_POST[ "application" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ], "" ) );
  $Application = $_POST[ "application" ];
+}
 
 // check if non-compulsory posts were set...
 if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && is_numeric( $_POST[ "start" ] ) )
+{
+ if( strlen( $_POST[ "start" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+  return( LGI_Error_Response( 48, $ErrorMsgs[ 48 ], "" ) );
  $JobIdStart = $_POST[ "start" ];
+}
 else 
  $JobIdStart = 0;
 
 if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" ) && is_numeric( $_POST[ "limit" ] ) )
+{
+ if( strlen( $_POST[ "limit" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+  return( LGI_Error_Response( 49, $ErrorMsgs[ 49 ], "" ) );
  $JobIdLimit = $_POST[ "limit" ];
+}
 else
  $JobIdLimit = mysql_escape_string( $Config[ "DEFAULT_WORK_REQUEST_LIMIT" ] );
 

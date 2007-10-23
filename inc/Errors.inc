@@ -65,5 +65,24 @@ $ErrorMsgs[ 41 ] = "Update fields not correctly posted";
 $ErrorMsgs[ 42 ] = "Trying to kill a non-existing session of a resource"; 
 $ErrorMsgs[ 43 ] = "Compulsory resource_name field was not posted"; 
 $ErrorMsgs[ 44 ] = "Could not setup a new session with resource"; 
+$ErrorMsgs[ 45 ] = "State field posted too big"; 
+$ErrorMsgs[ 46 ] = "Application field posted too big"; 
+$ErrorMsgs[ 47 ] = "Job_id field posted too big"; 
+$ErrorMsgs[ 48 ] = "Start field posted too big"; 
+$ErrorMsgs[ 49 ] = "Limit field posted too big"; 
+$ErrorMsgs[ 50 ] = "Target_resources field posted too big"; 
+$ErrorMsgs[ 51 ] = "Read_access field posted too big"; 
+$ErrorMsgs[ 52 ] = "Owners field posted too big"; 
+$ErrorMsgs[ 53 ] = "Job_specifics field posted too big"; 
+$ErrorMsgs[ 54 ] = "Input field posted too big"; 
+$ErrorMsgs[ 55 ] = "Output field posted too big"; 
+$ErrorMsgs[ 56 ] = "Groups field posted too big"; 
+$ErrorMsgs[ 57 ] = "User field posted too big"; 
+$ErrorMsgs[ 58 ] = "Project field posted too big"; 
+$ErrorMsgs[ 59 ] = "Version field posted too big"; 
+$ErrorMsgs[ 60 ] = "Servers field posted too big"; 
+$ErrorMsgs[ 61 ] = "Update field posted too big"; 
+$ErrorMsgs[ 62 ] = "Session_id field posted too big"; 
+$ErrorMsgs[ 63 ] = "Resource_name field posted too big"; 
 
 ?>

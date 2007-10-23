@@ -18,9 +18,11 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Resources.inc' );
 require_once( '../inc/Utils.inc' );
 
+global $Config;
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
@@ -34,7 +36,11 @@ if( Resource_Verify_Session( $ResourceData ) )
 if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || !is_numeric( $_POST[ "job_id" ] ) )
  return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ], "" ) );
 else
+{
+ if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ], "" ) );
  $JobId = $_POST[ "job_id" ];
+}
 
 // check if we had the job locked...
 if( !Resource_Has_Job_Locked( $ResourceData, $JobId ) )
@@ -44,10 +50,17 @@ if( !Resource_Has_Job_Locked( $ResourceData, $JobId ) )
 $UpdateQuery = "UPDATE job_queue SET job_id=".$JobId.", state_time_stamp=UNIX_TIMESTAMP()";
 
 if( isset( $_POST[ "state" ] ) && ( $_POST[ "state" ] != "" ) )
+{
+ if( strlen( $_POST[ "state" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 45, $ErrorMsgs[ 45 ], "" ) );
  $UpdateQuery .= ", state='".mysql_escape_string( $_POST[ "state" ] )."'";
+}
 
 if( isset( $_POST[ "target_resources" ] ) && ( $_POST[ "target_resources" ] != "" ) )
 {
+ if( strlen( $_POST[ "target_resources" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 50, $ErrorMsgs[ 50 ], "" ) );
+
  // only do the allowed target_recources...
  $TargetResourcesArray = CommaSeparatedField2Array( $_POST[ "target_resources" ], "," );
 
@@ -68,13 +81,27 @@ if( isset( $_POST[ "target_resources" ] ) && ( $_POST[ "target_resources" ] != "
 }
 
 if( isset( $_POST[ "input" ] ) && ( $_POST[ "input" ] != "" ) )
- $UpdateQuery .= ", input='".mysql_escape_string( hexbin( $_POST[ "input" ] ) )."'";
+{
+ $Input = hexbin( $_POST[ "input" ] );
+ if( strlen( $Input ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
+  return( LGI_Error_Response( 54, $ErrorMsgs[ 54 ], "" ) );
+ $UpdateQuery .= ", input='".mysql_escape_string( $Input )."'";
+}
 
 if( isset( $_POST[ "output" ] ) && ( $_POST[ "output" ] != "" ) )
- $UpdateQuery .= ", output='".mysql_escape_string( hexbin( $_POST[ "output" ] ) )."'";
+{
+ $Output = hexbin( $_POST[ "output" ] );
+ if( strlen( $Output ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
+  return( LGI_Error_Response( 55, $ErrorMsgs[ 55 ], "" ) );
+ $UpdateQuery .= ", output='".mysql_escape_string( $Output )."'";
+}
 
 if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
+{
+ if( strlen( $_POST[ "job_specifics" ] ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
+  return( LGI_Error_Response( 53, $ErrorMsgs[ 53 ], "" ) );
  $UpdateQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ] )."'";
+}
 
 $UpdateQuery .= " WHERE job_id=".$JobId;
 

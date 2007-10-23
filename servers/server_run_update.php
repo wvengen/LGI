@@ -18,9 +18,11 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Servers.inc' );
 require_once( '../inc/Utils.inc' );
 
+global $Config;
 global $ErrorMsgs;
  
 // check if server is known to the project and certified correctly...
@@ -29,6 +31,13 @@ $ServerData = Server_Verify( $_POST[ "project" ] );
 // check if update is being pushed to this server...
 if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POST[ "update" ] ) )
 {
+ if( strlen( $_POST[ "version" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+  return( LGI_Error_Response( 59, $ErrorMsgs[ 59 ], "" ) );
+ if( strlen( $_POST[ "servers" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 60, $ErrorMsgs[ 60 ], "" ) );
+ if( strlen( $_POST[ "update" ] ) >= 2 * $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
+  return( LGI_Error_Response( 61, $ErrorMsgs[ 61 ], "" ) );
+
  $UpdateVersion = $_POST[ "version" ];
  $TargetServers = $_POST[ "servers" ];
  $UpdateQuery = $_POST[ "update" ];

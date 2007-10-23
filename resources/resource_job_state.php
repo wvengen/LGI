@@ -18,8 +18,10 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Resources.inc' );
 
+global $Config;
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
@@ -29,7 +31,11 @@ $ResourceData = Resource_Verify( $_POST[ "project" ], "" );
 if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || !is_numeric( $_POST[ "job_id" ] ) )
  return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ], "" ) );
 else
+{
+ if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
+  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ], "" ) );
  $JobId = $_POST[ "job_id" ];
+}
 
 // query for the job specs...
 $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobId );

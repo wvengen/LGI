@@ -18,8 +18,10 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Resources.inc' );
 
+global $Config;
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...

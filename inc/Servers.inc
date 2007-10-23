@@ -33,11 +33,17 @@ function Server_Verify( $Project )
  global $Config;
 
  // first see if valid client certificate was used in the connection...
- if( SSL_Verify_Client() ) return( 2 );
+ if( SSL_Verify_Client() )
+  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "" ) );
 
  // if it was not posted, use default value for this server...
  if( !isset( $Project ) || ( $Project == "" ) )
   $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
+ else
+ {
+  if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+   return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ], "" ) );
+ }
 
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );

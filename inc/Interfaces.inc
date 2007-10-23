@@ -33,17 +33,29 @@ function Interface_Verify( $Project, $User, $Groups, $ExitOnError = true )
  global $Config;
 
  // first see if valid client certificate was used in the connection ...
- if( SSL_Verify_Client() ) return( 2 );
+ if( SSL_Verify_Client( $ExitOnError ) ) 
+  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "", $ExitOnError ) );
 
  if( !isset( $Groups ) || ( $Groups == "" ) )
   return( LGI_Error_Response( 31, $ErrorMsgs[ 31 ], "", $ExitOnError ) );
 
+ if( strlen( $Groups ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 56, $ErrorMsgs[ 56 ], "", $ExitOnError ) );
+
  if( !isset( $User ) || ( $User == "" ) )
   return( LGI_Error_Response( 32, $ErrorMsgs[ 32 ], "", $ExitOnError ) );
+ 
+ if( strlen( $User ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 57, $ErrorMsgs[ 57 ], "", $ExitOnError ) );
 
  // if it was not posted, use default value for this server...
  if( !isset( $Project ) || ( $Project == "" ) )
   $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
+ else 
+ {
+  if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+   return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ], "", $ExitOnError ) );
+ }
 
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );

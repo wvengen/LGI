@@ -18,8 +18,10 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Resources.inc' );
 
+global $Config;
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
@@ -29,7 +31,11 @@ $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 if( !isset( $_POST[ "resource_name" ] ) || ( $_POST[ "resource_name" ] == "" ) )
  return( LGI_Error_Response( 43, $ErrorMsgs[ 43 ], "" ) );
 else
+{
+ if( strlen( $_POST[ "resource_name" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 63, $ErrorMsgs[ 63 ], "" ) );
  $ResourceName = mysql_escape_string( $_POST[ "resource_name" ] );
+}
 
 // query for the job specs...
 $ResourceQuery = mysql_query( "SELECT * FROM active_resources WHERE resource_name='".$ResourceName."'" );

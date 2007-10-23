@@ -18,10 +18,12 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
+require_once( '../inc/Config.inc' );
 require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Utils.inc' );
 
 global $ErrorMsgs;
+global $Config;
 
 // check if resource is known to the project and certified correctly...
 Interface_Verify( $_POST[ "project" ], $_POST[ "user" ], $_POST[ "groups" ] );
@@ -34,13 +36,20 @@ $JobUser = $_POST[ "user" ];
 if( !isset( $_POST[ "application" ] ) || ( $_POST[ "application" ] == "" ) )
  return( LGI_Error_Response( 18, $ErrorMsgs[ 18 ], "" ) );
 else
+{
+ if( strlen( $_POST[ "application" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ], "" ) );
  $JobApplication = $_POST[ "application" ];
+}
 
 if( !isset( $_POST[ "target_resources" ] ) || ( $_POST[ "target_resources" ] == "" ) )
  return( LGI_Error_Response( 27, $ErrorMsgs[ 27 ], "" ) );
 else
+{
+ if( strlen( $_POST[ "target_resources" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 50, $ErrorMsgs[ 50 ], "" ) );
  $JobTargetResources = NormalizeCommaSeparatedField( $_POST[ "target_resources" ], "," );
-
+}
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $JobTargetResources, "," );
 
@@ -64,7 +73,7 @@ $GroupsArray = CommaSeparatedField2Array( $JobGroups, "," );
 
 if( !isset( $_POST[ "groups" ] ) || ( $_POST[ "groups" ] == "" ) )
 {
- $GroupsArray[ $GroupsArray[ 0 ] + 1 ] = $JobUSer;         // add user personal group at the end of the list...
+ $GroupsArray[ $GroupsArray[ 0 ] + 1 ] = $JobUser;         // add user personal group at the end of the list...
  $GroupsArray[ 0 ]++;
 }
 
@@ -119,8 +128,14 @@ else
 // now determine the owners and read_access fields based on the possibly posted data and the user+groups data...
 if( isset( $_POST[ "read_access" ] ) && ( $_POST[ "read_access" ] != "" ) )
 {
+ if( strlen( $_POST[ "read_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 51, $ErrorMsgs[ 51 ], "" ) );
+
  if( isset( $_POST[ "owners" ] ) && ( $_POST[ "owners" ] != "" ) )
  {
+  if( strlen( $_POST[ "owners" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+   return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ], "" ) );
+
   // if owners and read_access were posted...
   $JobOwners = $JobUser.", ".$_POST[ "owners" ];
   $JobReadAccess = $JobUser.", ".$JobGroups.", ".$_POST[ "read_access" ].", ".$_POST[ "owners" ];
@@ -136,6 +151,9 @@ else
 {
  if( isset( $_POST[ "owners" ] ) && ( $_POST[ "owners" ] != "" ) )
  {
+  if( strlen( $_POST[ "owners" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+   return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ], "" ) );
+
   // if only owners was posted...
   $JobOwners = $JobUser.", ".$_POST[ "owners" ];
   $JobReadAccess = $JobUser.", ".$JobGroups.", ".$_POST[ "owners" ];
@@ -158,13 +176,27 @@ $JobTargetResources = mysql_escape_string( $JobTargetResources );
 $InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$JobApplication."', owners='".$JobOwners."', read_access='".$JobReadAccess."', target_resources='".$JobTargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP()";
 
 if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
+{
+ if( strlen( $_POST[ "job_specifics" ] ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
+  return( LGI_Error_Response( 53, $ErrorMsgs[ 53 ], "" ) );
  $InsertQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ] )."'";
+}
 
 if( isset( $_POST[ "input" ] ) && ( $_POST[ "input" ] != "" ) )
- $InsertQuery .= ", input='".mysql_escape_string( hexbin( $_POST[ "input" ] ) )."'";
+{
+ $Input = hexbin( $_POST[ "input" ] );
+ if( strlen( $Input ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
+  return( LGI_Error_Response( 54, $ErrorMsgs[ 54 ], "" ) );
+ $InsertQuery .= ", input='".mysql_escape_string( $Input )."'";
+}
 
 if( isset( $_POST[ "output" ] ) && ( $_POST[ "output" ] != "" ) )
- $InsertQuery .= ", output='".mysql_escape_string( hexbin( $_POST[ "output" ] ) )."'";
+{
+ $Output = hexbin( $_POST[ "output" ] );
+ if( strlen( $Output ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
+  return( LGI_Error_Response( 55, $ErrorMsgs[ 55 ], "" ) );
+ $InsertQuery .= ", output='".mysql_escape_string( $Output )."'";
+}
 
 // insert the job into the database...
 $queryresult = mysql_query( $InsertQuery );

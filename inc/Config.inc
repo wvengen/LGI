@@ -33,6 +33,10 @@ $Config[ "MYSQL_USER" ]                  = "LGI";
 $Config[ "MYSQL_PASSWD" ]                = "LGIpasswd";
 $Config[ "MYSQL_DEFAULT_DATABASE" ]      = "LGI";                  // what DB to use by default
 
+$Config[ "MAX_POST_SIZE_FOR_BLOB" ]      = 65355;                  // max post size for blob and text fields...
+$Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ]  = 255;                    // max post size for tinytext fields...
+$Config[ "MAX_POST_SIZE_FOR_INTEGER" ]   = 10;                     // max post size for integer fields...
+
 $Config[ "LGI_TIMEOUT_VALUE" ]           = 10;                     // default timeout in seconds for back-off
 $Config[ "LGI_SPIN_LOCK_ATTEMPTS" ]      = 30;                     // number of attempt to get a spin-lock before failing for interfaces
 $Config[ "LGI_INACTIVITY_VALUE" ]        = 1800;                   // default timeout in seconds before resource session is considered inactive
