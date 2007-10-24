@@ -11,5 +11,7 @@ echo -n " submitted from " >> LGI_output
 /bin/cat LGI_input >> LGI_output
 /bin/sleep 160
 
+/home/mark/temp/LGI/daemon/src/LGI_qsub -a hello_world -i LGI_target_resources >> LGI_output
+
 /bin/touch finished
 /bin/rm running

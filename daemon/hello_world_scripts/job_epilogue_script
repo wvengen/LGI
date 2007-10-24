@@ -1,3 +1,2 @@
 #!/bin/sh
-/home/mark/temp/LGI/daemon/src/LGI_qsub -a hello_world -i LGI_target_resources >> LGI_output
 /bin/true
