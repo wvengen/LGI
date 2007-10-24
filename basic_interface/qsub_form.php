@@ -1,12 +1,12 @@
 <?php
 
 // []--------------------------------------------------------[]
-//  |                       index.php                        |
+//  |                       qsub_form.php                    |
 // []--------------------------------------------------------[]
 //  |                                                        |
 //  | AUTHOR:     M.F.Somers                                 |
 //  | VERSION:    1.00, October 2007.                        |
-//  | USE:        Give basic interface menu...               |
+//  | USE:        Generate a form to submit a job...         |
 //  |                                                        |
 // []--------------------------------------------------------[]
 //
@@ -61,6 +61,12 @@ $Project = mysql_escape_string( $Project );
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
+// specify the from post method...
+echo '<form action="qsub.php" method="POST">';
+echo '<input type="hidden" name="user" value="'.$User.'">';
+echo '<input type="hidden" name="groups" value="'.$Groups.'">';
+
+// start building form to fill in...
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
 Row2( "<b>This project server:</b>", Get_Server_URL() ); 
@@ -68,12 +74,20 @@ Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basi
 Row2( "<b>User:</b>", $User ); 
 Row2( "<b>Groups:</b>", $Groups ); 
 Row2( "<b>Project:</b>", $Project ); 
+Row1( "<center><font color='green' size='4'><b>Specify job details</b></font></center>" );
+Row2( "Application: ", '<input type="text" size="65" name="application" value="hello_world" maxlength="128" >' );
+Row2( "Extra owners: ", '<input type="text" size="65" name="owners" value="" maxlength="128" >' );
+Row2( "Extra read access: ", '<input type="text" size="65" name="read_access" value="" maxlength="128" >' );
+Row2( "Target resources: ", '<input type="text" size="65" name="target_resources" value="any" maxlength="128" >' );
+Row2( "Job specifics: ", '<input type="text" size="65" name="job_specifics" value="" maxlength="1024" >' );
+Row2( "Input: ", '<textarea wrap="off" rows="20" cols="74" name="input"></textarea>' );
+Row1( '<center><input type="submit" value="     Submit Job     "></center>' );
 End_Table();
 
 echo "<br><a href=list.php?project_server=1>Show project server list</a>\n";
 echo "<br><a href=list.php?project_server=0>Show project resource list</a>\n"; 
-echo "<br><a href=qsub_form.php>Submit a job</a>\n";
 echo "<br><a href=qstat.php>Show job list</a>\n"; 
+echo "<br><a href=index.php>Go to main menu</a>\n";
 
 Page_Tail();
 ?>
