@@ -37,7 +37,6 @@ else
  if( isset( $_POST[ "user" ] ) )
   $User = $_POST[ "user" ];
 if( strlen( $User ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 57 ] );
-$User = mysql_escape_string( $User );
 
 // check if groups is set in request... or default to user's group...
 $Groups = $User;
@@ -47,7 +46,6 @@ else
  if( isset( $_POST[ "groups" ] ) )
   $Groups = $_POST[ "groups" ];
 if( strlen( $Groups ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 56 ] );
-$Groups = mysql_escape_string( $Groups );
 
 // check if project is set in request... or default to value set in config...
 $Project = $Config[ "MYSQL_DEFAULT_DATABASE" ];
@@ -57,7 +55,6 @@ else
  if( isset( $_POST[ "project" ] ) )
   $Project = $_POST[ "project" ];
 if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 58 ] );
-$Project = mysql_escape_string( $Project );
 
 // check if application was given...
 $Application = "";
@@ -68,7 +65,6 @@ else
   $Application = $_POST[ "application" ];
 if( $Application == "" ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 18 ] );
 if( strlen( $Application ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 46 ] );
-$Application = mysql_escape_string( $Application );
 
 // check if target_resources was given...
 $TargetResources = "";
@@ -79,7 +75,6 @@ else
   $TargetResources = $_POST[ "target_resources" ];
 if( $TargetResources == "" ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 27 ] );
 if( strlen( $TargetResources ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 50 ] );
-$TargetResources = mysql_escape_string( $TargetResources );
 
 // check if job_specifics was given...
 $JobSpecifics = "";
@@ -89,7 +84,6 @@ else
  if( isset( $_POST[ "job_specifics" ] ) )
   $JobSpecifics = $_POST[ "jobs_specifics" ];
 if( strlen( $JobSpecifics ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 53 ] );
-$JobSpecifics = mysql_escape_string( $JobSpecifics );
 
 // check if owners was given...
 $Owners = "";
@@ -122,9 +116,127 @@ if( strlen( $Input ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "E
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
-// ...
-// ...
-// ...
+// check if any of posted target resources is allowed...
+$Resources = CommaSeparatedField2Array( $TargetResources, "," );
+
+$NewTargetResourceList = "";
+$FoundResourceFlag = 0;
+
+for( $i = 1; $i <= $Resources[ 0 ]; $i++ )
+ if( Interface_Is_Target_Resource_Known( $Resources[ $i ] ) )
+ {
+  $NewTargetResourceList .= ", ".$Resources[ $i ];
+  $FoundResourceFlag = 1;
+ }
+
+if( !$FoundResourceFlag ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 28 ] );
+
+$TargetResources = substr( $NewTargetResourceList, 2 );
+
+// check if any of the posted combinations of user+groups or just the user is allowed to submit a job...
+$GroupsArray = CommaSeparatedField2Array( $Groups, "," );
+$NewGroupsList = "";
+$FoundPossibleGroup = 0;
+
+for( $i = 1; $i <= $GroupsArray[ 0 ]; $i++ )
+{
+ $LimitType = Interface_User_In_Group_Is_Allowed_To_Submit( $User, $GroupsArray[ $i ], $Application, $NumberOfJobsAllowed );
+
+ if( $LimitType )           // is allowed to submit a job?
+ {
+  if( $NumberOfJobsAllowed )           // if there is a limit set for this owner, check it...
+  {
+
+   if( $LimitType == 1 )          // was it a limit defined from the user tables or the group tables...
+    Interface_Count_Owners_Jobs_In_Queue( $User, $Application, $TotalNrOfJobs, $NrOfRunningJobs );
+   else
+    Interface_Count_Owners_Jobs_In_Queue( $GroupsArray[ $i ], $Application, $TotalNrOfJobs, $NrOfRunningJobs );
+
+   if( $NumberOfJobsAllowed > 0 )
+   {
+    if( $TotalNrOfJobs < $NumberOfJobsAllowed )   // check if total nr of jobs for this owner is allowed...
+    {
+     $NewGroupsList .= ", ".$GroupsArray[ $i ];
+     $FoundPossibleGroup = 1;
+    }
+   }
+   else
+   {
+    if( $NrOfRunningJobs + $NumberOfJobsAllowed < 0 ) // check if nr of running jobs for this owner is allowed...
+    {
+     $NewGroupsList .= ", ".$GroupsArray[ $i ];
+     $FoundPossibleGroup = 1;
+    }
+   }
+
+  }
+  else
+  {
+   $NewGroupsList .= ", ".$GroupsArray[ $i ];
+   $FoundPossibleGroup = 1;
+  }
+ }
+}
+
+if( $FoundPossibleGroup )
+ $Groups = substr( $NewGroupsList, 2 );
+else
+ Exit_With_Text( "ERROR: ".$ErrorMsgs[ 33 ] );
+
+// now determine the owners and read_access fields based on the possibly posted data and the user+groups data...
+if( $ReadAccess != "" )
+{
+ if( $Owners != "" )
+ {
+  // if owners and read_access were posted...
+  $Owners = $User.", ".$Owners;
+  $ReadAccess = $User.", ".$Groups.", ".$ReadAccess.", ".$Owners;
+ }
+ else
+ {
+  // if only read_access was posted...
+  $Owners = $User;
+  $ReadAccess = $User.", ".$Groups.", ".$ReadAccess;
+ }
+}
+else
+{
+ if( $Owners != "" )
+ {
+  // if only owners was posted...
+  $Owners = $User.", ".$Owners;
+  $ReadAccess = $User.", ".$Groups.", ".$Owners;
+ }
+ else
+ {
+  // if neither owners nor read_access were posted...
+  $Owners = $User;
+  $ReadAccess = $User.", ".$Groups;
+ }
+}
+
+// make sure that future REGEXP's do work...
+$Owners = mysql_escape_string( NormalizeCommaSeparatedField( $Owners, "," ) );
+$ReadAccess = mysql_escape_string( NormalizeCommaSeparatedField( $ReadAccess, "," ) );
+$Application = mysql_escape_string( $Application );
+$TargetResources = mysql_escape_string( $TargetResources );
+
+// start building the insert query based on all possible posted fields...
+$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$Application."', owners='".$Owners."', read_access='".$ReadAccess."', target_resources='".$TargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP()";
+
+if( $JobSpecifics != "" )
+ $InsertQuery .= ", job_specifics='".mysql_escape_string( $JobSpecifics )."'";
+
+if( $Input != "" )
+ $InsertQuery .= ", input='".mysql_escape_string( $Input )."'";
+
+// insert the job into the database...
+$queryresult = mysql_query( $InsertQuery );
+
+// retrieve job just inserted...
+$JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=LAST_INSERT_ID()" );
+$JobSpecs = mysql_fetch_object( $JobQuery );
+mysql_free_result( $JobQuery );
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
