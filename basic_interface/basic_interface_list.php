@@ -1,7 +1,7 @@
 <?php
 
 // []--------------------------------------------------------[]
-//  |                       list.php                         |
+//  |                 basic_interface_list.php               |
 // []--------------------------------------------------------[]
 //  |                                                        |
 //  | AUTHOR:     M.F.Somers                                 |
@@ -96,7 +96,7 @@ if( $ProjectServer != 0 )
 
  End_Table();
 
- echo "<br><a href=list.php?project_server=0>Show project resource list</a>\n";
+ echo "<br><a href=basic_interface_list.php?project_server=0>Show project resource list</a>\n";
 }
 else
 {
@@ -115,11 +115,11 @@ else
  mysql_free_result( $ResourceListQuery );
  End_Table();
 
- echo "<br><a href=list.php?project_server=1>Show project server list</a>\n";
+ echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n";
 }
 
-echo "<br><a href=qstat.php>Show job list</a>\n"; 
-echo "<br><a href=qsub_form.php>Submit a job</a>\n";
+echo "<br><a href=basic_interface_job_state.php>Show job list</a>\n"; 
+echo "<br><a href=basic_interface_submit_job_form.php>Submit a job</a>\n";
 echo "<br><a href=index.php>Go to main menu</a>\n"; 
 
 Page_Tail();

@@ -1,7 +1,7 @@
 <?php
 
 // []--------------------------------------------------------[]
-//  |                       qdel.php                         |
+//  |             basic_interface_delete_job.php             |
 // []--------------------------------------------------------[]
 //  |                                                        |
 //  | AUTHOR:     M.F.Somers                                 |
@@ -121,10 +121,10 @@ Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
 Row2( "<b>Job specifics:</b>", $JobSpecs -> job_specifics );
 End_Table();
 
-echo "<br><a href=list.php?project_server=1>Show project server list</a>\n";
-echo "<br><a href=list.php?project_server=0>Show project resource list</a>\n"; 
-echo "<br><a href=qsub_form.php>Submit a job</a>\n";
-echo "<br><a href=qstat.php>Show job list</a>\n"; 
+echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n";
+echo "<br><a href=basic_interface_list.php?project_server=0>Show project resource list</a>\n"; 
+echo "<br><a href=basic_interface_submit_job_form.php>Submit a job</a>\n";
+echo "<br><a href=basic_interface_job_state.php>Show job list</a>\n"; 
 echo "<br><a href=index.php>Go to main menu</a>\n"; 
 
 Page_Tail();

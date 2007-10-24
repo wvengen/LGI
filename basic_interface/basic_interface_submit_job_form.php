@@ -1,7 +1,7 @@
 <?php
 
 // []--------------------------------------------------------[]
-//  |                       qsub_form.php                    |
+//  |           basic_interface_submit_job_form.php          |
 // []--------------------------------------------------------[]
 //  |                                                        |
 //  | AUTHOR:     M.F.Somers                                 |
@@ -62,7 +62,7 @@ $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // specify the from post method...
-echo '<form action="qsub.php" method="POST">';
+echo '<form action="basic_interface_submit_job_action.php" method="POST">';
 echo '<input type="hidden" name="user" value="'.$User.'">';
 echo '<input type="hidden" name="groups" value="'.$Groups.'">';
 
@@ -75,18 +75,18 @@ Row2( "<b>User:</b>", $User );
 Row2( "<b>Groups:</b>", $Groups ); 
 Row2( "<b>Project:</b>", $Project ); 
 Row1( "<center><font color='green' size='4'><b>Specify job details</b></font></center>" );
-Row2( "Application: ", '<input type="text" size="65" name="application" value="hello_world" maxlength="128" >' );
-Row2( "Extra owners: ", '<input type="text" size="65" name="owners" value="" maxlength="128" >' );
-Row2( "Extra read access: ", '<input type="text" size="65" name="read_access" value="" maxlength="128" >' );
-Row2( "Target resources: ", '<input type="text" size="65" name="target_resources" value="any" maxlength="128" >' );
-Row2( "Job specifics: ", '<input type="text" size="65" name="job_specifics" value="" maxlength="1024" >' );
-Row2( "Input: ", '<textarea wrap="off" rows="20" cols="74" name="input"></textarea>' );
+Row2( "<b>Application:</b>", '<input type="text" size="65" name="application" value="hello_world" maxlength="128" >' );
+Row2( "<b>Extra owners:</b>", '<input type="text" size="65" name="owners" value="" maxlength="128" >' );
+Row2( "<b>Extra read access:</b>", '<input type="text" size="65" name="read_access" value="" maxlength="128" >' );
+Row2( "<b>Target resources:</b>", '<input type="text" size="65" name="target_resources" value="any" maxlength="128" >' );
+Row2( "<b>Job specifics:</b>", '<input type="text" size="65" name="job_specifics" value="" maxlength="1024" >' );
+Row2( "<b>Input:</b>", '<textarea wrap="off" rows="20" cols="74" name="input"></textarea>' );
 Row1( '<center><input type="submit" value="     Submit Job     "></center>' );
 End_Table();
 
-echo "<br><a href=list.php?project_server=1>Show project server list</a>\n";
-echo "<br><a href=list.php?project_server=0>Show project resource list</a>\n"; 
-echo "<br><a href=qstat.php>Show job list</a>\n"; 
+echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n";
+echo "<br><a href=basic_interface_list.php?project_server=0>Show project resource list</a>\n"; 
+echo "<br><a href=basic_interface_job_state.php>Show job list</a>\n"; 
 echo "<br><a href=index.php>Go to main menu</a>\n";
 
 Page_Tail();
