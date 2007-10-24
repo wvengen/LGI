@@ -11,6 +11,11 @@ then
  if [ "${SPID}" == "" ]
  then
     echo "LGI daemon not running anymore, restarting..."
+    if [ -f ${LGI_ROOT}/LGI.log ]
+    then
+       DATE=`date +%s`
+       mv ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.log_${DATE}
+    fi
     ${LGI_ROOT}/src/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
     ps -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
  else

@@ -30,11 +30,11 @@ $ServerData = Server_Verify( $_POST[ "project" ] );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "version" ] ) || ( $_POST[ "version" ] == "" ) || !is_numeric( $_POST[ "version" ] ) )
- return( LGI_Error_Response( 40, $ErrorMsgs[ 40 ], "" ) );
+ return( LGI_Error_Response( 40, $ErrorMsgs[ 40 ] ) );
 else
 {
  if( strlen( $_POST[ "version" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 59, $ErrorMsgs[ 59 ], "" ) );
+  return( LGI_Error_Response( 59, $ErrorMsgs[ 59 ] ) );
  $ServerVersionNumber = $_POST[ "version" ];
 }
 
@@ -78,6 +78,6 @@ else
 mysql_free_result( $mysqlresult );
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

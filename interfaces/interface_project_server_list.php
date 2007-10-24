@@ -52,6 +52,6 @@ for( $i = 1; $i <= $NumberOfServers; $i++ )
 mysql_free_result( $queryresult );
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

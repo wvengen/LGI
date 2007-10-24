@@ -32,7 +32,7 @@ function SSL_Verify_Client( $ExitOnError = true )
  // See if a valid CA-signed client certificate was used to connect
 
  if( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_VERIFY" ] != "SUCCESS" )
-  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "", $ExitOnError ) );
+  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], $ExitOnError ) );
 
  return( 0 );
 }

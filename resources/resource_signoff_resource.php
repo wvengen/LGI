@@ -29,7 +29,7 @@ $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 
 // check if this call is valid...
 if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
+ return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ] ) );
 
 // remove any stale locks this resource might have of this session...
 Resource_Remove_Stale_Locks( $ResourceData );
@@ -60,5 +60,5 @@ $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 Resource_Kill_Session( $ResourceData );
 
 // and return the response...
-LGI_Response( $Response, "" );
+return( LGI_Response( $Response ) );
 ?>

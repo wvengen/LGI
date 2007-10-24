@@ -27,14 +27,14 @@ require_once( '../inc/Utils.inc' );
 
 // -------------------------------------------------------------------- 
 
-function Server_Verify( $Project )
+function Server_Verify( &$Project )
 {
  global $ErrorMsgs;
  global $Config;
 
  // first see if valid client certificate was used in the connection...
  if( SSL_Verify_Client() )
-  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "" ) );
+  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ] ) );
 
  // if it was not posted, use default value for this server...
  if( !isset( $Project ) || ( $Project == "" ) )
@@ -42,7 +42,7 @@ function Server_Verify( $Project )
  else
  {
   if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-   return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ], "" ) );
+   return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ] ) );
  }
 
  // get common name from certificate ...
@@ -56,7 +56,7 @@ function Server_Verify( $Project )
   if( FoundInCommaSeparatedField( $CommonNameArray[ 2 ], $Project, "," ) ) 
    Select_MySQL_DataBase( $Project ); 
    else
-    return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ], "" ) );
+    return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ] ) );
  }
  else
  {
@@ -73,7 +73,7 @@ function Server_Verify( $Project )
  if( mysql_num_rows( $queryresult ) <= 0 )
  {
   mysql_free_result( $queryresult );
-  return( LGI_Error_Response( 5, $ErrorMsgs[ 5 ], "" ) );
+  return( LGI_Error_Response( 5, $ErrorMsgs[ 5 ] ) );
  }
 
  // otherwise get the recorded data...
@@ -82,11 +82,11 @@ function Server_Verify( $Project )
 
  // and check if the certificate's match... 
  if( $Data->client_certificate != SSL_Get_Full_Client_Certificate() )
-  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "" ) );
+  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ] ) );
 
  // and also check if the resource is listed as a server for this project...
  if( !$Data->project_server )
-  return( LGI_Error_Response( 39, $ErrorMsgs[ 39 ], "" ) );
+  return( LGI_Error_Response( 39, $ErrorMsgs[ 39 ] ) );
 
  // update time_stamp of resource...
  $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
@@ -121,7 +121,7 @@ function Get_Master_Server_URL( )
  $queryresult = mysql_query( "SELECT url FROM active_resources WHERE project_server=1" );
 
  if( mysql_num_rows( $queryresult ) != 1 )
-  return( LGI_Error_Response( 6, $ErrorMsgs[ 6 ], "" ) );
+  return( LGI_Error_Response( 6, $ErrorMsgs[ 6 ] ) );
 
  $MasterServer = mysql_fetch_object( $queryresult );
 

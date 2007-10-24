@@ -30,7 +30,7 @@ $MySQLCurrentProjectDatabase = "";
 
 // -------------------------------------------------------------------- 
 
-function Setup_MySQL_Connection( )
+function Setup_MySQL_Connection( $ExitOnError = true )
 {
  global $MySQLSetup_Flag;
  global $MySQLCurrentProjectDatabase;
@@ -46,14 +46,14 @@ function Setup_MySQL_Connection( )
 
  // Connect ...
  if( !mysql_pconnect( $Host, $User, $Passwd ) )
-  return( LGI_Error_Response( 3, $ErrorMsgs[ 3 ], "" ) );
+  return( LGI_Error_Response( 3, $ErrorMsgs[ 3 ], $ExitOnError ) );
 
  $DataBase = mysql_escape_string( $Config[ "MYSQL_DEFAULT_DATABASE" ] );
 
  // Select default database ...
  if( isset( $DataBase ) )
   if( !mysql_select_db( $DataBase ) )
-   return( LGI_Error_Response( 4, $ErrorMsgs[ 4 ], "" ) );
+   return( LGI_Error_Response( 4, $ErrorMsgs[ 4 ], $ExitOnError ) );
   else
    $MySQLCurrentProjectDatabase = $DataBase;
 
@@ -65,21 +65,23 @@ function Setup_MySQL_Connection( )
 
 // -------------------------------------------------------------------- 
 
-function Select_MySQL_DataBase( $DataBase )
+function Select_MySQL_DataBase( $DataBase, $ExitOnError = true )
 {
  global $ErrorMsgs;
  global $MySQLCurrentProjectDatabase;
 
  // Setup connection ...
- Setup_MySQL_Connection();
+ Setup_MySQL_Connection( $ExitOnError );
 
  $DataBase = mysql_escape_string( $DataBase );
 
  // and try to use requested database ...
  if( !mysql_select_db( $DataBase ) )
-  return( LGI_Error_Response( 4, $ErrorMsgs[ 4 ], "" ) );
+  return( LGI_Error_Response( 4, $ErrorMsgs[ 4 ], $ExitOnError ) );
  else
   $MySQLCurrentProjectDatabase = $DataBase;
+
+ return( 0 );
 }
 
 // -------------------------------------------------------------------- 

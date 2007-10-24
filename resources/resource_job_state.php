@@ -25,15 +25,15 @@ global $Config;
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ], "" );
+$ResourceData = Resource_Verify( $_POST[ "project" ] );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || !is_numeric( $_POST[ "job_id" ] ) )
- return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ], "" ) );
+ return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ] ) );
 else
 {
  if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ], "" ) );
+  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ] ) );
  $JobId = $_POST[ "job_id" ];
 }
 
@@ -43,7 +43,7 @@ $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobId );
 if( mysql_num_rows( $JobQuery ) != 1 )
 {
  mysql_free_result( $JobQuery );
- return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "" ) );
+ return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ] ) );
 }
 
 $JobSpecs = mysql_fetch_object( $JobQuery );
@@ -51,7 +51,7 @@ mysql_free_result( $JobQuery );
 
 // check if this resource is allowed to get the state of this job...
 if( !FoundInCommaSeparatedField( $JobSpecs->target_resources, $ResourceData->resource_name, "," ) )
- return( LGI_Error_Response( 24, $ErrorMsgs[ 24 ], "" ) );
+ return( LGI_Error_Response( 24, $ErrorMsgs[ 24 ] ) );
 
 // build response for this job...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
@@ -67,6 +67,6 @@ $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_s
 $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>"; 
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

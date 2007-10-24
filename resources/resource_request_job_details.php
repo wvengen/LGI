@@ -30,21 +30,21 @@ $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 
 // check if this call is valid...
 if( Resource_Verify_Session( $ResourceData ) )
- return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
+ return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ] ) );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || ! is_numeric( $_POST[ "job_id" ] ) )
- return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ], "" ) );
+ return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ] ) );
 else
 {
  if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ], "" ) );
+  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ] ) );
  $JobId = $_POST[ "job_id" ];
 }
 
 // check if this resource has this job locked...
 if( !Resource_Has_Job_Locked( $ResourceData, $JobId ) )
- return( LGI_Error_Response( 20, $ErrorMsgs[ 20 ], "" ) ); 
+ return( LGI_Error_Response( 20, $ErrorMsgs[ 20 ] ) ); 
 
 // query for the job specs...
 $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobId );
@@ -68,6 +68,6 @@ $Response .= " <input> ".binhex( $JobSpecs->input )." </input>";
 $Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job>"; 
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

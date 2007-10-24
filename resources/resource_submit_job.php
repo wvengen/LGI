@@ -30,48 +30,48 @@ $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 
 // check if this call is valid...
 if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
+ return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ] ) );
 
 // check if compulsory post variables were set...
 if( !isset( $_POST[ "state" ] ) || ( $_POST[ "state" ] == "" ) )
- return( LGI_Error_Response( 25, $ErrorMsgs[ 25 ], "" ) );
+ return( LGI_Error_Response( 25, $ErrorMsgs[ 25 ] ) );
 else
 {
  if( strlen( $_POST[ "state" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-  return( LGI_Error_Response( 45, $ErrorMsgs[ 45 ], "" ) );
+  return( LGI_Error_Response( 45, $ErrorMsgs[ 45 ] ) );
  $JobState = $_POST[ "state" ];
 }
 
 if( !isset( $_POST[ "application" ] ) || ( $_POST[ "application" ] == "" ) )
- return( LGI_Error_Response( 18, $ErrorMsgs[ 18 ], "" ) );
+ return( LGI_Error_Response( 18, $ErrorMsgs[ 18 ] ) );
 else
 {
  if( strlen( $_POST[ "application" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-  return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ], "" ) );
+  return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ] ) );
  $JobApplication = $_POST[ "application" ];
 }
 
 if( !isset( $_POST[ "owners" ] ) || ( $_POST[ "owners" ] == "" ) )
- return( LGI_Error_Response( 26, $ErrorMsgs[ 26 ], "" ) );
+ return( LGI_Error_Response( 26, $ErrorMsgs[ 26 ] ) );
 else
 {
  if( strlen( $_POST[ "owners" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-  return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ], "" ) );
+  return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ] ) );
  $JobOwners = NormalizeCommaSeparatedField( $_POST[ "owners" ], "," );
 }
 
 if( !isset( $_POST[ "target_resources" ] ) || ( $_POST[ "target_resources" ] == "" ) )
- return( LGI_Error_Response( 27, $ErrorMsgs[ 27 ], "" ) );
+ return( LGI_Error_Response( 27, $ErrorMsgs[ 27 ] ) );
 else
 {
  if( strlen( $_POST[ "target_resources" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-  return( LGI_Error_Response( 50, $ErrorMsgs[ 50 ], "" ) );
+  return( LGI_Error_Response( 50, $ErrorMsgs[ 50 ] ) );
  $JobTargetResources = NormalizeCommaSeparatedField( $_POST[ "target_resources" ], "," );
 }
 
 // check if this resource has any jobs locked...
 if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )
- return( LGI_Error_Response( 17, $ErrorMsgs[ 17 ], "" ) );
+ return( LGI_Error_Response( 17, $ErrorMsgs[ 17 ] ) );
 
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $JobTargetResources, "," );
@@ -87,7 +87,7 @@ for( $i = 1; $i <= $Resources[ 0 ]; $i++ )
  }
 
 if( !$FoundResourceFlag )
- return( LGI_Error_Response( 28, $ErrorMsgs[ 28 ], "" ) );
+ return( LGI_Error_Response( 28, $ErrorMsgs[ 28 ] ) );
 
 $JobTargetResources = substr( $NewTargetResourceList, 2 );
 
@@ -130,7 +130,7 @@ for( $i = 1; $i <= $OwnersArray[ 0 ]; $i++ )
  }
 
 if( !$FoundPossibleOwner )
- return( LGI_Error_Response( 29, $ErrorMsgs[ 29 ], "" ) );
+ return( LGI_Error_Response( 29, $ErrorMsgs[ 29 ] ) );
 
 $JobOwners = mysql_escape_string( substr( $NewOwnersList, 2 ) );
 $JobState = mysql_escape_string( $JobState );
@@ -143,7 +143,7 @@ $InsertQuery = "INSERT INTO job_queue SET state='".$JobState."', application='".
 if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
 {
  if( strlen( $_POST[ "job_specifics" ] ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
-  return( LGI_Error_Response( 53, $ErrorMsgs[ 53 ], "" ) );
+  return( LGI_Error_Response( 53, $ErrorMsgs[ 53 ] ) );
  $InsertQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ] )."'";
 }
 
@@ -151,7 +151,7 @@ if( isset( $_POST[ "input" ] ) && ( $_POST[ "input" ] != "" ) )
 {
  $Input = hexbin( $_POST[ "input" ] );
  if( strlen( $Input ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
-  return( LGI_Error_Response( 54, $ErrorMsgs[ 54 ], "" ) );
+  return( LGI_Error_Response( 54, $ErrorMsgs[ 54 ] ) );
  $InsertQuery .= ", input='".mysql_escape_string( $Input )."'";
 }
 
@@ -159,14 +159,14 @@ if( isset( $_POST[ "output" ] ) && ( $_POST[ "output" ] != "" ) )
 {
  $Output = hexbin( $_POST[ "output" ] );
  if( strlen( $Output ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
-  return( LGI_Error_Response( 55, $ErrorMsgs[ 55 ], "" ) );
+  return( LGI_Error_Response( 55, $ErrorMsgs[ 55 ] ) );
  $InsertQuery .= ", output='".mysql_escape_string( $Output )."'";
 }
 
 if( isset( $_POST[ "read_access" ] ) && ( $_POST[ "read_access" ] != "" ) )
 {
  if( strlen( $_POST[ "read_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-  return( LGI_Error_Response( 51, $ErrorMsgs[ 51 ], "" ) );
+  return( LGI_Error_Response( 51, $ErrorMsgs[ 51 ] ) );
  $InsertQuery .= ", read_access='".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "read_access" ], "," ) )."'";
 }
 else
@@ -200,6 +200,6 @@ $Response .= " <input> ".binhex( $JobSpecs->input )." </input>";
 $Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job>";
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

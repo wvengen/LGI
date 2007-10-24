@@ -29,21 +29,21 @@ $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 
 // check if this call is valid...
 if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
+ return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ] ) );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || !is_numeric( $_POST[ "job_id" ] ) )
- return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ], "" ) );
+ return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ] ) );
 else
 {
  if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ], "" ) );
+  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ] ) );
  $JobId = $_POST[ "job_id" ];
 }
 
 // now try to lock the job... return an error response if we failed somehow...
 if( Resource_Lock_Job( $ResourceData, $JobId ) )
- return( LGI_Error_Response( 22, $ErrorMsgs[ 22 ], "" ) ); 
+ return( LGI_Error_Response( 22, $ErrorMsgs[ 22 ] ) ); 
 
 // query for the lock specs...
 $LockQuery = mysql_query( "SELECT lock_id,job_id,lock_time,session_id,resource_id FROM running_locks WHERE job_id=".$JobId );
@@ -61,6 +61,6 @@ $Response .= " <lock_time> ".$LockSpecs->lock_time." </lock_time> <session_id> "
 $Response .= " <resource_id> ".$LockSpecs->session_id." </resource_id> </lock>";
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

@@ -36,7 +36,7 @@ $JobUser = $_POST[ "user" ];
 if( isset( $_POST[ "job_id" ] ) && ( $_POST[ "job_id" ] != "" ) && is_numeric( $_POST[ "job_id" ] ) )
 {
  if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ], "" ) );
+  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ] ) );
  $JobId = $_POST[ "job_id" ];
  $DetailMode = 1;
 }
@@ -55,7 +55,7 @@ if( !$DetailMode )
  if( isset( $_POST[ "state" ] ) && ( $_POST[ "state" ] != "" ) )
  {
   if( strlen( $_POST[ "state" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-   return( LGI_Error_Response( 45, $ErrorMsgs[ 45 ], "" ) );
+   return( LGI_Error_Response( 45, $ErrorMsgs[ 45 ] ) );
   $JobState = $_POST[ "state" ];
  }
  else
@@ -67,7 +67,7 @@ if( !$DetailMode )
  if( isset( $_POST[ "application" ] ) && ( $_POST[ "application" ] != "" ) )
  {
   if( strlen( $_POST[ "application" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-   return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ], "" ) );
+   return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ] ) );
   $JobApplication = $_POST[ "application" ];
  }
  else
@@ -79,7 +79,7 @@ if( !$DetailMode )
  if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && is_numeric( $_POST[ "start" ] ) ) 
  {
   if( strlen( $_POST[ "start" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-   return( LGI_Error_Response( 48, $ErrorMsgs[ 48 ], "" ) );
+   return( LGI_Error_Response( 48, $ErrorMsgs[ 48 ] ) );
   $JobStart = $_POST[ "start" ];
  }
  else
@@ -89,7 +89,7 @@ if( !$DetailMode )
  if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" )  && is_numeric( $_POST[ "limit" ] ) )
  {
   if( strlen( $_POST[ "limit" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-   return( LGI_Error_Response( 49, $ErrorMsgs[ 49 ], "" ) );
+   return( LGI_Error_Response( 49, $ErrorMsgs[ 49 ] ) );
   $JobLimit = $_POST[ "limit" ];
  }
  else
@@ -145,7 +145,7 @@ else
 
  // now check if user+groups is allowed to get the data anyway...
  if( !Interface_Is_User_Allowed_To_Read_Job( $JobSpecs, $JobUser, $JobGroups ) )
-  return( LGI_Error_Response( 34, $ErrorMsgs[ 34 ], "" ) );
+  return( LGI_Error_Response( 34, $ErrorMsgs[ 34 ] ) );
 
  // finally send out the data in the response... 
  $Response .= " <number_of_jobs> 1 </number_of_jobs> <job number='1'>";
@@ -162,6 +162,6 @@ else
 }
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

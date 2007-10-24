@@ -36,18 +36,18 @@ $JobUser = $_POST[ "user" ];
 if( isset( $_POST[ "job_id" ] ) && ( $_POST[ "job_id" ] != "" ) && is_numeric( $_POST[ "job_id" ] ) )
 {
  if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ], "" ) );
+  return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ] ) );
  $JobId = $_POST[ "job_id" ];
 }
 else
- return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ], "" ) );
+ return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ] ) );
 
 // do query for specific job number... make sure job is not locked...
 $JobSpecs = Interface_Wait_For_Cleared_Spin_Lock_On_Job( $JobId );
 
 // now check if user+groups is allowed to modify the data anyway...
 if( !Interface_Is_User_Allowed_To_Modify_Job( $JobSpecs, $JobUser, $JobGroups ) )
- return( LGI_Error_Response( 35, $ErrorMsgs[ 35 ], "" ) );
+ return( LGI_Error_Response( 35, $ErrorMsgs[ 35 ] ) );
 
 // if the job can be actually removed...
 if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( $JobSpecs->state == 'aborted' ) )
@@ -79,6 +79,6 @@ $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
 $Response .= " <state> ".$JobState." </state> <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp> </job>";
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

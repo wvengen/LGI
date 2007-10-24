@@ -23,25 +23,26 @@ require_once( '../inc/Errors.inc' );
 
 // -------------------------------------------------------------------- 
 
-function LGI_Response( $DataTags, $ExtraInfoTags, $Exit = true )
+function LGI_Response( $DataTags, $Exit = true, $ExtraInfoTags = "" )
 {
  global $Config;
 
  $ExtraInfoTags = "<CA_certificate> ".$Config["SERVER_SSL_CA_CERTIFICATE_URL"]." </CA_certificate> ".$ExtraInfoTags;
+ $Response = "<LGI> ".$ExtraInfoTags." <response> ".$DataTags." </response> </LGI>";
 
  if( $Exit )
-  exit( "<LGI> ".$ExtraInfoTags." <response> ".$DataTags." </response> </LGI>" ); 
+  exit( $Response ); 
  else
-  return( 0 );
+  return( $Response );
 }
 
 // -------------------------------------------------------------------- 
 
-function LGI_Error_Response( $ErrorNo, $ErrorMessage, $ExtraInfoTags, $Exit = true )
+function LGI_Error_Response( $ErrorNo, $ErrorMessage, $Exit = true, $ExtraInfoTags = "" )
 {
- $ErrorTags = "<number> ".$ErrorNo." </number> <message> ".$ErrorMessage." </message> ";
+ $ErrorTags = "<error> <number> ".$ErrorNo." </number> <message> ".$ErrorMessage." </message> </error>";
 
- LGI_Response( "<error> ".$ErrorTags." </error>", $ExtraInfoTags, $Exit ); 
+ LGI_Response( $ErrorTags, $Exit, $ExtraInfoTags ); 
 
  return( $ErrorNo );
 }
@@ -53,10 +54,9 @@ function LGI_BackOff_Response( $Exit = true )
  global $Config;
  global $ErrorMsgs;
 
- $ErrorMessage =  "<error> <number> 1 </number> <message> ".$ErrorMsgs[ 1 ]." </message>";
- $ErrorMessage .= " <timeout> ".$Config["LGI_TIMEOUT_VALUE"]." </timeout> </error> ";
+ $ErrorMessage =  "<error> <number> 1 </number> <message> ".$ErrorMsgs[ 1 ]." </message>  <timeout> ".$Config["LGI_TIMEOUT_VALUE"]." </timeout> </error> ";
 
- LGI_Response( $ErrorMessage, "", $Exit );
+ LGI_Response( $ErrorMessage, $Exit );
 
  return( 1 );
 }

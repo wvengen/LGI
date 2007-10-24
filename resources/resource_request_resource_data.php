@@ -29,11 +29,11 @@ $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "resource_name" ] ) || ( $_POST[ "resource_name" ] == "" ) )
- return( LGI_Error_Response( 43, $ErrorMsgs[ 43 ], "" ) );
+ return( LGI_Error_Response( 43, $ErrorMsgs[ 43 ] ) );
 else
 {
  if( strlen( $_POST[ "resource_name" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-  return( LGI_Error_Response( 63, $ErrorMsgs[ 63 ], "" ) );
+  return( LGI_Error_Response( 63, $ErrorMsgs[ 63 ] ) );
  $ResourceName = mysql_escape_string( $_POST[ "resource_name" ] );
 }
 
@@ -43,7 +43,7 @@ $ResourceQuery = mysql_query( "SELECT * FROM active_resources WHERE resource_nam
 if( mysql_num_rows( $ResourceQuery ) != 1 )
 {
  mysql_free_result( $ResourceQuery );
- return( LGI_Error_Response( 5, $ErrorMsgs[ 5 ], "" ) );
+ return( LGI_Error_Response( 5, $ErrorMsgs[ 5 ] ) );
 }
 
 $ResourceSpecs = mysql_fetch_object( $ResourceQuery );
@@ -59,6 +59,6 @@ $Response .= " <resource_url> ".$ResourceSpecs->url." </url>";
 $Response .= " <last_call_time> ".$ResourceSpecs->last_call_time." </last_call_time> </requested_resource_data>";
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

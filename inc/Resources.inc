@@ -34,10 +34,10 @@ function Resource_Verify_Session( &$ResourceData )
 
  // check if variable was set correctly...
  if( !isset( $ResourceData -> SessionID ) || ( $ResourceData -> SessionID == "" ) || !is_numeric( $ResourceData -> SessionID ) )
-  return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ], "" ) );
+  return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ] ) );
 
  if( strlen( $ResourceData -> SessionID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 62, $ErrorMsgs[ 62 ], "" ) );
+  return( LGI_Error_Response( 62, $ErrorMsgs[ 62 ] ) );
 
  // get session id for this resource from running_sessions...
  $query = mysql_query( "SELECT session_id FROM running_sessions WHERE session_id=".$ResourceData->SessionID." AND resource_id=".$ResourceData->resource_id );
@@ -70,7 +70,7 @@ function Resource_Setup_Session( &$ResourceData )
  $query = mysql_query( "SELECT session_id FROM running_sessions WHERE session_id=LAST_INSERT_ID() AND resource_id=".$ResourceData->resource_id );
 
  if( mysql_num_rows( $query ) != 1 )
-  return( LGI_Error_Response( 44, $ErrorMsgs[ 44 ], "" ) );
+  return( LGI_Error_Response( 44, $ErrorMsgs[ 44 ] ) );
 
  $querydata = mysql_fetch_object( $query );
 
@@ -89,7 +89,7 @@ function Resource_Kill_Session( &$ResourceData )
  global $ErrorMsgs;
 
  if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 42, $ErrorMsgs[ 42 ], "" ) );
+  return( LGI_Error_Response( 42, $ErrorMsgs[ 42 ] ) );
 
  // remove any stale locks this resource might have of this session...
  Resource_Remove_Stale_Locks( $ResourceData );
@@ -105,14 +105,14 @@ function Resource_Kill_Session( &$ResourceData )
 
 // --------------------------------------------------------------------
 
-function Resource_Verify( $Project, $SessionID )
+function Resource_Verify( &$Project, $SessionID = "" )
 {
  global $Config;
  global $ErrorMsgs;
 
  // first see if valid client certificate was used in the connection...
  if( SSL_Verify_Client() )
-  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "" ) );
+  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ] ) );
 
  // if it was not posted, use default value for this server...
  if( !isset( $Project ) || ( $Project == "" ) )
@@ -120,7 +120,7 @@ function Resource_Verify( $Project, $SessionID )
  else
  {
   if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-   return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ], "" ) );
+   return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ] ) );
  }
  
  // get common name from certificate ...
@@ -134,7 +134,7 @@ function Resource_Verify( $Project, $SessionID )
   if( FoundInCommaSeparatedField( $CommonNameArray[ 2 ], $Project, "," ) ) 
    Select_MySQL_DataBase( $Project ); 
    else
-    return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ], "" ) );
+    return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ] ) );
  }
  else
  {
@@ -151,7 +151,7 @@ function Resource_Verify( $Project, $SessionID )
  if( mysql_num_rows( $queryresult ) <= 0 )
  {
   mysql_free_result( $queryresult );
-  return( LGI_Error_Response( 5, $ErrorMsgs[ 5 ], "" ) );
+  return( LGI_Error_Response( 5, $ErrorMsgs[ 5 ] ) );
  }
 
  // otherwise get the recorded data...
@@ -160,7 +160,7 @@ function Resource_Verify( $Project, $SessionID )
 
  // and check if the certificate's match... 
  if( $Data->client_certificate != SSL_Get_Full_Client_Certificate() )
-  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], "" ) );
+  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ] ) );
 
  // update time_stamp of resource...
  $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
@@ -169,7 +169,7 @@ function Resource_Verify( $Project, $SessionID )
  if( isset( $SessionID ) && is_numeric( $SessionID ) ) 
  {
   if( strlen( $SessionID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-   return( LGI_Error_Response( 62, $ErrorMsgs[ 62 ], "" ) );
+   return( LGI_Error_Response( 62, $ErrorMsgs[ 62 ] ) );
   $Data -> SessionID = $SessionID;
  }
 
@@ -183,7 +183,7 @@ function Resource_Check_For_Job_Locks( $ResourceData )
  global $ErrorMsgs;
 
  if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 9, $ErrorMsgs[ 9 ], "" ) );
+  return( LGI_Error_Response( 9, $ErrorMsgs[ 9 ] ) );
 
  // count the number of locks this resource has...
  $TheNumberOfLocks = mysql_fetch_object(mysql_query( "SELECT COUNT(lock_id) AS N FROM running_locks WHERE resource_id=".$ResourceData->resource_id." AND session_id=".$ResourceData->SessionID )); 
@@ -198,7 +198,7 @@ function Resource_Has_Job_Locked( $ResourceData, $JobId )
  global $ErrorMsgs;
 
  if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 10, $ErrorMsgs[ 10 ], "" ) );
+  return( LGI_Error_Response( 10, $ErrorMsgs[ 10 ] ) );
 
  // get lock data from running_locks table...
  $queryresult = mysql_query( "SELECT lock_id FROM running_locks WHERE job_id=".$JobId." AND resource_id=".$ResourceData->resource_id." AND session_id=".$ResourceData->SessionID );
@@ -220,7 +220,7 @@ function Resource_Lock_Job( $ResourceData, $JobId )
  global $ErrorMsgs;
 
  if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 11, $ErrorMsgs[ 11 ], "" ) );
+  return( LGI_Error_Response( 11, $ErrorMsgs[ 11 ] ) );
 
  // check for lock data from running_locks table...
  $queryresult = mysql_query( "SELECT lock_id FROM running_locks WHERE job_id=".$JobId );
@@ -239,7 +239,7 @@ function Resource_Lock_Job( $ResourceData, $JobId )
  if( mysql_num_rows( $queryresult ) < 1 )
  {
   mysql_free_result( $queryresult );
-  return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], "" ) );
+  return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ] ) );
  }
 
  // check if this resource is allowed to lock the job...
@@ -248,7 +248,7 @@ function Resource_Lock_Job( $ResourceData, $JobId )
  mysql_free_result( $queryresult );
 
  if( !FoundInCommaSeparatedField( $JobData->target_resources, $ResourceData->resource_name, "," ) )
-  return( LGI_Error_Response( 21, $ErrorMsgs[ 21 ], "" ) );
+  return( LGI_Error_Response( 21, $ErrorMsgs[ 21 ] ) );
   
  // now try and get a lock on the job in job_queue...
  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state+1 WHERE job_id=".$JobId );
@@ -281,23 +281,23 @@ function Resource_UnLock_Job( $ResourceData, $JobId )
  global $ErrorMsgs;
 
  if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 10, $ErrorMsgs[ 10 ], "" ) );
+  return( LGI_Error_Response( 10, $ErrorMsgs[ 10 ] ) );
 
  // get lock data from running_locks table...
  $queryresult = mysql_query( "SELECT lock_id,job_id,resource_id,session_id FROM running_locks WHERE job_id=".$JobId );
 
  if( mysql_num_rows( $queryresult ) > 1 )
-  return( LGI_Error_Response( 12, $ErrorMsgs[ 12 ], "" ) ); 
+  return( LGI_Error_Response( 12, $ErrorMsgs[ 12 ] ) ); 
 
  if( mysql_num_rows( $queryresult ) < 1 )
-  return( LGI_Error_Response( 13, $ErrorMsgs[ 13 ], "" ) ); 
+  return( LGI_Error_Response( 13, $ErrorMsgs[ 13 ] ) ); 
 
  // now check if it was locked by current resource...
  $TheLockData = mysql_fetch_object( $queryresult );
  mysql_free_result( $queryresult );
  
  if( ( $TheLockData -> resource_id != $ResourceData -> resource_id ) || ( $TheLockData -> session_id != $ResourceData -> SessionID ) )
-  return( LGI_Error_Response( 14, $ErrorMsgs[ 14 ], "" ) );
+  return( LGI_Error_Response( 14, $ErrorMsgs[ 14 ] ) );
  
  // first unlock the job in the job_queue table...
  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobId );
@@ -315,7 +315,7 @@ function Resource_Remove_Stale_Locks( $ResourceData )
  global $ErrorMsgs;
 
  if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 7, $ErrorMsgs[ 7 ], "" ) );
+  return( LGI_Error_Response( 7, $ErrorMsgs[ 7 ] ) );
 
  // get list of locks of this resource...
  $TheLocks = mysql_query( "SELECT lock_id,job_id FROM running_locks WHERE resource_id=".$ResourceData->resource_id." AND session_id=".$ResourceData->SessionID ); 
@@ -356,7 +356,7 @@ function Get_Master_Server_URL( )
  $queryresult = mysql_query( "SELECT url FROM active_resources WHERE project_server=1" );
 
  if( mysql_num_rows( $queryresult ) != 1 )
-  return( LGI_Error_Response( 6, $ErrorMsgs[ 6 ], "" ) );
+  return( LGI_Error_Response( 6, $ErrorMsgs[ 6 ] ) );
 
  $MasterServer = mysql_fetch_object( $queryresult );
 

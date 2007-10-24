@@ -32,11 +32,11 @@ $ServerData = Server_Verify( $_POST[ "project" ] );
 if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POST[ "update" ] ) )
 {
  if( strlen( $_POST[ "version" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 59, $ErrorMsgs[ 59 ], "" ) );
+  return( LGI_Error_Response( 59, $ErrorMsgs[ 59 ] ) );
  if( strlen( $_POST[ "servers" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-  return( LGI_Error_Response( 60, $ErrorMsgs[ 60 ], "" ) );
+  return( LGI_Error_Response( 60, $ErrorMsgs[ 60 ] ) );
  if( strlen( $_POST[ "update" ] ) >= 2 * $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
-  return( LGI_Error_Response( 61, $ErrorMsgs[ 61 ], "" ) );
+  return( LGI_Error_Response( 61, $ErrorMsgs[ 61 ] ) );
 
  $UpdateVersion = $_POST[ "version" ];
  $TargetServers = $_POST[ "servers" ];
@@ -44,7 +44,7 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
 
  // check if posted fields are correct and allowed...
  if( !is_numeric( $UpdateVersion ) || ( $TargetServers == "" ) || ( $UpdateQuery == "" ) )
-  return( LGI_Error_Response( 41, $ErrorMsgs[ 41 ], "" ) );
+  return( LGI_Error_Response( 41, $ErrorMsgs[ 41 ] ) );
  
  // build response header...
  $Response = "<project> ".Get_Selected_MySQL_DataBase()." </project> ";
@@ -72,14 +72,14 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
    $MaxVersion = mysql_fetch_object( $mysqlresult );
    mysql_free_result( $mysqlresult );
    $Response .= "<update> <did_update_cyle> 1 </did_update_cyle> <update_version> ".$MaxVersion->max." </update_version> </update>";
-   return( LGI_Response( $Response, "" ) );
+   return( LGI_Response( $Response ) );
   }
 
   // if we already have this update...
   if( $UpdateVersion <= $MaxVersion->max )
   {
    $Response .= "<update> <did_update_cyle> 0 </did_update_cyle> <update_version> ".$MaxVersion->max." </update_version> </update>";
-   return( LGI_Response( $Response, "" ) );
+   return( LGI_Response( $Response ) );
   }
  }
   
@@ -105,7 +105,7 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
   $Response .= "<update> <did_update_cyle> 0 </did_update_cyle> <update_version> -1 </update_version> </update>";
 
  mysql_free_result( $mysqlresult );
- return( LGI_Response( $Response, "" ) );
+ return( LGI_Response( $Response ) );
 }
 
 // this is an update cycle being initiated by another server...
@@ -120,6 +120,6 @@ $Response .= "<this_project_server> ".$ServerData->resource_name." </this_projec
 $Response .= "<project_server> ".Get_Server_URL()." </project_server> ";
 $Response .= "<update> <did_update_cyle> 1 </did_update_cyle> <update_version> ".$MaxVersion->max." </update_version> </update>";
 
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

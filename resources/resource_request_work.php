@@ -29,15 +29,15 @@ $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 
 // check if this call is valid...
 if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ], "" ) );
+ return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ] ) );
 
 // check if compulsory post variable was set...
 if( !isset( $_POST[ "application" ] ) || ( $_POST[ "application" ] == "" ) )
- return( LGI_Error_Response( 18, $ErrorMsgs[ 18 ], "" ) );
+ return( LGI_Error_Response( 18, $ErrorMsgs[ 18 ] ) );
 else
 {
  if( strlen( $_POST[ "application" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-  return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ], "" ) );
+  return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ] ) );
  $Application = $_POST[ "application" ];
 }
 
@@ -45,7 +45,7 @@ else
 if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && is_numeric( $_POST[ "start" ] ) )
 {
  if( strlen( $_POST[ "start" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 48, $ErrorMsgs[ 48 ], "" ) );
+  return( LGI_Error_Response( 48, $ErrorMsgs[ 48 ] ) );
  $JobIdStart = $_POST[ "start" ];
 }
 else 
@@ -54,7 +54,7 @@ else
 if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" ) && is_numeric( $_POST[ "limit" ] ) )
 {
  if( strlen( $_POST[ "limit" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
-  return( LGI_Error_Response( 49, $ErrorMsgs[ 49 ], "" ) );
+  return( LGI_Error_Response( 49, $ErrorMsgs[ 49 ] ) );
  $JobIdLimit = $_POST[ "limit" ];
 }
 else
@@ -62,7 +62,7 @@ else
 
 // check if this resource has any jobs locked...
 if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )
- return( LGI_Error_Response( 17, $ErrorMsgs[ 17 ], "" ) ); 
+ return( LGI_Error_Response( 17, $ErrorMsgs[ 17 ] ) ); 
 
 // header of the response...
 $Response = "<start> ".$JobIdStart." </start> <limit> ".$JobIdLimit." </limit>";
@@ -123,6 +123,6 @@ else
 }
 
 // return the response...
-return( LGI_Response( $Response, "" ) );
+return( LGI_Response( $Response ) );
 ?>
 

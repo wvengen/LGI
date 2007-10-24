@@ -25,7 +25,7 @@ global $Config;
 global $ErrorMsgs;
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ], "" );
+$ResourceData = Resource_Verify( $_POST[ "project" ] );
 
 // now create a new session for this resource...
 Resource_Setup_Session( $ResourceData );
@@ -53,5 +53,5 @@ mysql_free_result( $queryresult );
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 
 // and return the response...
-LGI_Response( $Response, "" );
+return( LGI_Response( $Response ) );
 ?>
