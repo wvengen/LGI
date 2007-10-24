@@ -36,6 +36,7 @@ if( isset( $_GET[ "user" ] ) )
 else
  if( isset( $_POST[ "user" ] ) )
   $User = $_POST[ "user" ];
+if( strlen( $User ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 57 ] );
 $User = mysql_escape_string( $User );
 
 // check if groups is set in request... or default to user's group...
@@ -45,6 +46,7 @@ if( isset( $_GET[ "groups" ] ) )
 else
  if( isset( $_POST[ "groups" ] ) )
   $Groups = $_POST[ "groups" ];
+if( strlen( $Groups ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 56 ] );
 $Groups = mysql_escape_string( $Groups );
 
 // check if project is set in request... or default to value set in config...
@@ -54,6 +56,7 @@ if( isset( $_GET[ "project" ] ) )
 else
  if( isset( $_POST[ "project" ] ) )
   $Project = $_POST[ "project" ];
+if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 58 ] );
 $Project = mysql_escape_string( $Project );
 
 // check if application was given...
@@ -64,6 +67,7 @@ else
  if( isset( $_POST[ "application" ] ) )
   $Application = $_POST[ "application" ];
 if( $Application == "" ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 18 ] );
+if( strlen( $Application ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 46 ] );
 $Application = mysql_escape_string( $Application );
 
 // check if target_resources was given...
@@ -74,12 +78,53 @@ else
  if( isset( $_POST[ "target_resources" ] ) )
   $TargetResources = $_POST[ "target_resources" ];
 if( $TargetResources == "" ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 27 ] );
+if( strlen( $TargetResources ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 50 ] );
 $TargetResources = mysql_escape_string( $TargetResources );
 
+// check if job_specifics was given...
+$JobSpecifics = "";
+if( isset( $_GET[ "job_specifics" ] ) )
+ $JobSpecifics = $_GET[ "job_specifics" ];
+else
+ if( isset( $_POST[ "job_specifics" ] ) )
+  $JobSpecifics = $_POST[ "jobs_specifics" ];
+if( strlen( $JobSpecifics ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 53 ] );
+$JobSpecifics = mysql_escape_string( $JobSpecifics );
+
+// check if owners was given...
+$Owners = "";
+if( isset( $_GET[ "owners" ] ) )
+ $Owners = $_GET[ "owners" ];
+else
+ if( isset( $_POST[ "owners" ] ) )
+  $Owners = $_POST[ "owners" ];
+if( strlen( $Owners ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 52 ] );
+
+// check if read_access was given...
+$ReadAccess = "";
+if( isset( $_GET[ "read_access" ] ) )
+ $ReadAccess = $_GET[ "read_access" ];
+else
+ if( isset( $_POST[ "read_access" ] ) )
+  $ReadAccess = $_POST[ "read_access" ];
+if( strlen( $ReadAccess ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 51 ] );
+
+// check if input was given...
+$Input = "";
+if( isset( $_GET[ "input" ] ) )
+ $Input = $_GET[ "input" ];
+else
+ if( isset( $_POST[ "input" ] ) )
+  $Input = $_POST[ "input" ];
+if( strlen( $Input ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 54 ] );
 
 // now verfiy the user using the basic browser interface... also make MySQL connection...
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
+
+// ...
+// ...
+// ...
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );

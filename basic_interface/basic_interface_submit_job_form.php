@@ -37,6 +37,7 @@ if( isset( $_GET[ "user" ] ) )
 else
  if( isset( $_POST[ "user" ] ) )
   $User = $_POST[ "user" ];
+if( strlen( $User ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 57 ] );
 $User = mysql_escape_string( $User );
 
 // check if groups is set in request... or default to user's group...
@@ -46,6 +47,7 @@ if( isset( $_GET[ "groups" ] ) )
 else
  if( isset( $_POST[ "groups" ] ) )
   $Groups = $_POST[ "groups" ];
+if( strlen( $Groups ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 56 ] );
 $Groups = mysql_escape_string( $Groups );
 
 // check if project is set in request... or default to value set in config...
@@ -55,18 +57,18 @@ if( isset( $_GET[ "project" ] ) )
 else
  if( isset( $_POST[ "project" ] ) )
   $Project = $_POST[ "project" ];
+if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 58 ] );
 $Project = mysql_escape_string( $Project );
 
 // now verfiy the user using the basic browser interface... also make MySQL connection...
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
-// specify the from post method...
+// start building form to fill in...
 echo '<form action="basic_interface_submit_job_action.php" method="POST">';
 echo '<input type="hidden" name="user" value="'.$User.'">';
 echo '<input type="hidden" name="groups" value="'.$Groups.'">';
 
-// start building form to fill in...
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
 Row2( "<b>This project server:</b>", Get_Server_URL() ); 

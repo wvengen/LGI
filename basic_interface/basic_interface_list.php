@@ -37,6 +37,7 @@ if( isset( $_GET[ "user" ] ) )
 else
  if( isset( $_POST[ "user" ] ) )
   $User = $_POST[ "user" ];
+if( strlen( $User ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 57 ] );
 $User = mysql_escape_string( $User );
 
 // check if groups is set in request... or default to user's group...
@@ -46,6 +47,7 @@ if( isset( $_GET[ "groups" ] ) )
 else
  if( isset( $_POST[ "groups" ] ) )
   $Groups = $_POST[ "groups" ];
+if( strlen( $Groups ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 56 ] );
 $Groups = mysql_escape_string( $Groups );
 
 // check if project is set in request... or default to value set in config...
@@ -55,11 +57,8 @@ if( isset( $_GET[ "project" ] ) )
 else
  if( isset( $_POST[ "project" ] ) )
   $Project = $_POST[ "project" ];
+if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 58 ] );
 $Project = mysql_escape_string( $Project );
-
-// now verfiy the user using the basic browser interface... also make MySQL connection...
-$ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
-if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // check if project_server is set in request... or default to 0...
 $ProjectServer = "0";
@@ -68,7 +67,12 @@ if( isset( $_GET[ "project_server" ] ) )
 else
  if( isset( $_POST[ "project_server" ] ) )
   $ProjectServer = $_POST[ "project_server" ];
+if( strlen( $ProjectServer ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] ) Exit_With_Text( "ERROR: Project_server field posted too big" );
 if( !is_numeric( $ProjectServer ) ) Exit_With_Text( "ERROR: Project_server is not a number" );
+
+// now verfiy the user using the basic browser interface... also make MySQL connection...
+$ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
+if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );

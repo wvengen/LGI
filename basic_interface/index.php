@@ -37,6 +37,7 @@ if( isset( $_GET[ "user" ] ) )
 else
  if( isset( $_POST[ "user" ] ) )
   $User = $_POST[ "user" ];
+if( strlen( $User ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 57 ] );
 $User = mysql_escape_string( $User );
 
 // check if groups is set in request... or default to user's group...
@@ -46,6 +47,7 @@ if( isset( $_GET[ "groups" ] ) )
 else
  if( isset( $_POST[ "groups" ] ) )
   $Groups = $_POST[ "groups" ];
+if( strlen( $Groups ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 56 ] );
 $Groups = mysql_escape_string( $Groups );
 
 // check if project is set in request... or default to value set in config...
@@ -55,6 +57,7 @@ if( isset( $_GET[ "project" ] ) )
 else
  if( isset( $_POST[ "project" ] ) )
   $Project = $_POST[ "project" ];
+if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 58 ] );
 $Project = mysql_escape_string( $Project );
 
 // now verfiy the user using the basic browser interface... also make MySQL connection...

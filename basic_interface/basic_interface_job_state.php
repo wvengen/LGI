@@ -37,6 +37,7 @@ if( isset( $_GET[ "user" ] ) )
 else
  if( isset( $_POST[ "user" ] ) )
   $User = $_POST[ "user" ];
+if( strlen( $User ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 57 ] );
 $User = mysql_escape_string( $User );
 
 // check if groups is set in request... or default to user's group...
@@ -46,6 +47,7 @@ if( isset( $_GET[ "groups" ] ) )
 else
  if( isset( $_POST[ "groups" ] ) )
   $Groups = $_POST[ "groups" ];
+if( strlen( $Groups ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 56 ] );
 $Groups = mysql_escape_string( $Groups );
 
 // check if project is set in request... or default to value set in config...
@@ -55,11 +57,8 @@ if( isset( $_GET[ "project" ] ) )
 else
  if( isset( $_POST[ "project" ] ) )
   $Project = $_POST[ "project" ];
+if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 58 ] );
 $Project = mysql_escape_string( $Project );
-
-// now verfiy the user using the basic browser interface... also make MySQL connection...
-$ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
-if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // check if job_id is set in request... otherwise default to list mode...
 if( isset( $_GET[ "job_id" ] ) )
@@ -68,8 +67,13 @@ else
  if( isset( $_POST[ "job_id" ] ) )
   $Job_ID = $_POST[ "job_id" ];
 
+// now verfiy the user using the basic browser interface... also make MySQL connection...
+$ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
+if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
+
 if( isset( $Job_ID ) )               // we requested details on a job...
 {
+ if( strlen( $Job_ID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 47 ] );
  if( !is_numeric( $Job_ID ) ) Exit_With_Text( "ERROR: Job_id not a number" );
 
  $JobSpecs = Interface_Wait_For_Cleared_Spin_Lock_On_Job( $Job_ID, false );
