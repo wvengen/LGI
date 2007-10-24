@@ -55,6 +55,7 @@ if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( 
  Interface_Set_Spin_Lock_On_Job( $JobId );
  $queryresult = mysql_query( "DELETE FROM job_queue WHERE job_id=".$JobId );
  $JobState = "deleted";
+ $JobStateTimeStamp = time();
 }
 else
 {
@@ -63,6 +64,7 @@ else
  Interface_Clear_Spin_Lock_On_Job( $JobId );
  $JobSpecs = Interface_Wait_For_Cleared_Spin_Lock_On_Job( $JobId );
  $JobState = $JobSpecs->state;
+ $JobStateTimeStamp = $JobSpecs->state_time_stamp;
 }
 
 // build response header...
@@ -76,7 +78,7 @@ $Response .= " <application> ".$JobSpecs->application." </application>";
 $Response .= " <owners> ".$JobSpecs->owners." </owners>";
 $Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
 $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
-$Response .= " <state> ".$JobState." </state> <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp> </job>";
+$Response .= " <state> ".$JobState." </state> <state_time_stamp> ".$JobStateTimeStamp." </state_time_stamp> </job>";
 
 // return the response...
 return( LGI_Response( $Response ) );

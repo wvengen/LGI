@@ -5,7 +5,7 @@
 // []--------------------------------------------------------[]
 //  |                                                        |
 //  | AUTHOR:     M.F.Somers                                 |
-//  | VERSION:    1.00, August 2007.                         |
+//  | VERSION:    1.00, October 2007.                        |
 //  | USE:        Request job state from project DB...       |
 //  |                                                        |
 // []--------------------------------------------------------[]
@@ -73,16 +73,15 @@ if( isset( $Job_ID ) )               // we requested details on a job...
  if( !is_numeric( $Job_ID ) ) Exit_With_Text( "ERROR: Job_id not a number" );
 
  $JobSpecs = Interface_Wait_For_Cleared_Spin_Lock_On_Job( $Job_ID, false );
-
- if( $JobSpecs === 15 ) Exit_With_Text( "ERROR: Job was not found in database" );
- if( $JobSpecs === 2 ) Exit_With_Text( "ERROR: Server too busy, backoff for a minute!" );
+ if( $JobSpecs === 15 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $JobSpecs ] );
+ if( $JobSpecs === 2 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $JobSpecs ] );
 
  if( !Interface_Is_User_Allowed_To_Read_Job( $JobSpecs, $User, $Groups ) ) Exit_With_Text( "ERROR: User is not allowed to get details of this job" );
 
  Start_Table();
- Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface QSTAT at ".gmdate( "j M Y G:i", time() )." UTC of job with ID=$Job_ID</b></font></center>" );
+ Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
  Row2( "<b>This project server:</b>", Get_Server_URL() ); 
- Row2( "<b>Project master server:</b>", Get_Master_Server_URL() ); 
+ Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basic_interface>".Get_Master_Server_URL()."</a>" );
  Row2( "<b>User:</b>", $User ); 
  Row2( "<b>Groups:</b>", $Groups ); 
  Row2( "<b>Project:</b>", $Project ); 
@@ -90,7 +89,7 @@ if( isset( $Job_ID ) )               // we requested details on a job...
  Row2( "<b>Job ID:</b>", $Job_ID ); 
  Row2( "<b>Application:</b>", $JobSpecs -> application ); 
  Row2( "<b>State:</b>", $JobSpecs -> state ); 
- Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_stamp ) ); 
+ Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_stamp )." UTC" ); 
  Row2( "<b>Owners:</b>", $JobSpecs -> owners ); 
  Row2( "<b>Read access:</b>", $JobSpecs -> read_access ); 
  Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources ); 
@@ -101,7 +100,10 @@ if( isset( $Job_ID ) )               // we requested details on a job...
 
  echo "<br><a href=qdel.php?job_id=$JobSpecs->job_id>Abort or Delete this job</a>\n";
  echo "<br><a href=qstat.php>Show job list</a>\n"; 
-
+ echo "<br><a href=list.php?project_server=1>Show project server list</a>\n"; 
+ echo "<br><a href=list.php?project_server=0>Show project resource list</a>\n"; 
+ echo "<br><a href=qsub_form.php>Submit a job</a>\n";
+ echo "<br><a href=index.php>Go to main menu</a>\n"; 
 }
 else
 {
@@ -143,9 +145,9 @@ else
  if( !is_numeric( $Limit ) ) Exit_With_Text( "ERROR: Limit not a number" );
 
  Start_Table();
- Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface QSTAT at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
+ Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
  Row2( "<b>This project server:</b>", Get_Server_URL() ); 
- Row2( "<b>Project master server:</b>", Get_Master_Server_URL() ); 
+ Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basic_interface>".Get_Master_Server_URL()."</a>" );
  Row2( "<b>User:</b>", $User ); 
  Row2( "<b>Groups:</b>", $Groups ); 
  Row2( "<b>Project:</b>", $Project ); 
@@ -169,15 +171,19 @@ else
  for( $i = 1; $i <= $Number; $i++ )
  {
   $Job = mysql_fetch_object( $QueryResult );
-  Row5( "<center><a href=qstat.php?job_id=$Job->job_id>$Job->job_id</a></center>", "<center>$Job->state</center>", "<center>$Job->target_resources</center>", "<center>$Job->application</center>", "<center>".gmdate( "j M Y G:i", $Job->state_time_stamp )."</center>" );
+  Row5( "<center><a href=qstat.php?job_id=$Job->job_id>$Job->job_id</a></center>", "<center>$Job->state</center>", "<center>$Job->target_resources</center>", "<center>$Job->application</center>", "<center>".gmdate( "j M Y G:i", $Job->state_time_stamp )." UTC </center>" );
  }
 
  mysql_free_result( $QueryResult ); 
 
  End_Table();
+
+ echo "<br><a href=list.php?project_server=1>Show project server list</a>\n"; 
+ echo "<br><a href=list.php?project_server=0>Show project resource list</a>\n"; 
+ echo "<br><a href=qsub_form.php>Submit a job</a>\n";
+ echo "<br><a href=index.php>Go to main menu</a>\n"; 
 }
 
 Page_Tail();
-
 ?>
 
