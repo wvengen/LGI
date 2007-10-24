@@ -104,6 +104,7 @@ function Interface_Verify( &$Project, $User, &$Groups, $ExitOnError = true )
   Select_MySQL_DataBase( $Project );
  }
 
+ return( 0 );
 }
 
 // -------------------------------------------------------------------- 

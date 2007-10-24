@@ -58,7 +58,12 @@ $Project = mysql_escape_string( $Project );
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 
 Page_Head();
-Exit_With_Text( "error: ".$ErrorMsgs[ $ErrorCode ] );
+Start_Table();
+Row1( "LGI queue at ".time() );
+Row2( "User:", $User ); 
+Row2( "Groups:", $Groups ); 
+Row2( "Project:", $Project ); 
+End_Table();
 Page_Tail();
 
 ?>

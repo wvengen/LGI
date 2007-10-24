@@ -71,7 +71,8 @@ function Select_MySQL_DataBase( $DataBase, $ExitOnError = true )
  global $MySQLCurrentProjectDatabase;
 
  // Setup connection ...
- Setup_MySQL_Connection( $ExitOnError );
+ $ErrorCode = Setup_MySQL_Connection( $ExitOnError );
+ if( $ErrorCode ) return ( $ErrorCode );
 
  $DataBase = mysql_escape_string( $DataBase );
 
@@ -95,6 +96,6 @@ function Get_Selected_MySQL_DataBase( )
 // -------------------------------------------------------------------- 
 
 // Make connection at include ...
-Setup_MySQL_Connection();
+// Setup_MySQL_Connection();
 
 ?>
