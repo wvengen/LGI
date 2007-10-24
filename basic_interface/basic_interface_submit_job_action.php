@@ -246,7 +246,7 @@ Row2( "<b>User:</b>", $User );
 Row2( "<b>Groups:</b>", $Groups );
 Row2( "<b>Project:</b>", $Project );
 Row1( "<center><font color='green' size='4'><b>Job details</b></font></center>" );
-Row2( "<b>Job ID:</b>", $Job_ID );
+Row2( "<b>Job ID:</b>", $JobSpecs -> job_id );
 Row2( "<b>Application:</b>", $JobSpecs -> application );
 Row2( "<b>State:</b>", $JobSpecs -> state );
 Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_stamp )." UTC" );
