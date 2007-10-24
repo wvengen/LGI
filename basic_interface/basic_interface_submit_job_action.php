@@ -245,7 +245,7 @@ Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basi
 Row2( "<b>User:</b>", $User );
 Row2( "<b>Groups:</b>", $Groups );
 Row2( "<b>Project:</b>", $Project );
-Row1( "<center><font color='green' size='4'><b>Job details</b></font></center>" );
+Row1( "<center><font color='green' size='4'><b>Submitted job details</b></font></center>" );
 Row2( "<b>Job ID:</b>", $JobSpecs -> job_id );
 Row2( "<b>Application:</b>", $JobSpecs -> application );
 Row2( "<b>State:</b>", $JobSpecs -> state );
@@ -256,6 +256,11 @@ Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
 Row2( "<b>Job specifics:</b>", $JobSpecs -> job_specifics );
 Row2( "<b>Input:</b>", $JobSpecs -> input );
 End_Table();
+
+echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n";
+echo "<br><a href=basic_interface_list.php?project_server=0>Show project resource list</a>\n";
+echo "<br><a href=basic_interface_submit_job_form.php>Submit a job</a>\n";
+echo "<br><a href=index.php>Go to main menu</a>\n";
 
 Page_Tail();
 
