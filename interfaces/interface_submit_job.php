@@ -50,6 +50,7 @@ else
   return( LGI_Error_Response( 50, $ErrorMsgs[ 50 ] ) );
  $JobTargetResources = NormalizeCommaSeparatedField( $_POST[ "target_resources" ], "," );
 }
+
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $JobTargetResources, "," );
 
