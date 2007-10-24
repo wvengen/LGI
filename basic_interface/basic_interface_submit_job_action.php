@@ -82,7 +82,7 @@ if( isset( $_GET[ "job_specifics" ] ) )
  $JobSpecifics = $_GET[ "job_specifics" ];
 else
  if( isset( $_POST[ "job_specifics" ] ) )
-  $JobSpecifics = $_POST[ "jobs_specifics" ];
+  $JobSpecifics = $_POST[ "job_specifics" ];
 if( strlen( $JobSpecifics ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 53 ] );
 
 // check if owners was given...
