@@ -75,7 +75,7 @@ Row2( "<b>User:</b>", $User );
 Row2( "<b>Groups:</b>", $Groups ); 
 Row2( "<b>Project:</b>", $Project ); 
 Row1( "<center><font color='green' size='4'><b>Specify job details</b></font></center>" );
-Row2( "<b>Application:</b>", '<input type="text" size="65" name="application" value="hello_world" maxlength="128" >' );
+Row2( "<b>Application:</b>", '<input type="text" size="67" name="application" value="hello_world" maxlength="128" >' );
 Row2( "<b>Extra owners:</b>", '<input type="text" size="65" name="owners" value="" maxlength="128" >' );
 Row2( "<b>Extra read access:</b>", '<input type="text" size="65" name="read_access" value="" maxlength="128" >' );
 Row2( "<b>Target resources:</b>", '<input type="text" size="65" name="target_resources" value="any" maxlength="128" >' );
