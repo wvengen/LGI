@@ -60,38 +60,49 @@ function End_Table()
 
 function Row1( $X )
 {
- if ( $X == "" ) $X = "<br>";
- echo "<tr><td colspan=12>$X</td></tr>\n";
+ echo "<tr><td colspan=120>$X</td></tr>\n";
 }
 
 // -------------------------------------------------------------------- 
 
 function Row2( $X, $Y )
 {
- if ( $X == "" ) $X = "<br>";
- if ( $Y == "" ) $Y = "<br>";
- echo "<tr><td colspan=6>$X</td><td colspan=6>$Y</td></tr>\n";
+ echo "<tr><td colspan=60>$X</td><td colspan=60>$Y</td></tr>\n";
 }
 
 // -------------------------------------------------------------------- 
 
 function Row3( $X, $Y, $Z ) 
 {
- if ( $X == "" ) $X = "<br>";
- if ( $Y == "" ) $Y = "<br>";
- if ( $Z == "" ) $Z = "<br>";
- echo "<tr><td colspan=4>$X</td><td colspan=4>$Y</td><td colspan=4>$Z</td></tr>\n";
+ echo "<tr><td colspan=40>$X</td><td colspan=40>$Y</td><td colspan=40>$Z</td></tr>\n";
 }
 
 // --------------------------------------------------------------------
 
 function Row4( $X, $Y, $Z, $XX )
 {
- if ( $X == "" ) $X = "<br>";
- if ( $Y == "" ) $Y = "<br>";
- if ( $Z == "" ) $Z = "<br>";
- if ( $XX == "" ) $XX = "<br>";
- echo "<tr><td colspan=3>$X</td><td colspan=3>$Y</td><td colspan=3>$Z</td><td colspan=3>$XX</td></tr>\n";
+ echo "<tr><td colspan=30>$X</td><td colspan=30>$Y</td><td colspan=30>$Z</td><td colspan=30>$XX</td></tr>\n";
+}
+
+// --------------------------------------------------------------------
+
+function Row5( $X, $Y, $Z, $XX, $XY )
+{
+ echo "<tr><td colspan=24>$X</td><td colspan=24>$Y</td><td colspan=24>$Z</td><td colspan=24>$XX</td><td colspan=24>$XY</td></tr>\n";
+}
+
+// --------------------------------------------------------------------
+
+function Row6( $X, $Y, $Z, $XX, $XY, $XZ )
+{
+ echo "<tr><td colspan=20>$X</td><td colspan=20>$Y</td><td colspan=20>$Z</td><td colspan=20>$XX</td><td colspan=20>$XY</td><td colspan=20>$XZ</td></tr>\n";
+}
+
+// --------------------------------------------------------------------
+
+function Row8( $X, $Y, $Z, $XX, $XY, $XZ, $YX, $YY )
+{
+ echo "<tr><td colspan=15>$X</td><td colspan=15>$Y</td><td colspan=15>$Z</td><td colspan=15>$XX</td><td colspan=15>$XY</td><td colspan=15>$XZ</td><td colspan=15>$YX</td><td colspan=15>$YY</td></tr>\n";
 }
 
 // -------------------------------------------------------------------- 
