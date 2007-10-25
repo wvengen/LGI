@@ -140,7 +140,7 @@ else
  if( !is_numeric( $Start ) ) Exit_With_Text( "ERROR: Start not a number" );
 
  // check if application is set in request... otherwise default to a nice number...
- $Limit = "4098";
+ $Limit = "64";
  if( isset( $_GET[ "limit" ] ) )
   $Limit = $_GET[ "limit" ];
  else
@@ -181,6 +181,18 @@ else
  mysql_free_result( $QueryResult ); 
 
  End_Table();
+
+ $Menu = ""; 
+ if( $Start > 0 )
+ {
+  if( $Start > $Limit )
+   $Menu .= "<a href=basic_interface_job_state.php?start=".($Start-$Limit)."> Prev </a>";
+  else
+   $Menu .= "<a href=basic_interface_job_state.php?start=0> Prev </a>";
+ }
+ if( $Number >= $Limit  )
+  $Menu .= "<a href=basic_interface_job_state.php?start=".($Start+$Number)."> Next </a>";
+ if( $Menu != "" ) echo "$Menu<br>";
 
  echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n"; 
  echo "<br><a href=basic_interface_list.php?project_server=0>Show project resource list</a>\n"; 
