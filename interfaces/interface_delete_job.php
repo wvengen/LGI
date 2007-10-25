@@ -69,7 +69,7 @@ else
 
 // build response header...
 $Response =  " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <project_server> ".Get_Server_URL()." </project_server>";
+$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
 $Response .= " <user> ".$JobUser." </user> <groups> ".$JobGroups." </groups>";
 $Response .= " <number_of_jobs> 1 </number_of_jobs> <job number='1'>";
 $Response .= " <job_id> ".$JobSpecs->job_id." </job_id>";

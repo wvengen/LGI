@@ -71,11 +71,11 @@ echo '<input type="hidden" name="groups" value="'.$Groups.'">';
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
+Row2( "<b>Project:</b>", $Project ); 
 Row2( "<b>This project server:</b>", Get_Server_URL() ); 
 Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basic_interface>".Get_Master_Server_URL()."</a>" ); 
 Row2( "<b>User:</b>", $User ); 
 Row2( "<b>Groups:</b>", $Groups ); 
-Row2( "<b>Project:</b>", $Project ); 
 Row1( "<center><font color='green' size='4'><b>Specify job details</b></font></center>" );
 Row2( "<b>Application:</b>", '<input type="text" size="65" name="application" value="hello_world" maxlength="128" >' );
 Row2( "<b>Extra owners:</b>", '<input type="text" size="65" name="owners" value="" maxlength="128" >' );

@@ -49,8 +49,8 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
  // build response header...
  $Response = "<project> ".Get_Selected_MySQL_DataBase()." </project> ";
  $Response .= "<project_master_server> ".Get_Master_Server_URL()." </project_master_server> ";
- $Response .= "<this_project_server> ".$ServerData->resource_name." </this_project_server> ";
- $Response .= "<project_server> ".Get_Server_URL()." </project_server> ";
+ $Response .= "<requesting_project_server> ".$ServerData->resource_name." </requesting_project_server> ";
+ $Response .= "<this_project_server> ".Get_Server_URL()." </this_project_server> ";
  $Response .= "<update_version> ".$UpdateVersion." </update_version> ";
  $Response .= "<target_servers> ".$TargetServers." </target_servers> ";
  $Response .= "<update_query> ".$UpdateQuery." </update_query> ";
@@ -116,8 +116,8 @@ $MaxVersion = mysql_fetch_object( $mysqlresult );
 mysql_free_result( $mysqlresult );
 $Response = "<project> ".Get_Selected_MySQL_DataBase()." </project> ";
 $Response .= "<project_master_server> ".Get_Master_Server_URL()." </project_master_server> ";
-$Response .= "<this_project_server> ".$ServerData->resource_name." </this_project_server> ";
-$Response .= "<project_server> ".Get_Server_URL()." </project_server> ";
+$Response .= "<requesting_project_server> ".$ServerData->resource_name." </requesting_project_server> ";
+$Response .= "<this_project_server> ".Get_Server_URL()." </this_project_server> ";
 $Response .= "<update> <did_update_cyle> 1 </did_update_cyle> <update_version> ".$MaxVersion->max." </update_version> </update>";
 
 return( LGI_Response( $Response ) );

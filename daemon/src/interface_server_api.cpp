@@ -126,6 +126,33 @@ int Interface_Server_API::Interface_Project_Server_List( string &Response, strin
 
 // ------------------------------------------------------------------------------
 
+int Interface_Server_API::Interface_Project_Resource_List( string &Response, string ServerURL, string Project, string User, string Groups )
+{
+ DEBUG_LOG( "Interface_Server_API::Interface_Project_Resource_List; ServerURL=" << ServerURL << ", Project=" << Project << ", User=" << User << ", Groups=" << Groups );
+
+ string PostURL = ServerURL + "/interfaces/interface_project_resource_list.php";
+ CURL *cURLHandle = SetupcURLForPost( PostURL );
+
+ if( cURLHandle != NULL )
+ {
+  struct curl_httppost *PostList = NULL;
+  struct curl_httppost *LastItem = NULL;
+
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "user", CURLFORM_PTRCONTENTS, User.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "groups", CURLFORM_PTRCONTENTS, Groups.c_str(), CURLFORM_END );
+
+  CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
+
+  VERBOSE_DEBUG_LOG_RETURN( cURLResult, "Interface_Server_API::Interface_Project_Resource_List; returned " << cURLResult );
+ }
+ else
+  CRITICAL_LOG_RETURN( CURLE_FAILED_INIT, "Interface_Server_API::Interface_Project_Resource_List; Couldn't obtain cURL handle, returned " << CURLE_FAILED_INIT );
+
+}
+
+// ------------------------------------------------------------------------------
+
 int Interface_Server_API::Interface_Job_State( string &Response, string ServerURL, string Project, string User, string Groups, string Job_Id, string State, string Application, string Start, string Limit )
 {
  DEBUG_LOG( "Interface_Server_API::Interface_Job_State; ServerURL=" << ServerURL << ", Project=" << Project << ", User=" << User << ", Groups=" << Groups  << ", Job_Id=" << Job_Id << ", State=" << State << ", Application=" << Application << ", Start=" << Start << ", Limit= " << Limit );

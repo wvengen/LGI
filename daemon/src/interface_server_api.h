@@ -42,6 +42,7 @@ class Interface_Server_API
               Interface_Server_API( string KeyFile, string CertificateFile, string CAFile );
 
               int Interface_Project_Server_List( string &Response, string ServerURL, string Project, string User, string Groups );
+              int Interface_Project_Resource_List( string &Response, string ServerURL, string Project, string User, string Groups );
               int Interface_Job_State( string &Response, string ServerURL, string Project, string User, string Groups, string Job_Id = "", string State = "", string Application = "", string Start = "", string Limit = "" );
               int Interface_Delete_Job( string &Response, string ServerURL, string Project, string User, string Groups, string Job_Id );
               int Interface_Submit_Job( string &Response, string ServerURL, string Project, string User, string Groups, string Application, string Target_Resources, string Job_Specifics = "", string Input = "", string Read_Access = "", string Owners = "", string Output = ""  );

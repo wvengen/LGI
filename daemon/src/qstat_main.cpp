@@ -59,6 +59,7 @@ void PrintHelp( char *ExeName )
  cout << "-s state                   specify job state to query about. default is any." << endl;
  cout << "-x                         output in XML format." << endl;
  cout << "-l                         report project server list." << endl;
+ cout << "-L                         report project resource list." << endl;
  cout << "-c directory               specify configuration directory to read. default is ~/.LGI. use the options below to overrule those settings." << endl; 
  cout << "-P project                 specify project name. if not specified, the default project of the server is assumed." << endl; 
  cout << "-S serverurl               specify project server to query." << endl;
@@ -97,7 +98,9 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-x" ) ) {
      OutputInXML = 1;
   } else if( !strcmp( argv[ i ], "-l" ) ) {
-     ListServers = 1;
+     ListServers |= 1;
+  } else if( !strcmp( argv[ i ], "-L" ) ) {
+     ListServers |= 2;
   } else if( !strcmp( argv[ i ], "-c" ) ) {
     if( argv[ ++i ] )
     {
@@ -228,46 +231,93 @@ int main( int argc, char *argv[] )
  if( ListServers )            // should we list servers...
  {
 
-  if( ( Flag = ServerAPI.Interface_Project_Server_List( Response, ServerURL, Project, User, Groups ) ) != CURLE_OK )
+  if( ListServers & 1 )
   {
-   cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
-   return( 1 );
-  }
-
-  Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-
-  if( Response.empty() ) return( 1 );
-
-  if( OutputInXML )
-  {
-   cout << Response << endl;                // just dump the XML if requested...
-
-   if( !Parse_XML( Response, "error" ).empty() ) return( 1 );
-  }
-  else
-  {
-   if( !Parse_XML( Response, "error" ).empty() ) 
+   if( ( Flag = ServerAPI.Interface_Project_Server_List( Response, ServerURL, Project, User, Groups ) ) != CURLE_OK )
    {
-    cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
     return( 1 );
    }
 
-   cout << endl << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
-   cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
-   
-   int Count = atoi( NormalizeString( Parse_XML( Response, "number_of_slave_servers" ) ).c_str() );
-   int StartPos = 0;
-   string Attributes;
- 
-   for( int i = 1; i <= Count; ++i )
-    cout << "Project slave server  : " << NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) ) << endl;
+   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
-   cout << endl;
+   if( Response.empty() ) return( 1 );
+
+   if( OutputInXML )
+   {
+    cout << Response << endl;                // just dump the XML if requested...
+
+    if( !Parse_XML( Response, "error" ).empty() ) return( 1 );
+   }
+   else
+   {
+    if( !Parse_XML( Response, "error" ).empty() ) 
+    {
+     cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+     return( 1 );
+    }
+
+    cout << endl << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+    cout << "This project server   : " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
+    cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
+   
+    int Count = atoi( NormalizeString( Parse_XML( Response, "number_of_slave_servers" ) ).c_str() );
+    int StartPos = 0;
+    string Attributes;
+ 
+    for( int i = 1; i <= Count; ++i )
+     cout << "Project slave server  : " << NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) ) << endl;
+
+    if( !( ListServers & 2 ) ) cout << endl;
+   }
+  }
+
+  if( ListServers & 2 )
+  {
+   if( ( Flag = ServerAPI.Interface_Project_Resource_List( Response, ServerURL, Project, User, Groups ) ) != CURLE_OK )
+   {
+    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+    return( 1 );
+   }
+
+   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+
+   if( Response.empty() ) return( 1 );
+
+   if( OutputInXML )
+   {
+    cout << Response << endl;                // just dump the XML if requested...
+
+    if( !Parse_XML( Response, "error" ).empty() ) return( 1 );
+   }
+   else
+   {
+    if( !Parse_XML( Response, "error" ).empty() )
+    {
+     cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+     return( 1 );
+    }
+
+    if( !( ListServers & 1 ) )
+    {
+     cout << endl << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+     cout << "This project server   : " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
+     cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
+    }
+
+    int Count = atoi( NormalizeString( Parse_XML( Response, "number_of_resources" ) ).c_str() );
+    int StartPos = 0;
+    string Attributes;
+
+    for( int i = 1; i <= Count; ++i )
+     cout << "Project resource      : " << NormalizeString( Parse_XML( Response, "resource", Attributes, StartPos ) ) << endl;
+
+    cout << endl;
+   }
   }
 
   return( 0 );
  }
-
 
 
 
@@ -353,7 +403,7 @@ int main( int argc, char *argv[] )
 
      cout << "<project> " << NormalizeString( Parse_XML( Response, "project" ) ) << " </project> ";
      cout << "<project_master_server> " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << " </project_master_server> ";
-     cout << "<project_server> " << NormalizeString( Parse_XML( Response, "project_server" ) ) << " </project_server> ";
+     cout << "<this_project_server> " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << " </this_project_server> ";
      cout << "<user> " << NormalizeString( Parse_XML( Response, "user" ) ) << " </user> ";
      cout << "<groups> " << NormalizeString( Parse_XML( Response, "groups" ) ) << " </groups> ";
      cout << "<state> " << NormalizeString( Parse_XML( Response, "state" ) ) << " </state> ";
@@ -366,7 +416,7 @@ int main( int argc, char *argv[] )
      cout << "------------------------------------------------------------------------------------------------------------------------------------------------------" << endl << endl;
      cout << "Number of jobs listed : " << TotalNrOfJobs << endl;
      cout << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
-     cout << "This project server   : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
+     cout << "This project server   : " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
      cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl << endl;
     }
    }
@@ -410,9 +460,9 @@ int main( int argc, char *argv[] )
    char *TimeStampStr = ctime( &TimeStamp );
    TimeStampStr[ 24 ] = '\0';
 
-   cout << endl << "Project               : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+   cout << endl << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+   cout << "This project server   : " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
    cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
-   cout << "Project server        : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
    cout << "User                  : " << NormalizeString( Parse_XML( Response, "user" ) ) << endl;
    cout << "Groups                : " << NormalizeString( Parse_XML( Response, "groups" ) ) << endl;
  

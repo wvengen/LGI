@@ -398,9 +398,9 @@ int main( int argc, char *argv[] )
   TimeStampStr[ 24 ] = '\0';
  
   cout << endl << "Job has been submitted. Some details: " << endl << endl;
-  cout << "Project               : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+  cout << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
+  cout << "This project server   : " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
   cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl;
-  cout << "Project server        : " << NormalizeString( Parse_XML( Response, "project_server" ) ) << endl;
   cout << "User                  : " << NormalizeString( Parse_XML( Response, "user" ) ) << endl;
   cout << "Groups                : " << NormalizeString( Parse_XML( Response, "groups" ) ) << endl;
 

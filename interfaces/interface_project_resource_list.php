@@ -1,12 +1,12 @@
 <?php
 
 // []--------------------------------------------------------[]
-//  |            interface_project_server_list.php           |
+//  |          interface_project_resource_list.php           |
 // []--------------------------------------------------------[]
 //  |                                                        |
 //  | AUTHOR:     M.F.Somers                                 |
 //  | VERSION:    1.00, August 2007.                         |
-//  | USE:        List project servers from project DB...    |
+//  | USE:        List resources from project DB...          |
 //  |                                                        |
 // []--------------------------------------------------------[]
 //
@@ -38,16 +38,16 @@ $Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server>";
 $Response .= " <this_project_server> ".Get_Server_URL()." </this_project_server>";
 
-$queryresult = mysql_query( "SELECT url FROM active_resources WHERE project_server=2" );
+$queryresult = mysql_query( "SELECT resource_name FROM active_resources WHERE project_server=0" );
 
-$NumberOfServers = mysql_num_rows( $queryresult );
+$NumberOfResources = mysql_num_rows( $queryresult );
 
-$Response .= " <number_of_slave_servers> ".$NumberOfServers." </number_of_slave_servers>";
+$Response .= " <number_of_resources> ".$NumberOfResources." </number_of_resources>";
 
-for( $i = 1; $i <= $NumberOfServers; $i++ )
+for( $i = 1; $i <= $NumberOfResources; $i++ )
 {
- $Server = mysql_fetch_object( $queryresult );
- $Response .= " <project_server number='".$i."'> ".$Server->url." </project_server>";
+ $Resource = mysql_fetch_object( $queryresult );
+ $Response .= " <resource number='".$i."'> ".$Resource->resource_name." </resource>";
 }
 
 mysql_free_result( $queryresult );

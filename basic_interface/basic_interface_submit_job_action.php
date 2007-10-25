@@ -240,11 +240,11 @@ mysql_free_result( $JobQuery );
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
+Row2( "<b>Project:</b>", $Project );
 Row2( "<b>This project server:</b>", Get_Server_URL() );
 Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basic_interface>".Get_Master_Server_URL()."</a>" );
 Row2( "<b>User:</b>", $User );
 Row2( "<b>Groups:</b>", $Groups );
-Row2( "<b>Project:</b>", $Project );
 Row1( "<center><font color='green' size='4'><b>Submitted job details</b></font></center>" );
 Row2( "<b>Job ID:</b>", $JobSpecs -> job_id );
 Row2( "<b>Application:</b>", $JobSpecs -> application );

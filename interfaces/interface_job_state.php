@@ -45,7 +45,7 @@ else
 
 // build response header...
 $Response =  " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <project_server> ".Get_Server_URL()." </project_server>";
+$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
 $Response .= " <user> ".$JobUser." </user> <groups> ".$JobGroups." </groups>";
 
 // should we detail on a job or not...
