@@ -186,9 +186,9 @@ else
  if( $Start > 0 )
  {
   if( $Start > $Limit )
-   $Menu .= "<a href=basic_interface_job_state.php?start=".($Start-$Limit)."> Prev </a>";
+   $Menu .= "<a href=basic_interface_job_state.php?start=".($Start-$Limit)."&limit=$Limit$state=$State&groups=$Groups&application=$Applicatio&project=$Project> Prev </a>";
   else
-   $Menu .= "<a href=basic_interface_job_state.php?start=0> Prev </a>";
+   $Menu .= "<a href=basic_interface_job_state.php?start=0&limit=$Limit$state=$State&groups=$Groups&application=$Applicatio&project=$Project> Prev </a>";
  }
  if( $Number >= $Limit  )
   $Menu .= "<a href=basic_interface_job_state.php?start=".($Start+$Number)."> Next </a>";
