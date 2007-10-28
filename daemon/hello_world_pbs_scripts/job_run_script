@@ -6,7 +6,6 @@ cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -q small
 #PBS -N hello_world_pbs
 #PBS -o LGI_output
-#PBS -e finished
 
 NODES=\`/bin/cat \${PBS_NODEFILE}\`
 /bin/sleep 10
@@ -20,7 +19,9 @@ echo -n ". This job was submitted from "
 /bin/sleep 160
 echo "."
 
-#/home/mark/temp/LGI/daemon/src/LGI_qsub -a hello_world_pbs -j \${PBS_O_WORKDIR} -i \${PBS_O_WORKDIR}/LGI_target_resources
+/home/mark/temp/LGI/daemon/src/LGI_qsub -a hello_world_pbs -j \${PBS_O_WORKDIR} -i \${PBS_O_WORKDIR}/LGI_target_resources
+
+/bin/touch \${PBS_O_WORKDIR}/finished
 
 END_OF_PBS_SCRIPT
 
