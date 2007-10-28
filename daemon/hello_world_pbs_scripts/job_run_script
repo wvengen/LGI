@@ -1,0 +1,27 @@
+#!/bin/sh
+
+cat > ./pbs_script << END_OF_PBS_SCRIPT
+#PBS -S /bin/sh
+#PBS -l nodes=01:ppn=01,walltime=0:15:00
+#PBS -q small
+#PBS -N hello_world_pbs
+#PBS -o LGI_output
+#PBS -e finished
+
+NODES=\`/bin/cat \${PBS_NODEFILE}\`
+/bin/sleep 10
+echo -n "Hello_World_PBS running on nodes \${NODES} in directory \${PBS_O_WORKDIR} at " 
+/bin/sleep 20
+/bin/cat \${PBS_O_WORKDIR}/LGI_target_resources
+/bin/sleep 40
+echo -n ". This job was submitted from "
+/bin/sleep 80
+/bin/cat \${PBS_O_WORKDIR}/LGI_input
+/bin/sleep 160
+echo "."
+
+#/home/mark/LGI/daemon/src/LGI_qsub -a hello_world_pbs -i \${PBS_O_WORKDIR}/LGI_target_resources
+
+END_OF_PBS_SCRIPT
+
+/usr/local/bin/qsub pbs_script > ./running
