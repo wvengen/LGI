@@ -559,7 +559,7 @@ int Daemon::RequestWorkCycle( void )
 
      }
      else
-      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; System limit reached for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() );
+      DEBUG_LOG( "Daemon::RequestWorkCycle; System limit reached for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() );
     }
 
     // sign off from this server...
