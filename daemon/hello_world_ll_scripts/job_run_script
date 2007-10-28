@@ -1,0 +1,28 @@
+#!/bin/sh
+
+cat > ./llsubmit_script << END_OF_LLSUBMIT_SCRIPT
+#@ shell = /bin/sh
+#@ job_name = hello_world_ll
+#@ notification = never
+#@ output = LGI_output
+#@ wall_clock_limit = 00:15:00
+#@ queue
+
+/bin/sleep 10
+echo -n "Hello_World_PBS running on nodes \${LOADL_PROCESSOR_LIST} in directory \${LOADL_STEP_INITDIR} at " 
+/bin/sleep 20
+/bin/cat \${LOADL_STEP_INITDIR}/LGI_target_resources
+/bin/sleep 40
+echo -n ". This job was submitted from "
+/bin/sleep 80
+/bin/cat \${LOADL_STEP_INITDIR}/LGI_input
+/bin/sleep 160
+echo "."
+
+#/home/somers/LGI/daemon/src/LGI_qsub -a hello_world_pbs -j \${LOADL_STEP_INITDIR} -i \${LOADL_STEP_INITDIR}/LGI_target_resources
+
+/bin/touch \${LOADL_STEP_INITDIR}/finished
+
+END_OF_LLSUBMIT_SCRIPT
+
+llsubmit llsubmit_script | /usr/bin/awk '/llsubmit/ { print $4 }' | /usr/bin/cut -d'.' -f5 | /usr/bin/cut -d '"' -f1 > ./running
