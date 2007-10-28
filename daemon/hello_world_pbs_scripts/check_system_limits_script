@@ -2,7 +2,9 @@
 queued_in_small=`/usr/local/bin/qstat -q small | /usr/bin/awk '/small/ { print $7 }'`
 if (( $queued_in_small < 1 ))
 then
+# echo No system limit reached
  exit 1
 else
+# echo System limit has been reached
  exit 0
 fi
