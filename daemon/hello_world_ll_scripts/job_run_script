@@ -9,7 +9,7 @@ cat > ./llsubmit_script << END_OF_LLSUBMIT_SCRIPT
 #@ queue
 
 /bin/sleep 10
-echo -n "Hello_World_PBS running on nodes \${LOADL_PROCESSOR_LIST} in directory \${LOADL_STEP_INITDIR} at " 
+echo -n "Hello_World_LL running on nodes \${LOADL_PROCESSOR_LIST} in directory \${LOADL_STEP_INITDIR} at " 
 /bin/sleep 20
 /bin/cat \${LOADL_STEP_INITDIR}/LGI_target_resources
 /bin/sleep 40
