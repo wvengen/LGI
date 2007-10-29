@@ -25,4 +25,4 @@ echo "."
 
 END_OF_LLSUBMIT_SCRIPT
 
-llsubmit llsubmit_script | /usr/bin/awk '/llsubmit/ { print $4 }' | /usr/bin/cut -d'.' -f5 | /usr/bin/cut -d '"' -f1 > ./running
+llsubmit llsubmit_script | /usr/bin/awk '/submitted/ { print $4 }' | /usr/bin/cut -d'.' -f5 | /usr/bin/cut -d '"' -f1 > ./running
