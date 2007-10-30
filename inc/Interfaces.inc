@@ -118,6 +118,15 @@ function Get_Server_URL( )
 
 // -------------------------------------------------------------------- 
 
+function Get_Server_Name( )
+{
+ global $Config;
+
+ return( $Config[ "SERVER_NAME" ] );
+}
+
+// -------------------------------------------------------------------- 
+
 function Get_Master_Server_URL( $ExitOnError = true )
 {
  global $ErrorMsgs;

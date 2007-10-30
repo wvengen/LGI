@@ -161,19 +161,19 @@ function Server_Check_And_Perform_Updates( )
    // post our version number and get a possible update...
    $PostResponse =  SSL_Post_To_URL( $CurrentUpdateServer->url."/servers/server_get_update.php", "project=".Get_Selected_MySQL_DataBase()."&version=".$CurrentVersionNumber );
 
-   $UpdateData = Parse_XML( Parse_XML( Parse_XML( $PostResponse, "LGI", $Attributes ), "response", $Attributes ), "update", $Attributes );
+   $UpdateData = NormalizeString( Parse_XML( Parse_XML( Parse_XML( $PostResponse, "LGI", $Attributes ), "response", $Attributes ), "update", $Attributes ) );
 
    // check if update data was retrieved...
    if( $UpdateData != "" )
    {
-    $UpdateFlag = Parse_XML( $UpdateData, "updates", $Attributes );
+    $UpdateFlag = NomalizeString( Parse_XML( $UpdateData, "updates", $Attributes ) );
 
     // an update was sent back in the response...
     if( $UpdateFlag >= 1 )
     {
-     $UpdateVersion = Parse_XML( $UpdateData, "update_version", $Attributes );
-     $UpdateServers = Parse_XML( $UpdateData, "target_servers", $Attributes );
-     $UpdateQuery   = hexbin( Parse_XML( $UpdateData, "update_query", $Attributes ) );
+     $UpdateVersion = NormalizeString( Parse_XML( $UpdateData, "update_version", $Attributes ) );
+     $UpdateServers = NormalizeString( Parse_XML( $UpdateData, "target_servers", $Attributes ) );
+     $UpdateQuery   = hexbin( NormalizeString( Parse_XML( $UpdateData, "update_query", $Attributes ) ) );
 
      // perform the update on the DB if needed...
      if( FoundInCommaSeparatedField( $UpdateServers, $Config[ "SERVER_NAME" ], "," ) )

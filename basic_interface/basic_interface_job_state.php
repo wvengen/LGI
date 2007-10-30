@@ -82,6 +82,21 @@ if( isset( $Job_ID ) )               // we requested details on a job...
 
  if( !Interface_Is_User_Allowed_To_Read_Job( $JobSpecs, $User, $Groups ) ) Exit_With_Text( "ERROR: User is not allowed to get details of this job" );
 
+ // get repository url from specs...
+ $RepositoryURL = NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) );
+ if( $RepositoryURL != "" )
+ {
+  $RepositoryArray = CommaSeparatedField2Array( $RepositoryURL, ":" );
+
+  if( $RepositoryArray[ 0 ] == 2 )
+  {
+   $RepositoryArray = CommaSeparatedField2Array( $RepositoryArray[ 2 ], "/" );
+   $RepositoryURL = $RepositoryArray[ 1 ];
+  }
+  else
+   $RepositoryURL = "";
+ }
+
  Start_Table();
  Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
  Row2( "<b>Project:</b>", $Project ); 
@@ -97,9 +112,10 @@ if( isset( $Job_ID ) )               // we requested details on a job...
  Row2( "<b>Owners:</b>", $JobSpecs -> owners ); 
  Row2( "<b>Read access:</b>", $JobSpecs -> read_access ); 
  Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources ); 
- Row2( "<b>Job specifics:</b>", $JobSpecs -> job_specifics ); 
- Row2( "<b>Input:</b>", $JobSpecs -> input ); 
- Row2( "<b>Output:</b>", $JobSpecs -> output ); 
+ Row2( "<b>Job specifics:</b>", htmlentities( $JobSpecs -> job_specifics ) ); 
+ if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href=$RepositoryURL> $RepositoryURL </a>" ); 
+ Row2( "<b>Input:</b>", htmlentities( $JobSpecs -> input ) ); 
+ Row2( "<b>Output:</b>", htmlentities( $JobSpecs -> output ) ); 
  End_Table();
 
  echo "<br><a href=basic_interface_delete_job.php?job_id=$JobSpecs->job_id>Abort or Delete this job</a>\n";

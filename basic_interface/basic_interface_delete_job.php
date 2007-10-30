@@ -91,6 +91,17 @@ if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( 
 {
  $ErrorCode = Interface_Set_Spin_Lock_On_Job( $Job_ID, false );
  if( $ErrorCode != 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
+
+ $RepositoryURL = NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) );
+ if( $RepositoryURL != "" )
+ {
+  $RepositoryArray = CommaSeparatedField2Array( $RepositoryURL, ":" );
+
+  if( $RepositoryArray[ 0 ] == 2 )
+   rmpath( $RepositoryArray[ 2 ] );
+ }
+
+ // now delete from db...
  $queryresult = mysql_query( "DELETE FROM job_queue WHERE job_id=".$Job_ID );
  $JobState = "deleted";
  $JobStateTimeStamp = time();
@@ -124,7 +135,7 @@ Row2( "<b>State time stamp:</b>", "<b>".gmdate( "j M Y G:i", $JobStateTimeStamp 
 Row2( "<b>Owners:</b>", $JobSpecs -> owners );
 Row2( "<b>Read access:</b>", $JobSpecs -> read_access );
 Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
-Row2( "<b>Job specifics:</b>", $JobSpecs -> job_specifics );
+Row2( "<b>Job specifics:</b>", htmlentities( $JobSpecs -> job_specifics ) );
 End_Table();
 
 echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n";

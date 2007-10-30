@@ -26,6 +26,9 @@ require_once( '../inc/Html.inc' );
 global $ErrorMsgs;
 global $Config;
 
+// remove repository cookie from client...
+setcookie( "repository" );
+
 Page_Head();
 
 // check if user is set in request... or use value from certificate...
@@ -116,6 +119,27 @@ if( strlen( $Input ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "E
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
+// check if repository name was posted... default to a new unique name otherwise...
+$RepositoryName = "JOB_".md5(uniqid(time()));
+if( isset( $_GET[ "repository" ] ) )
+ $RepositoryName = $_GET[ "repository" ];
+else
+ if( isset( $_POST[ "repository" ] ) )
+  $RepositoryName = $_POST[ "repository" ];
+if( strlen( $RepositoryName ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: Repository field posted too big" );
+if( strpos( $RepositoryName, "." ) !== FALSE ) Exit_With_Text( "ERROR: Invalid repository field posted" );
+
+// create the job respository directory if not there yet...
+if( !is_dir( $RepositoryName ) )
+{
+ $OldMask = umask( 0 );
+ mkdir( $RepositoryName, 0770 );
+ umask( $OldMask );
+}
+
+// build up the repository URL... use the server unique name which should be correctly formated for resources...
+$RepositoryURL = Get_Server_Name().":".getcwd()."/".$RepositoryName;
+
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $TargetResources, "," );
 
@@ -129,7 +153,11 @@ for( $i = 1; $i <= $Resources[ 0 ]; $i++ )
   $FoundResourceFlag = 1;
  }
 
-if( !$FoundResourceFlag ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 28 ] );
+if( !$FoundResourceFlag ) 
+{ 
+ rmpath( $RepositoryName ); 
+ Exit_With_Text( "ERROR: ".$ErrorMsgs[ 28 ] ); 
+}
 
 $TargetResources = substr( $NewTargetResourceList, 2 );
 
@@ -181,7 +209,10 @@ for( $i = 1; $i <= $GroupsArray[ 0 ]; $i++ )
 if( $FoundPossibleGroup )
  $Groups = substr( $NewGroupsList, 2 );
 else
+{
+ rmpath( $RepositoryName );
  Exit_With_Text( "ERROR: ".$ErrorMsgs[ 33 ] );
+}
 
 // now determine the owners and read_access fields based on the possibly posted data and the user+groups data...
 if( $ReadAccess != "" )
@@ -222,10 +253,7 @@ $Application = mysql_escape_string( $Application );
 $TargetResources = mysql_escape_string( $TargetResources );
 
 // start building the insert query based on all possible posted fields...
-$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$Application."', owners='".$Owners."', read_access='".$ReadAccess."', target_resources='".$TargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP()";
-
-if( $JobSpecifics != "" )
- $InsertQuery .= ", job_specifics='".mysql_escape_string( $JobSpecifics )."'";
+$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$Application."', owners='".$Owners."', read_access='".$ReadAccess."', target_resources='".$TargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP(), job_specifics='".mysql_escape_string( $JobSpecifics." <repository> $RepositoryURL </repository>" )."'";
 
 if( $Input != "" )
  $InsertQuery .= ", input='".mysql_escape_string( $Input )."'";
@@ -237,6 +265,21 @@ $queryresult = mysql_query( $InsertQuery );
 $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=LAST_INSERT_ID()" );
 $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
+
+// get repository url from specs...
+$RepositoryURL = NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) );
+if( $RepositoryURL != "" )
+{
+ $RepositoryArray = CommaSeparatedField2Array( $RepositoryURL, ":" );
+
+ if( $RepositoryArray[ 0 ] == 2 )
+ {
+  $RepositoryArray = CommaSeparatedField2Array( $RepositoryArray[ 2 ], "/" );
+  $RepositoryURL = $RepositoryArray[ 1 ];
+ }
+ else
+  $RepositoryURL = "";
+}
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
@@ -253,8 +296,9 @@ Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_s
 Row2( "<b>Owners:</b>", $JobSpecs -> owners );
 Row2( "<b>Read access:</b>", $JobSpecs -> read_access );
 Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
-Row2( "<b>Job specifics:</b>", $JobSpecs -> job_specifics );
-Row2( "<b>Input:</b>", $JobSpecs -> input );
+Row2( "<b>Job specifics:</b>", htmlentities( $JobSpecs -> job_specifics ) );
+if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href=$RepositoryURL> $RepositoryURL </a>" );
+Row2( "<b>Input:</b>", htmlentities( $JobSpecs -> input ) );
 End_Table();
 
 echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n";

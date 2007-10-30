@@ -210,4 +210,42 @@ function Parse_XML( $XML, $Tag, &$Attributes )
 
 // --------------------------------------------------- 
 
+function NormalizeString( $String )
+{
+ $Start = 0;
+ $End = strlen( $String );
+
+ if( $End <= 0 ) return( "" );
+
+ while( ( $String[ $Start ] == " " ) && ( $Start < $End ) ) $Start++;  
+ if( $Start >= $End ) return( "" );
+
+ while( ( $String[ $End - 1 ] == " " ) && ( $End > $Start ) ) $End--; 
+ if( $End <= $Start ) return( "" );
+
+ return( substr( $String, $Start, $End - $Start ) );
+}
+
+// --------------------------------------------------- 
+
+function rmpath( $Path )
+{
+ if( is_dir( $Path ) )
+ {
+  $DirHandle = opendir( $Path );
+
+  while( ( $Entry = readdir( $DirHandle ) ) !== FALSE )
+   if( $Entry[ 0 ] != "." )
+    rmpath( $Path."/".$Entry );
+
+  closedir( $DirHandle );
+
+  rmdir( $Path );
+ }
+ elseif( is_file( $Path ) )
+  unlink( $Path );
+} 
+
+// --------------------------------------------------- 
+
 ?>

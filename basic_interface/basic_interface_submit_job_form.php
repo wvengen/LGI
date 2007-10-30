@@ -27,7 +27,19 @@ require_once( '../inc/Html.inc' );
 global $Config;
 global $ErrorMsgs;
 
+// check if job respository cookie was set...
+if( !isset( $_COOKIE[ "repository" ] ) || ( $_COOKIE[ "repository" ] == "" ) )
+{
+ $RepositoryName = "JOB_".md5(uniqid(time()));
+ setcookie( "repository", $RepositoryName );
+}
+else
+ $RepositoryName = $_COOKIE[ "repository" ];
+
 Page_Head();
+
+// check repository name here...
+if( strpos( $RepositoryName, "." ) !== FALSE ) Exit_With_Text( "ERROR: Invalid repository field posted" );
 
 // check if user is set in request... or use value from certificate...
 $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
@@ -64,10 +76,19 @@ $Project = mysql_escape_string( $Project );
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
+// create the job respository directory if not there yet...
+if( !is_dir( $RepositoryName ) )
+{
+ $OldMask = umask( 0 );
+ mkdir( $RepositoryName, 0770 );
+ umask( $OldMask );
+}
+
 // start building form to fill in...
 echo '<form action="basic_interface_submit_job_action.php" method="POST">';
 echo '<input type="hidden" name="user" value="'.$User.'">';
 echo '<input type="hidden" name="groups" value="'.$Groups.'">';
+echo '<input type="hidden" name="repository" value="'.$RepositoryName.'">';
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
@@ -82,6 +103,7 @@ Row2( "<b>Extra owners:</b>", '<input type="text" size="65" name="owners" value=
 Row2( "<b>Extra read access:</b>", '<input type="text" size="65" name="read_access" value="" maxlength="128" >' );
 Row2( "<b>Target resources:</b>", '<input type="text" size="65" name="target_resources" value="any" maxlength="128" >' );
 Row2( "<b>Job specifics:</b>", '<input type="text" size="65" name="job_specifics" value="" maxlength="1024" >' );
+Row2( "<b>Repository:</b>", "<a href=$RepositoryName> $RepositoryName </a>" );
 Row2( "<b>Input:</b>", '<textarea wrap="off" rows="20" cols="74" name="input"></textarea>' );
 Row1( '<center><input type="submit" value="     Submit Job     "></center>' );
 End_Table();
