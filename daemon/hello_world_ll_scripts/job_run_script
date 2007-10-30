@@ -19,7 +19,7 @@ echo -n ". This job was submitted from "
 /bin/sleep 160
 echo "."
 
-/home/temp/mark/LGI/daemon/src/LGI_qsub -a hello_world_ll -j \${LOADL_STEP_INITDIR} -i \${LOADL_STEP_INITDIR}/LGI_target_resources
+/home/somers/LGI/daemon/src/LGI_qsub -a hello_world -j \${LOADL_STEP_INITDIR} -i \${LOADL_STEP_INITDIR}/LGI_target_resources
 
 /bin/touch \${LOADL_STEP_INITDIR}/finished
 
