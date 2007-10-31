@@ -77,12 +77,12 @@ $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // create the job respository directory if not there yet...
-if( !is_dir( $RepositoryName ) )
+/* if( !is_dir( $RepositoryName ) )
 {
  $OldMask = umask( 0 );
  mkdir( $RepositoryName, 0770 );
  umask( $OldMask );
-}
+} */
 
 // start building form to fill in...
 echo '<form action="basic_interface_submit_job_action.php" method="POST">';
