@@ -1,0 +1,283 @@
+
+
+                         HOW TO SETUP LGI
+                         ----------------
+
+In this document a howto is presented on the setup of LGI. The document
+is divided into three parts. Part I will show you howto setup a resource
+within an existing LGI project, part II will show you how to setup a new
+LGI project with a project server and finally part III will show you how
+to add an extra project server into an existing LGI project.
+
+
+
+
+Part I : Howto setup a resource 
+-------------------------------
+
+Setting up a resource with an LGI project is rather easy. Just follow the
+following steps:
+
+
+- Get in contact with the project administrator to get a x509 certificate
+and a private key for your resource.
+
+- Copy the key and certificate files into the '~/LGI/certificates' directory.
+
+- Make sure that libcurl is installed. Visit http://curl.haxx.se/libcurl/ if
+you do not have this yet.
+
+- Go to the '~/LGI/daemon/src' directory and invoke make. If you have a
+different compiler installed that GNU's g++, or you have libcurl installed
+in a different location, adjust the first few lines of the file Makefile to
+your needs.
+
+- If you want, you can also invoke make with the 'make install' command. If
+you do that the directory '~/LGI/daemon/bin' will be created and you can
+include that in your PATH for convencience.
+
+- Edit the '~/LGI/daemon/LGI.cfg' example configuration file. It has been
+setup to run the hello_world application by just simple forking scripts.
+Other example scripts on how to use the 'hello_world' example usig Torque
+/ PBS or LoadLeveler are included to in the corresponding '~LGI/daemon/
+hello_world_XX_scripts' subdirectories. Please make sure you refer to
+the right LGI project server, use the correct project name and use the
+correct private key and certificate files from the '~/LGI/certificates'
+directory. Also be sure to use absolute paths in the configuration file
+so it is possible to invoke the daemon from any other directory. Finally
+set the run directory correctly if you do not want it to be the default.
+
+- Start the daemon by invoking the daemon like '~/LGI/daemon/src/LGI_daemon 
+-l ~/LGI/daemon/LGI.log ~/LGI/daemon/LGI.cfg'. You can now inspect the log
+file '~/LGI/daemon/LGI.log' and see if everything was setup correctly.
+
+- You can gracefully stop the dameon by sending it a 'kill' signal. While
+the daemon is running, you can edit the configuartion file without any
+problems. You can also edit the scripts in the mean time, only newly spawned
+jobs will be affected. 
+
+
+
+
+
+
+Part II : Howto setup a project server 
+--------------------------------------
+
+Setting up your own project is not too hard either. You can decide to be
+a fully independent project by setting up your own x509 certificate Center
+of Authority, or you can decide to be a sub project and thus be a x509
+sub-CA of the LGI-CA. In this part, it is shown how to become an
+independant project and be your own x509 CA.
+
+- Make sure libcurl, php, mysql, apache and openssl are installed on your
+system.
+
+- Make sure MySQL is configured correctly and mysqld is running.
+
+- Make sure PHP is configured correctly.
+
+- Switch to the user apache and make sure you install the source tree
+  in the home of user apache:
+
+  sudo su -l -s /bin/bash apache 
+
+  tar -zxf LGI.tar.gz -C /var/www
+
+- Use openssl to create a CA private key and certificate with which you can
+create and sign your project server, resource and client certificates too:
+
+ Start by creating a private key for your CA:
+
+    openssl genrsa -out /var/www/html/LGI/certificates/exampleCA.key 4096    
+
+ Then create a x509 selfsigned certificate for it:
+
+    openssl req -new -x509 -days 365 -set_serial 0 -extensions v3_ca 
+            -key /var/www/html/LGI/certificates/exampleCA.key 
+            -out /var/www/html/LGI/certificates/exampleCA.crt
+
+ and create a CA serial number file:
+
+    echo "0100" > /var/www/html/LGI/certificates/exampleCA.srl 
+
+ Now create a private key for your server:
+ 
+    openssl genrsa -out /var/www/html/LGI/certificates/exampleserver.key 4096
+
+ Then create a sign request for it:
+
+    openssl req -new -key /var/www/html/LGI/certificates/exampleserver.key 
+            -out /var/www/html/LGI/certificates/exampleserver.crs
+
+ and in filling in the commonname of the CA certificate, use the LGI format
+ 'apache@exampleserver.somewhere.org; exampleprojectname'.
+
+ Now create the CA signed server certificate from this request:
+
+    openssl x509 -req -in /var/www/html/LGI/certificates/exampleserver.crs
+            -days 365 -CA /var/www/html/LGI/certificates/exampleCA.crt
+            -CAkey /var/www/html/LGI/certificates/exampleCA.key 
+            -CAserial /var/www/html/LGI/certificates/exampleCA.srl 
+            -out /var/www/html/LGI/certificates/exampleserver.crt
+
+ You should now safely store the CA private key file somewere not on
+ this server computer that is conected to the internet. Or, at least, if
+ you do not do that, encrypt the file using a password protection:
+
+    openssl aes-256-ecb -e -in /var/www/html/LGI/certificates/exampleCA.key
+            -out /var/www/html/LGI/certificates/exampleCA.key.aes; rm 
+            /var/www/html/LGI/certificates/exampleCA.key
+
+ Now copy the public exampleCA.crt certificate to a place that Apache will
+ serve:
+
+    cp /var/www/html/LGI/certificates/exampleCA.crt /var/www/html/LGI
+
+    cp /var/www/html/LGI/certificates/exampleserver.crt /var/www/html/LGI
+
+- Make sure Apache is setup correctly to use client and server certificates
+for https and check that the following options have been set correctly into
+the ssl virtual host configuration:
+
+ SSLCertificateFile /var/www/html/LGI/certificates/exampleserver.crt
+ SSLCertificateKeyFile /var/www/html/LGI/certificates/exampleserver.key
+ SSLCertificateChainFile /var/www/html/LGI/certificates/exampleCA.crt
+ SSLCACertificateFile /var/www/html/LGI/certificates/exampleCA.crt
+ SSLVerifyClient require
+ SSLVerifyDepth  2
+ SSLOptions +ExportCertData
+
+ <Files ~ "\.(cgi|shtml|phtml|php3?)$">
+    SSLOptions +StdEnvVars
+ </Files>
+
+
+ Also make sure the AccessFileName has been set correctly in the Apache main
+ configuration and that the LGI document tree will be protected by .htaccess
+ files:
+
+ DocumentRoot "/var/www/html"
+ AccessFileName .htaccess
+
+ <Directory "/var/www/html/LGI">
+        AllowOverride Limit
+ </Directory>
+
+ Make sure you have a .htaccess file in the '/var/www/html/LGI/certificates'\
+ directory with the following content:
+
+ Order Allow,Deny
+ Deny from all
+
+ Finally check your apache configuration with the 'apachectl configtest' command.
+
+- Now create a MySQL user and database for your project with the database
+  name equal to your project name "exampleprojectname":
+
+  mysqladmin -u root password "yourmysqlrootpassword"
+
+  mysqladmin -u root -p create "exampleprojectname"
+
+  echo 'GRANT ALL PRIVILEGES ON exampleprojectname.* to 
+       "examplemysqluser"@"localhost" IDENTIFIED BY "examplemysqluserpasswd"'
+       | mysql -u root -p mysql
+
+  mysql -u examplemysqluser -p exampleprojectname < /var/www/html/LGI/LGI.db
+
+  At this point you need to insert a project server entry into the database:
+
+  export CERTIFICATE=`cat /var/www/html/LGI/certificates/exampleCA.crt`
+
+  echo "INSERT INTO active_resources SET resource_name=
+       'apache@exampleserver.somewhere.org',project_server=1,
+       url='https://exampleserver.somewhere.org/LGI',
+       client_certificate='$CERTIFICATE'" | mysql -u
+       examplemysqluser -p exampleprojectname
+
+- Make sure you edit the project web server configuration file 
+  /var/www/html/LGI/inc/Config.inc:
+
+ $Config[ "SERVER_URL" ] = "https://exampleserver.somewhere.org/LGI";    
+ $Config[ "SERVER_NAME" ] = "apache@exampleserver.somewhere.org"; 
+ $Config[ "SERVER_SSL_CERTIFICATE_FILE" ] = "../certificates/exampleserver.crt"; 
+ $Config[ "SERVER_SSL_KEY" ] = "../certificates/exampleserver.key";
+ $Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ] = 
+          "https://exampleserver.somewhere.org/LGI/exampleCA.crt";
+ $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ] = "../certificates/exampleCA.crt";        
+ $Config[ "MYSQL_URL" ] = "localhost";
+ $Config[ "MYSQL_USER" ] = "examplemysqluser";
+ $Config[ "MYSQL_PASSWD" ] = "examplemusqluserpasswd";
+ $Config[ "MYSQL_DEFAULT_DATABASE" ] = "exampleprojectname"; 
+
+- The last thing to do is to edit a crontab entry for the apache user
+
+  crontab -u apache -e
+
+  Add the following lines:
+ 
+  MAILTO=""
+  HOME=/var/www
+  */10 * * * *  /usr/bin/php -f /var/www/html/LGI/tools/cron_job.php
+  
+
+
+
+
+Part III : Howto setup a second slave project server 
+----------------------------------------------------
+
+After having successfully setup your first LGI master project server yourself,
+adding slave servers is fairly straightforward. Follow the same procedure
+on the slave server as was described in part II for the master server, but now
+there is no need to setup a CA. You can directly generate a server key and a
+certificate request for the slave server.
+
+After having setup the slave server, at the point where you insert the server
+entry into the fresh database, use the command from part II to insert the MASTER
+server data into the slave database:
+
+  (on the slaveserver)
+
+  wget https://exampleserver.somewhere.org/exampleCA.crt 
+       -O /var/www/html/LGI/certificates/exampleCA.crt
+
+  wget https://exampleserver.somewhere.org/exampleserver.crt 
+       -O /var/www/html/LGI/certificates/exampleserver.crt
+
+  export CERTIFICATE=`cat /var/www/html/LGI/certificates/exampleserver.crt`
+
+  echo "INSERT INTO active_resources SET resource_name=
+       'apache@exampleserver.somewhere.org',project_server=1,
+       url='https://exampleserver.somewhere.org/LGI',
+       client_certificate='$CERTIFICATE'" | mysql -u
+       examplemysqluser -p exampleprojectname
+
+Now insert the slave server details into the master server database:
+
+  (on the masterserver)
+
+  wget https://exampleslaveserver.somewhere.org/exampleslaveserver.crt 
+       -O /var/www/html/LGI/certificates/exampleslaveserver.crt
+
+  export SLAVECERTIFICATE=`cat /var/www/html/LGI/certificates/exampleslaveserver.crt`
+
+  export SLAVEINSERTQUERY="INSERT INTO active_resources SET resource_name=
+       'apache@exampleslaveserver.somewhere.org',project_server=2,
+       url='https://exampleslaveserver.somewhere.org/LGI',
+       client_certificate='$SLAVECERTIFICATE'"
+
+  echo $SAVEINSERTQUERY | mysql -u examplemysqluser -p exampleprojectname
+
+  echo "INSERT INTO updates SET servers='any', update_query='$SAVEINSERTQUERY'"
+       | mysql -u examplemysqluser -p exampleprojectname
+
+
+  
+
+At this point the two servers are linked together and the crontab entries
+of both will ensure that any updates pending in the 'updates' table of
+the master server database are transfered to the slave server.
+
+
+
