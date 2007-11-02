@@ -7,7 +7,8 @@ In this document a howto is presented on the setup of LGI. The document
 is divided into three parts. Part I will show you howto setup a resource
 within an existing LGI project, part II will show you how to setup a new
 LGI project with a project server and finally part III will show you how
-to add an extra project server into an existing LGI project.
+to add an extra project server into an existing LGI project. The last part
+part IV will detail on the maintenance of your LGI project servers.
 
 
 
@@ -233,9 +234,9 @@ on the slave server as was described in part II for the master server, but now
 there is no need to setup a CA. You can directly generate a server key and a
 certificate request for the slave server.
 
-After having setup the slave server, at the point where you insert the server
-entry into the fresh database, use the command from part II to insert the MASTER
-server data into the slave database:
+However, at the point where you insert the server entry into the fresh database
+in part II, use that command now to insert the MASTER server data into the 
+slave database:
 
   (on the slaveserver)
 
@@ -251,9 +252,9 @@ server data into the slave database:
        'apache@exampleserver.somewhere.org',project_server=1,
        url='https://exampleserver.somewhere.org/LGI',
        client_certificate='$CERTIFICATE'" | mysql -u
-       examplemysqluser -p exampleprojectname
+       exampleslavemysqluser -p exampleprojectname
 
-Now insert the slave server details into the master server database:
+and insert the slave server details into the master server database:
 
   (on the masterserver)
 
@@ -267,17 +268,24 @@ Now insert the slave server details into the master server database:
        url='https://exampleslaveserver.somewhere.org/LGI',
        client_certificate='$SLAVECERTIFICATE'"
 
-  echo $SAVEINSERTQUERY | mysql -u examplemysqluser -p exampleprojectname
+  export ESCAPEDSLAVEINSERTQUERY=`echo $SLAVEINSERTQUERY | sed "s/'/\\\\\'/g"`
 
-  echo "INSERT INTO updates SET servers='any', update_query='$SAVEINSERTQUERY'"
-       | mysql -u examplemysqluser -p exampleprojectname
+  export UPDATEQUERY="INSERT INTO updates SET servers='any',
+         update_query='$ESCAPEDSLAVEINSERTQUERY'"
 
+  echo $SLAVEINSERTQUERY | mysql -u examplemysqluser -p exampleprojectname
 
+  echo $UPDATEQUERY | mysql -u examplemysqluser -p exampleprojectname
   
-
 At this point the two servers are linked together and the crontab entries
 of both will ensure that any updates pending in the 'updates' table of
-the master server database are transfered to the slave server.
+the master server database are transfered to the slave server. 
 
+
+
+
+
+Part IV: Updating and maintaining project servers:
+--------------------------------------------------
 
 
