@@ -246,8 +246,8 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
 
  // and finally dump max output file size too..
  char TempBuffer[ 64 ];
- int ServerMaxOutput = atoi( NormalizeString( Parse_XML( TheXML, "server_max_output_size" ) ).c_str() );
- sprintf( TempBuffer, "%d", ( ServerMaxOutput > 1 ? MIN( ServerMaxOutput, Application.Max_Output_Size() ) : Application.Max_Output_Size() ) );
+ int ServerMaxFieldSize = atoi( NormalizeString( Parse_XML( TheXML, "server_max_field_size" ) ).c_str() );
+ sprintf( TempBuffer, "%d", ( ServerMaxFieldSize > 1 ? MIN( ServerMaxFieldSize, Application.Max_Output_Size() ) : Application.Max_Output_Size() ) );
  WriteStringToHashedFile( string( TempBuffer ), JobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE );
 
  NORMAL_LOG( "DaemonJob::DaemonJob; Job with JobDirectory=" << JobDirectory << " has been setup" );

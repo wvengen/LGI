@@ -388,7 +388,7 @@ int Daemon::RequestWorkCycle( void )
   // first signup to registered master server of this project to get all slaves... if this fails somehow, try the next...
 
   list<string> ServerList;
-  string Response, Attributes, SessionID, ServerMaxOutputSize;
+  string Response, Attributes, SessionID, ServerMaxFieldSize;
   int    StartPos;
 
   DEBUG_LOG( "Daemon::RequestWorkCycle; Signing up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
@@ -396,7 +396,7 @@ int Daemon::RequestWorkCycle( void )
   if( ServerAPI.Resource_SignUp_Resource( Response, TheProject.Project_Master_Server(), TheProject.Project_Name() ) != CURLE_OK ) continue;
 
   Response = Parse_XML( Response, "LGI" );
-  ServerMaxOutputSize = Parse_XML( Response, "server_max_output_size" );
+  ServerMaxFieldSize = Parse_XML( Response, "server_max_field_size" );
   Response = Parse_XML( Response, "response" );
 
   if( Response.empty() ) continue;
@@ -462,8 +462,8 @@ int Daemon::RequestWorkCycle( void )
                                   (*ServerPointer) + " </this_project_server> <project_master_server> " +
                                   Parse_XML( Response, "project_master_server" ) + " </project_master_server> " +
                                   "<application> " + TheApplication.Application_Name() + " </application> " +
-                                  "<state> queued </state> <server_max_output_size> " + ServerMaxOutputSize +
-                                  " </server_max_output_size>";
+                                  "<state> queued </state> <server_max_field_size> " + ServerMaxFieldSize +
+                                  " </server_max_field_size>";
   
      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Checking system limits for application " << TheApplication.Application_Name() );
 
@@ -586,14 +586,14 @@ int Daemon::RequestWorkCycle( void )
     else
     {
      Response = Parse_XML( Response, "LGI" );
-     ServerMaxOutputSize = Parse_XML( Response, "server_max_output_size" );
+     ServerMaxFieldSize = Parse_XML( Response, "server_max_field_size" );
      Response = Parse_XML( Response, "response" );
 
      if( !Parse_XML( Response, "error" ).empty() )
      {
       DEBUG_LOG( "Daemon::RequestWorkCycle; Unable to sign up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) );
       Response.clear();
-      ServerMaxOutputSize.clear();
+      ServerMaxFieldSize.clear();
       SessionID.clear();
      } 
      else
@@ -606,7 +606,7 @@ int Daemon::RequestWorkCycle( void )
    else
    {
     Response.clear();
-    ServerMaxOutputSize.clear();
+    ServerMaxFieldSize.clear();
     SessionID.clear();
    }
 
