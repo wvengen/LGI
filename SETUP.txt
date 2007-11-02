@@ -291,5 +291,35 @@ Part IV: Updating and maintaining project servers:
 By default on each project server, the basic interface is active and
 any user is allowed to have only two jobs in the database. If you want
 certain users or groups of users to be able to submit more, you can add
-that user with a new limit, 
+that user or group with a new limit for a certain application. One
+would do that with a queries like:
+
+  export QUERY="INSERT INTO users_allowed SET user_name='user', 
+         application='hello_world', job_limit=10"
+
+  echo $QUERY | mysql -u examplemysqluser -p exampleprojectname
+
+  export ESCAPEDQUERY=`echo $QUERY | sed "s/'/\\\\\'/g"`
+
+  export UPDATEQUERY="INSERT INTO updates SET 
+         servers='apache@exampleserver.somewhere.org',
+         update_query='$ESCAPEDQUERY'"
+
+  echo $UPDATEQUERY | mysql -u examplemysqluser -p exampleprojectname
+
+By also inserting an update query into the server database for this,
+slave servers will automatically synchronize and also apply them if
+needed. It also allows the easy addition of more slave servers as was
+shown in part III. To make this easier, one can use the UpdateDB script
+located in the tools subdirectory:
+
+  tools/UpdateDB "INSERT INTO users_allowed SET user_name='user',
+                 application='hello_world', job_limit=10" 
+                 "apache@exampleserver.somewhere.org" -u examplemysqluser 
+                 -p exampleprojectname
+
+Please read in the docs subdirectory the full details on the structure
+of the database, what the fields mean and what values you can assign them.
+
+
 
