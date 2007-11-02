@@ -288,4 +288,8 @@ the master server database are transfered to the slave server.
 Part IV: Updating and maintaining project servers:
 --------------------------------------------------
 
+By default on each project server, the basic interface is active and
+any user is allowed to have only two jobs in the database. If you want
+certain users or groups of users to be able to submit more, you can add
+that user with a new limit, 
 
