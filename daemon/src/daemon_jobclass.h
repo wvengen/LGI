@@ -41,6 +41,9 @@
 #include "daemon_configclass.h"
 #include "resource_server_api.h"
 
+#define MIN( A, B ) ( A > B ? B : A )
+#define MAX( A, B ) ( A > B ? A : B )
+
 using namespace std;
 
 // ------------ some handy defines -------------------------------------------

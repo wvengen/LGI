@@ -27,6 +27,7 @@ function LGI_Response( $DataTags, $Exit = true, $ExtraInfoTags = "" )
 {
  global $Config;
 
+ $ExtraInfoTags = "<server_max_output_size> ".$Config["MAX_OUTPUT_SIZE"]." </server_max_output_size> ".$ExtraInfoTags;
  $ExtraInfoTags = "<CA_certificate> ".$Config["SERVER_SSL_CA_CERTIFICATE_URL"]." </CA_certificate> ".$ExtraInfoTags;
  $Response = "<LGI> ".$ExtraInfoTags." <response> ".$DataTags." </response> </LGI>";
 
