@@ -25,7 +25,7 @@ Daemon::Daemon( string ConfigFile ) : DaemonConfig( ConfigFile )
 {
  ReadyForScheduling = 0; Jobs.clear(); Accounting.clear();
 
- if( !IsValidConfigured() ) { CRITICAL_LOG( "Daemon::Daemon; Configuration in file " << ConfigFile << " invalid" ); return;}
+ if( !IsValidConfigured() ) { CRITICAL_LOG( "Daemon::Daemon; Configuration in file " << ConfigFile << " invalid" ); return; }
 
  if( !ScanDirectoryForJobs( RunDirectory() ) ) { CRITICAL_LOG( "Daemon::Daemon; Error during scan of run directory " << RunDirectory() ); return; }
 
