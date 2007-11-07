@@ -191,7 +191,7 @@ else
  for( $i = 1; $i <= $Number; $i++ )
  {
   $Job = mysql_fetch_object( $QueryResult );
-  Row5( "<center><a href=basic_interface_job_state.php?job_id=$Job->job_id>$Job->job_id</a></center>", "<center>$Job->state</center>", "<center>$Job->target_resources</center>", "<center>$Job->application</center>", "<center>".gmdate( "j M Y G:i", $Job->state_time_stamp )." UTC </center>" );
+  Row5( "<center><a href=basic_interface_job_state.php?job_id=$Job->job_id&groups=$Groups&application=$Application&project=$Project>$Job->job_id</a></center>", "<center>$Job->state</center>", "<center>$Job->target_resources</center>", "<center>$Job->application</center>", "<center>".gmdate( "j M Y G:i", $Job->state_time_stamp )." UTC </center>" );
  }
 
  mysql_free_result( $QueryResult ); 
@@ -202,12 +202,12 @@ else
  if( $Start > 0 )
  {
   if( $Start > $Limit )
-   $Menu .= "<a href=basic_interface_job_state.php?start=".($Start-$Limit)."&limit=$Limit&$state=$State&groups=$Groups&application=$Applicatio&project=$Project> Prev </a>";
+   $Menu .= "<a href=basic_interface_job_state.php?start=".($Start-$Limit)."&limit=$Limit&$state=$State&groups=$Groups&application=$Application&project=$Project> Prev </a>";
   else
    $Menu .= "<a href=basic_interface_job_state.php?start=0&limit=$Limit&$state=$State&groups=$Groups&application=$Applicatio&project=$Project> Prev </a>";
  }
  if( $Number >= $Limit  )
-  $Menu .= "<a href=basic_interface_job_state.php?start=".($Start+$Number)."&limit=$Limit&$state=$State&groups=$Groups&application=$Applicatio&project=$Project> Next </a>";
+  $Menu .= "<a href=basic_interface_job_state.php?start=".($Start+$Number)."&limit=$Limit&$state=$State&groups=$Groups&application=$Application&project=$Project> Next </a>";
  if( $Menu != "" ) echo "$Menu<br>";
 
  echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n"; 
