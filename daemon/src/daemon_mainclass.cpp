@@ -211,8 +211,8 @@ int Daemon::CycleThroughJobs( void )
 
     if( TimeStamp.empty() )     // if this failed, check if job is a stale job that has been accepted by another daemon...
     {
-     if( TempJob.GetErrorNumber() == 24 )    // check if we weren't allowed to get job state...
-     {
+     if( ( TempJob.GetErrorNumber() == 24 ) || ( TempJob.GetErrorNumber() == 15 ) )    // check if we weren't allowed to get job state or
+     {                                                                                 // the job doesn't exist in the DB anymore...
       CRITICAL_LOG( "Daemon::CycleThroughJobs; Removed and cleaned up stale job with directory " << TempJob.GetJobDirectory() );
       RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
       TempJob.CleanUpJobDirectory();
