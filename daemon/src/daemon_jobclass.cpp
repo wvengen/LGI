@@ -67,6 +67,7 @@ int UnlinkDirectoryRecursively( string Directory )
 DaemonJob::DaemonJob( void )
 {
  JobDirectory.empty();
+ ErrorNumber = 0xFFFF;
 }
 
 // -----------------------------------------------------------------------------
@@ -118,6 +119,7 @@ DaemonJob::DaemonJob( string TheJobDirectory )
  // all files are there and are okay... accept the job directory...
 
  JobDirectory = TheJobDirectory;
+ ErrorNumber = 0;
 
  NORMAL_LOG( "DaemonJob::DaemonJob; Set up job with JobDirectory=" << TheJobDirectory );
 }
@@ -379,6 +381,13 @@ int DaemonJob::GetMaxOutputSize( void )
 
 // -----------------------------------------------------------------------------
 
+int DaemonJob::GetErrorNumber( void )
+{
+ return( ErrorNumber );
+}
+
+// -----------------------------------------------------------------------------
+
 string DaemonJob::GetCertificateFile( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetCertificateFile; JobDirectory empty" );
@@ -421,7 +430,6 @@ string DaemonJob::GetStateFromServer( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
- int ErrorNumber = 0;
 
  do
  {
@@ -446,7 +454,6 @@ string DaemonJob::GetStateTimeStampFromServer( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
- int ErrorNumber = 0;
 
  do
  {
@@ -486,7 +493,6 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response, Data, HexedInput, HexedOutput;
- int ErrorNumber = 0;
 
  if( !Input.empty() ) BinHex( Input, HexedInput );
  if( !Output.empty() )                                    // check the size of the output here and cut it off if needed...
@@ -582,7 +588,6 @@ int DaemonJob::LockJob( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
- int ErrorNumber = 0;
 
  do
  {
@@ -606,7 +611,6 @@ int DaemonJob::UnLockJob( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
- int ErrorNumber = 0;
 
  do
  {
@@ -630,7 +634,6 @@ int DaemonJob::SignUp( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
- int ErrorNumber = 0;
 
  do
  {
@@ -656,7 +659,6 @@ int DaemonJob::SignOff( void )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response;
- int ErrorNumber = 0;
 
  do
  {
@@ -682,7 +684,6 @@ int DaemonJob::UpdateJobFromServer( bool UpdateOutputToo )
 
  Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile() );
  string Response, Data;
- int ErrorNumber = 0;
 
  do
  {

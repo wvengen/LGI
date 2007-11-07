@@ -164,12 +164,14 @@ class DaemonJob
               int  RunJobRunScript( void );
               
               int  GetMaxOutputSize( void );
+              int  GetErrorNumber( void );
 
        protected:
 
               int RunAScript( string TheScriptFile );
 
-       string JobDirectory, SessionID;
+              int ErrorNumber;
+              string JobDirectory, SessionID;
       };
 
 // -----------------------------------------------------------------------------

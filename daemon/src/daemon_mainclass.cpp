@@ -200,17 +200,29 @@ int Daemon::CycleThroughJobs( void )
    int SignedUp = 0;
    string SessionID;
 
-   for( list<DaemonJob>::iterator Job = Server -> second.begin(); Job != Server -> second.end() && ReadyForScheduling; ++Job )
+   for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end() && ReadyForScheduling; )
    {
-    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Get time stamp for job with directory " << Job -> GetJobDirectory() );
+    DaemonJob TempJob;
+    TempJob = (*(JobPointer++));                 // get copy and point to next for iterator...
+ 
+    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Get time stamp for job with directory " << TempJob.GetJobDirectory() );
 
-    string TimeStamp = Job -> GetStateTimeStampFromServer();          // get state time stamp on server of job...
+    string TimeStamp = TempJob.GetStateTimeStampFromServer();          // get state time stamp on server of job...
 
-    if( TimeStamp.empty() ) continue;
+    if( TimeStamp.empty() )     // if this failed, check if job is a stale job that has been accepted by another daemon...
+    {
+     if( TempJob.GetErrorNumber() == 24 )    // check if we weren't allowed to get job state...
+     {
+      CRITICAL_LOG( "Daemon::CycleThroughJobs; Removed and cleaned up stale job with directory " << TempJob.GetJobDirectory() );
+      RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
+      TempJob.CleanUpJobDirectory();
+     }
+     continue;
+    }
     
-    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Obtained time stamp for job with directory " << Job -> GetJobDirectory() );
+    VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Obtained time stamp for job with directory " << TempJob.GetJobDirectory() );
 
-    if( TimeStamp != Job -> GetStateTimeStamp() )                     // server and job not synchronized...
+    if( TimeStamp != TempJob.GetStateTimeStamp() )                     // server and job not synchronized...
     {
      if( !SignedUp )
      {
@@ -223,16 +235,16 @@ int Daemon::CycleThroughJobs( void )
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Signed up to " << Server -> first << " with session id " << SessionID );
      }
 
-     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronizing job with directory " << Job -> GetJobDirectory() << " using session id " << SessionID );
-     Job -> SetSessionID( SessionID );
-     if( !( Job -> LockJob() ) ) continue;                            // lock, update and unlock job...
-     if( !( Job -> UpdateJobFromServer() ) ) continue;
-     if( !( Job -> UnLockJob() ) ) continue;
-     Job -> SetSessionID( "" );
-     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronised job with directory " << Job -> GetJobDirectory() );
+     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronizing job with directory " << TempJob.GetJobDirectory() << " using session id " << SessionID );
+     TempJob.SetSessionID( SessionID );
+     if( !( TempJob.LockJob() ) ) continue;                            // lock, update and unlock job...
+     if( !( TempJob.UpdateJobFromServer() ) ) continue;
+     if( !( TempJob.UnLockJob() ) ) continue;
+     TempJob.SetSessionID( "" );
+     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Synchronised job with directory " << TempJob.GetJobDirectory() );
     }
     else
-     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << Job -> GetJobDirectory() << " was up to date" );
+     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " was up to date" );
    }
 
    if( SignedUp )
