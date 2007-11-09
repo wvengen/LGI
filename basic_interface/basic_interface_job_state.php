@@ -202,12 +202,12 @@ else
  if( $Start > 0 )
  {
   if( $Start > $Limit )
-   $Menu .= "<a href=basic_interface_job_state.php?start=".($Start-$Limit)."&limit=$Limit&$state=$State&groups=$Groups&application=$Application&project=$Project> Prev </a>";
+   $Menu .= "<a href=basic_interface_job_state.php?start=".($Start-$Limit)."&limit=$Limit&state=$State&groups=$Groups&application=$Application&project=$Project> Prev </a>";
   else
-   $Menu .= "<a href=basic_interface_job_state.php?start=0&limit=$Limit&$state=$State&groups=$Groups&application=$Applicatio&project=$Project> Prev </a>";
+   $Menu .= "<a href=basic_interface_job_state.php?start=0&limit=$Limit&state=$State&groups=$Groups&application=$Application&project=$Project> Prev </a>";
  }
  if( $Number >= $Limit  )
-  $Menu .= "<a href=basic_interface_job_state.php?start=".($Start+$Number)."&limit=$Limit&$state=$State&groups=$Groups&application=$Application&project=$Project> Next </a>";
+  $Menu .= "<a href=basic_interface_job_state.php?start=".($Start+$Number)."&limit=$Limit&state=$State&groups=$Groups&application=$Application&project=$Project> Next </a>";
  if( $Menu != "" ) echo "$Menu<br>";
 
  echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n"; 
