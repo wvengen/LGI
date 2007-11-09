@@ -21,10 +21,10 @@
 global $Config;
 
 $Config[ "SERVER_URL" ]            = "https://fwnc7003.leidenuniv.nl/LGI";     // the URL of this project server
-$Config[ "SERVER_NAME" ]           = "mark@fwnc7003.wks.gorlaeus.net";         // the unique name of this project server
+$Config[ "SERVER_NAME" ]           = "apache@fwnc7003.wks.gorlaeus.net";         // the unique name of this project server
 
-$Config[ "SERVER_SSL_CERTIFICATE_FILE" ]     = "../certificates/fwnc7003.crt";      // the certificate of this server
-$Config[ "SERVER_SSL_KEY" ]                  = "../certificates/fwnc7003.key";      // the certificate key file of this server
+$Config[ "SERVER_SSL_CERTIFICATE_FILE" ]     = "../certificates/apache@fwnc7003.crt";      // the certificate of this server
+$Config[ "SERVER_SSL_KEY" ]                  = "../certificates/apache@fwnc7003.key";      // the certificate key file of this server
 $Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ]   = "https://fwnc7003.leidenuniv.nl/LGI/LGI+CA.crt";   // the certificate of the CA server
 $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ]  = "../certificates/LGI+CA.crt";           // the local certificate of the CA server
 

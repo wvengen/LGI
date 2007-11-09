@@ -1,5 +1,5 @@
 #!/bin/sh
-export LGI_ROOT=/var/www/html/LGI/daemon
+export LGI_ROOT=${HOME}/temp/LGI/daemon
 
 if [ -f ${LGI_ROOT}/LGI.pid ]
 then
