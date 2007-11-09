@@ -1,5 +1,5 @@
 #!/bin/sh
-export LGI_ROOT=${HOME}/temp/LGI/daemon
+export LGI_ROOT=/var/www/html/LGI/daemon
 
 if [ -f ${LGI_ROOT}/LGI.pid ]
 then
@@ -16,7 +16,7 @@ then
        DATE=`date +%s`
        mv ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.log_${DATE}
     fi
-    ${LGI_ROOT}/src/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
+    ${LGI_ROOT}/bin/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
     ps -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
  else
     echo "LGI daemon still running..."
@@ -25,7 +25,7 @@ then
 else
 
  echo No LGI.pid found, starting the daemon...
- ${LGI_ROOT}/src/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
+ ${LGI_ROOT}/bin/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
  ps -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
 
 fi

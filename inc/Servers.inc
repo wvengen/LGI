@@ -166,7 +166,7 @@ function Server_Check_And_Perform_Updates( )
    // check if update data was retrieved...
    if( $UpdateData != "" )
    {
-    $UpdateFlag = NomalizeString( Parse_XML( $UpdateData, "updates", $Attributes ) );
+    $UpdateFlag = NormalizeString( Parse_XML( $UpdateData, "updates", $Attributes ) );
 
     // an update was sent back in the response...
     if( $UpdateFlag >= 1 )
