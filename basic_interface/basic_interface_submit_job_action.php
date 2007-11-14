@@ -130,15 +130,27 @@ if( strlen( $RepositoryName ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_
 if( strpos( $RepositoryName, "." ) !== FALSE ) Exit_With_Text( "ERROR: Invalid repository field posted" );
 
 // create the job respository directory if not there yet...
-if( !is_dir( $RepositoryName ) )
+if( $Config[ "REPOSITORY_DIRECTORY" ] != "" )
+ $RepositoryDir = $Config[ "REPOSITORY_DIRECTORY" ]."/".$RepositoryName;
+else
+ $RepositoryDir = getcwd()."/".$RepositoryName;
+if( !is_dir( $RepositoryDir ) )
 {
  $OldMask = umask( 0 );
- mkdir( $RepositoryName, 0770 );
+ mkdir( $RepositoryDir, 0770 );
  umask( $OldMask );
 }
 
 // build up the repository URL... use the server unique name which should be correctly formated for resources...
-$RepositoryURL = Get_Server_Name().":".getcwd()."/".$RepositoryName;
+if( $Config[ "REPOSITORY_SERVER_NAME" ] != "" )
+ $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ].":".$RepositoryDir;
+else
+ $RepositoryURL = Get_Server_Name().":".$RepositoryDir;
+
+// now handle file uploads...
+// ...
+// ...
+// ...
 
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $TargetResources, "," );
@@ -155,7 +167,7 @@ for( $i = 1; $i <= $Resources[ 0 ]; $i++ )
 
 if( !$FoundResourceFlag ) 
 { 
- rmpath( $RepositoryName ); 
+ rmpath( $RepositoryDir ); 
  Exit_With_Text( "ERROR: ".$ErrorMsgs[ 28 ] ); 
 }
 
@@ -210,7 +222,7 @@ if( $FoundPossibleGroup )
  $Groups = substr( $NewGroupsList, 2 );
 else
 {
- rmpath( $RepositoryName );
+ rmpath( $RepositoryDir );
  Exit_With_Text( "ERROR: ".$ErrorMsgs[ 33 ] );
 }
 
@@ -276,6 +288,7 @@ if( $RepositoryURL != "" )
  {
   $RepositoryArray = CommaSeparatedField2Array( $RepositoryArray[ 2 ], "/" );
   $RepositoryURL = $RepositoryArray[ 1 ];
+  if( $Config[ "REPOSITORY_URL" ] != "" ) $RepositoryURL = $Config[ "REPOSITORY_URL" ]."/".$RepositoryURL;
  }
  else
   $RepositoryURL = "";

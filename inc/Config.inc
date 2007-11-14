@@ -28,6 +28,10 @@ $Config[ "SERVER_SSL_KEY" ]                  = "../certificates/apache@fwnc7003.
 $Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ]   = "https://fwnc7003.leidenuniv.nl/LGI/LGI+CA.crt";   // the certificate of the CA server
 $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ]  = "../certificates/LGI+CA.crt";           // the local certificate of the CA server
 
+$Config[ "REPOSITORY_DIRECTORY" ] = "";                            // location on filesystem of basic interface repository
+$Config[ "REPOSITORY_SERVER_NAME" ] = "";                          // on what server and user the basic interface repository is 
+$Config[ "REPOSITORY_URL" ] = "";                                  // location on web of basic interface repository
+
 $Config[ "MYSQL_URL" ]                   = "localhost";            // where is the MySQL db and how to connect to it
 $Config[ "MYSQL_USER" ]                  = "LGI"; 
 $Config[ "MYSQL_PASSWD" ]                = "LGIpasswd";

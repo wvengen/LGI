@@ -76,14 +76,6 @@ $Project = mysql_escape_string( $Project );
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
-// create the job respository directory if not there yet...
-/* if( !is_dir( $RepositoryName ) )
-{
- $OldMask = umask( 0 );
- mkdir( $RepositoryName, 0770 );
- umask( $OldMask );
-} */
-
 // start building form to fill in...
 echo '<form action="basic_interface_submit_job_action.php" method="POST">';
 echo '<input type="hidden" name="user" value="'.$User.'">';
@@ -103,7 +95,6 @@ Row2( "<b>Extra owners:</b>", '<input type="text" size="65" name="owners" value=
 Row2( "<b>Extra read access:</b>", '<input type="text" size="65" name="read_access" value="" maxlength="128" >' );
 Row2( "<b>Target resources:</b>", '<input type="text" size="65" name="target_resources" value="any" maxlength="128" >' );
 Row2( "<b>Job specifics:</b>", '<input type="text" size="65" name="job_specifics" value="" maxlength="1024" >' );
-// Row2( "<b>Repository:</b>", "<a href=$RepositoryName> $RepositoryName </a>" );
 Row2( "<b>Repository:</b>", $RepositoryName );
 Row2( "<b>Input:</b>", '<textarea wrap="off" rows="20" cols="74" name="input"></textarea>' );
 Row1( '<center><input type="submit" value="     Submit Job     "></center>' );

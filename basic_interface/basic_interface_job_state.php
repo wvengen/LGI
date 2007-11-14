@@ -92,6 +92,7 @@ if( isset( $Job_ID ) )               // we requested details on a job...
   {
    $RepositoryArray = CommaSeparatedField2Array( $RepositoryArray[ 2 ], "/" );
    $RepositoryURL = $RepositoryArray[ 1 ];
+   if( $Config[ "REPOSITORY_URL" ] != "" ) $RepositoryURL = $Config[ "REPOSITORY_URL" ]."/".$RepositoryURL;
   }
   else
    $RepositoryURL = "";
