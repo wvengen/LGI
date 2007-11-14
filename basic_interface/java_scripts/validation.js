@@ -65,20 +65,6 @@ function emptyFunction() {
 	return true;
 }
 
-/*********************************/
-
-var W3CDOM = document.createElement && document.getElementsByTagName;
-
-function validateForms() {
-	if (!W3CDOM) return;
-	var forms = document.forms;
-	for (var i=0;i<forms.length;i++) {
-		forms[i].onsubmit = validate;
-	}
-}
-
-addEventSimple(window,'load',validateForms);
-
 function validate() {
 	var els = this.elements;
 	var validForm = true;
@@ -151,3 +137,29 @@ function removeError() {
 	}
 	this.onchange = null;
 }
+
+function addEventSimple(obj,evt,fn) {
+        if (obj.addEventListener)
+                obj.addEventListener(evt,fn,false);
+        else if (obj.attachEvent)
+                obj.attachEvent('on'+evt,fn);
+}
+
+function removeEventSimple(obj,evt,fn) {
+        if (obj.removeEventListener)
+                obj.removeEventListener(evt,fn,false);
+        else if (obj.detachEvent)
+                obj.detachEvent('on'+evt,fn);
+}
+
+var W3CDOM = document.createElement && document.getElementsByTagName;
+
+function validateForms() {
+	if (!W3CDOM) return;
+	var forms = document.forms;
+	for (var i=0;i<forms.length;i++) {
+		forms[i].onsubmit = validate;
+	}
+}
+
+addEventSimple(window,'load',validateForms);
