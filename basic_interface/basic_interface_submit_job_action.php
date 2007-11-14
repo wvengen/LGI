@@ -295,6 +295,7 @@ if( $RepositoryURL != "" )
 }
 
 Start_Table();
+Row1( $_POST[ "number_of_uploaded_files" ] );
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
 Row2( "<b>Project:</b>", $Project );
 Row2( "<b>This project server:</b>", Get_Server_URL() );
@@ -302,7 +303,7 @@ Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/bas
 Row2( "<b>User:</b>", $User );
 Row2( "<b>Groups:</b>", $Groups );
 Row1( "<center><font color='green' size='4'><b>Submitted job details</b></font></center>" );
-Row2( "<b>Job ID:</b>", $JobSpecs -> job_id );
+Row2( "<b>Job ID:</b>", "<a href='basic_interface_job_state.php?job_id=".$JobSpecs -> job_id."'>".$JobSpecs -> job_id."</a>" );
 Row2( "<b>Application:</b>", $JobSpecs -> application );
 Row2( "<b>State:</b>", $JobSpecs -> state );
 Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_stamp )." UTC" );
@@ -310,7 +311,7 @@ Row2( "<b>Owners:</b>", $JobSpecs -> owners );
 Row2( "<b>Read access:</b>", $JobSpecs -> read_access );
 Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
 Row2( "<b>Job specifics:</b>", htmlentities( $JobSpecs -> job_specifics ) );
-if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href='$RepositoryURL'> $RepositoryURL </a>" );
+if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href='".$RepositoryURL."'> $RepositoryURL </a>" );
 Row2( "<b>Input:</b>", htmlentities( $JobSpecs -> input ) );
 End_Table();
 
