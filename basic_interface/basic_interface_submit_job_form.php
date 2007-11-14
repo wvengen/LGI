@@ -29,6 +29,27 @@ global $ErrorMsgs;
 
 Page_Head();
 
+?>
+<script type="text/javascript">
+
+function addEventSimple(obj,evt,fn) {
+        if (obj.addEventListener)
+                obj.addEventListener(evt,fn,false);
+        else if (obj.attachEvent)
+                obj.attachEvent('on'+evt,fn);
+}
+
+function removeEventSimple(obj,evt,fn) {
+        if (obj.removeEventListener)
+                obj.removeEventListener(evt,fn,false);
+        else if (obj.detachEvent)
+                obj.detachEvent('on'+evt,fn);
+}
+
+</script>
+<script type="text/javascript" src="./validation.js"></script>
+<?php
+
 // check if user is set in request... or use value from certificate...
 $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
 $User = $CommonNameArray[ 1 ];
@@ -80,15 +101,15 @@ Row2( "<b>User:</b>", $User );
 Row2( "<b>Groups:</b>", $Groups ); 
 Row1( "<center><font color='green' size='4'><b>Specify job details</b></font></center>" );
 Row2( "<b>Job repository:</b>", $RepositoryName );
-Row2( "<b>Application:</b>", '<input type="text" size="75" name="application" value="hello_world" maxlength="128" />' );
+Row2( "<b>Application:</b>", '<input type="text" size="75" name="application" value="hello_world" maxlength="128" validation="required"/>' );
 Row2( "<b>Extra owners:</b>", '<input type="text" size="75" name="owners" value="" maxlength="128" />' );
 Row2( "<b>Extra read access:</b>", '<input type="text" size="75" name="read_access" value="" maxlength="128" />' );
-Row2( "<b>Target resources:</b>", '<input type="text" size="75" name="target_resources" value="any" maxlength="128" />' );
+Row2( "<b>Target resources:</b>", '<input type="text" size="75" name="target_resources" value="any" maxlength="128" validation="required"/>' );
 Row2( "<b>Job specifics:</b>", '<input type="text" size="75" name="job_specifics" value="" maxlength="1024" />' );
 
 ?>
 <script type="text/javascript">
-<!--
+
 function FileUploadChanged()
 {
  var this_form = document.getElementById( 'this_form' );
@@ -123,7 +144,6 @@ function FileUploadChanged()
  }
 }
 
-// -->
 </script>
 <?php
 
