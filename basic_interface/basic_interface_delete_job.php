@@ -124,7 +124,7 @@ Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
 Row2( "<b>Project:</b>", $Project ); 
 Row2( "<b>This project server:</b>", Get_Server_URL() ); 
-Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basic_interface>".Get_Master_Server_URL()."</a>" );
+Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface'>".Get_Master_Server_URL()."</a>" );
 Row2( "<b>User:</b>", $User ); 
 Row2( "<b>Groups:</b>", $Groups ); 
 Row1( "<center><font color='green' size='4'><b>Job deleted or aborted</b></font></center>" );
@@ -138,11 +138,11 @@ Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
 Row2( "<b>Job specifics:</b>", htmlentities( $JobSpecs -> job_specifics ) );
 End_Table();
 
-echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n";
-echo "<br><a href=basic_interface_list.php?project_server=0>Show project resource list</a>\n"; 
-echo "<br><a href=basic_interface_submit_job_form.php>Submit a job</a>\n";
-echo "<br><a href=basic_interface_job_state.php>Show job list</a>\n"; 
-echo "<br><a href=index.php>Go to main menu</a>\n"; 
+echo "<br><a href='basic_interface_list.php?project_server=1'>Show project server list</a>\n";
+echo "<br><a href='basic_interface_list.php?project_server=0'>Show project resource list</a>\n"; 
+echo "<br><a href='basic_interface_submit_job_form.php'>Submit a job</a>\n";
+echo "<br><a href='basic_interface_job_state.php'>Show job list</a>\n"; 
+echo "<br><a href='index.php'>Go to main menu</a>\n"; 
 
 Page_Tail();
 ?>

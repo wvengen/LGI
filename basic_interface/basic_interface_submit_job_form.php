@@ -85,7 +85,7 @@ Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
 Row2( "<b>Project:</b>", $Project ); 
 Row2( "<b>This project server:</b>", Get_Server_URL() ); 
-Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basic_interface>".Get_Master_Server_URL()."</a>" ); 
+Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface'>".Get_Master_Server_URL()."</a>" ); 
 Row2( "<b>User:</b>", $User ); 
 Row2( "<b>Groups:</b>", $Groups ); 
 Row1( "<center><font color='green' size='4'><b>Specify job details</b></font></center>" );
@@ -138,14 +138,14 @@ function FileUploadChanged()
 
 Row2( "<b>File(s) to upload:</b>", '<div id="file_upload_entry_1"> <input name="uploaded_file_1" type="file" onchange="FileUploadChanged()" size="75" /> </div>' );
 Row2( "<b>Input:</b>", '<textarea wrap="off" rows="20" cols="75" name="input"></textarea>' );
-Row1( '<center><input type="submit" value="     Submit Job     " /></center></form>' );
+Row1( '<center><input type="submit" value="     Submit Job     " /></center>' );
 
 End_Table();
 
-echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n";
-echo "<br><a href=basic_interface_list.php?project_server=0>Show project resource list</a>\n"; 
-echo "<br><a href=basic_interface_job_state.php>Show job list</a>\n"; 
-echo "<br><a href=index.php>Go to main menu</a>\n";
+echo "</form><br><a href='basic_interface_list.php?project_server=1'>Show project server list</a>\n";
+echo "<br><a href='basic_interface_list.php?project_server=0'>Show project resource list</a>\n"; 
+echo "<br><a href='basic_interface_job_state.php'>Show job list</a>\n"; 
+echo "<br><a href='index.php'>Go to main menu</a>\n";
 
 Page_Tail();
 ?>

@@ -23,16 +23,16 @@
 function Page_Head( $Title = "" )
 {
  if( $Title != "" )
-  echo "<html><head><title>$Title</title></head><body bgcolor='ffffff'>";
+  echo "<html><head><title>$Title</title></head>";
  else
-  echo "<html><body bgcolor='ffffff'>";
+  echo "<html>";
 }
 
 // --------------------------------------------------------------------
 
 function Page_Tail( )
 {
- echo "</body></html>";
+ echo "</html>";
 }
 
 // -------------------------------------------------------------------- 
