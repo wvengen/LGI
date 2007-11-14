@@ -30,6 +30,12 @@ global $ErrorMsgs;
 Page_Head();
 
 ?>
+<style>
+.errorMessage {
+  color: red;
+  font-weight: bold;
+}
+</style>
 <script type="text/javascript">
 
 function addEventSimple(obj,evt,fn) {
@@ -47,7 +53,7 @@ function removeEventSimple(obj,evt,fn) {
 }
 
 </script>
-<script type="text/javascript" src="./validation.js"></script>
+<script type="text/javascript" src="java_scripts/validation.js"></script>
 <?php
 
 // check if user is set in request... or use value from certificate...
