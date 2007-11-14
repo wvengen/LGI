@@ -27,19 +27,7 @@ require_once( '../inc/Html.inc' );
 global $Config;
 global $ErrorMsgs;
 
-// check if job respository cookie was set...
-if( !isset( $_COOKIE[ "repository" ] ) || ( $_COOKIE[ "repository" ] == "" ) )
-{
- $RepositoryName = "JOB_".md5(uniqid(time()));
- setcookie( "repository", $RepositoryName );
-}
-else
- $RepositoryName = $_COOKIE[ "repository" ];
-
 Page_Head();
-
-// check repository name here...
-if( strpos( $RepositoryName, "." ) !== FALSE ) Exit_With_Text( "ERROR: Invalid repository field posted" );
 
 // check if user is set in request... or use value from certificate...
 $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
@@ -77,7 +65,8 @@ $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // start building form to fill in...
-echo '<form action="basic_interface_submit_job_action.php" method="POST">';
+$RepositoryName = "JOB_".md5(uniqid(time()));
+echo '<form action="basic_interface_submit_job_action.php" method="POST" enctype="multipart/form-data">';
 echo '<input type="hidden" name="user" value="'.$User.'">';
 echo '<input type="hidden" name="groups" value="'.$Groups.'">';
 echo '<input type="hidden" name="repository" value="'.$RepositoryName.'">';
@@ -90,14 +79,59 @@ Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basi
 Row2( "<b>User:</b>", $User ); 
 Row2( "<b>Groups:</b>", $Groups ); 
 Row1( "<center><font color='green' size='4'><b>Specify job details</b></font></center>" );
-Row2( "<b>Application:</b>", '<input type="text" size="65" name="application" value="hello_world" maxlength="128" >' );
-Row2( "<b>Extra owners:</b>", '<input type="text" size="65" name="owners" value="" maxlength="128" >' );
-Row2( "<b>Extra read access:</b>", '<input type="text" size="65" name="read_access" value="" maxlength="128" >' );
-Row2( "<b>Target resources:</b>", '<input type="text" size="65" name="target_resources" value="any" maxlength="128" >' );
-Row2( "<b>Job specifics:</b>", '<input type="text" size="65" name="job_specifics" value="" maxlength="1024" >' );
-Row2( "<b>Repository:</b>", $RepositoryName );
-Row2( "<b>Input:</b>", '<textarea wrap="off" rows="20" cols="74" name="input"></textarea>' );
-Row1( '<center><input type="submit" value="     Submit Job     "></center>' );
+Row2( "<b>Job repository:</b>", $RepositoryName );
+Row2( "<b>Application:</b>", '<input type="text" size="75" name="application" value="hello_world" maxlength="128" />' );
+Row2( "<b>Extra owners:</b>", '<input type="text" size="75" name="owners" value="" maxlength="128" />' );
+Row2( "<b>Extra read access:</b>", '<input type="text" size="75" name="read_access" value="" maxlength="128" />' );
+Row2( "<b>Target resources:</b>", '<input type="text" size="75" name="target_resources" value="any" maxlength="128" />' );
+Row2( "<b>Job specifics:</b>", '<input type="text" size="75" name="job_specifics" value="" maxlength="1024" />' );
+
+?>
+<script type="text/javascript">
+<!--
+function FileUploadChanged()
+{
+ var usedFields = 0;
+ var fields = new Array();
+
+ alert( "hi" );
+
+ for( var i = 0; i < document.compose.elements.length; i++ )
+  if( ( document.compose.elements[ i ].type == 'file'  ) && ( document.compose.elements[ i ].name.substr( 0, 14 ) == 'uploaded_file_' ) )
+   fields[ fields.length ] = document.compose.elements[ i ];
+
+ for( var i = 0; i < fields.length; i++ )
+  if( fields[ i ].value.length > 0 ) usedFields++;
+
+ if( usedFields == fields.length )
+ {
+  var lastEntry = document.getElementById( 'file_upload_entry_' + usedFields );
+
+  if( lastEntry )
+  {
+   var newEntry = document.createElement( 'div' );
+   newEntry.id = 'file_upload_entry_' + ( usedFields + 1 );
+
+   var file = document.createElement( 'input' );
+   file.type = 'file';
+   file.name = 'uploaded_file_' + ( usedFields + 1 );
+   file.onchange = function() { FileUploadChanged(); };
+   file.size = 75;
+
+   newEntry.appendChild( document.createElement( 'br' ) );
+   newEntry.appendChild( file );
+   lastEntry.parentNode.insertBefore( newEntry, lastEntry.nextSibling );
+  }
+ }
+}
+// -->
+</script>
+<?php
+
+Row2( "<b>File(s) to upload:</b>", '<div id="file_upload_entry_1"> <input name="uploaded_file_1" type="file" onchange="FileUploadChanged()" size="75" /> </div>' );
+Row2( "<b>Input:</b>", '<textarea wrap="off" rows="20" cols="75" name="input" />' );
+Row1( '<center><input type="submit" value="     Submit Job     " /></center></form>' );
+
 End_Table();
 
 echo "<br><a href=basic_interface_list.php?project_server=1>Show project server list</a>\n";
