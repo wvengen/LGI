@@ -295,7 +295,6 @@ if( $RepositoryURL != "" )
 }
 
 Start_Table();
-Row1( $_POST[ "number_of_uploaded_files" ] );
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
 Row2( "<b>Project:</b>", $Project );
 Row2( "<b>This project server:</b>", Get_Server_URL() );
@@ -315,6 +314,7 @@ if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href='".$RepositoryUR
 Row2( "<b>Input:</b>", htmlentities( $JobSpecs -> input ) );
 End_Table();
 
+echo "<br><a href='basic_interface_delete_job.php?job_id=$JobSpecs -> job_id'>Delete or abort this job</a>\n";
 echo "<br><a href='basic_interface_list.php?project_server=1'>Show project server list</a>\n";
 echo "<br><a href='basic_interface_list.php?project_server=0'>Show project resource list</a>\n";
 echo "<br><a href='basic_interface_submit_job_form.php'>Submit a job</a>\n";
