@@ -314,7 +314,7 @@ if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href='".$RepositoryUR
 Row2( "<b>Input:</b>", htmlentities( $JobSpecs -> input ) );
 End_Table();
 
-echo "<br><a href='basic_interface_delete_job.php?job_id=$JobSpecs -> job_id'>Delete or abort this job</a>\n";
+echo "<br><a href='basic_interface_delete_job.php?job_id=".$JobSpecs -> job_id."'>Abort or Delete this job</a>\n";
 echo "<br><a href='basic_interface_list.php?project_server=1'>Show project server list</a>\n";
 echo "<br><a href='basic_interface_list.php?project_server=0'>Show project resource list</a>\n";
 echo "<br><a href='basic_interface_submit_job_form.php'>Submit a job</a>\n";
