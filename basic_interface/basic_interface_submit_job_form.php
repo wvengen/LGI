@@ -66,7 +66,7 @@ if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // start building form to fill in...
 $RepositoryName = "JOB_".md5(uniqid(time()));
-echo '<form action="basic_interface_submit_job_action.php" method="POST" enctype="multipart/form-data">';
+echo '<form id="this_form" action="basic_interface_submit_job_action.php" method="POST" enctype="multipart/form-data">';
 echo '<input type="hidden" name="user" value="'.$User.'">';
 echo '<input type="hidden" name="groups" value="'.$Groups.'">';
 echo '<input type="hidden" name="repository" value="'.$RepositoryName.'">';
@@ -91,14 +91,13 @@ Row2( "<b>Job specifics:</b>", '<input type="text" size="75" name="job_specifics
 <!--
 function FileUploadChanged()
 {
+ var this_form = document.getElementById( 'this_form' );
  var usedFields = 0;
  var fields = new Array();
 
- alert( "hi" );
-
- for( var i = 0; i < document.compose.elements.length; i++ )
-  if( ( document.compose.elements[ i ].type == 'file'  ) && ( document.compose.elements[ i ].name.substr( 0, 14 ) == 'uploaded_file_' ) )
-   fields[ fields.length ] = document.compose.elements[ i ];
+ for( var i = 0; i < this_form.elements.length; i++ )
+  if( ( this_form.elements[ i ].type == 'file'  ) && ( this_form.elements[ i ].name.substr( 0, 14 ) == 'uploaded_file_' ) )
+   fields[ fields.length ] = this_form.elements[ i ];
 
  for( var i = 0; i < fields.length; i++ )
   if( fields[ i ].value.length > 0 ) usedFields++;
@@ -118,18 +117,18 @@ function FileUploadChanged()
    file.onchange = function() { FileUploadChanged(); };
    file.size = 75;
 
-   newEntry.appendChild( document.createElement( 'br' ) );
    newEntry.appendChild( file );
    lastEntry.parentNode.insertBefore( newEntry, lastEntry.nextSibling );
   }
  }
 }
+
 // -->
 </script>
 <?php
 
 Row2( "<b>File(s) to upload:</b>", '<div id="file_upload_entry_1"> <input name="uploaded_file_1" type="file" onchange="FileUploadChanged()" size="75" /> </div>' );
-Row2( "<b>Input:</b>", '<textarea wrap="off" rows="20" cols="75" name="input" />' );
+Row2( "<b>Input:</b>", '<textarea wrap="off" rows="20" cols="75" name="input"></textarea>' );
 Row1( '<center><input type="submit" value="     Submit Job     " /></center></form>' );
 
 End_Table();
