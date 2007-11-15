@@ -19,7 +19,7 @@ echo -n ". This job was submitted from "
 /bin/sleep 160
 echo "."
 
-/home/mark/LGI/daemon/bin/LGI_qsub -a hello_world -j \${PBS_O_WORKDIR} -i \${PBS_O_WORKDIR}/LGI_target_resources
+# /home/mark/LGI/daemon/bin/LGI_qsub -a hello_world -j \${PBS_O_WORKDIR} -i \${PBS_O_WORKDIR}/LGI_target_resources
 
 /bin/touch \${PBS_O_WORKDIR}/finished
 
