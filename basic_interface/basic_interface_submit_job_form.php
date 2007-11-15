@@ -80,6 +80,7 @@ echo '<form id="this_form" action="basic_interface_submit_job_action.php" method
 echo '<input type="hidden" name="user" value="'.$User.'">';
 echo '<input type="hidden" name="groups" value="'.$Groups.'">';
 echo '<input type="hidden" name="repository" value="'.$RepositoryName.'">';
+echo '<input type="hidden" name="number_of_uploaded_files" value="0" >';
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
@@ -111,6 +112,8 @@ function FileUploadChanged()
 
  for( var i = 0; i < fields.length; i++ )
   if( fields[ i ].value.length > 0 ) usedFields++;
+
+ this_form.number_of_uploaded_files.value = usedFields;
 
  if( usedFields == fields.length )
  {
