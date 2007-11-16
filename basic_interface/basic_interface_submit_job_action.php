@@ -262,6 +262,15 @@ else
  $RepositoryIDFile = "";
 }
 
+if( $Config[ "REPOSITORY_SCP_COMMAND" ] != "" )
+ $SCPCommand = $Config[ "REPOSITORY_SCP_COMMAND" ];
+else
+{
+ $RepositoryDir = getcwd()."/".$RepositoryName;
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
 if( $Config[ "REPOSITORY_URL" ] == "" )
 {
  $RepositoryDir = getcwd()."/".$RepositoryName;
@@ -270,7 +279,7 @@ if( $Config[ "REPOSITORY_URL" ] == "" )
 }
 
 if( $RepositoryIDFile != "" )
- exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL ".'"'."mkdir $RepositoryDir".'"' );
+ exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir $RepositoryDir; chmod 770 $RepositoryDir\"" );
 else
 {
  if( !is_dir( $RepositoryDir ) )
@@ -282,10 +291,23 @@ else
 }
 
 // now handle file uploads...
-// ...
-// ...
-// ...
+for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
+{
+ $FileHandle = "uploaded_file_$i";
 
+ if( isset( $_FILES[ $FileHandle ] ) && ( $_FILES[ $FileHandle ][ "error" ] === UPLOAD_ERR_OK ) )
+ {
+  $File = $_FILES[ $FileHandle ];
+
+  if( $RepositoryIDFile != "" )
+  {
+   exec( "$SCPCommand -qBi $RepositoryIDFile ".$File[ "tmp_name" ]." \"$RepositoryURL:$RepositoryDir/'".$File[ "name" ]."'\"" );
+   exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"chmod 440 '$RepositoryDir/".$File[ "name" ]."'\"" );
+  }
+  else
+   move_uploaded_file( $File[ "tmp_name" ], $RepositoryDir."/".$File[ "name" ] );
+ }
+}
 // make sure that future REGEXP's do work...
 $Owners = mysql_escape_string( NormalizeCommaSeparatedField( $Owners, "," ) );
 $ReadAccess = mysql_escape_string( NormalizeCommaSeparatedField( $ReadAccess, "," ) );
