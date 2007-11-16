@@ -102,7 +102,7 @@ if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( 
    if( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" )
    {
     if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
-     exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." ".$RepositoryArray[ 1 ].'"'."rm -rf ".$RepositoryArray[ 2 ].'"' );
+     exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." ".$RepositoryArray[ 1 ].' "'."rm -rf ".$RepositoryArray[ 2 ].'"' );
    }
    else
     if( $RepositoryArray[ 1 ] == Get_Server_Name() )
