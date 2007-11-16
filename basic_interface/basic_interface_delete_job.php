@@ -98,7 +98,16 @@ if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( 
   $RepositoryArray = CommaSeparatedField2Array( $RepositoryURL, ":" );
 
   if( $RepositoryArray[ 0 ] == 2 )
-   rmpath( $RepositoryArray[ 2 ] );
+  {
+   if( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" )
+   {
+    if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
+     exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." ".$RepositoryArray[ 1 ].'"'."rm -rf ".$RepositoryArray[ 2 ].'"' );
+   }
+   else
+    if( $RepositoryArray[ 1 ] == Get_Server_Name() )
+     rmpath( $RepositoryArray[ 2 ] );
+  }
  }
 
  // now delete from db...
