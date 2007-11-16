@@ -75,7 +75,7 @@ $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // start building form to fill in...
-$RepositoryName = "JOB_".md5(uniqid(time()));
+$RepositoryName = "JOB_".md5( uniqid( time() ) );
 echo '<form id="this_form" action="basic_interface_submit_job_action.php" method="POST" enctype="multipart/form-data">';
 echo '<input type="hidden" name="user" value="'.$User.'">';
 echo '<input type="hidden" name="groups" value="'.$Groups.'">';
@@ -113,7 +113,7 @@ function FileUploadChanged()
  for( var i = 0; i < fields.length; i++ )
   if( fields[ i ].value.length > 0 ) usedFields++;
 
- this_form.number_of_uploaded_files.value = usedFields;
+ this_form.number_of_uploaded_files.value = fields.length;
 
  if( usedFields == fields.length )
  {

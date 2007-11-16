@@ -117,7 +117,7 @@ $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // check if repository name was posted... default to a new unique name otherwise...
-$RepositoryName = "JOB_".md5(uniqid(time()));
+$RepositoryName = "JOB_".md5( uniqid( time() ) );
 if( isset( $_GET[ "repository" ] ) )
  $RepositoryName = $_GET[ "repository" ];
 else
@@ -138,7 +138,7 @@ if( !is_dir( $RepositoryDir ) )
  umask( $OldMask );
 }
 
-// build up the repository URL... use the server unique name which should be correctly formated for resources...
+// build up the repository URL...
 if( $Config[ "REPOSITORY_SERVER_NAME" ] != "" )
  $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ].":".$RepositoryDir;
 else
