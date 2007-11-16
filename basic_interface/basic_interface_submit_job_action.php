@@ -336,8 +336,7 @@ if( $RepositoryURL != "" )
 
  if( $RepositoryArray[ 0 ] == 2 )
  {
-  $RepositoryArray = CommaSeparatedField2Array( $RepositoryArray[ 2 ], "/" );
-  $RepositoryURL = $RepositoryArray[ 1 ];
+  $RepositoryURL = basename( $RepositoryArray[ 2 ] );
   if( $Config[ "REPOSITORY_URL" ] != "" ) $RepositoryURL = $Config[ "REPOSITORY_URL" ]."/".$RepositoryURL;
  }
  else
