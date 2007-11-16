@@ -233,7 +233,7 @@ else
 }
 
 // create the job respository directory...
-if( $Config[ "REPOSITORY_SERVER_NAME" ] != "" )
+if( ( $Config[ "REPOSITORY_SERVER_NAME" ] != "" ) && ( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" ) )
 {
  $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ];
  $RepositoryIDFile = $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ];
