@@ -13,7 +13,7 @@ echo -n "Hello_World_PBS running on nodes \${NODES} in directory \${PBS_O_WORKDI
 /bin/sleep 20
 /bin/cat \${PBS_O_WORKDIR}/LGI_target_resources
 /bin/sleep 40
-echo -n ". This job was submitted from "
+echo -n ". This job was submitted with input: "
 /bin/sleep 80
 /bin/cat \${PBS_O_WORKDIR}/LGI_input
 /bin/sleep 160

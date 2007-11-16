@@ -15,7 +15,7 @@ echo -n "Hello_World_LL running on nodes \${LOADL_PROCESSOR_LIST} in directory \
 /bin/sleep 20
 /bin/cat \${LOADL_STEP_INITDIR}/LGI_target_resources
 /bin/sleep 40
-echo -n ". This job was submitted from "
+echo -n ". This job was submitted with input: "
 /bin/sleep 80
 /bin/cat \${LOADL_STEP_INITDIR}/LGI_input
 /bin/sleep 160

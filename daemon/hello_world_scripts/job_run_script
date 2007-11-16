@@ -6,7 +6,7 @@ echo -n "Hello_World from " > LGI_output
 /bin/sleep 20
 /bin/cat LGI_target_resources >> LGI_output
 /bin/sleep 40
-echo -n " submitted from " >> LGI_output
+echo -n " submitted with input: " >> LGI_output
 /bin/sleep 80
 /bin/cat LGI_input >> LGI_output
 /bin/sleep 160
