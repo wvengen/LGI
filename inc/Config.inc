@@ -21,16 +21,18 @@
 global $Config;
 
 $Config[ "SERVER_URL" ]            = "https://fwnc7003.leidenuniv.nl/LGI";     // the URL of this project server
-$Config[ "SERVER_NAME" ]           = "apache@fwnc7003.wks.gorlaeus.net";         // the unique name of this project server
+$Config[ "SERVER_NAME" ]           = "LGI@fwnc7003.wks.gorlaeus.net";          // the unique name of this project server
 
-$Config[ "SERVER_SSL_CERTIFICATE_FILE" ]     = "../certificates/apache@fwnc7003.crt";      // the certificate of this server
-$Config[ "SERVER_SSL_KEY" ]                  = "../certificates/apache@fwnc7003.key";      // the certificate key file of this server
+$Config[ "SERVER_SSL_CERTIFICATE_FILE" ]     = "../certificates/LGI@fwnc7003.crt";      // the certificate of this server
+$Config[ "SERVER_SSL_KEY" ]                  = "../certificates/LGI@fwnc7003.key";      // the certificate key file of this server
 $Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ]   = "https://fwnc7003.leidenuniv.nl/LGI/LGI+CA.crt";   // the certificate of the CA server
 $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ]  = "../certificates/LGI+CA.crt";           // the local certificate of the CA server
 
-$Config[ "REPOSITORY_DIRECTORY" ] = "";                            // location on filesystem of basic interface repository
-$Config[ "REPOSITORY_SERVER_NAME" ] = "";                          // on what server and user the basic interface repository is 
-$Config[ "REPOSITORY_URL" ] = "";                                  // location on web of basic interface repository
+$Config[ "REPOSITORY_DIRECTORY" ] = "";                 // location on filesystem of basic interface repository
+$Config[ "REPOSITORY_SERVER_NAME" ] = "";               // on what server and user the basic interface repository is 
+$Config[ "REPOSITORY_URL" ] = "";                       // location on web of basic interface repository
+$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] = "";         // the identity file to use to ssh RSA authorization to handle basic interface repository
+$Config[ "REPOSITORY_SSH_COMMAND" ] = "/usr/bin/ssh";   // the default location of the ssh command
 
 $Config[ "MYSQL_URL" ]                   = "localhost";            // where is the MySQL db and how to connect to it
 $Config[ "MYSQL_USER" ]                  = "LGI"; 
