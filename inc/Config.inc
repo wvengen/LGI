@@ -32,7 +32,7 @@ $Config[ "REPOSITORY_DIRECTORY" ] = "/mnt/sdb1/LGI/Repository";                /
 $Config[ "REPOSITORY_SERVER_NAME" ] = "LGI@fwnc7003.leidenuniv.nl";            // on what server and user the basic interface repository is 
 $Config[ "REPOSITORY_URL" ] = "Repository";                                    // location on web of basic interface repository
 $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] = "../certificates/LGI@fwnc7003.id_rsa";       // the identity file to use to ssh RSA authorization to handle basic interface repository
-$Config[ "REPOSITORY_SSH_COMMAND" ] = "/usr/bin/ssh -o UserKnownHostsFile='/mnt/sdb1/LGI/Repository/known_hosts'";   // the default location of the ssh command
+$Config[ "REPOSITORY_SSH_COMMAND" ] = "/usr/bin/ssh -o UserKnownHostsFile='../certificates/known_hosts'";   // the default location of the ssh command
 
 $Config[ "MYSQL_URL" ]                   = "localhost";            // where is the MySQL db and how to connect to it
 $Config[ "MYSQL_USER" ]                  = "LGI"; 
