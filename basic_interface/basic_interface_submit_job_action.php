@@ -112,10 +112,6 @@ else
   $Input = $_POST[ "input" ];
 if( strlen( $Input ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 54 ] );
 
-// now verfiy the user using the basic browser interface... also make MySQL connection...
-$ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
-if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
-
 // check if repository name was posted... default to a new unique name otherwise...
 $RepositoryName = "JOB_".md5( uniqid( time() ) );
 if( isset( $_GET[ "repository" ] ) )
@@ -126,29 +122,15 @@ else
 if( strlen( $RepositoryName ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: Repository field posted too big" );
 if( strpos( $RepositoryName, "." ) !== FALSE ) Exit_With_Text( "ERROR: Invalid repository field posted" );
 
-// create the job respository directory if not there yet...
-if( $Config[ "REPOSITORY_DIRECTORY" ] != "" )
- $RepositoryDir = $Config[ "REPOSITORY_DIRECTORY" ]."/".$RepositoryName;
-else
- $RepositoryDir = getcwd()."/".$RepositoryName;
-if( !is_dir( $RepositoryDir ) )
-{
- $OldMask = umask( 0 );
- mkdir( $RepositoryDir, 0770 );
- umask( $OldMask );
-}
+// check posted number of uploaded files...
+$NrOfUploadedFiles = -1;
+if( isset( $_POST[ "number_of_uploaded_files" ] ) && is_numeric( $_POST[ "number_of_uploaded_files" ] ) )
+ $NrOfUploadedFiles = $_POST[ "number_of_uploaded_files" ];
+if( $NrOfUploadedFiles < 0 ) Exit_With_Text( "ERROR: Hidden field number_of_uploaded_files not correctly posted." );
 
-// build up the repository URL...
-if( $Config[ "REPOSITORY_SERVER_NAME" ] != "" )
- $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ].":".$RepositoryDir;
-else
- $RepositoryURL = Get_Server_Name().":".$RepositoryDir;
-
-// now handle file uploads...
-// ...
-// ...
-// $_POST[ "number_of_uploaded_files" ]
-// ...
+// now verfiy the user using the basic browser interface... also make MySQL connection...
+$ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
+if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $TargetResources, "," );
@@ -164,10 +146,7 @@ for( $i = 1; $i <= $Resources[ 0 ]; $i++ )
  }
 
 if( !$FoundResourceFlag ) 
-{ 
- rmpath( $RepositoryDir ); 
  Exit_With_Text( "ERROR: ".$ErrorMsgs[ 28 ] ); 
-}
 
 $TargetResources = substr( $NewTargetResourceList, 2 );
 
@@ -219,10 +198,7 @@ for( $i = 1; $i <= $GroupsArray[ 0 ]; $i++ )
 if( $FoundPossibleGroup )
  $Groups = substr( $NewGroupsList, 2 );
 else
-{
- rmpath( $RepositoryDir );
  Exit_With_Text( "ERROR: ".$ErrorMsgs[ 33 ] );
-}
 
 // now determine the owners and read_access fields based on the possibly posted data and the user+groups data...
 if( $ReadAccess != "" )
@@ -256,6 +232,60 @@ else
  }
 }
 
+// create the job respository directory...
+if( $Config[ "REPOSITORY_SERVER_NAME" ] != "" )
+{
+ $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ];
+ $RepositoryIDFile = $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ];
+}
+else
+{
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
+if( $Config[ "REPOSITORY_DIRECTORY" ] != "" )
+ $RepositoryDir = $Config[ "REPOSITORY_DIRECTORY" ]."/".$RepositoryName;
+else
+{
+ $RepositoryDir = getcwd()."/".$RepositoryName;
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
+if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
+ $SSHCommand = $Config[ "REPOSITORY_SSH_COMMAND" ];
+else
+{
+ $RepositoryDir = getcwd()."/".$RepositoryName;
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
+if( $Config[ "REPOSITORY_URL" ] == "" )
+{
+ $RepositoryDir = getcwd()."/".$RepositoryName;
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
+if( $RepositoryIDFile != "" )
+ exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL ".'"'."mkdir $RepositoryDir".'"' );
+else
+{
+ if( !is_dir( $RepositoryDir ) )
+ {
+  $OldMask = umask( 0 );
+  mkdir( $RepositoryDir, 0770 );
+  umask( $OldMask );
+ }
+}
+
+// now handle file uploads...
+// ...
+// ...
+// ...
+
 // make sure that future REGEXP's do work...
 $Owners = mysql_escape_string( NormalizeCommaSeparatedField( $Owners, "," ) );
 $ReadAccess = mysql_escape_string( NormalizeCommaSeparatedField( $ReadAccess, "," ) );
@@ -263,7 +293,7 @@ $Application = mysql_escape_string( $Application );
 $TargetResources = mysql_escape_string( $TargetResources );
 
 // start building the insert query based on all possible posted fields...
-$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$Application."', owners='".$Owners."', read_access='".$ReadAccess."', target_resources='".$TargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP(), job_specifics='".mysql_escape_string( $JobSpecifics." <repository> $RepositoryURL </repository>" )."'";
+$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$Application."', owners='".$Owners."', read_access='".$ReadAccess."', target_resources='".$TargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP(), job_specifics='".mysql_escape_string( $JobSpecifics." <repository> $RepositoryURL:$RepositoryDir </repository>" )."'";
 
 if( $Input != "" )
  $InsertQuery .= ", input='".mysql_escape_string( $Input )."'";
@@ -293,7 +323,6 @@ if( $RepositoryURL != "" )
 }
 
 Start_Table();
-Row1( $_POST[ "number_of_uploaded_files" ] );
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
 Row2( "<b>Project:</b>", $Project );
 Row2( "<b>This project server:</b>", Get_Server_URL() );
