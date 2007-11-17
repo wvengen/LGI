@@ -29,8 +29,9 @@ $Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ]   = "https://fwnc7003.leidenuniv.nl/L
 $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ]  = "../certificates/LGI+CA.crt";           // the local certificate of the CA server
 
 $Config[ "REPOSITORY_DIRECTORY" ]         = getcwd()."/repository";                                               // location on filesystem of basic interface repository server
-$Config[ "REPOSITORY_SERVER_NAME" ]       = "";                                                                   // on what server and user the basic interface repository is located 
+$Config[ "REPOSITORY_SERVER_NAME" ]       = $Config[ "SERVER_NAME" ];                                             // on what server and user the basic interface repository is located 
 $Config[ "REPOSITORY_URL" ]               = $Config[ "SERVER_URL" ]."/basic_interface/repository";                // location on web of basic interface repository for browsing purposes
+
 $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] = "";                                                                   // the identity file to use to ssh RSA authorization to handle basic interface repository
 $Config[ "REPOSITORY_SSH_COMMAND" ]       = "/usr/bin/ssh -o UserKnownHostsFile='../certificates/known_hosts'";   // the default location of the ssh command
 $Config[ "REPOSITORY_SCP_COMMAND" ]       = "/usr/bin/scp -o UserKnownHostsFile='../certificates/known_hosts'";   // the default location of the scp command
