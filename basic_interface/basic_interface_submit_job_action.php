@@ -112,16 +112,6 @@ else
   $Input = $_POST[ "input" ];
 if( strlen( $Input ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 54 ] );
 
-// check if repository name was posted... default to a new unique name otherwise...
-$RepositoryName = "JOB_".md5( uniqid( time() ) );
-if( isset( $_GET[ "repository" ] ) )
- $RepositoryName = $_GET[ "repository" ];
-else
- if( isset( $_POST[ "repository" ] ) )
-  $RepositoryName = $_POST[ "repository" ];
-if( strlen( $RepositoryName ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: Repository field posted too big" );
-if( strpos( $RepositoryName, "." ) !== FALSE ) Exit_With_Text( "ERROR: Invalid repository field posted" );
-
 // check posted number of uploaded files...
 $NrOfUploadedFiles = -1;
 if( isset( $_POST[ "number_of_uploaded_files" ] ) && is_numeric( $_POST[ "number_of_uploaded_files" ] ) )
@@ -233,6 +223,8 @@ else
 }
 
 // create the job respository directory...
+$RepositoryName = "JOB_".md5( uniqid( time() ) );
+
 if( ( $Config[ "REPOSITORY_SERVER_NAME" ] != "" ) && ( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" ) )
 {
  $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ];

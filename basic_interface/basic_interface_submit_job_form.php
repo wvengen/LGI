@@ -75,11 +75,9 @@ $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // start building form to fill in...
-$RepositoryName = "JOB_".md5( uniqid( time() ) );
 echo '<form id="this_form" action="basic_interface_submit_job_action.php" method="POST" enctype="multipart/form-data">';
 echo '<input type="hidden" name="user" value="'.$User.'">';
 echo '<input type="hidden" name="groups" value="'.$Groups.'">';
-echo '<input type="hidden" name="repository" value="'.$RepositoryName.'">';
 echo '<input type="hidden" name="number_of_uploaded_files" value="0" >';
 
 Start_Table();
@@ -90,7 +88,6 @@ Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/bas
 Row2( "<b>User:</b>", $User ); 
 Row2( "<b>Groups:</b>", $Groups ); 
 Row1( "<center><font color='green' size='4'><b>Specify job details</b></font></center>" );
-Row2( "<b>Job repository:</b>", $RepositoryName );
 Row2( "<b>Application:</b>", '<input type="text" size="75" name="application" value="hello_world" maxlength="128" validation="required"/>' );
 Row2( "<b>Extra owners:</b>", '<input type="text" size="75" name="owners" value="" maxlength="128" />' );
 Row2( "<b>Extra read access:</b>", '<input type="text" size="75" name="read_access" value="" maxlength="128" />' );
