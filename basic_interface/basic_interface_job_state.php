@@ -112,10 +112,10 @@ if( isset( $Job_ID ) )               // we requested details on a job...
  Row2( "<b>Owners:</b>", $JobSpecs -> owners ); 
  Row2( "<b>Read access:</b>", $JobSpecs -> read_access ); 
  Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources ); 
- Row2( "<b>Job specifics:</b>", htmlentities( $JobSpecs -> job_specifics ) ); 
+ Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) ); 
  if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href=$RepositoryURL> $RepositoryURL </a>" ); 
- Row2( "<b>Input:</b>", htmlentities( $JobSpecs -> input ) ); 
- Row2( "<b>Output:</b>", htmlentities( $JobSpecs -> output ) ); 
+ Row2( "<b>Input:</b>", nl2br( htmlentities( $JobSpecs -> input ) ) ); 
+ Row2( "<b>Output:</b>", nl2br( htmlentities( $JobSpecs -> output ) ) ); 
  End_Table();
 
  echo "<br><a href='basic_interface_delete_job.php?job_id=".$JobSpecs -> job_id."'>Abort or Delete this job</a>\n";

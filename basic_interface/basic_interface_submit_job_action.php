@@ -350,9 +350,9 @@ Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_s
 Row2( "<b>Owners:</b>", $JobSpecs -> owners );
 Row2( "<b>Read access:</b>", $JobSpecs -> read_access );
 Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
-Row2( "<b>Job specifics:</b>", htmlentities( $JobSpecs -> job_specifics ) );
+Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) );
 if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href='".$RepositoryURL."'> $RepositoryURL </a>" );
-Row2( "<b>Input:</b>", htmlentities( $JobSpecs -> input ) );
+Row2( "<b>Input:</b>", nl2br( htmlentities( $JobSpecs -> input ) ) );
 End_Table();
 
 echo "<br><a href='basic_interface_delete_job.php?job_id=".$JobSpecs -> job_id."'>Abort or Delete this job</a>\n";

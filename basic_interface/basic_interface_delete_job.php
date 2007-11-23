@@ -144,7 +144,7 @@ Row2( "<b>State time stamp:</b>", "<b>".gmdate( "j M Y G:i", $JobStateTimeStamp 
 Row2( "<b>Owners:</b>", $JobSpecs -> owners );
 Row2( "<b>Read access:</b>", $JobSpecs -> read_access );
 Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
-Row2( "<b>Job specifics:</b>", htmlentities( $JobSpecs -> job_specifics ) );
+Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) );
 End_Table();
 
 echo "<br><a href='basic_interface_list.php?project_server=1'>Show project server list</a>\n";
