@@ -1,0 +1,28 @@
+#!/bin/sh
+if [ -f running ]
+then
+ ID=`/bin/cat running`
+ FINISHED=`/usr/local/bin/qstat $ID 2> /dev/null`
+ if [ "$FINISHED" == "" ]
+ then
+  if [ -f aborted ]
+  then
+#   echo Aborted
+   exit 0
+  fi
+  if [ -f finished ]
+  then
+#   echo Finished
+   exit 0
+  else
+#   echo Crashed
+   exit 1
+  fi
+ else
+#  echo Running
+  exit 1
+ fi
+else
+# echo Not started yet
+ exit 1
+fi
