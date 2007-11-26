@@ -1,5 +1,6 @@
 #!/bin/sh
-/bin/cat /proc/self/status | /bin/grep -e "^PPid" | /usr/bin/cut -f2 > running
+#/bin/cat /proc/self/status | /bin/grep -e "^PPid" | /usr/bin/cut -f2 > running
+echo $$ > running
 
 /bin/sleep 10
 echo -n "Hello_World from " > LGI_output
