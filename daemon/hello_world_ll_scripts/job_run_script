@@ -10,21 +10,21 @@ cat > ./llsubmit_script << END_OF_LLSUBMIT_SCRIPT
 #@ wall_clock_limit = 00:15:00
 #@ queue
 
-/bin/sleep 10
+sleep 10
 echo -n "Hello_World_LL running on nodes \${LOADL_PROCESSOR_LIST} in directory \${LOADL_STEP_INITDIR} at " 
-/bin/sleep 20
-/bin/cat \${LOADL_STEP_INITDIR}/LGI_target_resources
-/bin/sleep 40
+sleep 20
+cat \${LOADL_STEP_INITDIR}/LGI_target_resources
+sleep 40
 echo -n ". This job was submitted with input: "
-/bin/sleep 80
-/bin/cat \${LOADL_STEP_INITDIR}/LGI_input
-/bin/sleep 160
+sleep 80
+cat \${LOADL_STEP_INITDIR}/LGI_input
+sleep 160
 echo "."
 
 # /home/somers/LGI/daemon/bin/LGI_qsub -a hello_world -j \${LOADL_STEP_INITDIR} -i \${LOADL_STEP_INITDIR}/LGI_target_resources
 
-/bin/touch \${LOADL_STEP_INITDIR}/finished
+touch \${LOADL_STEP_INITDIR}/finished
 
 END_OF_LLSUBMIT_SCRIPT
 
-llsubmit llsubmit_script | /usr/bin/awk '/submitted/ { print $4 }' | /usr/bin/cut -d'.' -f5 | /usr/bin/cut -d '"' -f1 > ./running
+llsubmit llsubmit_script | awk '/submitted/ { print $4 }' | cut -d'.' -f5 | cut -d '"' -f1 > ./running

@@ -1,0 +1,61 @@
+#!/bin/csh
+
+echo $$ > running
+
+setenv LGI_DIR /home/${USER}/LGI
+setenv PRIVATE_KEY_FILE ${LGI_DIR}/certificates/huygens.key
+setenv REPOSITORY `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository; cat repository_file`
+
+setenv CWD `pwd`
+
+if ( ${REPOSITORY} != "" ) then
+ setenv DATE `date`
+ echo "G03_LL started retrieving repository ${REPOSITORY} to ${CWD}/repository at ${DATE}." >> LGI_output
+ mkdir repository
+ scp -qBri ${PRIVATE_KEY_FILE} "${REPOSITORY}/*" repository
+
+ cat > ./llsubmit_script << END_OF_LLSUBMIT_SCRIPT
+#@ shell = /usr/bin/csh
+#@ job_name = g03_ll
+#@ job_type = serial
+#@ node_usage = shared
+#@ notification = never
+#@ output = ll_output
+#@ wall_clock_limit = 12:00:00
+#@ queue
+
+cd \${LOADL_STEP_INITDIR}/repository
+
+source \${MODULESHOME}/init/csh
+module load gaussian
+
+dos2unix -n \${LOADL_STEP_INITDIR}/LGI_input g03.input
+g03 > g03.output < g03.input
+END_OF_LLSUBMIT_SCRIPT
+
+ llsubmit llsubmit_script | awk '/submitted/ { print $4 }' | cut -d'.' -f5 | cut -d '"' -f1 > ./ll_running
+ echo "G03_LL created llsubmit script and submitted at ${DATE}." >> LGI_output
+
+ sleep 3
+ setenv ID `cat ll_running`
+ setenv FINISHED `llq $ID | grep $ID`
+ while ( "${FINISHED}" != "" )
+  echo Sleeping a bit...
+  sleep 3 
+  setenv ID `cat ll_running`
+  setenv FINISHED `llq $ID | grep $ID`
+ end
+
+ setenv DATE `date`
+ echo "G03_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY} at ${DATE}." >> LGI_output
+ chmod 664 ./repository/*
+ scp -qBri ${PRIVATE_KEY_FILE} ./repository/* ${REPOSITORY}
+
+else
+ echo "ERROR: No repository was specified for job... Stopping..." >> LGI_output
+endif
+
+setenv DATE `date`
+echo "G03_LL finished at ${DATE}." >> LGI_output
+touch finished
+rm running

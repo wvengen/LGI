@@ -1,8 +1,8 @@
 #!/bin/sh
 if [ -f running ]
 then
- ID=`/bin/cat running`
- FINISHED=`llq $ID | /usr/bin/grep $ID`
+ ID=`cat running`
+ FINISHED=`llq $ID | grep $ID`
  if [ "$FINISHED" == "" ]
  then
   if [ -f aborted ]

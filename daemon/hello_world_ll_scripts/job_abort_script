@@ -1,8 +1,8 @@
 #!/bin/sh
 if [ -f running ]
 then
- ID=`/bin/cat running`
- FINISHED=`llq $ID  | /usr/bin/grep $ID`
+ ID=`cat running`
+ FINISHED=`llq $ID  | grep $ID`
  if [ "$FINISHED" == "" ]
  then
   if [ -f aborted ]
@@ -21,7 +21,7 @@ then
  else
 #  echo Running and aborting now
   llcancel $ID
-  /usr/bin/touch aborted
+  touch aborted
   exit 1
  fi
 else

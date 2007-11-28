@@ -1,8 +1,8 @@
 #!/bin/sh
 if [ -f running ]
 then
- ID=`/bin/cat running`
- FINISHED=`/usr/local/bin/qstat $ID 2> /dev/null`
+ ID=`cat running`
+ FINISHED=`qstat $ID 2> /dev/null`
  if [ "$FINISHED" == "" ]
  then
   if [ -f aborted ]
@@ -20,8 +20,8 @@ then
   fi
  else
 #  echo Running and aborting now
-  /usr/local/bin/qdel $ID
-  /bin/touch aborted
+  qdel $ID
+  touch aborted
   exit 1
  fi
 else

@@ -1,6 +1,6 @@
 #!/bin/csh
 
-/bin/cat > ./pbs_script << END_OF_PBS_SCRIPT
+cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -S /bin/csh
 #PBS -l nodes=01:ppn=01
 #PBS -q small
@@ -18,30 +18,30 @@ source /home/g03/g03d01/g03/bsd/g03.login
 setenv NODES \`/bin/cat \${PBS_NODEFILE}\`
 cd /scratch/\${USER}/\${PBS_JOBID}
 
-setenv CWD \`/bin/pwd\`
+setenv CWD \`pwd\`
 
 if ( \${REPOSITORY} != "" ) then
- setenv DATE \`/bin/date\`
- echo "G03_PBS started retreiving repository \${REPOSITORY} to \${NODES}:\${CWD} at \${DATE}." 
- /usr/bin/scp -qBri \${PRIVATE_KEY_FILE} "\${REPOSITORY}/*" .
+ setenv DATE \`date\`
+ echo "G03_PBS started retrieving repository \${REPOSITORY} to \${NODES}:\${CWD} at \${DATE}." 
+ scp -qBri \${PRIVATE_KEY_FILE} "\${REPOSITORY}/*" .
 
- /usr/bin/dos2unix -n \${PBS_O_WORKDIR}/LGI_input g03.input
+ dos2unix -n \${PBS_O_WORKDIR}/LGI_input g03.input
 
- setenv DATE \`/bin/date\`
+ setenv DATE \`date\`
  echo "G03_PBS started g03 on node \${NODES} at \${DATE}." 
  g03 > g03.output < g03.input
 
- setenv DATE \`/bin/date\`
+ setenv DATE \`date\`
  echo "G03_PBS started sending back the output from \${NODES}:\${CWD} to repository \${REPOSITORY} at \${DATE}." 
- /bin/chmod 664 ./*
- /usr/bin/scp -qBri \${PRIVATE_KEY_FILE} ./* \${REPOSITORY}
+ chmod 664 ./*
+ scp -qBri \${PRIVATE_KEY_FILE} ./* \${REPOSITORY}
 else
  echo "ERROR: No repository was specified for job... Stopping..."
 endif
 
-setenv DATE \`/bin/date\`
+setenv DATE \`date\`
 echo "G03_PBS finished at \${DATE}." 
-/bin/touch \${PBS_O_WORKDIR}/finished
+touch \${PBS_O_WORKDIR}/finished
 END_OF_PBS_SCRIPT
 
-/usr/local/bin/qsub pbs_script > ./running
+qsub pbs_script > ./running
