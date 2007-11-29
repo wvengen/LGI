@@ -14,7 +14,7 @@ if ( ${REPOSITORY} != "" ) then
  mkdir repository
  scp -qBri ${PRIVATE_KEY_FILE} "${REPOSITORY}/*" repository
 
- cat > ./llsubmit_script << END_OF_LLSUBMIT_SCRIPT
+ cat > ./ll_submit_script << END_OF_LL_SUBMIT_SCRIPT
 #@ shell = /usr/bin/csh
 #@ job_name = g03_ll
 #@ job_type = serial
@@ -31,37 +31,31 @@ module load gaussian
 
 dos2unix -n \${LOADL_STEP_INITDIR}/LGI_input g03.input
 g03 > g03.output < g03.input
-sleep 300
-END_OF_LLSUBMIT_SCRIPT
+END_OF_LL_SUBMIT_SCRIPT
 
- llsubmit llsubmit_script | awk '/submitted/ { print $4 }' | cut -d'.' -f5 | cut -d '"' -f1 > ll_running
+ llsubmit ll_submit_script | awk '/submitted/ { print $4 }' | cut -d'.' -f5 | cut -d '"' -f1 > ll_running
  setenv DATE `date`
- echo "G03_LL created llsubmit script and submitted at ${DATE}." >> LGI_output
+ echo "G03_LL created loadleveler script and submitted at ${DATE}." >> LGI_output
  
  setenv ID `cat ll_running`
  if ( "${ID}" != "" ) then
-  sleep 120 
+  sleep 5
   setenv FINISHED `llq ${ID} | grep ${ID}`
 
   while ( "${FINISHED}" != "" )
-   sleep 120 
+   sleep 300 
    setenv FINISHED `llq ${ID} | grep ${ID}`
   end
 
-  sleep 120
+  setenv DATE `date`
+  echo "G03_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY} at ${DATE}." >> LGI_output
+  chmod 664 ./repository/*
+  scp -qBri ${PRIVATE_KEY_FILE} ./repository/* ${REPOSITORY}
+
  else
    echo "ERROR: Job could not be submitted to loadleveler." >> LGI_output
  endif
  
- setenv DATE `date`
- echo "G03_LL removed llsubmit script at ${DATE}." >> LGI_output
- rm ll_running ll_output llsubmit_script
-
- setenv DATE `date`
- echo "G03_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY} at ${DATE}." >> LGI_output
- chmod 664 ./repository/*
- scp -qBri ${PRIVATE_KEY_FILE} ./repository/* ${REPOSITORY}
-
 else
  echo "ERROR: No repository was specified for job... Stopping..." >> LGI_output
 endif
