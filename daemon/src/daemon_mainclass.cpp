@@ -479,8 +479,6 @@ int Daemon::RequestWorkCycle( void )
                                   "<state> queued </state> <server_max_field_size> " + ServerMaxFieldSize +
                                   " </server_max_field_size>";
 
-     CRITICAL_LOG( "Test 2: " << ExtraJobDetailsTags );
-  
      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Checking system limits for application " << TheApplication.Application_Name() );
 
      // check if there is a system wide limit reached for this application...
