@@ -31,21 +31,31 @@ module load gaussian
 
 dos2unix -n \${LOADL_STEP_INITDIR}/LGI_input g03.input
 g03 > g03.output < g03.input
+sleep 300
 END_OF_LLSUBMIT_SCRIPT
 
- llsubmit llsubmit_script | awk '/submitted/ { print $4 }' | cut -d'.' -f5 | cut -d '"' -f1 > ./ll_running
+ llsubmit llsubmit_script | awk '/submitted/ { print $4 }' | cut -d'.' -f5 | cut -d '"' -f1 > ll_running
+ setenv DATE `date`
  echo "G03_LL created llsubmit script and submitted at ${DATE}." >> LGI_output
-
- sleep 30
+ 
  setenv ID `cat ll_running`
- setenv FINISHED `llq $ID | grep $ID`
- while ( "${FINISHED}" != "" )
-  sleep 60 
-  setenv ID `cat ll_running`
-  setenv FINISHED `llq $ID | grep $ID`
- end
+ if ( "${ID}" != "" ) then
+  sleep 120 
+  setenv FINISHED `llq ${ID} | grep ${ID}`
 
- rm ll_running
+  while ( "${FINISHED}" != "" )
+   sleep 120 
+   setenv FINISHED `llq ${ID} | grep ${ID}`
+  end
+
+  sleep 120
+ else
+   echo "ERROR: Job could not be submitted to loadleveler." >> LGI_output
+ endif
+ 
+ setenv DATE `date`
+ echo "G03_LL removed llsubmit script at ${DATE}." >> LGI_output
+ rm ll_running ll_output llsubmit_script
 
  setenv DATE `date`
  echo "G03_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY} at ${DATE}." >> LGI_output
@@ -58,5 +68,6 @@ endif
 
 setenv DATE `date`
 echo "G03_LL finished at ${DATE}." >> LGI_output
-touch finished
 rm running
+touch finished
+
