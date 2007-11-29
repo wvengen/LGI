@@ -408,7 +408,7 @@ int Daemon::RequestWorkCycle( void )
   if( ServerAPI.Resource_SignUp_Resource( Response, TheProject.Project_Master_Server(), TheProject.Project_Name() ) != CURLE_OK ) continue;
 
   Response = Parse_XML( Response, "LGI" );
-  ServerMaxFieldSize = Parse_XML( Response, "server_max_field_size" );
+  ServerMaxFieldSize = NormalizeString( Parse_XML( Response, "server_max_field_size" ) );
   Response = Parse_XML( Response, "response" );
 
   if( Response.empty() ) continue;
@@ -423,30 +423,33 @@ int Daemon::RequestWorkCycle( void )
   
   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Received list of " << NumberOfServers << " servers from " << TheProject.Project_Master_Server() );
 
-  string SlaveServer;
+  string Server;
 
   for( int nS = StartPos = 0; nS < NumberOfServers; nS++ )
   {
-   SlaveServer = NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) );
-   if( SlaveServer.empty() ) continue; 
-   if( SlaveServer != TheProject.Project_Master_Server() )
+   Server = NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) );
+   if( Server.empty() ) continue; 
+   if( Server != TheProject.Project_Master_Server() )
    {
-    ServerList.insert( ServerList.begin(), SlaveServer );
-    VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << SlaveServer << " to server request list" )
+    ServerList.insert( ServerList.begin(), Server );
+    VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << Server << " to server request list" )
    }
   }
 
   // now add also master server reported in the response, and the one we just asked...
-  SlaveServer = NormalizeString( Parse_XML( Response, "project_master_server" ) ); 
-  if( SlaveServer != TheProject.Project_Master_Server() ) 
+  Server = NormalizeString( Parse_XML( Response, "project_master_server" ) ); 
+
+  if( Server != TheProject.Project_Master_Server() ) 
   {
-   ServerList.insert( ServerList.end(), SlaveServer ); 
-   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << SlaveServer << " to server request list" );
+   ServerList.insert( ServerList.end(), Server ); 
+   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << Server << " to server request list" );
   }
 
-  SlaveServer = TheProject.Project_Master_Server();
-  ServerList.insert( ServerList.begin(), SlaveServer ); 
-  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << SlaveServer << " to server request list" );
+  Server = TheProject.Project_Master_Server();
+  ServerList.insert( ServerList.begin(), Server ); 
+  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Added " << Server << " to server request list" );
+
+  Server = NormalizeString( Parse_XML( Response, "project_master_server" ) ); 
 
   list<string>::iterator ServerPointer = ServerList.begin();
 
@@ -471,11 +474,12 @@ int Daemon::RequestWorkCycle( void )
      if( TheApplication.Job_Limit() <= Accounting[ "; TOTALS; " + TheProject.Project_Name() + "; " + TheApplication.Application_Name() ] ) continue;
 
      string ExtraJobDetailsTags = "<project> " + TheProject.Project_Name()  + " </project> <this_project_server> " +
-                                  (*ServerPointer) + " </this_project_server> <project_master_server> " +
-                                  Parse_XML( Response, "project_master_server" ) + " </project_master_server> " +
+                                  (*ServerPointer) + " </this_project_server> <project_master_server> " + Server + " </project_master_server> " +
                                   "<application> " + TheApplication.Application_Name() + " </application> " +
                                   "<state> queued </state> <server_max_field_size> " + ServerMaxFieldSize +
                                   " </server_max_field_size>";
+
+     CRITICAL_LOG( "Test 2: " << ExtraJobDetailsTags );
   
      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Checking system limits for application " << TheApplication.Application_Name() );
 
@@ -594,12 +598,14 @@ int Daemon::RequestWorkCycle( void )
     {
      Response.clear();
      SessionID.clear();
+     Server.clear();
     }
     else
     {
      Response = Parse_XML( Response, "LGI" );
-     ServerMaxFieldSize = Parse_XML( Response, "server_max_field_size" );
+     ServerMaxFieldSize = NormalizeString( Parse_XML( Response, "server_max_field_size" ) );
      Response = Parse_XML( Response, "response" );
+     Server = NormalizeString( Parse_XML( Response, "project_master_server" ) ); 
 
      if( !Parse_XML( Response, "error" ).empty() )
      {
@@ -607,6 +613,7 @@ int Daemon::RequestWorkCycle( void )
       Response.clear();
       ServerMaxFieldSize.clear();
       SessionID.clear();
+      Server.clear();
      } 
      else
      {
@@ -620,6 +627,7 @@ int Daemon::RequestWorkCycle( void )
     Response.clear();
     ServerMaxFieldSize.clear();
     SessionID.clear();
+    Server.clear();
    }
 
   }
