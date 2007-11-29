@@ -1,6 +1,6 @@
 #!/bin/sh
-PID=`/bin/cat running`
+PID=`cat running`
 kill $PID
-/bin/touch finished
-/bin/rm running
-/bin/true
+touch finished
+rm running
+true

@@ -7,22 +7,20 @@ cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -N hello_world_pbs
 #PBS -o LGI_output
 
-NODES=\`/bin/cat \${PBS_NODEFILE}\`
-/bin/sleep 10
+NODES=\`cat \${PBS_NODEFILE}\`
+sleep 10
 echo -n "Hello_World_PBS running on nodes \${NODES} in directory \${PBS_O_WORKDIR} at " 
-/bin/sleep 20
-/bin/cat \${PBS_O_WORKDIR}/LGI_target_resources
-/bin/sleep 40
+sleep 20
+cat \${PBS_O_WORKDIR}/LGI_target_resources
+sleep 40
 echo -n ". This job was submitted with input: "
-/bin/sleep 80
-/bin/cat \${PBS_O_WORKDIR}/LGI_input
-/bin/sleep 160
+sleep 80
+cat \${PBS_O_WORKDIR}/LGI_input
+sleep 160
 echo "."
 
-# /home/mark/LGI/daemon/bin/LGI_qsub -a hello_world -j \${PBS_O_WORKDIR} -i \${PBS_O_WORKDIR}/LGI_target_resources
-
-/bin/touch \${PBS_O_WORKDIR}/finished
+touch \${PBS_O_WORKDIR}/finished
 
 END_OF_PBS_SCRIPT
 
-/usr/local/bin/qsub pbs_script > ./running
+qsub pbs_script > ./running

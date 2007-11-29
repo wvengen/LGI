@@ -1,8 +1,8 @@
 #!/bin/sh
 if [ -f running ]
 then
- PID=`/bin/cat running`
- SPID=`/bin/ps -p ${PID} -o pid=`
+ PID=`cat running`
+ SPID=`ps -p ${PID} -o pid=`
 
  if [ "${SPID}" == "" ]
  then

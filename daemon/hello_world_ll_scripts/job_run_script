@@ -21,8 +21,6 @@ cat \${LOADL_STEP_INITDIR}/LGI_input
 sleep 160
 echo "."
 
-# /home/somers/LGI/daemon/bin/LGI_qsub -a hello_world -j \${LOADL_STEP_INITDIR} -i \${LOADL_STEP_INITDIR}/LGI_target_resources
-
 touch \${LOADL_STEP_INITDIR}/finished
 
 END_OF_LLSUBMIT_SCRIPT

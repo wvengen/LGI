@@ -36,12 +36,11 @@ END_OF_LLSUBMIT_SCRIPT
  llsubmit llsubmit_script | awk '/submitted/ { print $4 }' | cut -d'.' -f5 | cut -d '"' -f1 > ./ll_running
  echo "G03_LL created llsubmit script and submitted at ${DATE}." >> LGI_output
 
- sleep 3
+ sleep 30
  setenv ID `cat ll_running`
  setenv FINISHED `llq $ID | grep $ID`
  while ( "${FINISHED}" != "" )
-  echo Sleeping a bit...
-  sleep 3 
+  sleep 60 
   setenv ID `cat ll_running`
   setenv FINISHED `llq $ID | grep $ID`
  end
