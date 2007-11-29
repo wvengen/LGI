@@ -45,6 +45,8 @@ END_OF_LLSUBMIT_SCRIPT
   setenv FINISHED `llq $ID | grep $ID`
  end
 
+ rm ll_running
+
  setenv DATE `date`
  echo "G03_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY} at ${DATE}." >> LGI_output
  chmod 664 ./repository/*

@@ -7,33 +7,29 @@ then
  then
   if [ -f aborted ]
   then
-#   echo Aborted
    PID=`cat running`
    kill $PID
    touch finished
    rm ll_running
    rm running
    exit 0
-  fi
-  if [ -f finished ]
-  then
-#   echo Finished
-   exit 1
   else
-#   echo Crashed
    exit 1
   fi
  else
-#  echo Running in loadlleveler and aborting now
   llcancel $ID
   touch aborted
   exit 1
  fi
 else
-# echo Not started yet in loadlleveler
- PID=`cat running`
- kill $PID
- touch finished
- rm running
- exit 0
+ if [ -f running ]
+ then
+  PID=`cat running`
+  kill $PID
+  touch finished
+  rm running
+  exit 0
+ else
+  exit 1
+ fi
 fi

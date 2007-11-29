@@ -4,13 +4,10 @@ if [ "$queued" != "" ]
 then
  if (( $queued >= 1 ))
  then
-#  echo System limit has been reached
   exit 1
  else
-#  echo No system limit reached
   exit 0
  fi
 else
-# echo No system limit reached
  exit 0
 fi
