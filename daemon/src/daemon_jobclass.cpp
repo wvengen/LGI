@@ -41,7 +41,7 @@ int UnlinkDirectoryRecursively( string Directory )
 
   if( S_ISDIR( FileStat.st_mode ) )                        // check if it is a directory...
   { 
-   if( UnlinkDirectoryRecursively( Name ) ) 
+   if( !UnlinkDirectoryRecursively( Name ) ) 
    {
     closedir( Dir );
     return( 0 );
