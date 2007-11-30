@@ -159,7 +159,7 @@ function Server_Check_And_Perform_Updates( )
     $CurrentVersionNumber = -1;
 
    // post our version number and get a possible update...
-   $PostResponse =  SSL_Post_To_URL( $CurrentUpdateServer->url."/servers/server_get_update.php", "project=".Get_Selected_MySQL_DataBase()."&version=".$CurrentVersionNumber );
+   $PostResponse =  SSL_Post_To_URL( $CurrentUpdateServer->url."/servers/server_get_update.php", "project=".Get_Selected_MySQL_DataBase()."&version=".(string)( $CurrentVersionNumber ) );
 
    $UpdateData = NormalizeString( Parse_XML( Parse_XML( Parse_XML( $PostResponse, "LGI", $Attributes ), "response", $Attributes ), "update", $Attributes ) );
 
