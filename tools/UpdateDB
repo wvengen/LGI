@@ -14,6 +14,9 @@ export UPDATEQUERY="INSERT INTO updates SET servers='${SERVERS}', update_query='
 shift
 shift
 
+echo "Running an update cycle..."
+php -f ./cron_job.php
+
 echo "Applying query \"${QUERY}\"..."
 echo ${QUERY} | mysql $@
 echo ${UPDATEQUERY} | mysql $@
