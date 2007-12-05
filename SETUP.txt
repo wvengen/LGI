@@ -30,7 +30,7 @@ and a private key for your resource.
 you do not have this yet.
 
 - Go to the '~/LGI/daemon/src' directory and invoke make. If you have a
-different compiler installed that GNU's g++, or you have libcurl installed
+different compiler installed than GNU's g++, or you have libcurl installed
 in a different location, adjust the first few lines of the file Makefile to
 your needs.
 
@@ -40,7 +40,7 @@ include that in your PATH for convencience.
 
 - Edit the '~/LGI/daemon/LGI.cfg' example configuration file. It has been
 setup to run the hello_world application by just simple forking scripts.
-Other example scripts on how to use the 'hello_world' example usig Torque
+Other example scripts on how to use the 'hello_world' example using Torque
 / PBS or LoadLeveler are included to in the corresponding '~LGI/daemon/
 hello_world_XX_scripts' subdirectories. Please make sure you refer to
 the right LGI project server, use the correct project name and use the
@@ -71,11 +71,11 @@ Part II : Howto setup a project server
 
 Setting up your own project is not too hard either. You can decide to be
 a fully independent project by setting up your own X.509 certificate Center
-of Authority, or you can decide to be a sub project and thus be a X.509
+of Authority, or you can decide to be a sub project and thus be an X.509
 sub-CA of the LGI-CA. In this part, it is shown how to become an independant
 project and be your own X.509 CA.
 
-- Make sure libcurl, php, mysql, apache and openssl are installed on your
+- Make sure libcurl, PHP, MySQL, Apache and OpenSSL are installed on your
 system.
 
 - Make sure MySQL is configured correctly and mysqld is running.
@@ -89,14 +89,14 @@ into the home of user apache where it will be served:
 
   tar -zxf LGI.tar.gz -C /var/www/html
 
-- Use openssl to create a CA private key and certificate with which you can
+- Use OpenSSL to create a CA private key and certificate with which you can
 create and sign your project server, resource and client certificates:
 
  Start by creating a private key for your CA:
 
     openssl genrsa -out /var/www/html/LGI/certificates/exampleCA.key 4096    
 
- Then create a X.509 selfsigned certificate for it:
+ Then create an X.509 selfsigned certificate for it:
 
     openssl req -new -x509 -days 365 -set_serial 0 -extensions v3_ca 
             -key /var/www/html/LGI/certificates/exampleCA.key 
@@ -115,8 +115,8 @@ create and sign your project server, resource and client certificates:
     openssl req -new -key /var/www/html/LGI/certificates/exampleserver.key 
             -out /var/www/html/LGI/certificates/exampleserver.crs
 
- and in filling in the commonname of the CA certificate, use the LGI format
- 'apache@exampleserver.somewhere.org; exampleprojectname'.
+ and in filling in the commonname of the CA certificate, be sure to use the 
+ correct LGI format 'apache@exampleserver.somewhere.org; exampleprojectname'.
 
  Now create the CA signed server certificate from this request:
 
@@ -167,19 +167,19 @@ the https virtual host configuration:
         AllowOverride All
  </Directory>
 
- Make sure you have a .htaccess file in the '/var/www/html/LGI/certificates'
- directory with the following content:
+ Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates'
+ and '/var/www/html/LGI/inc' directories with the following content:
 
  Order Allow,Deny
  Deny from all
 
- Also sure you have a .htaccess file in the '/var/www/html/LGI/
+ Also sure you have an .htaccess file in the '/var/www/html/LGI/
  basic_interface/repository' directory with the following content:
 
  hp_flag engine off
  SSLRequireSSL
 
- Finally check your apache configuration with the 'apachectl configtest' command.
+ Finally check your Apache configuration with the 'apachectl configtest' command.
 
 - Now create a MySQL user and database for your project with the database
 name equal to your project name "exampleprojectname":

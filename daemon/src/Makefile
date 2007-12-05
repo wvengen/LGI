@@ -92,10 +92,10 @@ hash.o : hash.cpp hash.h
 clean :
 	rm -rf ${OBJS} LGI_daemon xml binhex hexbin hash csv LGI_filetransfer LGI_qstat LGI_qdel LGI_qsub
 
-# install...
+# uninstall...
 uninstall :
 	rm -rf ../bin
 
 # install...
 install : all
-	mkdir ../bin; cp LGI_daemon xml binhex hexbin hash csv LGI_filetransfer LGI_qstat LGI_qsub LGI_qdel ../bin
+	mkdir -p ../bin; cp LGI_daemon xml binhex hexbin hash csv LGI_filetransfer LGI_qstat LGI_qsub LGI_qdel ../bin
