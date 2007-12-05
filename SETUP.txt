@@ -275,14 +275,14 @@ and insert the slave server details into the master server database:
        url='https://exampleslaveserver.somewhere.org/LGI',
        client_certificate='$SLAVECERTIFICATE'"
 
-  export ESCAPEDSLAVEINSERTQUERY=`echo $SLAVEINSERTQUERY | sed "s/'/\\\\\'/g"`
+  export ESCAPEDSLAVEINSERTQUERY=`echo "$SLAVEINSERTQUERY" | sed "s/'/\\\\\'/g"`
 
   export UPDATEQUERY="INSERT INTO updates SET servers='any',
          update_query='$ESCAPEDSLAVEINSERTQUERY'"
 
-  echo $SLAVEINSERTQUERY | mysql -u examplemysqluser -p exampleprojectname
+  echo "$SLAVEINSERTQUERY" | mysql -u examplemysqluser -p exampleprojectname
 
-  echo $UPDATEQUERY | mysql -u examplemysqluser -p exampleprojectname
+  echo "$UPDATEQUERY" | mysql -u examplemysqluser -p exampleprojectname
   
 At this point the two servers are linked together and the crontab entries
 of both will ensure that any updates pending in the 'updates' table of
@@ -308,15 +308,15 @@ should do that like:
   export QUERY="INSERT INTO users_allowed SET user_name='user', 
          application='hello_world', job_limit=10"
 
-  echo $QUERY | mysql -u examplemysqluser -p exampleprojectname
+  echo "$QUERY" | mysql -u examplemysqluser -p exampleprojectname
 
-  export ESCAPEDQUERY=`echo $QUERY | sed "s/'/\\\\\'/g"`
+  export ESCAPEDQUERY=`echo "$QUERY" | sed "s/'/\\\\\'/g"`
 
   export UPDATEQUERY="INSERT INTO updates SET 
          servers='apache@exampleserver.somewhere.org',
          update_query='$ESCAPEDQUERY'"
 
-  echo $UPDATEQUERY | mysql -u examplemysqluser -p exampleprojectname
+  echo "$UPDATEQUERY" | mysql -u examplemysqluser -p exampleprojectname
 
 By also inserting an update query into the server database for this,
 slave servers will automatically synchronize and also apply them if
@@ -333,5 +333,6 @@ Beware, if you have password protected the account for user examplemysqluser
 in MySQL, you need to type in your password twice with this UpdateDB script.
 
 Please read in the docs subdirectory the full details on the structure
-of the database, what the fields mean and what values you can assign them.
+of the database, what the fields mean and what values you can assign to 
+them with MySQL queries like demonstrated.
 
