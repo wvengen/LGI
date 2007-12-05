@@ -5,7 +5,7 @@
                          ----------------
 
 In this document a howto is presented on the setup of LGI. The document
-is divided into four parts. Part I will show you howto setup a resource
+is divided into four parts. Part I will show you how to setup a resource
 within an existing LGI project, part II will show you how to setup a new
 LGI project with a project server. Part III will show you how to add an 
 extra project server into an existing LGI project. The last part part IV
