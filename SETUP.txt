@@ -70,10 +70,10 @@ Part II : Howto setup a project server
 --------------------------------------
 
 Setting up your own project is not too hard either. You can decide to be
-a fully independent project by setting up your own X.509 certificate Center
-of Authority, or you can decide to be a sub project and thus be an X.509
-sub-CA of the LGI-CA. In this part, it is shown how to become an independant
-project and be your own X.509 CA.
+a fully independent project by setting up your own X.509 Certificate
+Authority, or you can decide to be a sub project and thus be an X.509 sub-CA
+of the LGI-CA. In this part, it is shown how to become an independant project
+and be your own X.509 CA.
 
 - Make sure libcurl, PHP, MySQL, Apache and OpenSSL are installed on your
 system.
