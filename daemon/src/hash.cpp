@@ -43,8 +43,8 @@ string Hash( string S, string StartHash )
   for( r = 0; r < 16; ++r )                        // run through block
    for( i = StartIndex; i < EndIndex; ++i )
    {
-    n1 = ( int )( S[ i ] >> 4 ) & 0x0F;
-    n2 = ( int )( S[ i ] ) & 0x0F;
+    n1 = ( int )( ( S[ i ] + TheHash[ r ] ) >> 4 ) & 0x0F;
+    n2 = ( int )( ( S[ i ] - TheHash[ r ] ) ) & 0x0F;
 
     s = TheHash[ n1 ];
     TheHash[ n1 ] = TheHash[ n2 ];
