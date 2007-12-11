@@ -24,60 +24,25 @@
 string Hash( string S, string StartHash )
 {
  string TheHash( "0123456789ABCDEF" );
- int r, i, n1, n2;
- char s;
+ int i;
+ unsigned char s, h, n0, n1, n2;
 
  if( ( !StartHash.empty() ) && ( StartHash.size() == 16 ) )
   TheHash = StartHash;
 
- for( i = r = 0; i < S.length(); r = ( ++i & 0x0F ) )
+ for( i = n0 = 0; i < S.length(); n0 = ( ++i & 0x0F ) )
  {
-  n1 = ( ( S[ i ] + TheHash[ r ] ) >> 4 ) & 0x0F;
-  n2 = ( ( S[ i ] - TheHash[ r ] ) ) & 0x0F;
+  s = S[ i ];
+  h = TheHash[ n0 ];
 
+  n1 = ( ( s + h ) >> 4 ) & 0x0F;
+  n2 = ( ( s - h ) ) & 0x0F;
+
+  TheHash[ n0 ] = h ^ ( s + n0 );
+  
   s = TheHash[ n1 ];
   TheHash[ n1 ] = TheHash[ n2 ];
   TheHash[ n2 ] = s;
-
-  TheHash[ r ] ^= ( char )( S[ i ] + r );
- }
-
- return( TheHash );
-}
-
-// -----------------------------------------------------------------------------
-
-string Hash2( string S, string StartHash )
-{
- string TheHash( "0123456789ABCDEF" );
- int b, r, i, n1, n2, StartIndex, EndIndex, NrBlocks;
- char s;
-
- if( ( !StartHash.empty() ) && ( StartHash.size() == 16 ) )
-  TheHash = StartHash;
-
- NrBlocks = ( S.length() / HASH_BLOCK_SIZE ) + 1;           
-
- for( b = 0; b < NrBlocks; ++b )             // run through string in blocks of size HASH_BLOCK_SIZE
- {
-  StartIndex = b * HASH_BLOCK_SIZE;
-  EndIndex = ( b + 1 ) * HASH_BLOCK_SIZE;
-
-  if( StartIndex >= S.length() ) continue;                 // check the bounds
-  if( EndIndex >= S.length() ) EndIndex = S.length();
-
-  for( r = 0; r < 16; ++r )                        // run through block
-   for( i = StartIndex; i < EndIndex; ++i )
-   {
-    n1 = ( int )( ( S[ i ] + TheHash[ r ] ) >> 4 ) & 0x0F;
-    n2 = ( int )( ( S[ i ] - TheHash[ r ] ) ) & 0x0F;
-
-    s = TheHash[ n1 ];
-    TheHash[ n1 ] = TheHash[ n2 ];
-    TheHash[ n2 ] = s;
-
-    TheHash[ r ] ^= ( char )( S[ i ] + ( i - StartIndex ) );
-   }
  }
 
  return( TheHash );
