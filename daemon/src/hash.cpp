@@ -24,6 +24,32 @@
 string Hash( string S, string StartHash )
 {
  string TheHash( "0123456789ABCDEF" );
+ int r, i, n1, n2;
+ char s;
+
+ if( ( !StartHash.empty() ) && ( StartHash.size() == 16 ) )
+  TheHash = StartHash;
+
+ for( i = r = 0; i < S.length(); r = ( ++i & 0x0F ) )
+ {
+  n1 = ( ( S[ i ] + TheHash[ r ] ) >> 4 ) & 0x0F;
+  n2 = ( ( S[ i ] - TheHash[ r ] ) ) & 0x0F;
+
+  s = TheHash[ n1 ];
+  TheHash[ n1 ] = TheHash[ n2 ];
+  TheHash[ n2 ] = s;
+
+  TheHash[ r ] ^= ( char )( S[ i ] + r );
+ }
+
+ return( TheHash );
+}
+
+// -----------------------------------------------------------------------------
+
+string Hash2( string S, string StartHash )
+{
+ string TheHash( "0123456789ABCDEF" );
  int b, r, i, n1, n2, StartIndex, EndIndex, NrBlocks;
  char s;
 
