@@ -8,7 +8,7 @@ fi
 
 export QUERY=$1
 export SERVERS=$2
-export ESCAPEDQUERY=`echo "${QUERY}" | sed "s/'/\\\\\'/g"`
+export ESCAPEDQUERY=`echo -e "${QUERY}" | sed "s/'/\\\\\'/g"`
 export UPDATEQUERY="INSERT INTO updates SET servers='${SERVERS}', update_query='${ESCAPEDQUERY}'"
 
 shift
@@ -18,6 +18,6 @@ echo "Running an update cycle..."
 #php -f ./cron_job.php
 
 echo "Applying query \"${QUERY}\"..."
-echo "${QUERY}" | mysql $@
+echo -e "${QUERY}" | mysql $@
 echo "${UPDATEQUERY}" | mysql $@
 

@@ -198,10 +198,10 @@ name equal to your project name "exampleprojectname":
 
   export CERTIFICATE=`cat /var/www/html/LGI/certificates/exampleCA.crt`
 
-  echo "INSERT INTO active_resources SET resource_name=
+  echo -e "INSERT INTO active_resources SET resource_name=
        'apache@exampleserver.somewhere.org',project_server=1,
        url='https://exampleserver.somewhere.org/LGI',
-       client_certificate='$CERTIFICATE'" | mysql -u
+       client_certificate='$CERTIFICATE\n'" | mysql -u
        examplemysqluser -p exampleprojectname
 
 - Make sure you edit the project web server configuration file 
@@ -255,10 +255,10 @@ slave database:
 
   export CERTIFICATE=`cat /var/www/html/LGI/certificates/exampleserver.crt`
 
-  echo "INSERT INTO active_resources SET resource_name=
+  echo -e "INSERT INTO active_resources SET resource_name=
        'apache@exampleserver.somewhere.org',project_server=1,
        url='https://exampleserver.somewhere.org/LGI',
-       client_certificate='$CERTIFICATE'" | mysql -u
+       client_certificate='$CERTIFICATE\n'" | mysql -u
        exampleslavemysqluser -p exampleprojectname
 
 and insert the slave server details into the master server database:
@@ -273,9 +273,9 @@ and insert the slave server details into the master server database:
   export SLAVEINSERTQUERY="INSERT INTO active_resources SET resource_name=
        'apache@exampleslaveserver.somewhere.org',project_server=2,
        url='https://exampleslaveserver.somewhere.org/LGI',
-       client_certificate='$SLAVECERTIFICATE'"
+       client_certificate='$SLAVECERTIFICATE\n'"
 
-  export ESCAPEDSLAVEINSERTQUERY=`echo "$SLAVEINSERTQUERY" | sed "s/'/\\\\\'/g"`
+  export ESCAPEDSLAVEINSERTQUERY=`echo -e "$SLAVEINSERTQUERY" | sed "s/'/\\\\\'/g"`
 
   export UPDATEQUERY="INSERT INTO updates SET servers='any',
          update_query='$ESCAPEDSLAVEINSERTQUERY'"
