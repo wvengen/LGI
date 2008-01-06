@@ -15,7 +15,7 @@ shift
 shift
 
 echo "Running an update cycle..."
-#php -f ./cron_job.php
+php -f ./cron_job.php
 
 echo "Applying query \"${QUERY}\"..."
 echo -e "${QUERY}" | mysql $@
