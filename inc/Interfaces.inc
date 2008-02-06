@@ -93,7 +93,7 @@ function Interface_Verify( &$Project, $User, &$Groups, $ExitOnError = true )
  {
   // check if allowed...
   if( FoundInCommaSeparatedField( $CommonNameArray[ 3 ], $Project, "," ) )
-   Select_MySQL_DataBase( $Project );
+   return( Select_MySQL_DataBase( $Project, $ExitOnError ) );
   else
     return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ], $ExitOnError ) );
  }
@@ -101,7 +101,7 @@ function Interface_Verify( &$Project, $User, &$Groups, $ExitOnError = true )
  {
   // otherwise just try the possibly posted Project...
 
-  Select_MySQL_DataBase( $Project );
+  return( Select_MySQL_DataBase( $Project, $ExitOnError ) );
  }
 
  return( 0 );
