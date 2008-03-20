@@ -53,6 +53,26 @@ if( !Interface_Is_User_Allowed_To_Modify_Job( $JobSpecs, $JobUser, $JobGroups ) 
 if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( $JobSpecs->state == 'aborted' ) )
 {
  Interface_Set_Spin_Lock_On_Job( $JobId );
+
+ $RepositoryURL = NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) );
+ if( $RepositoryURL != "" )
+ {
+  $RepositoryArray = CommaSeparatedField2Array( $RepositoryURL, ":" );
+
+  if( $RepositoryArray[ 0 ] == 2 )
+  {
+   if( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" )
+   {
+    if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
+     exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." ".$RepositoryArray[ 1 ].'
+ "'."rm -rf ".$RepositoryArray[ 2 ].'"' );
+   }
+   else
+    if( $RepositoryArray[ 1 ] == Get_Server_Name() )
+     rmpath( $RepositoryArray[ 2 ] );
+  }
+ }
+
  $queryresult = mysql_query( "DELETE FROM job_queue WHERE job_id=".$JobId );
  $JobState = "deleted";
  $JobStateTimeStamp = time();
