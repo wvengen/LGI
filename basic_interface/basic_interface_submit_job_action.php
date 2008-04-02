@@ -297,7 +297,8 @@ for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
     move_uploaded_file( $File[ "tmp_name" ], $RepositoryDir."/".$File[ "name" ] );
   }
   else
-   Exit_With_Text( "ERROR: ".$ErrorMsgs[ 64 ].": '".$File[ "name" ]."'" );
+   if( isset( $File[ "name" ] ) && ( $File[ "name" ] != "" ) )
+    Exit_With_Text( "ERROR: ".$ErrorMsgs[ 64 ].": '".$File[ "name" ]."'" );
  }
 }
 // make sure that future REGEXP's do work...
