@@ -18,12 +18,7 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-require_once( '../inc/Config.inc' );
 require_once( '../inc/Interfaces.inc' );
-require_once( '../inc/Utils.inc' );
-
-global $ErrorMsgs;
-global $Config;
 
 // check if resource is known to the project and certified correctly...
 Interface_Verify( $_POST[ "project" ], $_POST[ "user" ], $_POST[ "groups" ] );

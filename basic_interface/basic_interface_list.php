@@ -18,14 +18,8 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-require_once( '../inc/Config.inc' );
-require_once( '../inc/Errors.inc' );
 require_once( '../inc/Interfaces.inc' );
-require_once( '../inc/Utils.inc' );
 require_once( '../inc/Html.inc' );
-
-global $Config;
-global $ErrorMsgs;
 
 Page_Head();
 
