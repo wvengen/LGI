@@ -282,17 +282,22 @@ for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
 {
  $FileHandle = "uploaded_file_$i";
 
- if( isset( $_FILES[ $FileHandle ] ) && ( $_FILES[ $FileHandle ][ "error" ] === UPLOAD_ERR_OK ) )
+ if( isset( $_FILES[ $FileHandle ] ) )
  {
   $File = $_FILES[ $FileHandle ];
 
-  if( $RepositoryIDFile != "" )
+  if( $_FILES[ $FileHandle ][ "error" ] === UPLOAD_ERR_OK )
   {
-   exec( "$SCPCommand -qBi $RepositoryIDFile ".$File[ "tmp_name" ]." \"$RepositoryURL:$RepositoryDir/'".$File[ "name" ]."'\"" );
-   exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"chmod 440 '$RepositoryDir/".$File[ "name" ]."'\"" );
+   if( $RepositoryIDFile != "" )
+   {
+    exec( "$SCPCommand -qBi $RepositoryIDFile ".$File[ "tmp_name" ]." \"$RepositoryURL:$RepositoryDir/'".$File[ "name" ]."'\"" );
+    exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"chmod 440 '$RepositoryDir/".$File[ "name" ]."'\"" );
+   }
+   else
+    move_uploaded_file( $File[ "tmp_name" ], $RepositoryDir."/".$File[ "name" ] );
   }
   else
-   move_uploaded_file( $File[ "tmp_name" ], $RepositoryDir."/".$File[ "name" ] );
+   Exit_With_Text( "ERROR: ".$ErrorMsgs[ 64 ].": '".$File[ "name" ]."'" );
  }
 }
 // make sure that future REGEXP's do work...
