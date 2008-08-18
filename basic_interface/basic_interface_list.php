@@ -72,7 +72,7 @@ Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
 Row2( "<b>Project:</b>", $Project ); 
 Row2( "<b>This project server:</b>", Get_Server_URL() ); 
-Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface'>".Get_Master_Server_URL()."</a>" );
+Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface/index.php??project=$Project&groups=$Groups'>".Get_Master_Server_URL()."</a>" );
 Row2( "<b>User:</b>", $User ); 
 Row2( "<b>Groups:</b>", $Groups ); 
 
@@ -87,14 +87,14 @@ if( $ProjectServer != 0 )
  for( $i = 1; $i <= $Number; $i++ )
  {
   $Server = mysql_fetch_object( $ServerListQuery );
-  Row3( "<center>$Server->resource_name</center>", "<center><a href=$Server->url/basic_interface>$Server->url</a></center>", "<center>".gmdate( "j M Y G:i", $Server->last_call_time )." UTC </center>" );
+  Row3( "<center>$Server->resource_name</center>", "<center><a href=$Server->url/basic_interface/index.php?project=$Project&groups=$Groups>$Server->url</a></center>", "<center>".gmdate( "j M Y G:i", $Server->last_call_time )." UTC </center>" );
  }
 
  mysql_free_result( $ServerListQuery );
 
  End_Table();
 
- echo "<br><a href='basic_interface_list.php?project_server=0'>Show project resource list</a>\n";
+ echo "<br><a href='basic_interface_list.php?project_server=0&project=$Project&groups=$Groups'>Show project resource list</a>\n";
 }
 else
 {
@@ -113,12 +113,12 @@ else
  mysql_free_result( $ResourceListQuery );
  End_Table();
 
- echo "<br><a href='basic_interface_list.php?project_server=1'>Show project server list</a>\n";
+ echo "<br><a href='basic_interface_list.php?project_server=1&project=$Project&groups=$Groups'>Show project server list</a>\n";
 }
 
-echo "<br><a href='basic_interface_job_state.php'>Show job list</a>\n"; 
-echo "<br><a href='basic_interface_submit_job_form.php'>Submit a job</a>\n";
-echo "<br><a href='index.php'>Go to main menu</a>\n"; 
+echo "<br><a href='basic_interface_job_state.php?project=$Project&groups=$Groups'>Show job list</a>\n"; 
+echo "<br><a href='basic_interface_submit_job_form.php?project=$Project&groups=$Groups'>Submit a job</a>\n";
+echo "<br><a href='index.php?project=$Project&groups=$Groups'>Go to main menu</a>\n"; 
 
 Page_Tail();
 ?>

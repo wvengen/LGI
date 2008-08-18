@@ -95,7 +95,7 @@ if( isset( $Job_ID ) )               // we requested details on a job...
  Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
  Row2( "<b>Project:</b>", $Project ); 
  Row2( "<b>This project server:</b>", Get_Server_URL() ); 
- Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basic_interface>".Get_Master_Server_URL()."</a>" );
+ Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basic_interface/index.php?project=$Project&groups=$Groups>".Get_Master_Server_URL()."</a>" );
  Row2( "<b>User:</b>", $User ); 
  Row2( "<b>Groups:</b>", $Groups ); 
  Row1( "<center><font color='green' size='4'><b>Job details</b></font></center>" );
@@ -112,12 +112,12 @@ if( isset( $Job_ID ) )               // we requested details on a job...
  Row2( "<b>Output:</b>", nl2br( htmlentities( $JobSpecs -> output ) ) ); 
  End_Table();
 
- echo "<br><a href='basic_interface_delete_job.php?job_id=".$JobSpecs -> job_id."'>Abort or Delete this job</a>\n";
- echo "<br><a href='basic_interface_job_state.php?groups=".$Groups."&project=".$Project."'>Show job list</a>\n"; 
- echo "<br><a href='basic_interface_list.php?project_server=1'>Show project server list</a>\n"; 
- echo "<br><a href='basic_interface_list.php?project_server=0'>Show project resource list</a>\n"; 
- echo "<br><a href='basic_interface_submit_job_form.php'>Submit a job</a>\n";
- echo "<br><a href='index.php'>Go to main menu</a>\n"; 
+ echo "<br><a href='basic_interface_delete_job.php?job_id=".$JobSpecs -> job_id."&groups=$Groups&project=$Project'>Abort or Delete this job</a>\n";
+ echo "<br><a href='basic_interface_job_state.php?groups=$Groups&project=$Project'>Show job list</a>\n"; 
+ echo "<br><a href='basic_interface_list.php?project_server=1&project=$Project&groups=$Groups'>Show project server list</a>\n"; 
+ echo "<br><a href='basic_interface_list.php?project_server=0&project=$Project&groups=$Groups'>Show project resource list</a>\n"; 
+ echo "<br><a href='basic_interface_submit_job_form.php?project=$Project&groups=$Groups'>Submit a job</a>\n";
+ echo "<br><a href='index.php?project=$Project&groups=$Groups'>Go to main menu</a>\n"; 
 }
 else
 {
@@ -162,7 +162,7 @@ else
  Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
  Row2( "<b>Project:</b>", $Project ); 
  Row2( "<b>This project server:</b>", Get_Server_URL() ); 
- Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface'>".Get_Master_Server_URL()."</a>" );
+ Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface/index.php?project=$Project&groups=$Groups'>".Get_Master_Server_URL()."</a>" );
  Row2( "<b>User:</b>", $User ); 
  Row2( "<b>Groups:</b>", $Groups ); 
  Row2( "<b>Application:</b>", $Application ); 
@@ -204,10 +204,10 @@ else
   $Menu .= "<a href='basic_interface_job_state.php?start=".($Start+$Number)."&limit=$Limit&state=$State&groups=$Groups&application=$Application&project=$Project'> Next </a>";
  if( $Menu != "" ) echo "$Menu<br>";
 
- echo "<br><a href='basic_interface_list.php?project_server=1'>Show project server list</a>\n"; 
- echo "<br><a href='basic_interface_list.php?project_server=0'>Show project resource list</a>\n"; 
- echo "<br><a href='basic_interface_submit_job_form.php'>Submit a job</a>\n";
- echo "<br><a href='index.php'>Go to main menu</a>\n"; 
+ echo "<br><a href='basic_interface_list.php?project_server=1&project=$Project&groups=$Groups'>Show project server list</a>\n"; 
+ echo "<br><a href='basic_interface_list.php?project_server=0&project=$Project&groups=$Groups'>Show project resource list</a>\n"; 
+ echo "<br><a href='basic_interface_submit_job_form.php?project=$Project&groups=$Groups'>Submit a job</a>\n";
+ echo "<br><a href='index.php?project=$Project&groups=$Groups'>Go to main menu</a>\n"; 
 }
 
 Page_Tail();

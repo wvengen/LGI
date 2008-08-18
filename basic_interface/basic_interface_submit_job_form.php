@@ -72,13 +72,14 @@ if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 echo '<form id="this_form" action="basic_interface_submit_job_action.php" method="POST" enctype="multipart/form-data">';
 echo '<input type="hidden" name="user" value="'.$User.'">';
 echo '<input type="hidden" name="groups" value="'.$Groups.'">';
+echo '<input type="hidden" name="project" value="'.$Project.'">';
 echo '<input type="hidden" name="number_of_uploaded_files" value="0" >';
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
 Row2( "<b>Project:</b>", $Project ); 
 Row2( "<b>This project server:</b>", Get_Server_URL() ); 
-Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface'>".Get_Master_Server_URL()."</a>" ); 
+Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface/index.php?project=$Project&groups=$Groups'>".Get_Master_Server_URL()."</a>" ); 
 Row2( "<b>User:</b>", $User ); 
 Row2( "<b>Groups:</b>", $Groups ); 
 Row1( "<center><font color='green' size='4'><b>Specify job details</b></font></center>" );
@@ -136,10 +137,10 @@ Row1( '<center><input type="submit" value="     Submit Job     " /></center>' );
 
 End_Table();
 
-echo "</form><br><a href='basic_interface_list.php?project_server=1'>Show project server list</a>\n";
-echo "<br><a href='basic_interface_list.php?project_server=0'>Show project resource list</a>\n"; 
-echo "<br><a href='basic_interface_job_state.php'>Show job list</a>\n"; 
-echo "<br><a href='index.php'>Go to main menu</a>\n";
+echo "</form><br><a href='basic_interface_list.php?project=$Project&groups=$Groups&project_server=1'>Show project server list</a>\n";
+echo "<br><a href='basic_interface_list.php?project=$Project&groups=$Groups&project_server=0'>Show project resource list</a>\n"; 
+echo "<br><a href='basic_interface_job_state.php?project=$Project&groups=$Groups'>Show job list</a>\n"; 
+echo "<br><a href='index.php?project=$Project&groups=$Groups'>Go to main menu</a>\n";
 
 Page_Tail();
 ?>
