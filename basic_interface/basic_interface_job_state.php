@@ -180,12 +180,12 @@ else
  
  Row2( "<b>Number of jobs listed:</b>", $Number ); 
 
- Row5( "<center><font color='green' size='4'><b>job id</b></font></center>", "<center><font color='green' size='4'><b>job state</b></font></center>", "<center><font color='green' size='4'><b>target resources</b></font></center>", "<center><font color='green' size='4'><b>application</b></font></center>", "<center><font color='green' size='4'><b>time stamp</b></font></center>" );
+ Row6( "<center><font color='green' size='4'><b>job id</b></font></center>", "<center><font color='green' size='4'><b>job state</b></font></center>", "<center><font color='green' size='4'><b>target resources</b></font></center>", "<center><font color='green' size='4'><b>application</b></font></center>", "<center><font color='green' size='4'><b>time stamp</b></font></center>", "<center><font color='green' size='4'><b>owners</b></font></center>" );
 
  for( $i = 1; $i <= $Number; $i++ )
  {
   $Job = mysql_fetch_object( $QueryResult );
-  Row5( "<center><a href='basic_interface_job_state.php?job_id=$Job->job_id&groups=$Groups&project=$Project'>$Job->job_id</a></center>", "<center>$Job->state</center>", "<center>$Job->target_resources</center>", "<center>$Job->application</center>", "<center>".gmdate( "j M Y G:i", $Job->state_time_stamp )." UTC </center>" );
+  Row6( "<center><a href='basic_interface_job_state.php?job_id=$Job->job_id&groups=$Groups&project=$Project'>$Job->job_id</a></center>", "<center>$Job->state</center>", "<center>$Job->target_resources</center>", "<center>$Job->application</center>", "<center>".gmdate( "j M Y G:i", $Job->state_time_stamp )." UTC </center>", "<center>$Job->owners</center>" );
  }
 
  mysql_free_result( $QueryResult ); 
