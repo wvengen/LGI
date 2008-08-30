@@ -162,6 +162,66 @@ else
  }
 }
 
+// create the job respository directory...
+$RepositoryName = "JOB_".md5( uniqid( time() ) );
+
+if( ( $Config[ "REPOSITORY_SERVER_NAME" ] != "" ) && ( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" ) )
+{
+ $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ];
+ $RepositoryIDFile = $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ];
+}
+else
+{
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
+if( $Config[ "REPOSITORY_DIRECTORY" ] != "" )
+ $RepositoryDir = $Config[ "REPOSITORY_DIRECTORY" ]."/".$RepositoryName;
+else
+{
+ $RepositoryDir = getcwd()."/".$RepositoryName;
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
+if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
+ $SSHCommand = $Config[ "REPOSITORY_SSH_COMMAND" ];
+else
+{
+ $RepositoryDir = getcwd()."/".$RepositoryName;
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
+if( $Config[ "REPOSITORY_SCP_COMMAND" ] != "" )
+ $SCPCommand = $Config[ "REPOSITORY_SCP_COMMAND" ];
+else
+{
+ $RepositoryDir = getcwd()."/".$RepositoryName;
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
+if( $Config[ "REPOSITORY_URL" ] == "" )
+{
+ $RepositoryDir = getcwd()."/".$RepositoryName;
+ $RepositoryURL = Get_Server_Name();
+ $RepositoryIDFile = "";
+}
+
+if( $RepositoryIDFile != "" )
+ exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir $RepositoryDir; chmod 770 $RepositoryDir\"" );
+else
+{
+ if( !is_dir( $RepositoryDir ) )
+ {
+  $OldMask = umask( 0 );
+  mkdir( $RepositoryDir, 0770 );
+  umask( $OldMask );
+ }
+}
+
 // make sure that future REGEXP's do work...
 $JobOwners = mysql_escape_string( NormalizeCommaSeparatedField( $JobOwners, "," ) );
 $JobReadAccess = mysql_escape_string( NormalizeCommaSeparatedField( $JobReadAccess, "," ) );
@@ -175,8 +235,10 @@ if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
 {
  if( strlen( $_POST[ "job_specifics" ] ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
   return( LGI_Error_Response( 53, $ErrorMsgs[ 53 ] ) );
- $InsertQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ] )."'";
+ $InsertQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ]." <repository> $RepositoryURL:$RepositoryDir </repository>" )."'";
 }
+else
+ $InsertQuery .= ", job_specifics='".mysql_escape_string( "<repository> $RepositoryURL:$RepositoryDir </repository>" )."'";
 
 if( isset( $_POST[ "input" ] ) && ( $_POST[ "input" ] != "" ) )
 {
