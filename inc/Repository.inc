@@ -18,8 +18,8 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-require_once( '../inc/Config.inc' )
-require_once( '../inc/Utils.inc' )
+require_once( '../inc/Config.inc' );
+require_once( '../inc/Utils.inc' );
 
 // --------------------------------------------------- 
 
@@ -83,7 +83,7 @@ function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile 
 
 function DeleteRepository( $RepositoryURL )
 {
- global Config;
+ global $Config;
 
  if( $RepositoryURL == "" ) return;
 
@@ -107,7 +107,7 @@ function DeleteRepository( $RepositoryURL )
 
 function RepositoryURL2WWW( $RepositoryURL )
 {
- global Config;
+ global $Config;
 
  if( $RepositoryURL != "" )
  {  
