@@ -20,6 +20,7 @@
 
 require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Html.inc' );
+require_once( '../inc/Repository.inc' );
 
 Page_Head();
 
@@ -218,64 +219,7 @@ else
 }
 
 // create the job respository directory...
-$RepositoryName = "JOB_".md5( uniqid( time() ) );
-
-if( ( $Config[ "REPOSITORY_SERVER_NAME" ] != "" ) && ( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" ) )
-{
- $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ];
- $RepositoryIDFile = $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ];
-}
-else
-{
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $Config[ "REPOSITORY_DIRECTORY" ] != "" )
- $RepositoryDir = $Config[ "REPOSITORY_DIRECTORY" ]."/".$RepositoryName;
-else
-{
- $RepositoryDir = getcwd()."/".$RepositoryName;
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
- $SSHCommand = $Config[ "REPOSITORY_SSH_COMMAND" ];
-else
-{
- $RepositoryDir = getcwd()."/".$RepositoryName;
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $Config[ "REPOSITORY_SCP_COMMAND" ] != "" )
- $SCPCommand = $Config[ "REPOSITORY_SCP_COMMAND" ];
-else
-{
- $RepositoryDir = getcwd()."/".$RepositoryName;
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $Config[ "REPOSITORY_URL" ] == "" )
-{
- $RepositoryDir = getcwd()."/".$RepositoryName;
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $RepositoryIDFile != "" )
- exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir $RepositoryDir; chmod 770 $RepositoryDir\"" );
-else
-{
- if( !is_dir( $RepositoryDir ) )
- {
-  $OldMask = umask( 0 );
-  mkdir( $RepositoryDir, 0770 );
-  umask( $OldMask );
- }
-}
+CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile );
 
 // now handle file uploads...
 for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
@@ -290,8 +234,8 @@ for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
   {
    if( $RepositoryIDFile != "" )
    {
-    exec( "$SCPCommand -qBi $RepositoryIDFile ".$File[ "tmp_name" ]." \"$RepositoryURL:$RepositoryDir/'".$File[ "name" ]."'\"" );
-    exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"chmod 440 '$RepositoryDir/".$File[ "name" ]."'\"" );
+    exec( $Config[ "REPOSITORY_SCP_COMMAND" ]." -qBi $RepositoryIDFile ".$File[ "tmp_name" ]." \"$RepositoryURL:$RepositoryDir/'".$File[ "name" ]."'\"" );
+    exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i $RepositoryIDFile $RepositoryURL \"chmod 440 '$RepositoryDir/".$File[ "name" ]."'\"" );
    }
    else
     move_uploaded_file( $File[ "tmp_name" ], $RepositoryDir."/".$File[ "name" ] );
@@ -301,6 +245,7 @@ for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
     Exit_With_Text( "ERROR: ".$ErrorMsgs[ 64 ].": '".$File[ "name" ]."'" );
  }
 }
+
 // make sure that future REGEXP's do work...
 $Owners = mysql_escape_string( NormalizeCommaSeparatedField( $Owners, "," ) );
 $ReadAccess = mysql_escape_string( NormalizeCommaSeparatedField( $ReadAccess, "," ) );
@@ -322,19 +267,7 @@ $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
 
 // get repository url from specs...
-$RepositoryURL = NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) );
-if( $RepositoryURL != "" )
-{
- $RepositoryArray = CommaSeparatedField2Array( $RepositoryURL, ":" );
-
- if( $RepositoryArray[ 0 ] == 2 )
- {
-  $RepositoryURL = basename( $RepositoryArray[ 2 ] );
-  if( $Config[ "REPOSITORY_URL" ] != "" ) $RepositoryURL = $Config[ "REPOSITORY_URL" ]."/".$RepositoryURL;
- }
- else
-  $RepositoryURL = "";
-}
+$RepositoryURL = RepositoryURL2WWW( NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) ) );
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );

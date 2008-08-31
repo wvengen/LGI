@@ -20,6 +20,7 @@
 
 require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Html.inc' );
+require_once( '../inc/Repository.inc' );
 
 Page_Head();
 
@@ -86,23 +87,9 @@ if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( 
  $ErrorCode = Interface_Set_Spin_Lock_On_Job( $Job_ID, false );
  if( $ErrorCode != 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
+ // remove the repository...
  $RepositoryURL = NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) );
- if( $RepositoryURL != "" )
- {
-  $RepositoryArray = CommaSeparatedField2Array( $RepositoryURL, ":" );
-
-  if( $RepositoryArray[ 0 ] == 2 )
-  {
-   if( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" )
-   {
-    if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
-     exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." ".$RepositoryArray[ 1 ].' "'."rm -rf ".$RepositoryArray[ 2 ].'"' );
-   }
-   else
-    if( $RepositoryArray[ 1 ] == Get_Server_Name() )
-     rmpath( $RepositoryArray[ 2 ] );
-  }
- }
+ if( $RepositoryURL != "" ) DeleteRepository( $RepositoryURL );
 
  // now delete from db...
  $queryresult = mysql_query( "DELETE FROM job_queue WHERE job_id=".$Job_ID );

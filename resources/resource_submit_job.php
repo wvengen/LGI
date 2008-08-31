@@ -19,6 +19,7 @@
 // http://www.gnu.org/licenses/gpl.txt
 
 require_once( '../inc/Resources.inc' );
+require_once( '../inc/Repository.inc' );
 
 // check if resource is known to the project and certified correctly...
 $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
@@ -127,6 +128,9 @@ for( $i = 1; $i <= $OwnersArray[ 0 ]; $i++ )
 if( !$FoundPossibleOwner )
  return( LGI_Error_Response( 29, $ErrorMsgs[ 29 ] ) );
 
+// create a repository...
+CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile );
+
 $JobOwners = mysql_escape_string( substr( $NewOwnersList, 2 ) );
 $JobState = mysql_escape_string( $JobState );
 $JobApplication = mysql_escape_string( $JobApplication );
@@ -139,8 +143,10 @@ if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
 {
  if( strlen( $_POST[ "job_specifics" ] ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
   return( LGI_Error_Response( 53, $ErrorMsgs[ 53 ] ) );
- $InsertQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ] )."'";
+ $InsertQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ]." <repository> $RepositoryURL:$RepositoryDir </repository>" )."'";
 }
+else
+ $InsertQuery .= ", job_specifics='".mysql_escape_string( "<repository> $RepositoryURL:$RepositoryDir </repository>" )."'";
 
 if( isset( $_POST[ "input" ] ) && ( $_POST[ "input" ] != "" ) )
 {

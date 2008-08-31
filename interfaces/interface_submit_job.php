@@ -19,6 +19,7 @@
 // http://www.gnu.org/licenses/gpl.txt
 
 require_once( '../inc/Interfaces.inc' );
+require_once( '../inc/Repository.inc' );
 
 // check if resource is known to the project and certified correctly...
 Interface_Verify( $_POST[ "project" ], $_POST[ "user" ], $_POST[ "groups" ] );
@@ -163,64 +164,7 @@ else
 }
 
 // create the job respository directory...
-$RepositoryName = "JOB_".md5( uniqid( time() ) );
-
-if( ( $Config[ "REPOSITORY_SERVER_NAME" ] != "" ) && ( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" ) )
-{
- $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ];
- $RepositoryIDFile = $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ];
-}
-else
-{
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $Config[ "REPOSITORY_DIRECTORY" ] != "" )
- $RepositoryDir = $Config[ "REPOSITORY_DIRECTORY" ]."/".$RepositoryName;
-else
-{
- $RepositoryDir = getcwd()."/".$RepositoryName;
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
- $SSHCommand = $Config[ "REPOSITORY_SSH_COMMAND" ];
-else
-{
- $RepositoryDir = getcwd()."/".$RepositoryName;
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $Config[ "REPOSITORY_SCP_COMMAND" ] != "" )
- $SCPCommand = $Config[ "REPOSITORY_SCP_COMMAND" ];
-else
-{
- $RepositoryDir = getcwd()."/".$RepositoryName;
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $Config[ "REPOSITORY_URL" ] == "" )
-{
- $RepositoryDir = getcwd()."/".$RepositoryName;
- $RepositoryURL = Get_Server_Name();
- $RepositoryIDFile = "";
-}
-
-if( $RepositoryIDFile != "" )
- exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir $RepositoryDir; chmod 770 $RepositoryDir\"" );
-else
-{
- if( !is_dir( $RepositoryDir ) )
- {
-  $OldMask = umask( 0 );
-  mkdir( $RepositoryDir, 0770 );
-  umask( $OldMask );
- }
-}
+CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile );
 
 // make sure that future REGEXP's do work...
 $JobOwners = mysql_escape_string( NormalizeCommaSeparatedField( $JobOwners, "," ) );

@@ -20,6 +20,7 @@
 
 require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Html.inc' );
+require_once( '../inc/Repository.inc' );
 
 Page_Head();
 
@@ -77,19 +78,7 @@ if( isset( $Job_ID ) )               // we requested details on a job...
  if( !Interface_Is_User_Allowed_To_Read_Job( $JobSpecs, $User, $Groups ) ) Exit_With_Text( "ERROR: User is not allowed to get details of this job" );
 
  // get repository url from specs...
- $RepositoryURL = NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) );
- if( $RepositoryURL != "" )
- {
-  $RepositoryArray = CommaSeparatedField2Array( $RepositoryURL, ":" );
-
-  if( $RepositoryArray[ 0 ] == 2 )
-  {
-   $RepositoryURL = basename( $RepositoryArray[ 2 ] );
-   if( $Config[ "REPOSITORY_URL" ] != "" ) $RepositoryURL = $Config[ "REPOSITORY_URL" ]."/".$RepositoryURL;
-  }
-  else
-   $RepositoryURL = "";
- }
+ $RepositoryURL = RepositoryURL2WWW( NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) ) );
 
  Start_Table();
  Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
