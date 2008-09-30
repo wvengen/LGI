@@ -25,7 +25,7 @@ require_once( '../inc/Repository.inc' );
 // check session...
 session_start();
 $SID = $_SESSION[ "sid" ];
-if( !isset( $_GET[ "sid" ] ) || ( $SID != $_GET[ "sid" ] ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 66 ] );
+if( !isset( $_GET[ "sid" ] ) || ( $SID != $_GET[ "sid" ] ) || ( $_GET[ "sid" ] == "" ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 66 ] );
 
 Page_Head();
 

@@ -25,7 +25,7 @@ require_once( '../inc/Repository.inc' );
 // check session...
 session_start();
 $SID = $_SESSION[ "sid" ];
-if( !isset( $_POST[ "sid" ] ) || ( $SID != $_POST[ "sid" ] ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 66 ] );
+if( !isset( $_POST[ "sid" ] ) || ( $SID != $_POST[ "sid" ] ) || ( $_POST[ "sid" ] == "" ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 66 ] );
 
 Page_Head();
 
