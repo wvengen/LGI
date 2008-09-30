@@ -20,6 +20,11 @@
 
 require_once( '../inc/Servers.inc' );
 
+// check session existance... if we happen to be hit through by browser that has a session running, we error!
+session_start();
+if( isset( $_SESSION[ "sid" ] ) ) return( LGI_Error_Response( 67, $ErrorMsgs[ 67 ] ) );
+session_destroy();
+
 // check if server is known to the project and certified correctly...
 $ServerData = Server_Verify( $_POST[ "project" ] );
 
