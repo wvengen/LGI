@@ -22,13 +22,12 @@ require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Html.inc' );
 require_once( '../inc/Repository.inc' );
 
+// check session...
 session_start();
 $SID = $_SESSION[ "sid" ];
+if( $SID != $_GET[ "sid" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 66 ] );
 
 Page_Head();
-
-// check session...
-if( $SID != $_POST[ "sid" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 66 ] );
 
 // check if user is set in request... or use value from certificate...
 $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );

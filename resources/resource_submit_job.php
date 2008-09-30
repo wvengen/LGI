@@ -21,6 +21,11 @@
 require_once( '../inc/Resources.inc' );
 require_once( '../inc/Repository.inc' );
 
+// check session existance... if we happen to be hit through by browser that has a session running, we error!
+session_start();
+if( isset( $_SESSION[ "sid" ] ) ) return( LGI_Error_Response( 67, $ErrorMsgs[ 67 ] ) );
+session_destroy();
+
 // check if resource is known to the project and certified correctly...
 $ResourceData = Resource_Verify( $_POST[ "project" ], $_POST[ "session_id" ] );
 

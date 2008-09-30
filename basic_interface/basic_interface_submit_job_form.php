@@ -21,13 +21,12 @@
 require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Html.inc' );
 
+// check session...
 session_start();
 $SID = $_SESSION[ "sid" ];
+if( $SID != $_GET[ "sid" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 66 ] );
 
 Page_Head();
-
-// check session...
-if( $SID != $_GET[ "sid" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 66 ] );
 
 ?>
 <style>
