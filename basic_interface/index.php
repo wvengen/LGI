@@ -21,6 +21,8 @@
 require_once( '../inc/Interfaces.inc' );
 require_once( '../inc/Html.inc' );
 
+session_start();
+
 Page_Head();
 
 // check if user is set in request... or use value from certificate...
@@ -54,6 +56,9 @@ else
 if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 58 ] );
 $Project = mysql_escape_string( $Project );
 
+// set the session id...
+$SID = $_SESSION[ "sid" ] = md5( $User.$Groups.$Project.uniqid( rand(), TRUE ) );
+
 // now verfiy the user using the basic browser interface... also make MySQL connection...
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
@@ -62,15 +67,15 @@ Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
 Row2( "<b>Project:</b>", $Project ); 
 Row2( "<b>This project server:</b>", Get_Server_URL() ); 
-Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface/index.php?project=$Project&groups=$Groups'>".Get_Master_Server_URL()."</a>" ); 
+Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface/index.php?project=$Project&groups=$Groups&sid=$SID'>".Get_Master_Server_URL()."</a>" ); 
 Row2( "<b>User:</b>", $User ); 
 Row2( "<b>Groups:</b>", $Groups ); 
 End_Table();
 
-echo "<br><a href='basic_interface_list.php?project=$Project&groups=$Groups&project_server=1'>Show project server list</a>\n";
-echo "<br><a href='basic_interface_list.php?project=$Project&groups=$Groups&project_server=0'>Show project resource list</a>\n"; 
-echo "<br><a href='basic_interface_submit_job_form.php?project=$Project&groups=$Groups'>Submit a job</a>\n";
-echo "<br><a href='basic_interface_job_state.php?project=$Project&groups=$Groups'>Show job list</a>\n"; 
+echo "<br><a href='basic_interface_list.php?project=$Project&groups=$Groups&project_server=1&sid=$SID'>Show project server list</a>\n";
+echo "<br><a href='basic_interface_list.php?project=$Project&groups=$Groups&project_server=0&sid=$SID'>Show project resource list</a>\n"; 
+echo "<br><a href='basic_interface_submit_job_form.php?project=$Project&groups=$Groups&sid=$SID'>Submit a job</a>\n";
+echo "<br><a href='basic_interface_job_state.php?project=$Project&groups=$Groups&sid=$SID'>Show job list</a>\n"; 
 
 Page_Tail();
 ?>

@@ -86,5 +86,6 @@ $ErrorMsgs[ 62 ] = "Session_id field posted too big";
 $ErrorMsgs[ 63 ] = "Resource_name field posted too big"; 
 $ErrorMsgs[ 64 ] = "Uploaded file size too big for current server settings"; 
 $ErrorMsgs[ 65 ] = "Total POST size too big for current server settings"; 
+$ErrorMsgs[ 66 ] = "Session ID mismatch"; 
 
 ?>
