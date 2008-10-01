@@ -451,7 +451,7 @@ int DaemonConfigProjectApplication::Job_Sandbox_UID( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "job_sandbox_uid" ) );
  if( Data.empty() )
-  DEBUG_LOG_RETURN( 0, "DaemonConfigProjectApplication::Job_Sandbox_UID; No valid job_sandbox_uid tag found, random uid sandboxing" )
+  DEBUG_LOG_RETURN( 0, "DaemonConfigProjectApplication::Job_Sandbox_UID; No valid job_sandbox_uid tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProjectApplication::Job_Sandbox_UID; Returned " << Data );
 }
