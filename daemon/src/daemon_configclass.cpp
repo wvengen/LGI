@@ -388,6 +388,8 @@ int DaemonConfigProjectApplication::IsValidConfigured( void )
  if( Job_Epilogue_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Job_Epilogue_Script() empty" );
  if( Job_Abort_Script().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Job_Abort_Script() empty" );
 
+ if( Job_Sandbox_UID() && getuid() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Job_SandBox_UID() was non-zero but not running as root" );
+
  if( ReadStringFromFile( Check_System_Limits_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Cannot read from file " << Check_System_Limits_Script() );
  if( ReadStringFromFile( Job_Check_Running_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Cannot read from file " << Job_Check_Running_Script() );
  if( ReadStringFromFile( Job_Check_Finished_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Cannot read from file " << Job_Check_Finished_Script() );
@@ -441,6 +443,17 @@ int DaemonConfigProjectApplication::Job_Limit( void )
   CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::Job_Limit; No data in job_limit tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProjectApplication::Job_Limit; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+int DaemonConfigProjectApplication::Job_Sandbox_UID( void )
+{
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "job_sandbox_uid" ) );
+ if( Data.empty() )
+  DEBUG_LOG_RETURN( 0, "DaemonConfigProjectApplication::Job_Sandbox_UID; No valid job_sandbox_uid tag found, random uid sandboxing" )
+ else
+  VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProjectApplication::Job_Sandbox_UID; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------

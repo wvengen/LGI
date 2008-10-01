@@ -76,6 +76,7 @@ using namespace std;
 #define LGI_JOBDAEMON_CERTIFICATE_FILE             "LGI_certificate_file"
 #define LGI_JOBDAEMON_CA_CERTIFICATE_FILE          "LGI_ca_certificate_file"
 #define LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE         "LGI_max_output_size"
+#define LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE         "LGI_job_sandbox_uid"
 
 // check values, a bit per file...
 
@@ -103,8 +104,9 @@ using namespace std;
 #define LGI_JOBDAEMON_CERTIFICATE_FILE_BIT_VALUE            2097152
 #define LGI_JOBDAEMON_CA_CERTIFICATE_FILE_BIT_VALUE         4194304
 #define LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE_BIT_VALUE        8388608
+#define LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE_BIT_VALUE        16777216
 
-#define LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER               16777215
+#define LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER               33554431
 
 // -----------------------------------------------------------------------------
 
@@ -137,6 +139,7 @@ class DaemonJob
               string GetKeyFile( void );
               string GetCertificateFile( void );
               string GetCACertificateFile( void );
+              string GetJobSandboxUID( void );
 
               string GetSessionID( void );
               void   SetSessionID( string ID );

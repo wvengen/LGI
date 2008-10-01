@@ -117,6 +117,7 @@ class DaemonConfigProjectApplication
               string Job_Abort_Script( void );
               int    Job_Limit( void );
               int    Max_Output_Size( void );
+              int    Job_Sandbox_UID( void );
 
        protected:
 

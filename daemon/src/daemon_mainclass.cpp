@@ -64,7 +64,6 @@ int Daemon::ScanDirectoryForJobs( string Directory )
   else
   {
    // mask the files we find...
-
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_PROJECT_FILE ) ) FileMask |= LGI_JOBDAEMON_PROJECT_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE ) ) FileMask |= LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE ) ) FileMask |= LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE_BIT_VALUE;
@@ -89,6 +88,7 @@ int Daemon::ScanDirectoryForJobs( string Directory )
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_CERTIFICATE_FILE ) ) FileMask |= LGI_JOBDAEMON_CERTIFICATE_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_CA_CERTIFICATE_FILE ) ) FileMask |= LGI_JOBDAEMON_CA_CERTIFICATE_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE ) ) FileMask |= LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE_BIT_VALUE;
+   if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE ) ) FileMask |= LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE_BIT_VALUE;
 
    // if we have all the needed files...
    if( FileMask == LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER )

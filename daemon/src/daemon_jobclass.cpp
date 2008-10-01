@@ -86,7 +86,7 @@ DaemonJob::DaemonJob( string TheJobDirectory )
  else
   closedir( Entry );
 
- // now check if some critical files should be present and untouched...
+ // now check if some critical files should be present, readable and untouched...
 
  string Data;
 
@@ -115,6 +115,7 @@ DaemonJob::DaemonJob( string TheJobDirectory )
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_CA_CERTIFICATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE << " seems corrupt in " << TheJobDirectory ); return; }
 
  // all files are there and are okay... accept the job directory...
 
@@ -135,8 +136,7 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
 
  JobDirectory.clear();
 
- // first check if config matches the XML response
-
+ // first check if config matches the XML response...
  if( NormalizeString( Parse_XML( TheXML, "project" ) ) != TheConfig.Project( ProjectNumber ).Project_Name() )
  {
   CRITICAL_LOG( "DaemonJob::DaemonJob; The XML response project does not match the one specified in the config" );
@@ -152,7 +152,6 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  }
 
  // then check if run dir is readable...
-
  DIR *Entry = opendir( TheConfig.RunDirectory().c_str() );
 
  if( Entry == NULL )
@@ -164,93 +163,208 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
   closedir( Entry );
 
  // now make subdirectories needed for this job...
-
  JobDirectory = TheConfig.RunDirectory() + "/" + TheConfig.Project( ProjectNumber ).Project_Name();
- mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
+ mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
+ if( !getuid() ) chmod( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
 
  Application = TheConfig.Project( ProjectNumber ).Application( ApplicationNumber ); 
-
  JobDirectory = JobDirectory + "/" + Application.Application_Name();
- mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH );
+ mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
+ if( !getuid() ) chmod( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
 
+ // now set sandbox uid if possible...
+ int UID = getuid();
+ if( UID == 0 )                                      // if we are running daemon as root...
+ {
+  UID = Application.Job_Sandbox_UID();               // get sandbox uid from config...
+  if( UID <= 0 ) UID = rand() % 10000 + 5000;        // if none given or invalid, take a random one...
+  DEBUG_LOG( "DaemonJob::DaemonJob; Using uid " << UID << " for sandboxing job" );
+ }
+ else
+  DEBUG_LOG( "DaemonJob::DaemonJob; Deamon not running as root, no sandboxing possible" );
+
+ // create job slot directory...
  BinHex( Hash( TheXML ), TheHash );
-
  JobDirectory = JobDirectory + "/JOB_" + TheHash;
- if( mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH ) )
+ if( mkdir( JobDirectory.c_str(), S_IRWXU ) )
  {
   CRITICAL_LOG( "DaemonJob::DaemonJob; Could not create job directory for JobDirectory=" << JobDirectory );
   JobDirectory.clear();
   return;
  }
+ chown( JobDirectory.c_str(), UID, UID ); 
 
  // then start writing stuff to disk from the response...
-
  WriteStringToHashedFile( NormalizeString( Parse_XML( TheXML, "project" ) ), JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
  WriteStringToHashedFile( NormalizeString( Parse_XML( TheXML, "this_project_server" ) ), JobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_THIS_PROJECT_SERVER_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
  WriteStringToHashedFile( NormalizeString( Parse_XML( TheXML, "project_master_server" ) ), JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_PROJECT_MASTER_SERVER_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  TheScript = NormalizeString( Parse_XML( TheXML, "application" ) );
  if( TheScript.empty() ) TheScript = NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "application" ) ); 
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE ).c_str(),  UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_APPLICATION_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "target_resources" ) ), JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "job_id" ) ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "owners" ) ), JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "read_access" ) ), JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "job_specifics" ) ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  TheScript = NormalizeString( Parse_XML( TheXML, "state" ) );
  if( TheScript.empty() ) TheScript = NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "state" ) ); 
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "state_time_stamp" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  HexBin( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "input" ) ), TheScript );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  HexBin( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "output" ) ), TheScript );
  WriteStringToFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), S_IRUSR | S_IWUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  // then dump the scripts there...
-
  TheScript = ReadStringFromFile( Application.Job_Check_Limits_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).c_str(), S_IRUSR | S_IXUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  TheScript = ReadStringFromFile( Application.Job_Check_Running_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).c_str(), S_IRUSR | S_IXUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  TheScript = ReadStringFromFile( Application.Job_Check_Finished_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT ).c_str(), S_IRUSR | S_IXUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  TheScript = ReadStringFromFile( Application.Job_Prologue_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT ).c_str(), S_IRUSR | S_IXUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  TheScript = ReadStringFromFile( Application.Job_Run_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str(), S_IRUSR | S_IXUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  TheScript = ReadStringFromFile( Application.Job_Epilogue_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT ).c_str(), S_IRUSR | S_IXUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  TheScript = ReadStringFromFile( Application.Job_Abort_Script() );
  WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).c_str(), S_IRWXU | S_IRWXG );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).c_str(), S_IRUSR | S_IXUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  // write the SSL config too...
  WriteStringToHashedFile( TheConfig.Resource_Key_File(), JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE );
- WriteStringToHashedFile( TheConfig.Resource_Certificate_File(), JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE );
- WriteStringToHashedFile( TheConfig.CA_Certificate_File(), JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_KEY_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
- // and finally dump max output file size too..
+ WriteStringToHashedFile( TheConfig.Resource_Certificate_File(), JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_CERTIFICATE_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ WriteStringToHashedFile( TheConfig.CA_Certificate_File(), JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_CA_CERTIFICATE_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ // dump max output file size too..
  char TempBuffer[ 64 ];
  int ServerMaxFieldSize = atoi( NormalizeString( Parse_XML( TheXML, "server_max_field_size" ) ).c_str() );
  sprintf( TempBuffer, "%d", ( ServerMaxFieldSize > 1 ? MIN( ServerMaxFieldSize, Application.Max_Output_Size() ) : Application.Max_Output_Size() ) );
  WriteStringToHashedFile( string( TempBuffer ), JobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ // write sandbox uid file...
+ sprintf( TempBuffer, "%d", UID );
+ WriteStringToHashedFile( string( TempBuffer ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  NORMAL_LOG( "DaemonJob::DaemonJob; Job with JobDirectory=" << JobDirectory << " has been setup" );
 }
@@ -424,6 +538,15 @@ string DaemonJob::GetStateTimeStamp( void )
 
 // -----------------------------------------------------------------------------
 
+string DaemonJob::GetJobSandboxUID( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetJobSandboxUID; JobDirectory empty" );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE, Data );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetJobSandboxUID; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
 string DaemonJob::GetStateFromServer( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetStateFromServer; JobDirectory empty" );
@@ -516,19 +639,56 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
  if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; Error from server " << GetThisProjectServer() << " Response=" << Response );
 
  // Dump obtained details of job into correct files...
+ int UID = atoi( GetJobSandboxUID().c_str() );
 
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "target_resources" ) ), JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_specifics" ) ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ), Data );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  if( !HexedOutput.empty() )      // only update output file if we posted output to server...
  {
   HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ), Data );
+  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), S_IRUSR | S_IWUSR );
   WriteStringToFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), S_IRUSR | S_IWUSR );
+  chown( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), UID, UID );
  }
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::UpdateJob; Response=" << Response << " returned 1" );
@@ -696,20 +856,57 @@ int DaemonJob::UpdateJobFromServer( bool UpdateOutputToo )
  if( ErrorNumber ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; Error from server Response=" << Response );
 
  // Dump obtained details of job into correct files...
+ int UID = atoi( GetJobSandboxUID().c_str() );
 
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "target_resources" ) ), JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_TARGET_RESOURCES_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_specifics" ) ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ), JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ), Data );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), S_IWUSR );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
  WriteStringToHashedFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  // we do not update the output from server here by default...
  if( UpdateOutputToo )
  {
   HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ), Data );
+  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), S_IRUSR | S_IWUSR );
   WriteStringToFile( Data, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), S_IRUSR | S_IWUSR );
+  chown( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), UID, UID );
  }
 
  VERBOSE_DEBUG_LOG_RETURN( 1, "DaemonJob::UpDateJobFromServer; Response=" << Response << " returned 1" );
@@ -792,9 +989,14 @@ int DaemonJob::RunJobRunScript( void )
 
   if( fork() == 0 )                      // this child will become a child of 'init' cause its parent quitted...
   {
-   chdir( JobDirectory.c_str() );
-   int Value = execl( "/bin/sh", "sh", "-c", ( "./" LGI_JOBDAEMON_JOB_RUN_SCRIPT ), NULL );
-   _exit( Value );
+   int UID = atoi( GetJobSandboxUID().c_str() );      // set real and effective uid and gid correctly of child...
+
+   setregid( UID, UID );
+   setreuid( UID, UID );
+ 
+   chdir( JobDirectory.c_str() );             // get into right directory and exec the run script...
+
+   _exit( execl( "/bin/sh", "sh", "-c", ( "./" LGI_JOBDAEMON_JOB_RUN_SCRIPT ), NULL ) );
   }
 
   _exit( 0 );                           // here we quit the parent of the above child...
@@ -834,17 +1036,23 @@ int DaemonJob::RunJobAbortScript( void )
 
 int DaemonJob::RunAScript( string TheScriptFile )
 {
- char CurrentDir[ 1024 ];
+ int pid, status;
 
- getcwd( CurrentDir, sizeof( CurrentDir ) );
+ if( ( pid = fork() ) == 0 )                         // fork and let child run script as needed...
+ {                                   
+  int UID = atoi( GetJobSandboxUID().c_str() );      // set real and effective uid and gid correctly of child...
 
- chdir( JobDirectory.c_str() );
+  setregid( UID, UID );
+  setreuid( UID, UID );
 
- int Value = system( ( "./" + TheScriptFile ).c_str() );
+  chdir( JobDirectory.c_str() );                    // get into right directory and exec the run script...
 
- chdir( CurrentDir );
+  _exit( execl( "/bin/sh", "sh", "-c", ( "./" + TheScriptFile ).c_str(), NULL ) );
+ }
 
- return( Value );
+ waitpid( pid, &status, 0 );                        // and here we wait on the forked child...
+
+ return( status );
 }
 
 // -----------------------------------------------------------------------------
