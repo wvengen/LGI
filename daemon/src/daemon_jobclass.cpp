@@ -164,13 +164,13 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
 
  // now make subdirectories needed for this job...
  JobDirectory = TheConfig.RunDirectory() + "/" + TheConfig.Project( ProjectNumber ).Project_Name();
- mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
- if( !getuid() ) chmod( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
+ mkdir( JobDirectory.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH );
+ if( !getuid() ) chmod( JobDirectory.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH );
 
  Application = TheConfig.Project( ProjectNumber ).Application( ApplicationNumber ); 
  JobDirectory = JobDirectory + "/" + Application.Application_Name();
- mkdir( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
- if( !getuid() ) chmod( JobDirectory.c_str(), S_IRWXU | S_IRWXG | S_IRWXO );
+ mkdir( JobDirectory.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH );
+ if( !getuid() ) chmod( JobDirectory.c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH );
 
  // now set sandbox uid if possible...
  int UID = getuid();
