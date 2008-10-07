@@ -88,5 +88,6 @@ $ErrorMsgs[ 64 ] = "Uploaded file size too big for current server settings";
 $ErrorMsgs[ 65 ] = "Total POST size too big for current server settings"; 
 $ErrorMsgs[ 66 ] = "Suspected cross-site-request-forgery (CSRF) attack"; 
 $ErrorMsgs[ 67 ] = "Suspected cross-site-scripting (XSS) attack"; 
+$ErrorMsgs[ 68 ] = "Error in file upload to repository"; 
 
 ?>

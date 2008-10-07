@@ -52,6 +52,11 @@ else
  $JobTargetResources = NormalizeCommaSeparatedField( $_POST[ "target_resources" ], "," );
 }
 
+// check posted number of uploaded files...
+$NrOfUploadedFiles = -1;
+if( isset( $_POST[ "number_of_uploaded_files" ] ) && is_numeric( $_POST[ "number_of_uploaded_files" ] ) )
+ $NrOfUploadedFiles = $_POST[ "number_of_uploaded_files" ];
+
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $JobTargetResources, "," );
 
@@ -170,6 +175,35 @@ else
 
 // create the job respository directory...
 CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile );
+$RepositoryWWWURL = RepositoryURL2WWW( $RepositoryURL.":".$RepositoryDir );
+
+// now handle file uploads...
+for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
+{
+ $FileHandle = "uploaded_file_$i";
+
+ if( isset( $_FILES[ $FileHandle ] ) )
+ {
+  $File = $_FILES[ $FileHandle ];
+
+  if( $_FILES[ $FileHandle ][ "error" ] === UPLOAD_ERR_OK )
+  {
+   if( $RepositoryIDFile != "" )
+   {
+    exec( $Config[ "REPOSITORY_SCP_COMMAND" ]." -qBi $RepositoryIDFile ".$File[ "tmp_name" ]." \"$RepositoryURL:$RepositoryDir/'".$File[ "name" ]."'\"" );
+    exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i $RepositoryIDFile $RepositoryURL \"chmod 440 '$RepositoryDir/".$File[ "name" ]."'\"" );
+   }
+   else
+    move_uploaded_file( $File[ "tmp_name" ], $RepositoryDir."/".$File[ "name" ] );
+  }
+  else
+   if( isset( $File[ "name" ] ) && ( $File[ "name" ] != "" ) )
+   {
+    DeleteRepository( $RepositoryURL.":".$RepositoryDir );
+    return( LGI_Error_Response( 68, $ErrorMsgs[ 68 ]) );
+   }
+ }
+}
 
 // make sure that future REGEXP's do work...
 $JobOwners = mysql_escape_string( NormalizeCommaSeparatedField( $JobOwners, "," ) );
@@ -184,10 +218,10 @@ if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
 {
  if( strlen( $_POST[ "job_specifics" ] ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
   return( LGI_Error_Response( 53, $ErrorMsgs[ 53 ] ) );
- $InsertQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ]." <repository> $RepositoryURL:$RepositoryDir </repository>" )."'";
+ $InsertQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ]." <repository> $RepositoryURL:$RepositoryDir </repository> <repository_url> $RepositoryWWWURL </repository_url>" )."'";
 }
 else
- $InsertQuery .= ", job_specifics='".mysql_escape_string( "<repository> $RepositoryURL:$RepositoryDir </repository>" )."'";
+ $InsertQuery .= ", job_specifics='".mysql_escape_string( "<repository> $RepositoryURL:$RepositoryDir </repository> <repository_url> $RepositoryWWWURL </repository_url>" )."'";
 
 if( isset( $_POST[ "input" ] ) && ( $_POST[ "input" ] != "" ) )
 {

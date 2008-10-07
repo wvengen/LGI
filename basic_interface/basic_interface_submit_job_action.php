@@ -225,6 +225,7 @@ else
 
 // create the job respository directory...
 CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile );
+$RepositoryWWWURL = RepositoryURL2WWW( $RepositoryURL.":".$RepositoryDir );
 
 // now handle file uploads...
 for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
@@ -247,7 +248,10 @@ for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
   }
   else
    if( isset( $File[ "name" ] ) && ( $File[ "name" ] != "" ) )
+   {
+    DeleteRepository( $RepositoryURL.":".$RepositoryDir );
     Exit_With_Text( "ERROR: ".$ErrorMsgs[ 64 ].": '".$File[ "name" ]."'" );
+   }
  }
 }
 
@@ -258,7 +262,7 @@ $Application = mysql_escape_string( $Application );
 $TargetResources = mysql_escape_string( $TargetResources );
 
 // start building the insert query based on all possible posted fields...
-$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$Application."', owners='".$Owners."', read_access='".$ReadAccess."', target_resources='".$TargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP(), job_specifics='".mysql_escape_string( $JobSpecifics." <repository> $RepositoryURL:$RepositoryDir </repository>" )."'";
+$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$Application."', owners='".$Owners."', read_access='".$ReadAccess."', target_resources='".$TargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP(), job_specifics='".mysql_escape_string( $JobSpecifics." <repository> $RepositoryURL:$RepositoryDir </repository> <repository_url> $RepositoryWWWURL </repository_url>" )."'";
 
 if( $Input != "" )
  $InsertQuery .= ", input='".mysql_escape_string( $Input )."'";
@@ -270,9 +274,6 @@ $queryresult = mysql_query( $InsertQuery );
 $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=LAST_INSERT_ID()" );
 $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
-
-// get repository url from specs...
-$RepositoryURL = RepositoryURL2WWW( NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) ) );
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
@@ -290,7 +291,7 @@ Row2( "<b>Owners:</b>", $JobSpecs -> owners );
 Row2( "<b>Read access:</b>", $JobSpecs -> read_access );
 Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
 Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) );
-if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href='".$RepositoryURL."'> $RepositoryURL </a>" );
+if( $RepositoryWWWURL != "" ) Row2( "<b>Repository:</b>", "<a href='".$RepositoryWWWURL."'> $RepositoryWWWURL </a>" );
 Row2( "<b>Input:</b>", nl2br( htmlentities( $JobSpecs -> input ) ) );
 End_Table();
 
