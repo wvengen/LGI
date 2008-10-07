@@ -105,7 +105,7 @@ function Resource_Kill_Session( &$ResourceData )
 
 // --------------------------------------------------------------------
 
-function Resource_Verify( &$Project, $SessionID = "" )
+function Resource_Verify( &$Project, $SessionID = "", $Capabilities = "" )
 {
  global $Config;
  global $ErrorMsgs;
@@ -122,6 +122,11 @@ function Resource_Verify( &$Project, $SessionID = "" )
   if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
    return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ] ) );
  }
+
+ // check if capabilites were given...
+ if( isset( $Capabilities ) && ( $Capabilities !== "" ) )
+  if( strlen( $Capabilities ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) 
+   return( LGI_Error_Response( 69, $ErrorMsgs[ 69 ] ) );
  
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
@@ -162,8 +167,14 @@ function Resource_Verify( &$Project, $SessionID = "" )
  if( $Data->client_certificate != SSL_Get_Full_Client_Certificate() )
   return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ] ) );
 
- // update time_stamp of resource...
- $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
+ // update time_stamp of resource... and capabilities if posted...
+ if( $Capabilities !== "" )
+ {
+  $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP(),resource_capabilities='".mysql_escape_string( $Capabilities )."' WHERE resource_name='".$CommonName."'" );
+  $Data -> resource_capabilities = $Capabilities;
+ }
+ else
+  $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
 
  // pass through the SessionID into the resource data structure...
  if( isset( $SessionID ) && is_numeric( $SessionID ) ) 

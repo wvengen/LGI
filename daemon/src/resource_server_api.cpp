@@ -99,7 +99,7 @@ CURLcode Resource_Server_API::PerformcURLPost( string &Response, CURL *cURLHandl
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_SignUp_Resource( string &Response, string ServerURL, string Project )
+int Resource_Server_API::Resource_SignUp_Resource( string &Response, string ServerURL, string Project, string Capabilities )
 {
  DEBUG_LOG( "Resource_Server_API::Resource_SignUp_Resource; ServerURL=" << ServerURL << ", Project=" << Project );
 
@@ -112,6 +112,7 @@ int Resource_Server_API::Resource_SignUp_Resource( string &Response, string Serv
   struct curl_httppost *LastItem = NULL;
 
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "project", CURLFORM_PTRCONTENTS, Project.c_str(), CURLFORM_END );
+  if( !Capabilities.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "capabilities", CURLFORM_PTRCONTENTS, Capabilities.c_str(), CURLFORM_END );
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 

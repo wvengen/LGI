@@ -36,6 +36,7 @@ Page_Head();
 }
 </style>
 <script type="text/javascript" src="java_scripts/validation.js"></script>
+<script type="text/javascript" src="java_scripts/upload.js"></script>
 <?php
 
 // check if user is set in request... or use value from certificate...
@@ -94,49 +95,6 @@ Row2( "<b>Extra owners:</b>", '<input type="text" size="75" name="owners" value=
 Row2( "<b>Extra read access:</b>", '<input type="text" size="75" name="read_access" value="" maxlength="128" />' );
 Row2( "<b>Target resources:</b>", '<input type="text" size="75" name="target_resources" value="any" maxlength="128" validation="required"/>' );
 Row2( "<b>Job specifics:</b>", '<input type="text" size="75" name="job_specifics" value="" maxlength="1024" />' );
-
-?>
-<script type="text/javascript">
-
-function FileUploadChanged()
-{
- var this_form = document.getElementById( 'this_form' );
- var usedFields = 0;
- var fields = new Array();
-
- for( var i = 0; i < this_form.elements.length; i++ )
-  if( ( this_form.elements[ i ].type == 'file'  ) && ( this_form.elements[ i ].name.substr( 0, 14 ) == 'uploaded_file_' ) )
-   fields[ fields.length ] = this_form.elements[ i ];
-
- for( var i = 0; i < fields.length; i++ )
-  if( fields[ i ].value.length > 0 ) usedFields++;
-
- this_form.number_of_uploaded_files.value = fields.length;
-
- if( usedFields == fields.length )
- {
-  var lastEntry = document.getElementById( 'file_upload_entry_' + usedFields );
-
-  if( lastEntry )
-  {
-   var newEntry = document.createElement( 'div' );
-   newEntry.id = 'file_upload_entry_' + ( usedFields + 1 );
-
-   var file = document.createElement( 'input' );
-   file.type = 'file';
-   file.name = 'uploaded_file_' + ( usedFields + 1 );
-   file.onchange = function() { FileUploadChanged(); };
-   file.size = 75;
-
-   newEntry.appendChild( file );
-   lastEntry.parentNode.insertBefore( newEntry, lastEntry.nextSibling );
-  }
- }
-}
-
-</script>
-<?php
-
 Row2( "<b>File(s) to upload:</b>", '<div id="file_upload_entry_1"> <input name="uploaded_file_1" type="file" onchange="FileUploadChanged()" size="75" /> </div>' );
 Row2( "<b>Input:</b>", '<textarea wrap="off" rows="20" cols="75" name="input"></textarea>' );
 Row1( '<center><input type="submit" value="     Submit Job     " /></center>' );

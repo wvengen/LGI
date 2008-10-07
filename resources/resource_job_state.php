@@ -56,7 +56,8 @@ if( !FoundInCommaSeparatedField( $JobSpecs->target_resources, $ResourceData->res
 
 // build response for this job...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
-$Response .=" <project> ".Get_Selected_MySQL_DataBase()." </project>";
+$Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
+$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
 $Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id>"; 
 $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>"; 

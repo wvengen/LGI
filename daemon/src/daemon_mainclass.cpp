@@ -405,7 +405,7 @@ int Daemon::RequestWorkCycle( void )
 
   DEBUG_LOG( "Daemon::RequestWorkCycle; Signing up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
 
-  if( ServerAPI.Resource_SignUp_Resource( Response, TheProject.Project_Master_Server(), TheProject.Project_Name() ) != CURLE_OK ) continue;
+  if( ServerAPI.Resource_SignUp_Resource( Response, TheProject.Project_Master_Server(), TheProject.Project_Name(), "dummy" ) != CURLE_OK ) continue;
 
   Response = Parse_XML( Response, "LGI" );
   ServerMaxFieldSize = NormalizeString( Parse_XML( Response, "server_max_field_size" ) );

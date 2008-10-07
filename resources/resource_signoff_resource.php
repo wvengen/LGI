@@ -37,6 +37,7 @@ Resource_Remove_Stale_Locks( $ResourceData );
 
 // start building the response of this api-call...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
+$Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
 $Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server>";
 $Response .= " <this_project_server> ".Get_Server_URL()." </this_project_server>";

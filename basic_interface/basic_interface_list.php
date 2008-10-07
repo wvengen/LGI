@@ -103,16 +103,16 @@ if( $ProjectServer != 0 )
 }
 else
 {
- $ResourceListQuery = mysql_query( "SELECT resource_name,last_call_time FROM active_resources WHERE project_server=0" );
+ $ResourceListQuery = mysql_query( "SELECT resource_name,last_call_time,resource_capabilities FROM active_resources WHERE project_server=0" );
  $Number = mysql_num_rows( $ResourceListQuery );
 
  Row2( "<b>Number of resources:</b>", $Number );
- Row2( "<center><font color='green' size='4'><b>Resource name</b></font></center>", "<center><font color='green' size='4'><b>Time stamp</b></font></center>" ); 
+ Row3( "<center><font color='green' size='4'><b>Resource name</b></font></center>", "<center><font color='green' size='4'><b>Time stamp</b></font></center>", "<center><font color='green' size='4'><b>Resource capabilities</b></font></center>" ); 
 
  for( $i = 1; $i <= $Number; $i++ )
  {
   $Resource = mysql_fetch_object( $ResourceListQuery );
-  Row2( "<center>$Resource->resource_name</center>", "<center>".gmdate( "j M Y G:i", $Resource ->last_call_time )." UTC </center>" );
+  Row3( "<center>$Resource->resource_name</center>", "<center>".gmdate( "j M Y G:i", $Resource ->last_call_time )." UTC </center>", "<center>".nl2br( htmlentities( $Resource->resource_capabilities ) )."</center>" );
  }
 
  mysql_free_result( $ResourceListQuery );

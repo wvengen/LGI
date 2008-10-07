@@ -26,13 +26,18 @@ if( isset( $_SESSION[ "sid" ] ) ) return( LGI_Error_Response( 67, $ErrorMsgs[ 67
 session_destroy();
 
 // check if resource is known to the project and certified correctly...
-$ResourceData = Resource_Verify( $_POST[ "project" ] );
+if( isset( $_POST[ "capabilities" ] ) )
+ $ResourceData = Resource_Verify( $_POST[ "project" ], "", $_POST[ "capabilities" ] );
+else
+ $ResourceData = Resource_Verify( $_POST[ "project" ] );
 
 // now create a new session for this resource...
 Resource_Setup_Session( $ResourceData );
 
 // start building the response of this api-call...
-$Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
+$Response = " <resource> ".$ResourceData->resource_name." </resource>";
+$Response .= " <resource_url> ".$ResourceData->url." </resource_url>";
+$Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
 $Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server>";
 $Response .= " <this_project_server> ".Get_Server_URL()." </this_project_server>";
