@@ -56,7 +56,7 @@ string ReadLineFromFile( string FileName )
 
 void PrintHelp( char *ExeName )
 {
- cout << endl << ExeName << " -a application [options] " << endl << endl;
+ cout << endl << ExeName << " -a application [options] [files to upload to repository]" << endl << endl;
  cout << "options:" << endl << endl;
  cout << "-h                      show this help." << endl;
  cout << "-a application          specify the application." << endl;
@@ -82,6 +82,7 @@ void PrintHelp( char *ExeName )
 int main( int argc, char *argv[] )
 {
  DaemonJob Job;
+ vector<string> FilesToUpload;
 
  // turn logging facilities off...
  InitializeLogger( 0 );
@@ -295,8 +296,13 @@ int main( int argc, char *argv[] )
      return( 1 );
     }
   } else {
-    PrintHelp( argv[ 0 ] );
-    return( 1 );
+    if( !ReadStringFromFile( string( argv[ i ] ) ).empty() )
+     FilesToUpload.push_back( string( argv[ i ] ) ); 
+    else
+    {
+     cout << "Cannot read from file '" << argv[ i ] << "'." << endl;
+     return( 1 );
+    }
   };
  }
 
@@ -341,7 +347,7 @@ int main( int argc, char *argv[] )
   // we are signed on and have a session running now...
   string SessionID = NormalizeString( Parse_XML( Response, "session_id" ) );
 
-  Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, SessionID, Application, "queued", Owners, Target_Resources, Read_Access, Job_Specifics, Input, "" );
+  Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, SessionID, Application, "queued", Owners, Target_Resources, Read_Access, Job_Specifics, Input, "", FilesToUpload );
   if( Flag != CURLE_OK )
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
   else
@@ -376,7 +382,7 @@ int main( int argc, char *argv[] )
  {
   Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
 
-  Flag = ServerAPI.Interface_Submit_Job( Response, ServerURL, Project, User, Groups, Application, Target_Resources, Job_Specifics, Input, Read_Access, Owners, "" );
+  Flag = ServerAPI.Interface_Submit_Job( Response, ServerURL, Project, User, Groups, Application, Target_Resources, Job_Specifics, Input, Read_Access, Owners, "", FilesToUpload );
   if( Flag != CURLE_OK )
   {
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;

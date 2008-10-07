@@ -291,7 +291,7 @@ int Resource_Server_API::Resource_Update_Job( string &Response, string ServerURL
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL, string Project, string SessionID, string Application, string State, string Owners, string Target_Resources, string Read_Access, string Job_Specifics, string Input, string Output )
+int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL, string Project, string SessionID, string Application, string State, string Owners, string Target_Resources, string Read_Access, string Job_Specifics, string Input, string Output, vector<string> FilesToUpload )
 {
  DEBUG_LOG( "Resource_Server_API::Resource_Submit_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Application=" << Application << ", State=" << State << ", Owners=" << Owners << ", Target_Resources=" << Target_Resources << ", Read_Access=" << Read_Access << ", Input=" << Input << ", Output=" << Output << ", Job_Specifics=" << Job_Specifics );
 
@@ -313,6 +313,26 @@ int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL
   if( !Job_Specifics.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_specifics", CURLFORM_PTRCONTENTS, Job_Specifics.c_str(), CURLFORM_END );
   if( !Input.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "input", CURLFORM_PTRCONTENTS, Input.c_str(), CURLFORM_END );
   if( !Output.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "output", CURLFORM_PTRCONTENTS, Output.c_str(), CURLFORM_END );
+
+  if( FilesToUpload.size() )     // there are files to be uploaded too...
+  {
+   char Tag[ 128 ];
+   int NrOfFiles = 0;
+
+   for( int i = 0; i < FilesToUpload.size(); ++i )
+    if( !FilesToUpload[ i ].empty() )
+    {
+     ++NrOfFiles;
+     sprintf( Tag, "uploaded_file_%d", NrOfFiles );
+     curl_formadd( &PostList, &LastItem, CURLFORM_COPYNAME, Tag, CURLFORM_FILE, FilesToUpload[ i ].c_str(), CURLFORM_END );
+    }
+
+   if( NrOfFiles >= 1 )
+   {
+    sprintf( Tag, "%d", NrOfFiles );
+    curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "number_of_uploaded_files", CURLFORM_PTRCONTENTS, Tag, CURLFORM_END );
+   }
+  }
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 

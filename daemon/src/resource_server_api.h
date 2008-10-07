@@ -23,6 +23,7 @@
 
 #include <cstdio>
 #include <string>
+#include <vector>
 #include <curl/curl.h>
 
 #include "logger.h"
@@ -48,7 +49,7 @@ class Resource_Server_API
               int Resource_Lock_Job( string &Response, string ServerURL, string Project, string SessionID, string Job_Id );
               int Resource_UnLock_Job( string &Response, string ServerURL, string Project, string SessionID, string Job_Id );
               int Resource_Update_Job( string &Response, string ServerURL, string Project, string Session_ID, string Job_Id, string State = "", string Target_Resources = "", string Input = "", string Output = "" , string Job_Specifics = "" );
-              int Resource_Submit_Job( string &Response, string ServerURL, string Project, string Session_ID, string Application, string State, string Owners, string Target_Resources, string Read_Access = "", string Job_Specifics = "", string Input = "", string Output = "" );
+              int Resource_Submit_Job( string &Response, string ServerURL, string Project, string Session_ID, string Application, string State, string Owners, string Target_Resources, string Read_Access = "", string Job_Specifics = "", string Input = "", string Output = "", vector<string> FilesToUpload = vector<string>() );
               int Resource_Job_State( string &Response, string ServerURL, string Project, string Job_Id );
               int Resource_Request_Resource_Data( string &Response, string ServerURL, string Project, string Resource_Name );
 
