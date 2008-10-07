@@ -332,12 +332,12 @@ int main( int argc, char *argv[] )
 
   if( !OutputInXML )                       // output header of list...
   {
-   cout << endl << "------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+   cout << endl << "-----------------------------------------------------------------------------------------------------------------------------------" << endl;
    cout << " " << setw( 4 ) << "#" << " | " << setw( 6 ) << "job_id" << " | ";
    cout << setw( 12 ) << "state" << " | " << setw( 36 ) << "target_resources" << " | ";
    cout << setw( 16 ) << "application" << " | " << setw( 24 ) << "time_stamp" << " | ";
-   cout << setw( 12 ) << "owners" << " |  specs" << endl;
-   cout << "------------------------------------------------------------------------------------------------------------------------------------------------------" << endl;
+   cout << setw( 12 ) << "owners" << endl;
+   cout << "-----------------------------------------------------------------------------------------------------------------------------------" << endl;
   }
 
   do
@@ -389,8 +389,7 @@ int main( int argc, char *argv[] )
       cout << setw( 36 ) << NormalizeString( Parse_XML( Job, "target_resources" ) ) << " | ";
       cout << setw( 16 ) << NormalizeString( Parse_XML( Job, "application" ) ) << " | ";
       cout << setw( 24 ) << TimeStampStr << " | ";
-      cout << setw( 12 ) << NormalizeString( Parse_XML( Job, "owners" ) ) << " | ";
-      cout << NormalizeString( Parse_XML( Job, "job_specifics" ) ) << endl;
+      cout << setw( 12 ) << NormalizeString( Parse_XML( Job, "owners" ) ) << endl;
      }
 
     }
@@ -413,7 +412,7 @@ int main( int argc, char *argv[] )
     }
     else
     {
-     cout << "------------------------------------------------------------------------------------------------------------------------------------------------------" << endl << endl;
+     cout << "-----------------------------------------------------------------------------------------------------------------------------------" << endl << endl;
      cout << "Number of jobs listed : " << TotalNrOfJobs << endl;
      cout << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
      cout << "This project server   : " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
