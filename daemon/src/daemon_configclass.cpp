@@ -557,6 +557,35 @@ string DaemonConfigProjectApplication::Job_Abort_Script( void )
 
 // -----------------------------------------------------------------------------
 
+string DaemonConfigProjectApplication::Capabilities( void )
+{
+ string Data = NormalizeString( Parse_XML( ApplicationCache, "capabilities_file" ) );
+
+ if( Data.empty() )
+ {
+  VERBOSE_DEBUG_LOG( "DaemonConfigProjectApplication::Capabilities; No data in capabilities_file tag found" );
+
+  Data = NormalizeString( Parse_XML( ApplicationCache, "capabilities" ) );
+
+  if( Data.empty() )
+   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Capabilities; No data in capabilities tag found" )
+  else
+   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Capabilities; Returned " << Data );
+ }
+ else
+ {
+  Data = ReadStringFromFile( Data );
+
+  if( Data.empty() )
+   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Capabilities; No data in capabilities_file file found" )
+  else
+   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Capabilities; Returned " << Data );
+ }
+
+}
+
+// -----------------------------------------------------------------------------
+
 string ReadStringFromFile( string FileName, int MaxSize )
 {
  char TempBuffer[ 1024 ];

@@ -398,14 +398,23 @@ int Daemon::RequestWorkCycle( void )
   if( TheProject.Job_Limit() <= Accounting[ "; TOTALS; " + TheProject.Project_Name() ] ) continue;
 
   // first signup to registered master server of this project to get all slaves... if this fails somehow, try the next...
-
   list<string> ServerList;
-  string Response, Attributes, SessionID, ServerMaxFieldSize;
+  string Response, Attributes, SessionID, ServerMaxFieldSize, Capabilities;
   int    StartPos;
 
   DEBUG_LOG( "Daemon::RequestWorkCycle; Signing up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
 
-  if( ServerAPI.Resource_SignUp_Resource( Response, TheProject.Project_Master_Server(), TheProject.Project_Name(), "dummy" ) != CURLE_OK ) continue;
+  // setup capabilities of this resource for this project's application...
+  for( int nA = 1; nA <= TheProject.Number_Of_Applications() && ReadyForScheduling; ++nA )
+  {
+   DaemonConfigProjectApplication TheApplication = TheProject.Application( nA );
+   string AppName = TheApplication.Application_Name();
+   Capabilities += "<" + AppName + "> " + TheApplication.Capabilities() + " </" + AppName + "> ";
+  }
+
+  VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Capabilities reported to server " << Capabilities );
+
+  if( ServerAPI.Resource_SignUp_Resource( Response, TheProject.Project_Master_Server(), TheProject.Project_Name(), Capabilities ) != CURLE_OK ) continue;
 
   Response = Parse_XML( Response, "LGI" );
   ServerMaxFieldSize = NormalizeString( Parse_XML( Response, "server_max_field_size" ) );
@@ -461,7 +470,6 @@ int Daemon::RequestWorkCycle( void )
    {
 
     // now check all applications for this project on this server...
-
     for( int nA = 1; nA <= TheProject.Number_Of_Applications() && ReadyForScheduling; ++nA ) 
     {
      DaemonConfigProjectApplication TheApplication;
@@ -482,7 +490,6 @@ int Daemon::RequestWorkCycle( void )
      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Checking system limits for application " << TheApplication.Application_Name() );
 
      // check if there is a system wide limit reached for this application...
-
      if( system( TheApplication.Check_System_Limits_Script().c_str() ) == 0 ) 
      {
       DEBUG_LOG( "Daemon::RequestWorkCycle; Requesting work for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() << " at server " << (*ServerPointer) << " with session id " << SessionID );
@@ -521,7 +528,6 @@ int Daemon::RequestWorkCycle( void )
         if( Job_Id.empty() ) continue;
 
         // now check if any of the owners is denied serving...
-
         int OwnerIndex;
         vector<string> Owners = CommaSeparatedValues2Array( Parse_XML( JobData, "owners" ) );
 
@@ -544,7 +550,7 @@ int Daemon::RequestWorkCycle( void )
          // create temporary job directory with the jobs response data...
          DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, nA );
 
-         // see if job has limits from job limits script somehow...
+         // see if job has limits from job limits script somehow... if so, delete temp job directory...
          if( TempJob.RunJobCheckLimitsScript() == 0 )
          {
           VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No job limits were encountered for job " << Job_Id );
@@ -562,7 +568,10 @@ int Daemon::RequestWorkCycle( void )
           FoundJob = JobsObtained = 1;
          }
          else
+         {
           VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; A job limit was encountered for job " << Job_Id );
+          UnlinkDirectoryRecursively( TempJob.GetJobDirectory() );
+         }
           
         }
         else

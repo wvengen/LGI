@@ -115,6 +115,7 @@ class DaemonConfigProjectApplication
               string Job_Run_Script( void );
               string Job_Epilogue_Script( void );
               string Job_Abort_Script( void );
+              string Capabilities( void );
               int    Job_Limit( void );
               int    Max_Output_Size( void );
               int    Job_Sandbox_UID( void );

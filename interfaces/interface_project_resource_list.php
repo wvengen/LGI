@@ -38,7 +38,7 @@ $Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server>";
 $Response .= " <this_project_server> ".Get_Server_URL()." </this_project_server>";
 
-$queryresult = mysql_query( "SELECT resource_name FROM active_resources WHERE project_server=0" );
+$queryresult = mysql_query( "SELECT resource_name,last_call_time,resource_capabilities FROM active_resources WHERE project_server=0" );
 
 $NumberOfResources = mysql_num_rows( $queryresult );
 
@@ -47,7 +47,9 @@ $Response .= " <number_of_resources> ".$NumberOfResources." </number_of_resource
 for( $i = 1; $i <= $NumberOfResources; $i++ )
 {
  $Resource = mysql_fetch_object( $queryresult );
- $Response .= " <resource number='".$i."'> ".$Resource->resource_name." </resource>";
+ $Response .= " <resource number='".$i."'> <resource_name> $Resource->resource_name </resource_name>";
+ $Response .= " <resource_capabilities> $Resource->resource_capabilities </resource_capabilities>";
+ $Response .= " <last_call_time> $Resource->last_call_time </last_call_time> </resource>";
 }
 
 mysql_free_result( $queryresult );

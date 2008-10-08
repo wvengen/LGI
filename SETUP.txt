@@ -64,6 +64,10 @@ While the daemon is running, you can edit the configuration file without any
 problems. You can also edit the scripts in the mean time, only newly spawned
 jobs will be affected by these changes. 
 
+Keep in mind for a project administrator, the public key of the resource
+should be added into the /var/www/.ssh/authorized_keys file on the project
+web-server where the repository is located.
+
 
 
 Part II : Howto setup a project server 
@@ -76,49 +80,49 @@ of the LGI-CA. In this part, it is shown how to become an independant project
 and be your own X.509 CA.
 
 - Make sure libcurl, PHP, MySQL, Apache and OpenSSL are installed on your
-system.
+  system.
 
 - Make sure MySQL is configured correctly and mysqld is running.
 
 - Make sure PHP is configured correctly.
 
 - Switch to the user apache and make sure you install the source tree
-into the home of user apache where it will be served:
+  into the home of user apache where it will be served:
 
   sudo su -l -s /bin/bash apache 
 
   tar -zxf LGI.tar.gz -C /var/www/html
 
 - Use OpenSSL to create a CA private key and certificate with which you can
-create and sign your project server, resource and client certificates:
+  create and sign your project server, resource and client certificates:
 
- Start by creating a private key for your CA:
+  Start by creating a private key for your CA:
 
     openssl genrsa -out /var/www/html/LGI/certificates/exampleCA.key 4096    
 
- Then create an X.509 selfsigned certificate for it:
+  Then create an X.509 selfsigned certificate for it:
 
     openssl req -new -x509 -days 365 -set_serial 0 -extensions v3_ca 
             -key /var/www/html/LGI/certificates/exampleCA.key 
             -out /var/www/html/LGI/certificates/exampleCA.crt
 
- and create a CA serial number file:
+  and create a CA serial number file:
 
     echo "0100" > /var/www/html/LGI/certificates/exampleCA.srl 
 
- Now create a private key for your server:
+  Now create a private key for your server:
  
     openssl genrsa -out /var/www/html/LGI/certificates/exampleserver.key 4096
 
- Then create a sign request for it:
+  Then create a sign request for it:
 
     openssl req -new -key /var/www/html/LGI/certificates/exampleserver.key 
             -out /var/www/html/LGI/certificates/exampleserver.crs
 
- and in filling in the commonname of the CA certificate, be sure to use the 
- correct LGI format 'apache@exampleserver.somewhere.org; exampleprojectname'.
+  and in filling in the commonname of the CA certificate, be sure to use the 
+  correct LGI format 'apache@exampleserver.somewhere.org; exampleprojectname'.
 
- Now create the CA signed server certificate from this request:
+  Now create the CA signed server certificate from this request:
 
     openssl x509 -req -in /var/www/html/LGI/certificates/exampleserver.crs
             -days 365 -CA /var/www/html/LGI/certificates/exampleCA.crt
@@ -126,63 +130,70 @@ create and sign your project server, resource and client certificates:
             -CAserial /var/www/html/LGI/certificates/exampleCA.srl 
             -out /var/www/html/LGI/certificates/exampleserver.crt
 
- You should now safely store the CA private key file somewere not on
- this server computer that is conected to the internet. Or, at least, if
- you do not do that, encrypt the file using a password protection:
+  You should now safely store the CA private key file somewere not on
+  this server computer that is conected to the internet. Or, at least, if
+  you do not do that, encrypt the file using a password protection:
 
     openssl aes-256-cbc -e -in /var/www/html/LGI/certificates/exampleCA.key
             -out /var/www/html/LGI/certificates/exampleCA.key.aes; rm 
             /var/www/html/LGI/certificates/exampleCA.key
 
- Now copy the public certificates to a place that Apache will serve:
+  Now copy the public certificates to a place that Apache will serve:
 
     cp /var/www/html/LGI/certificates/exampleCA.crt /var/www/html/LGI
 
     cp /var/www/html/LGI/certificates/exampleserver.crt /var/www/html/LGI
 
 - Make sure Apache is setup correctly to use client and server certificates
-for https and check that the following options have been set correctly into
-the https virtual host configuration:
+  for https and check that the following options have been set correctly into
+  the https virtual host configuration:
 
- SSLCertificateFile /var/www/html/LGI/certificates/exampleserver.crt
- SSLCertificateKeyFile /var/www/html/LGI/certificates/exampleserver.key
- SSLCertificateChainFile /var/www/html/LGI/certificates/exampleCA.crt
- SSLCACertificateFile /var/www/html/LGI/certificates/exampleCA.crt
- SSLVerifyClient require
- SSLVerifyDepth  5
- SSLOptions +ExportCertData
+  SSLCertificateFile /var/www/html/LGI/certificates/exampleserver.crt
+  SSLCertificateKeyFile /var/www/html/LGI/certificates/exampleserver.key
+  SSLCertificateChainFile /var/www/html/LGI/certificates/exampleCA.crt
+  SSLCACertificateFile /var/www/html/LGI/certificates/exampleCA.crt
+  SSLVerifyClient require
+  SSLVerifyDepth  5
+  SSLOptions +ExportCertData
 
- <Files ~ "\.(cgi|shtml|phtml|php3?)$">
-    SSLOptions +StdEnvVars
- </Files>
+  <Files ~ "\.(cgi|shtml|phtml|php3?)$">
+     SSLOptions +StdEnvVars
+  </Files>
 
- Also make sure the AccessFileName has been set correctly in the Apache main
- configuration and that the LGI document tree can be protected by .htaccess
- files:
+  Also make sure the AccessFileName has been set correctly in the Apache main
+  configuration and that the LGI document tree can be protected by .htaccess
+  files:
 
- DocumentRoot "/var/www/html"
- AccessFileName .htaccess
+  DocumentRoot "/var/www/html"
+  AccessFileName .htaccess
 
- <Directory "/var/www/html/LGI">
-        AllowOverride All
- </Directory>
+  <Directory "/var/www/html/LGI">
+         AllowOverride All
+  </Directory>
 
- Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates'
- and '/var/www/html/LGI/inc' directories with the following content:
+  Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates'
+  and '/var/www/html/LGI/inc' directories with the following content:
 
- Order Allow,Deny
- Deny from all
+  Order Allow,Deny
+  Deny from all
 
- Also sure you have an .htaccess file in the '/var/www/html/LGI/
- basic_interface/repository' directory with the following content:
+  Also sure you have an .htaccess file in the '/var/www/html/LGI/repository'
+  directory with the following content:
 
- hp_flag engine off
- SSLRequireSSL
+  hp_flag engine off
+  SSLRequireSSL
 
- Finally check your Apache configuration with the 'apachectl configtest' command.
+  Make sure you also have an 'index.html' file in the above repository
+  directory with the content:
+
+  <html>
+    ! No browsing allowed !
+  </html>
+
+  Finally check your Apache configuration with the 'apachectl configtest' command.
 
 - Now create a MySQL user and database for your project with the database
-name equal to your project name "exampleprojectname":
+  name equal to your project name "exampleprojectname":
 
   mysqladmin -u root password "yourmysqlrootpassword"
 
@@ -205,19 +216,37 @@ name equal to your project name "exampleprojectname":
        examplemysqluser -p exampleprojectname
 
 - Make sure you edit the project web server configuration file 
-'/var/www/html/LGI/inc/Config.inc':
+  '/var/www/html/LGI/inc/Config.inc':
 
- $Config[ "SERVER_URL" ] = "https://exampleserver.somewhere.org/LGI";    
- $Config[ "SERVER_NAME" ] = "apache@exampleserver.somewhere.org"; 
- $Config[ "SERVER_SSL_CERTIFICATE_FILE" ] = "../certificates/exampleserver.crt"; 
- $Config[ "SERVER_SSL_KEY" ] = "../certificates/exampleserver.key";
- $Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ] = 
-          "https://exampleserver.somewhere.org/LGI/exampleCA.crt";
- $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ] = "../certificates/exampleCA.crt";        
- $Config[ "MYSQL_URL" ] = "localhost";
- $Config[ "MYSQL_USER" ] = "examplemysqluser";
- $Config[ "MYSQL_PASSWD" ] = "examplemusqluserpasswd";
- $Config[ "MYSQL_DEFAULT_DATABASE" ] = "exampleprojectname"; 
+  $Config[ "SERVER_URL" ] = "https://exampleserver.somewhere.org/LGI";    
+  $Config[ "SERVER_NAME" ] = "apache@exampleserver.somewhere.org"; 
+  $Config[ "SERVER_SSL_CERTIFICATE_FILE" ] = "../certificates/exampleserver.crt"; 
+  $Config[ "SERVER_SSL_KEY" ] = "../certificates/exampleserver.key";
+  $Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ] = 
+           "https://exampleserver.somewhere.org/LGI/exampleCA.crt";
+  $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ] = "../certificates/exampleCA.crt";        
+  $Config[ "MYSQL_URL" ] = "localhost";
+  $Config[ "MYSQL_USER" ] = "examplemysqluser";
+  $Config[ "MYSQL_PASSWD" ] = "examplemusqluserpasswd";
+  $Config[ "MYSQL_DEFAULT_DATABASE" ] = "exampleprojectname"; 
+  $Config[ "REPOSITORY_DIRECTORY" ] = "/var/www/html/LGI/repository";
+  $Config[ "REPOSITORY_SERVER_NAME" ] = $Config[ "SERVER_NAME" ];
+  $Config[ "REPOSITORY_URL" ]  = $Config[ "SERVER_URL" ]."/repository";   
+
+- Now make sure that the apache user has the home directory /var/www and that
+  a directory /var/www/.ssh exists. In this directory an authorized_keys file
+  can be created to allow access from resources to the repository. The public
+  keys for each resource can be obtained with 'ssh-keygen':
+
+  ssh-keygen -y -f user@resource.key
+
+  Now the resource can access the repository by using 'scp' and the obtained
+  X.509 client certificate:
+
+  scp -qrBi user@resource.crt ./* apache@exampleserver.somewhere.org:
+       /var/www/html/LGI/repository/JOB_8737832635355665737373778
+
+  Also make sure that the user apache has a valid login shell.
 
 - The last thing to do is to edit a crontab entry for the apache user
 
@@ -229,6 +258,10 @@ name equal to your project name "exampleprojectname":
   HOME=/var/www
   */10 * * * *  /usr/bin/php -f /var/www/html/LGI/tools/cron_job.php
   
+You could also choose to use a different user account to setup your LGI
+project web-server. Just be sure that the user apache is part of the group the
+new user is part of too so that apache can serve the content. 
+
 
 
 Part III : Howto setup a second slave project server 
@@ -335,4 +368,7 @@ in MySQL, you need to type in your password twice with this UpdateDB script.
 Please read in the docs subdirectory the full details on the structure
 of the database, what the fields mean and what values you can assign to 
 them with MySQL queries like demonstrated.
+
+
+
 

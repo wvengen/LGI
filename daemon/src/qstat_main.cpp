@@ -32,7 +32,7 @@
 // ----------------------------------------------------------------------
 
 string KeyFile, CertificateFile, CACertificateFile, ServerURL, Response,
-       Project, State, Application, User, Groups, Job_Id, ConfigDir;
+       Project, State, Application, User, Groups, Job_Id, ConfigDir, BinData;
 int OutputInXML = 0;
 int ListServers = 0;
 
@@ -268,7 +268,7 @@ int main( int argc, char *argv[] )
     for( int i = 1; i <= Count; ++i )
      cout << "Project slave server  : " << NormalizeString( Parse_XML( Response, "project_server", Attributes, StartPos ) ) << endl;
 
-    if( !( ListServers & 2 ) ) cout << endl;
+    if( !(ListServers & 2) ) cout << endl;
    }
   }
 
@@ -310,7 +310,16 @@ int main( int argc, char *argv[] )
     string Attributes;
 
     for( int i = 1; i <= Count; ++i )
-     cout << "Project resource      : " << NormalizeString( Parse_XML( Response, "resource", Attributes, StartPos ) ) << endl;
+    {
+     string Resource = Parse_XML( Response, "resource", Attributes, StartPos );
+     time_t TimeStamp = atoi( NormalizeString( Parse_XML( Resource, "last_call_time" ) ).c_str() );
+     char *TimeStampStr = ctime( &TimeStamp );
+     TimeStampStr[ 24 ] = '\0';
+
+     cout << endl << "Resource name         : " << NormalizeString( Parse_XML( Resource, "resource_name" ) ) << endl;
+     cout << "Resource capabilities : " << NormalizeString( Parse_XML( Resource, "resource_capabilities" ) ) << endl;
+     cout << "Resource time stamp   : " <<  TimeStampStr << " [" << TimeStamp << "]" << endl;
+    }
 
     cout << endl;
    }
@@ -473,8 +482,11 @@ int main( int argc, char *argv[] )
    cout << "Job owners            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "owners" ) ) << endl;
    cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
    cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl;
-   cout << "Input                 : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ) << endl;
-   cout << "Output                : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ) << endl << endl;
+
+   HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ), BinData );
+   cout << "Input                 : " << BinData << endl;
+   HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ), BinData );
+   cout << "Output                : " << BinData << endl << endl;
 
   }
  }
