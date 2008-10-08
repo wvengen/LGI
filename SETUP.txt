@@ -22,51 +22,51 @@ following steps:
 - Untar or checkout the source tree in '~/LGI'.
 
 - Get in contact with the project administrator to get the X.509 certificate
-and a private key for your resource.
+  and a private key for your resource.
 
 - Copy the key and certificate files into the '~/LGI/certificates' directory.
 
 - Make sure that libcurl is installed. Visit http://curl.haxx.se/libcurl/ if
-you do not have this yet.
+  you do not have this yet.
 
 - Go to the '~/LGI/daemon/src' directory and invoke make. If you have a
-different compiler installed than GNU's g++, or you have libcurl installed
-in a different location, adjust the first few lines of the file Makefile to
-your needs.
+  different compiler installed than GNU's g++, or you have libcurl installed
+  in a different location, adjust the first few lines of the file Makefile to
+  your needs.
 
 - If you want, you can also invoke make with the 'make install' command. If
-you do that the directory '~/LGI/daemon/bin' will be created and you can
-include that in your PATH for convencience.
+  you do that the directory '~/LGI/daemon/bin' will be created and you can
+  include that in your PATH for convencience.
 
 - Edit the '~/LGI/daemon/LGI.cfg' example configuration file. It has been
-setup to run the hello_world application by just simple forking scripts.
-Other example scripts on how to use the 'hello_world' example using Torque
-/ PBS or LoadLeveler are included to in the corresponding '~LGI/daemon/
-hello_world_XX_scripts' subdirectories. Please make sure you refer to
-the right LGI project server, use the correct project name and use the
-correct private key and certificate files from the '~/LGI/certificates'
-directory. Also be sure to use absolute paths in the configuration file
-so it is possible to invoke the daemon from any other directory. Finally
-set the run directory correctly if you do not want it to be the default.
+  setup to run the hello_world application by just simple forking scripts.
+  Other example scripts on how to use the 'hello_world' example using Torque
+  / PBS or LoadLeveler are included to in the corresponding '~LGI/daemon/
+  hello_world_XX_scripts' subdirectories. Please make sure you refer to
+  the right LGI project server, use the correct project name and use the
+  correct private key and certificate files from the '~/LGI/certificates'
+  directory. Also be sure to use absolute paths in the configuration file
+  so it is possible to invoke the daemon from any other directory. Finally
+  set the run directory correctly if you do not want it to be the default.
 
 - Start the daemon by invoking the daemon like:
 
   ~/LGI/daemon/src/LGI_daemon -l ~/LGI/daemon/LGI.log ~/LGI/daemon/LGI.cfg
 
-You can now inspect the log file '~/LGI/daemon/LGI.log' and see if everything
-was setup correctly.
+ You can now inspect the log file '~/LGI/daemon/LGI.log' and see if everything
+ was setup correctly.
 
 - You can gracefully stop the dameon by sending it a 'kill' signal:
 
   killall LGI_daemon
 
-While the daemon is running, you can edit the configuration file without any
-problems. You can also edit the scripts in the mean time, only newly spawned
-jobs will be affected by these changes. 
+  While the daemon is running, you can edit the configuration file without any
+  problems. You can also edit the scripts in the mean time, only newly spawned
+  jobs will be affected by these changes. 
 
-Keep in mind for a project administrator, the public key of the resource
-should be added into the /var/www/.ssh/authorized_keys file on the project
-web-server where the repository is located.
+- Keep in mind for a project administrator, the public key of the resource
+  should be added into the /var/www/.ssh/authorized_keys file on the project
+  web-server where the repository is located.
 
 
 
@@ -258,9 +258,9 @@ and be your own X.509 CA.
   HOME=/var/www
   */10 * * * *  /usr/bin/php -f /var/www/html/LGI/tools/cron_job.php
   
-You could also choose to use a different user account to setup your LGI
-project web-server. Just be sure that the user apache is part of the group the
-new user is part of too so that apache can serve the content. 
+- You could also choose to use a different user account to setup your LGI
+  project web-server. Just be sure that the user apache is part of the group the
+  new user is part of too so that apache can serve the content. 
 
 
 
