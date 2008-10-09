@@ -161,8 +161,8 @@ and be your own X.509 CA.
   </Files>
 
   Also make sure the AccessFileName has been set correctly in the Apache main
-  configuration and that the LGI document tree can be protected by .htaccess
-  files too:
+  configuration so that the LGI document tree can be protected by .htaccess
+  files and make sure the important directories are carefully protected:
 
   DocumentRoot "/var/www/html"
   AccessFileName .htaccess
@@ -171,18 +171,24 @@ and be your own X.509 CA.
          AllowOverride All
   </Directory>
 
+  <Directory "/var/www/html/LGI/repository/JOB_*">
+        php_flag engine off
+        SSLRequireSSL
+        Script PUT /cgi-bin/put.cgi
+        <Limit GET PUT>
+             Allow from all
+        </Limit>
+  </Directory>
+
   <Directory "/var/www/html/LGI/repository">
-         php_flag engine off
-         SSLRequireSSL
+         Deny from all
   </Directory>
 
   <Directory "/var/www/html/LGI/inc">
-         Order Allow,Deny
          Deny from all
   </Directory>
 
   <Directory "/var/www/html/LGI/certificates">
-         Order Allow,Deny
          Deny from all
   </Directory>
 
@@ -201,17 +207,11 @@ and be your own X.509 CA.
          php_value post_max_size 16M
   </Directory>
 
-  Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates'
-  and '/var/www/html/LGI/inc' directories with the following content:
+  Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates', 
+  '/var/www/html/LGI/inc' and '/var/www/html/LGI/repository' directories with
+  the content:
 
-  Order Allow,Deny
   Deny from all
-
-  Also sure you have an .htaccess file in the '/var/www/html/LGI/repository'
-  directory with the following content:
-
-  hp_flag engine off
-  SSLRequireSSL
 
   Make sure you also have an 'index.html' file in the above repository
   directory with the content:
@@ -220,7 +220,7 @@ and be your own X.509 CA.
     ! No browsing allowed !
   </html>
 
-  Make sure you hae an .htaccess file in the directories
+  Make sure you have an .htaccess file in the directories
   '/var/www/html/LGI/basic_interface', '/var/www/html/LGI/interfaces' and
   '/var/www/html/LGI/resources' with the following content:
 
