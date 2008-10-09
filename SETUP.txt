@@ -188,6 +188,14 @@ and be your own X.509 CA.
          Deny from all
   </Directory>
 
+  <Directory "/var/www/html/LGI/tools">
+         Deny from all
+  </Directory>
+
+  <Directory "/var/www/html/LGI/daemon">
+         Deny from all
+  </Directory>
+
   <Directory "/var/www/html/LGI/certificates">
          Deny from all
   </Directory>
@@ -208,8 +216,8 @@ and be your own X.509 CA.
   </Directory>
 
   Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates', 
-  '/var/www/html/LGI/inc' and '/var/www/html/LGI/repository' directories with
-  the content:
+  '/var/www/html/LGI/inc', '/var/www/html/LGI/tools', '/var/www/html/LGI/daemon',
+  and '/var/www/html/LGI/repository' directories with the content:
 
   Deny from all
 
