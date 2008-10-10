@@ -488,6 +488,9 @@ int main( int argc, char *argv[] )
    HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ), BinData );
    cout << "Output                : " << BinData << endl << endl;
 
+   // here we output the repository content too...
+
+
   }
  }
 

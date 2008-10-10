@@ -19,6 +19,7 @@
 // http://www.gnu.org/licenses/gpl.txt
 
 require_once( '../inc/Interfaces.inc' );
+require_once( '../inc/Repository.inc' );
 
 // check session existance... if we happen to be hit through by browser that has a session running, we error!
 session_start();
@@ -147,6 +148,9 @@ else
  if( !Interface_Is_User_Allowed_To_Read_Job( $JobSpecs, $JobUser, $JobGroups ) )
   return( LGI_Error_Response( 34, $ErrorMsgs[ 34 ] ) );
 
+ // get repository content...
+ $RepoContent = GetRepositoryContent( NormalizeString( Parse_XML( $JobSpecs->job_specifics, "repository", $Attributes ) ) );
+
  // finally send out the data in the response... 
  $Response .= " <number_of_jobs> 1 </number_of_jobs> <job number='1'>";
  $Response .= " <job_id> ".$JobSpecs->job_id." </job_id>";
@@ -157,6 +161,7 @@ else
  $Response .= " <state> ".$JobSpecs->state." </state>";
  $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";
  $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
+ $Response .= " <repository_content> ".$RepoContent." </repository_content>";
  $Response .= " <input> ".binhex( $JobSpecs->input )." </input>";
  $Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job>";
 }

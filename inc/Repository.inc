@@ -94,7 +94,7 @@ function DeleteRepository( $RepositoryURL )
   if( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" )
   {
    if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
-    exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." ".$RepositoryArray[ 1 ].' "'."rm -rf ".$RepositoryArray[ 2 ].'"' );
+    exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." ".$RepositoryArray[ 1 ].' "rm -rf '.$RepositoryArray[ 2 ].'"' );
   }
   else
    if( $RepositoryArray[ 1 ] == Get_Server_Name() )
@@ -125,7 +125,33 @@ function RepositoryURL2WWW( $RepositoryURL )
  return( $RepositoryURL );
 }
 
-
 // --------------------------------------------------- 
+
+function GetRepositoryContent( $RepositoryURL )
+{
+ global $Config;
+
+ $Content = "";
+
+ if( $RepositoryURL != "" )
+ {
+  $RepositoryArray = CommaSeparatedField2Array( $RepositoryURL, ":" );
+
+  if( $RepositoryArray[ 0 ] == 2 )
+  {
+   $Find = "find ".$RepositoryArray[ 2 ]." -type f -printf '<file name=\"%P\"> <size> %s </size> <date> %T@ </date> </file> '";
+
+   if( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" )
+    $Content = shell_exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." $RepositoryURL \"$Find\"" );
+   else
+    $Content = shell_exec( $Find );
+  }
+ }
+
+ return( $Content );
+}
+
+
+// ---------------------------------------------------
 
 ?>

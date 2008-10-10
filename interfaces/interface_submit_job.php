@@ -247,6 +247,9 @@ $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=LAST_INSERT_ID()"
 $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
 
+// get repository content...
+$RepoContent = GetRepositoryContent( NormalizeString( Parse_XML( $JobSpecs->job_specifics, "repository", $Attributes ) ) );
+
 // and build response for this job submition...
 $Response =  " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
@@ -259,6 +262,7 @@ $Response .= " <application> ".$JobSpecs->application." </application>";
 $Response .= " <state> ".$JobSpecs->state." </state>";
 $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";
 $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
+$Response .= " <repository_content> ".$RepoContent." </repository_content>";
 $Response .= " <input> ".binhex( $JobSpecs->input )." </input>";
 $Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job>";
 

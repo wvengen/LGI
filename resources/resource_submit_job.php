@@ -223,6 +223,9 @@ mysql_free_result( $JobQuery );
 // insert a lock into the running_locks table for this inserted job...
 $queryresult = mysql_query( "INSERT INTO running_locks SET job_id=".$JobSpecs->job_id.",resource_id=".$ResourceData->resource_id.",lock_time=UNIX_TIMESTAMP(),session_id=".$ResourceData->SessionID );
 
+// get repository content...
+$RepoContent = GetRepositoryContent( NormalizeString( Parse_XML( $JobSpecs->job_specifics, "repository", $Attributes ) ) );
+
 // and build response for this job submition...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
 $Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
@@ -237,6 +240,7 @@ $Response .= " <application> ".$JobSpecs->application." </application>";
 $Response .= " <state> ".$JobSpecs->state." </state>";
 $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";
 $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
+$Response .= " <repository_content> ".$RepoContent." </repository_content>";
 $Response .= " <input> ".binhex( $JobSpecs->input )." </input>";
 $Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job>";
 

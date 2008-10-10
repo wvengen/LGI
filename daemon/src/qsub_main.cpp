@@ -32,7 +32,8 @@
 
 // ----------------------------------------------------------------------
 
-int ResourceMode = 0;                       // default to user mode...
+int XMLOutput = 0,
+    ResourceMode = 0;                       // default to user mode...
 
 string KeyFile, CertificateFile, CACertificateFile, 
        ServerURL, Project, Response, ConfigDir,
@@ -59,6 +60,7 @@ void PrintHelp( char *ExeName )
  cout << endl << ExeName << " -a application [options] [files to upload to repository]" << endl << endl;
  cout << "options:" << endl << endl;
  cout << "-h                      show this help." << endl;
+ cout << "-x                      output in XML format." << endl;
  cout << "-a application          specify the application." << endl;
  cout << "-t targetresources      specify the target resources." << endl;
  cout << "-s jobspecs             specify the job specifics." << endl;
@@ -133,6 +135,8 @@ int main( int argc, char *argv[] )
   if( !strcmp( argv[ i ], "-h" ) ) {
     PrintHelp( argv[ 0 ] );
     return( 0 );
+  } else if( !strcmp( argv[ i ], "-x" ) ) {
+    XMLOutput = 1;
   } else if( !strcmp( argv[ i ], "-c" ) ) {
     if( argv[ ++i ] ) 
     {
@@ -357,6 +361,7 @@ int main( int argc, char *argv[] )
    Flag = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
    if( Flag ) 
     cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+   if( XMLOutput ) cout << Response << endl;
   }
 
   // if we did submit the job, this signoff will unlock it automatically...
@@ -398,6 +403,12 @@ int main( int argc, char *argv[] )
    return( 1 );
   }
 
+  if( XMLOutput )
+  {
+   cout << Response << endl;
+   return( 0 );
+  }
+
   // dump job details we received back from response...
   time_t TimeStamp = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) ).c_str() );
   char *TimeStampStr = ctime( &TimeStamp );
@@ -417,7 +428,11 @@ int main( int argc, char *argv[] )
   cout << "Target resources      : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "target_resources" ) ) << endl;
   cout << "Job owners            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "owners" ) ) << endl;
   cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
-  cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl << endl;
+  cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl;
+  HexBin(  NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ), Input );
+  cout << "Input                 : " << Input << endl << endl;
+
+  // here we output the repository content too...
 
   return( 0 );
  }

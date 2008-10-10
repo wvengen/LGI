@@ -19,6 +19,7 @@
 // http://www.gnu.org/licenses/gpl.txt
 
 require_once( '../inc/Resources.inc' );
+require_once( '../inc/Repository.inc' );
 
 // check session existance... if we happen to be hit through by browser that has a session running, we error!
 session_start();
@@ -51,6 +52,9 @@ $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobId );
 $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
 
+// get repository content...
+$RepoContent = GetRepositoryContent( NormalizeString( Parse_XML( $JobSpecs->job_specifics, "repository", $Attributes ) ) );
+
 // build response for this job...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
 $Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
@@ -65,6 +69,7 @@ $Response .= " <application> ".$JobSpecs->application." </application>";
 $Response .= " <state> ".$JobSpecs->state." </state>"; 
 $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>"; 
 $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>"; 
+$Response .= " <repository_content> ".$RepoContent." </repository_content>"; 
 $Response .= " <input> ".binhex( $JobSpecs->input )." </input>"; 
 $Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job>"; 
 
