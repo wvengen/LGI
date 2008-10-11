@@ -486,10 +486,32 @@ int main( int argc, char *argv[] )
    HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ), BinData );
    cout << "Input                 : " << BinData << endl;
    HexBin( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "output" ) ), BinData );
-   cout << "Output                : " << BinData << endl << endl;
+   cout << "Output                : " << BinData << endl;
 
    // here we output the repository content too...
+   Response = NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "repository_content" ) );
+   if( !Response.empty() )
+   {
+    cout << "Repository content    : ";
 
+    BinData = Parse_XML( Response, "file", State, Flag = 0 );
+    do {
+     TimeStamp = atoi( NormalizeString( Parse_XML( BinData, "date" ) ).c_str() );
+     TimeStampStr = ctime( &TimeStamp );
+     TimeStampStr[ 24 ] = '\0';
+
+     cout << State.substr( 6, State.length() - 7 ) << " (" << NormalizeString( Parse_XML( BinData, "size" ) ) << "b) " <<
+             TimeStampStr << " [" << TimeStamp << "]";
+
+     BinData = Parse_XML( Response, "file", State, Flag );
+
+     if( !BinData.empty() ) cout << ", ";
+    } while( !BinData.empty() );
+
+    cout << endl;
+   }
+    
+   cout << endl;
 
   }
  }

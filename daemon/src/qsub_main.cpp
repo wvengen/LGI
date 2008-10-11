@@ -430,9 +430,32 @@ int main( int argc, char *argv[] )
   cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
   cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl;
   HexBin(  NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ), Input );
-  cout << "Input                 : " << Input << endl << endl;
+  cout << "Input                 : " << Input << endl;
 
   // here we output the repository content too...
+  Response = NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "repository_content" ) );
+  if( !Response.empty() )
+  {
+   cout << "Repository content    : ";
+
+   Output = Parse_XML( Response, "file", Input, Flag = 0 );
+   do {
+    TimeStamp = atoi( NormalizeString( Parse_XML( Output, "date" ) ).c_str() );
+    TimeStampStr = ctime( &TimeStamp );
+    TimeStampStr[ 24 ] = '\0';
+
+    cout << Input.substr( 6, Input.length() - 7 ) << " (" << NormalizeString( Parse_XML( Output, "size" ) ) << "b) " <<
+            TimeStampStr << " [" << TimeStamp << "]";
+
+    Output = Parse_XML( Response, "file", Input, Flag );
+
+    if( !Output.empty() ) cout << ", ";
+   } while( !Output.empty() );
+
+   cout << endl;
+  }
+
+  cout << endl;
 
   return( 0 );
  }
