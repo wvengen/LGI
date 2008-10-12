@@ -64,9 +64,11 @@ following steps:
   problems. You can also edit the scripts in the mean time, only newly spawned
   jobs will be affected by these changes. 
 
-- Keep in mind for a project administrator, the public key of the resource
-  should be added into the /var/www/.ssh/authorized_keys file on the project
-  web-server where the repository is located.
+Keep in mind for a project administrator, the public key of the resource
+should be added into the /var/www/.ssh/authorized_keys file on the project
+web-server where the repository is located. Also remember that as a project
+administrator you should also include the new resource into the projects 
+database.
 
 
 
@@ -182,6 +184,10 @@ and be your own X.509 CA.
 
   <Directory "/var/www/html/LGI/repository">
          Deny from all
+         <Files "repository_content.php">
+              SSLRequireSSL
+              Allow from all
+         </Files>
   </Directory>
 
   <Directory "/var/www/html/LGI/inc">
@@ -216,10 +222,21 @@ and be your own X.509 CA.
   </Directory>
 
   Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates', 
-  '/var/www/html/LGI/inc', '/var/www/html/LGI/tools', '/var/www/html/LGI/daemon',
-  and '/var/www/html/LGI/repository' directories with the content:
+  '/var/www/html/LGI/inc', '/var/www/html/LGI/tools' and '/var/www/html/LGI/daemon'
+  directories with the content:
 
   Deny from all
+
+  Make sure you have an .htaccess file in the '/var/www/html/LGI/repository'
+  directory with the content:
+
+  <Directory "/var/www/html/LGI/repository">
+         Deny from all
+         <Files "repository_content.php">
+              SSLRequireSSL
+              Allow from all
+         </Files>
+  </Directory>
 
   Make sure you also have an 'index.html' file in the above repository
   directory with the content:
@@ -302,10 +319,10 @@ and be your own X.509 CA.
   MAILTO=""
   HOME=/var/www
   */10 * * * *  /usr/bin/php -f /var/www/html/LGI/tools/cron_job.php
-  
-- You could also choose to use a different user account to setup your LGI
-  project web-server. Just be sure that the user apache is part of the group the
-  new user is part of too so that apache can serve the content. 
+
+You could also choose to use a different user account to setup your LGI
+project web-server. Just be sure that the user apache is part of the group the
+new user is part of too so that apache can serve the content. 
 
 
 
@@ -406,6 +423,15 @@ located in the tools subdirectory:
                  application='hello_world', job_limit=10" 
                  "apache@exampleserver.somewhere.org" -u examplemysqluser 
                  -p exampleprojectname
+
+To insert a new resource into the database use the following commands:
+
+   export CERTIFICATE=`cat newresource.crt`
+
+   tools/UpdateDB "INSERT INTO active_resources SET resource_name=
+              'user@newresource.somewere.org',project_server=0, url=
+              'user@newresource.somewere.org', client_certificate=
+              '$CERTIFICATE\n'" -u examplemysqluser -p exampleprojectname
 
 Beware, if you have password protected the account for user examplemysqluser
 in MySQL, you need to type in your password twice with this UpdateDB script.

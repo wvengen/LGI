@@ -1,1 +1,5 @@
 Deny from all
+<Files "repository_content.php">
+       SSLRequireSSL
+       Allow from all
+</Files>
