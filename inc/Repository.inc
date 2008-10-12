@@ -11,7 +11,7 @@
 // []--------------------------------------------------------[]
 //
 //
-// Copyright (C) 2007 M.F. Somers, Theoretical Chemistry Group, Leiden University
+// Copyright (C) 2008 M.F. Somers, Theoretical Chemistry Group, Leiden University
 //
 // This is free software; you can redistribute it and/or modify it under the terms of
 // the GNU General Public License as published by the Free Software Foundation.
