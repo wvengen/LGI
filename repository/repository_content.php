@@ -24,7 +24,7 @@
   if( isset( $_GET[ "repository" ] ) )
    $Repository = $_GET[ "repository" ];
 
-  if( isset( $Repository ) && is_dir( escapeshellcmd( $Repository ) ) )
+  if( isset( $Repository ) && is_dir( "./".escapeshellcmd( $Repository ) ) )
   {
    $Find = "find ./".escapeshellcmd( $Repository )." -type f -printf '<file name=\"%P\"> <size> %s </size> <date> %T@ </date> </file> '";
    $Content = shell_exec( $Find ); 
