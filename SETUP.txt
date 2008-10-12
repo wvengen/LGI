@@ -230,13 +230,11 @@ and be your own X.509 CA.
   Make sure you have an .htaccess file in the '/var/www/html/LGI/repository'
   directory with the content:
 
-  <Directory "/var/www/html/LGI/repository">
-         Deny from all
-         <Files "repository_content.php">
-              SSLRequireSSL
-              Allow from all
-         </Files>
-  </Directory>
+  Deny from all
+  <Files "repository_content.php">
+        SSLRequireSSL
+        Allow from all
+  </Files>
 
   Make sure you also have an 'index.html' file in the above repository
   directory with the content:
