@@ -1,5 +1,7 @@
 #!/bin/bash
-export LGI_ROOT=${HOME}/temp/LGI/daemon
+export LGI_ROOT=${HOME}/LGI/daemon
+
+. ${HOME}/.profile > /dev/null
 
 if [ -f ${LGI_ROOT}/LGI.pid ]
 then
@@ -7,10 +9,10 @@ then
  PID=`tail -n1 ${LGI_ROOT}/LGI.pid`
  SPID=`ps -p ${PID} -o pid=`
 
- echo Checking for PID ${PID}...
  if [ "${SPID}" == "" ]
  then
-    echo "LGI daemon not running anymore, restarting..."
+    DATE=`date`
+    echo "At ${DATE} the LGI daemon was not running anymore, restarting..."
     if [ -f ${LGI_ROOT}/LGI.log ]
     then
        DATE=`date +%s`
@@ -18,8 +20,6 @@ then
     fi
     ${LGI_ROOT}/bin/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
     ps -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
- else
-    echo "LGI daemon still running..."
  fi
 
 else

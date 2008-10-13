@@ -30,7 +30,7 @@ if ( \${REPOSITORY} != "" ) then
 
  setenv DATE \`date\`
  echo "VASP_PBS started VASP on node \${NODES} at \${DATE}." 
- mpiexec /home/mark/VASP/Vasp.4.6/vasp > VASP.output 
+ mpiexec /home/${USER}/VASP/Vasp.4.6/vasp > VASP.output 
 
  setenv DATE \`date\`
  echo "VASP_PBS started sending back the output from \${NODES}:\${CWD} to repository \${REPOSITORY} at \${DATE}." 

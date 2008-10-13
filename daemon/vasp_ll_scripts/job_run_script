@@ -1,0 +1,73 @@
+#!/bin/csh
+
+echo $$ > running
+
+setenv LGI_DIR /home/${USER}/LGI
+setenv PRIVATE_KEY_FILE ${LGI_DIR}/certificates/huygens.key
+setenv REPOSITORY `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository; cat repository_file`
+
+setenv CWD `pwd`
+
+if ( ${REPOSITORY} != "" ) then
+ setenv DATE `date`
+ echo "VASP_LL started retrieving repository ${REPOSITORY} to ${CWD}/repository at ${DATE}." >> LGI_output
+ mkdir repository
+ scp -qBri ${PRIVATE_KEY_FILE} "${REPOSITORY}/*" repository
+
+ cat > ./ll_submit_script << END_OF_LL_SUBMIT_SCRIPT
+#@ shell = /usr/bin/csh
+#@ job_name = VASP_ll
+#@ job_type = parallel
+#@ node = 1
+#@ tasks_per_node = 8
+#@ node_usage = shared
+#@ notification = never
+#@ output = ll_output
+#@ wall_clock_limit = 24:00:00
+#@ queue
+
+cd \${LOADL_STEP_INITDIR}/repository
+
+if ( -f INCAR )
+ echo "INCAR file downloaded from repository... Ignoring input..."
+else
+ echo "No INCAR file present in repository... Using input..."
+ dos2unix -n \${LOADL_STEP_INITDIR}/LGI_input INCAR
+endif
+
+mpiexec /home/${USER}/VASP/Vasp.4.6/vasp > VASP.output
+
+END_OF_LL_SUBMIT_SCRIPT
+
+ llsubmit ll_submit_script | awk '/submitted/ { print $4 }' | cut -d'.' -f5 | cut -d '"' -f1 > ll_running
+ setenv DATE `date`
+ echo "VASP_LL created loadleveler script and submitted at ${DATE}." >> LGI_output
+ 
+ setenv ID `cat ll_running`
+ if ( "${ID}" != "" ) then
+  sleep 5
+  setenv FINISHED `llq ${ID} | grep ${ID}`
+
+  while ( "${FINISHED}" != "" )
+   sleep 300 
+   setenv FINISHED `llq ${ID} | grep ${ID}`
+  end
+
+  setenv DATE `date`
+  echo "VASP_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY} at ${DATE}." >> LGI_output
+  chmod 664 ./repository/*
+  scp -qBri ${PRIVATE_KEY_FILE} ./repository/* ${REPOSITORY}
+
+ else
+   echo "ERROR: Job could not be submitted to loadleveler." >> LGI_output
+ endif
+ 
+else
+ echo "ERROR: No repository was specified for job... Stopping..." >> LGI_output
+endif
+
+setenv DATE `date`
+echo "VASP_LL finished at ${DATE}." >> LGI_output
+rm running
+touch finished
+
