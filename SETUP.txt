@@ -176,8 +176,8 @@ and be your own X.509 CA.
   <Directory "/var/www/html/LGI/repository/JOB_*">
         php_flag engine off
         SSLRequireSSL
-        Script PUT /cgi-bin/put.cgi
-        <Limit GET PUT>
+        Script PUT /LGI/repository/put.cgi
+        <Limit GET PUT DELETE>
              Allow from all
         </Limit>
   </Directory>
@@ -187,6 +187,12 @@ and be your own X.509 CA.
          <Files "repository_content.php">
               SSLRequireSSL
               Allow from all
+         </Files>
+         <Files "put.cgi">
+              SSLRequireSSL
+              Allow from all
+              Options +ExecCGI
+              AddHandler cgi-script .cgi
          </Files>
   </Directory>
 
@@ -234,6 +240,12 @@ and be your own X.509 CA.
   <Files "repository_content.php">
         SSLRequireSSL
         Allow from all
+  </Files>
+  <Files "put.cgi">
+        SSLRequireSSL
+        Allow from all
+        Options +ExecCGI
+        AddHandler cgi-script .cgi
   </Files>
 
   Make sure you also have an 'index.html' file in the above repository

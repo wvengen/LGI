@@ -3,3 +3,9 @@ Deny from all
        SSLRequireSSL
        Allow from all
 </Files>
+<Files "put.cgi">
+       SSLRequireSSL
+       Allow from all
+       Options +ExecCGI
+       AddHandler cgi-script .cgi
+</Files>
