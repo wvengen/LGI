@@ -28,14 +28,14 @@ if ( ${REPOSITORY} != "" ) then
 
 cd \${LOADL_STEP_INITDIR}/repository
 
-if ( -f INCAR )
+if ( -f INCAR ) then
  echo "INCAR file downloaded from repository... Ignoring input..."
 else
  echo "No INCAR file present in repository... Using input..."
  dos2unix -n \${LOADL_STEP_INITDIR}/LGI_input INCAR
 endif
 
-mpiexec /home/${USER}/VASP/Vasp.4.6/vasp > VASP.output
+mpiexec -n 8 /home/${USER}/VASP/Vasp.4.6/vasp > VASP.output
 
 END_OF_LL_SUBMIT_SCRIPT
 
