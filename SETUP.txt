@@ -441,7 +441,7 @@ To insert a new resource into the database use the following commands:
    tools/UpdateDB "INSERT INTO active_resources SET resource_name=
               'user@newresource.somewere.org',project_server=0, url=
               'user@newresource.somewere.org', client_certificate=
-              '$CERTIFICATE\n'" -u examplemysqluser -p exampleprojectname
+              '$CERTIFICATE\n'" "any" -u examplemysqluser -p exampleprojectname
 
 Beware, if you have password protected the account for user examplemysqluser
 in MySQL, you need to type in your password twice with this UpdateDB script.
