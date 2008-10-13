@@ -1,7 +1,5 @@
 FLAGS=-O2
-CC=xlc++ -q32
 CC=g++
-LD=xlc++ -q32
 LD=g++
 
 # default compile run...
@@ -9,7 +7,8 @@ LD=g++
 	${CC} ${FLAGS} -c $<
 
 # some defines...
-LIBS=/usr/lib64/libcurl.so.2
+LIBS=-lcurl
+
 OBJS=logger.o resource_server_api.o xml.o csv.o hash.o binhex.o daemon_configclass.o daemon_jobclass.o daemon_mainclass.o daemon_main.o xml_main.o binhex_main.o hexbin_main.o hash_main.o csv_main.o filetransfer_main.o interface_server_api.o qstat_main.o qdel_main.o qsub_main.o
 
 # all targets...
