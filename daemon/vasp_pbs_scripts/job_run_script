@@ -1,0 +1,48 @@
+#!/bin/csh
+
+cat > ./pbs_script << END_OF_PBS_SCRIPT
+#PBS -S /bin/csh
+#PBS -l nodes=01:ppn=08
+#PBS -q small_theor
+#PBS -N VASP_pbs
+#PBS -o LGI_output
+
+setenv LGI_DIR /home/\${USER}/LGI
+setenv PRIVATE_KEY_FILE \${LGI_DIR}/certificates/mark\@harpertown.key
+setenv REPOSITORY \`\${LGI_DIR}/daemon/bin/xml repository < \${PBS_O_WORKDIR}/LGI_job_specifics\`
+
+setenv NODES \`/bin/cat \${PBS_NODEFILE}\`
+cd /scratch/\${USER}/\${PBS_JOBID}
+
+setenv CWD \`pwd\`
+
+if ( \${REPOSITORY} != "" ) then
+ setenv DATE \`date\`
+ echo "VASP_PBS started retrieving repository \${REPOSITORY} to \${NODES}:\${CWD} at \${DATE}." 
+ scp -qBri \${PRIVATE_KEY_FILE} "\${REPOSITORY}/*" .
+
+ if ( -f INCAR ) then
+  echo "INCAR was uploaded into repository... Ignoring other input..."
+ else
+  echo "Creating INCAR from input..."
+  dos2unix -n \${PBS_O_WORKDIR}/LGI_input INCAR
+ endif
+
+ setenv DATE \`date\`
+ echo "VASP_PBS started VASP on node \${NODES} at \${DATE}." 
+ mpiexec /home/mark/VASP/Vasp.4.6/vasp > VASP.output 
+
+ setenv DATE \`date\`
+ echo "VASP_PBS started sending back the output from \${NODES}:\${CWD} to repository \${REPOSITORY} at \${DATE}." 
+ chmod 664 ./*
+ scp -qBri \${PRIVATE_KEY_FILE} ./* \${REPOSITORY}
+else
+ echo "ERROR: No repository was specified for job... Stopping..."
+endif
+
+setenv DATE \`date\`
+echo "VASP_PBS finished at \${DATE}." 
+touch \${PBS_O_WORKDIR}/finished
+END_OF_PBS_SCRIPT
+
+qsub pbs_script > ./running

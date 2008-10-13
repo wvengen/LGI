@@ -1,0 +1,8 @@
+#!/bin/sh
+queued_in_small=`qstat -q small_theor | awk '/small_theor/ { print $7 }'`
+if (( $queued_in_small < 1 ))
+then
+ exit 0
+else
+ exit 1
+fi
