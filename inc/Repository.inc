@@ -139,12 +139,16 @@ function GetRepositoryContent( $RepositoryURL )
 
   if( $RepositoryArray[ 0 ] == 2 )
   {
-   $Find = "find ".$RepositoryArray[ 2 ]." -type f -printf '<file name=\"%P\"> <size> %s </size> <date> %T@ </date> </file> '";
-
    if( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" )
-    $Content = shell_exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." $RepositoryURL \"$Find\"" );
+   {
+    $Find = "find ".$RepositoryArray[ 2 ]." -type f -printf '<file name=\\\"%P\\\"> <size> %s </size> <date> %T@ </date> </file> '";
+    $Content = shell_exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." ".$RepositoryArray[ 1 ]." \"$Find\"" );
+   }
    else
+   {
+    $Find = "find ".$RepositoryArray[ 2 ]." -type f -printf '<file name=\"%P\"> <size> %s </size> <date> %T@ </date> </file> '";
     $Content = shell_exec( $Find );
+   }
   }
  }
 

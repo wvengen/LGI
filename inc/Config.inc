@@ -33,8 +33,8 @@ $Config[ "REPOSITORY_SERVER_NAME" ]   = $Config[ "SERVER_NAME" ];               
 $Config[ "REPOSITORY_URL" ]           = $Config[ "SERVER_URL" ]."/repository";   // location on web of basic interface repository for browsing purposes
 
 $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] = "";                 // the identity file to use to ssh RSA authorization to handle basic interface repository
-$Config[ "REPOSITORY_SSH_COMMAND" ]       = "/usr/bin/ssh -o UserKnownHostsFile='../certificates/known_hosts'";   // the default location of the ssh command
-$Config[ "REPOSITORY_SCP_COMMAND" ]       = "/usr/bin/scp -o UserKnownHostsFile='../certificates/known_hosts'";   // the default location of the scp command
+$Config[ "REPOSITORY_SSH_COMMAND" ]       = "/usr/bin/ssh -o ForwardX11='no' -o UserKnownHostsFile='../certificates/known_hosts'";   // the default location of the ssh command
+$Config[ "REPOSITORY_SCP_COMMAND" ]       = "/usr/bin/scp -o ForwardX11='no' -o UserKnownHostsFile='../certificates/known_hosts'";   // the default location of the scp command
 
 $Config[ "MYSQL_URL" ]                   = "localhost";            // where is the MySQL db and how to connect to it
 $Config[ "MYSQL_USER" ]                  = "LGI"; 
