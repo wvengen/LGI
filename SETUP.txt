@@ -331,7 +331,13 @@ and be your own X.509 CA.
   scp -qrBi user@resource.crt ./* apache@exampleserver.somewhere.org:
        /var/www/html/LGI/repository/JOB_8737832635355665737373778
 
-  Also make sure that the user apache has a valid login shell.
+  Also make sure that the user apache has a valid login shell. 
+
+  Alternitivly, the run scripts on the resources should only use the
+  LGI_filetransfer utility to upload, download and delete files from
+  repositories. With the abope setup, Apache has been configured to handle the
+  needed PUT and DELETE requests through CGI scripts located in the repository
+  subdirectory.
 
 - The last thing to do is to edit a crontab entry for the apache user
 
