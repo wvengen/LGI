@@ -64,11 +64,8 @@ following steps:
   problems. You can also edit the scripts in the mean time, only newly spawned
   jobs will be affected by these changes. 
 
-Keep in mind for a project administrator, the public key of the resource
-should be added into the /var/www/.ssh/authorized_keys file on the project
-web-server where the repository is located. Also remember that as a project
-administrator you should also include the new resource into the projects 
-database.
+Keep in mind for a project administrator, you should also include the new resource
+into the projects database. See part IV for an example.
 
 
 
@@ -317,27 +314,6 @@ and be your own X.509 CA.
   $Config[ "REPOSITORY_DIRECTORY" ] = "/var/www/html/LGI/repository";
   $Config[ "REPOSITORY_SERVER_NAME" ] = $Config[ "SERVER_NAME" ];
   $Config[ "REPOSITORY_URL" ]  = $Config[ "SERVER_URL" ]."/repository";   
-
-- Now make sure that the apache user has the home directory /var/www and that
-  a directory /var/www/.ssh exists. In this directory an authorized_keys file
-  can be created to allow access from resources to the repository. The public
-  keys for each resource can be obtained with 'ssh-keygen':
-
-  ssh-keygen -y -f user@resource.key
-
-  Now the resource can access the repository by using 'scp' and the obtained
-  X.509 client certificate:
-
-  scp -qrBi user@resource.crt ./* apache@exampleserver.somewhere.org:
-       /var/www/html/LGI/repository/JOB_8737832635355665737373778
-
-  Also make sure that the user apache has a valid login shell. 
-
-  Alternitivly, the run scripts on the resources should only use the
-  LGI_filetransfer utility to upload, download and delete files from
-  repositories. With the abope setup, Apache has been configured to handle the
-  needed PUT and DELETE requests through CGI scripts located in the repository
-  subdirectory.
 
 - The last thing to do is to edit a crontab entry for the apache user
 
