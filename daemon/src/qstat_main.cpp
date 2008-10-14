@@ -500,8 +500,8 @@ int main( int argc, char *argv[] )
      TimeStampStr = ctime( &TimeStamp );
      TimeStampStr[ 24 ] = '\0';
 
-     cout << State.substr( 6, State.length() - 7 ) << " (" << NormalizeString( Parse_XML( BinData, "size" ) ) << "b) " <<
-             TimeStampStr << " [" << TimeStamp << "]";
+     cout << State.substr( 6, State.length() - 7 ) << " " << NormalizeString( Parse_XML( BinData, "size" ) ) << 
+             " " << TimeStampStr << " [" << TimeStamp << "]";
 
      BinData = Parse_XML( Response, "file", State, Flag );
 

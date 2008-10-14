@@ -19,7 +19,7 @@
 // http://www.gnu.org/licenses/gpl.txt
 
   if( isset( $_POST[ "repository" ] ) )
-   $Respository = $_POST[ "repository" ];
+   $Repository = $_POST[ "repository" ];
 
   if( isset( $_GET[ "repository" ] ) )
    $Repository = $_GET[ "repository" ];

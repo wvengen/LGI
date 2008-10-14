@@ -19,6 +19,13 @@
 
 #include <signal.h>
 #include <sys/wait.h>
+#include <curl/curl.h>
+
+#include <string>
+#include <vector>
+#include <iostream>
+#include <iomanip>
+#include <cstdio>
 
 #include "logger.h"
 #include "resource_server_api.h"
@@ -31,18 +38,30 @@
 
 // ----------------------------------------------------------------------
 
-#define CMD_REMOVE 1
-#define CMD_MOVE   2
-#define CMD_COPY   4
-#define CMD_SERVE  8
+#define CMD_LIST       1
+#define CMD_DOWNLOAD   2
+#define CMD_UPLOAD     4
+#define CMD_DELETE     8
 
 // ----------------------------------------------------------------------
 
-int Command = CMD_SERVE, ResourceMode = 0;                   
+int Command = 0, OutputXML = 0;
 
-string KeyFile, CertificateFile, CACertificateFile, 
-       ServerURL, Project, User, Groups, SourceFile,
-       DestinationFile;
+string KeyFile, CertificateFile, CACertificateFile, RepositoryURL,
+       RepositoryServer, RepositoryDir;
+
+vector<string> FileList;
+
+// ----------------------------------------------------------------------
+
+size_t WriteToStringCallBack( void *ptr, size_t size, size_t nmemb, void *stream )
+{
+ string *PointerToString = (string *)( stream );
+
+ (*PointerToString).append( (char *)( ptr ), size * nmemb );
+
+ return( size * nmemb );
+}
 
 // ----------------------------------------------------------------------
 
@@ -60,24 +79,210 @@ string ReadLineFromFile( string FileName )
 
 void PrintHelp( char *ExeName )
 {
- cout << endl << ExeName << " [options] command" << endl << endl;
+ cout << endl << ExeName << " [options] command repository-url [files]" << endl << endl;
  cout << "commands:" << endl << endl;
- cout << "serve                          run program as server serving file transfer request jobs from a job directory." << endl;
- cout << "remove file                    remove specified file." << endl;
- cout << "move sourcefile destination    move specified file to specified destination. either source or destination needs to be local." << endl;
- cout << "copy sourcefile destination    copy specified file to specified destination. either source or destination needs to be local." << endl << endl;
+ cout << "list                           list files present in specified repository." << endl;
+ cout << "download                       download files from repository." << endl;
+ cout << "upload                         upload files to repository." << endl;
+ cout << "delete                         delete files from repository." << endl << endl;
  cout << "options:" << endl << endl;
  cout << "-h                             show this help." << endl;
+ cout << "-x                             output lists in XML format." << endl;
  cout << "-c directory                   specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
  cout << "-j jobdirectory                specify job directory to use. if not specified try current directory or specify the following options." << endl;
  cout << "-K keyfile                     specify key file." << endl;
  cout << "-C certificatefile             specify certificate file." << endl;
- cout << "-CA cacertificatefile          specify ca certificate file." << endl;
- cout << "-U user                        specify username." << endl;
- cout << "-G groups                      specify groups." << endl;
- cout << "-S serverurl                   specify project server url." << endl;
- cout << "-P project                     specify project name." << endl;
- cout << "-m                             switch user or resource mode." << endl << endl;
+ cout << "-CA cacertificatefile          specify ca certificate file." << endl << endl;
+}
+
+// ----------------------------------------------------------------------
+
+int ListRepository( void )
+{
+ string Response, File, FileData, URL = RepositoryServer + "/repository_content.php?repository=" + RepositoryDir;
+ CURL *cURLHandle = curl_easy_init();
+ int Pos, FileNr;
+ time_t TimeStamp;
+ char *TimeStampStr;
+
+ if( cURLHandle != NULL )
+ {
+  curl_easy_setopt( cURLHandle, CURLOPT_URL, URL.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLCERT, CertificateFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, &Response );
+  curl_easy_setopt( cURLHandle, CURLOPT_WRITEFUNCTION, WriteToStringCallBack );
+  CURLcode cURLResult = curl_easy_perform( cURLHandle );
+  curl_easy_cleanup( cURLHandle );
+
+  if( cURLResult != CURLE_OK )
+  {
+   cout << endl << "Error value returned from cURL request: " << cURLResult << endl << endl;
+   return( cURLResult );
+  }
+
+  if( OutputXML ) cout << Response;  
+
+  Response = NormalizeString( Parse_XML( Response, "repository_content" ) );
+
+  if( !Response.empty() )
+  {
+   FileNr = 0;
+   FileData = Parse_XML( Response, "file", File, Pos = 0 );
+
+   if( !OutputXML ) cout << endl;
+
+   do {
+    FileNr++;
+
+    if( !OutputXML )
+    {
+     TimeStamp = atoi( NormalizeString( Parse_XML( FileData, "date" ) ).c_str() );
+     TimeStampStr = ctime( &TimeStamp );
+     TimeStampStr[ 24 ] = '\0';
+
+     cout << left << setw( 32 ) << File.substr( 6, File.length() - 7 ) << " " << right << 
+             setw( 8 ) << NormalizeString( Parse_XML( FileData, "size" ) ) << " " <<
+             TimeStampStr << " [" << TimeStamp << "]" << endl;
+    }
+    else
+     cout << " <file number=\"" << FileNr << "\"> " << FileData << " <file_name> " << 
+             File.substr( 6, File.length() - 7 ) << " </file_name> </file>";
+
+
+    FileData = Parse_XML( Response, "file", File, Pos );
+
+   } while( !FileData.empty() );
+
+   if( !OutputXML ) 
+    cout << endl;
+   else
+    cout << " <number_of_files> " << FileNr << " </number_of_files>" << endl;
+  }
+ 
+
+ }
+ else
+  return( 1 );
+
+ return( 0 );
+}
+
+// ----------------------------------------------------------------------
+
+int DownLoadFilesFromRepository( void )
+{
+ CURL *cURLHandle = curl_easy_init();
+
+ if( cURLHandle != NULL )
+ {
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLCERT, CertificateFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+
+  for( int i = 0; i < FileList.size(); ++i )
+   if( !FileList[ i ].empty() )
+   {
+    FILE *TheFile = fopen( FileList[ i ].c_str(), "wb" );
+
+    if( TheFile == NULL )
+    {
+     cout << endl << "Error opening file '" <<  FileList[ i ] << "' ..." << endl;
+     continue;
+    }
+
+    string URL = RepositoryURL + "/" + FileList[ i ];
+
+    curl_easy_setopt( cURLHandle, CURLOPT_URL, URL.c_str() );
+    curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, TheFile );
+
+    CURLcode cURLResult = curl_easy_perform( cURLHandle );
+
+    if( cURLResult != CURLE_OK )
+     cout << endl << "Error downloading from '" << URL << "' ..." << endl;
+    else
+     cout << endl << "Downloaded from '" << URL << "' ..." << endl;
+
+
+    fflush( TheFile );
+    fclose( TheFile );
+   }
+
+  curl_easy_cleanup( cURLHandle );
+
+  cout << endl;
+ }
+ else
+  return( 1 );
+
+ return( 0 );
+}
+
+// ----------------------------------------------------------------------
+
+int UpLoadFilesToRepository( void )
+{
+ CURL *cURLHandle = curl_easy_init();
+
+ if( cURLHandle != NULL )
+ {
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLCERT, CertificateFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_UPLOAD, 1 );
+
+  for( int i = 0; i < FileList.size(); ++i )
+   if( !FileList[ i ].empty() )
+   {
+    FILE *TheFile = fopen( FileList[ i ].c_str(), "rb" );
+
+    if( TheFile == NULL )
+    {
+     cout << endl << "Error opening file '" <<  FileList[ i ] << "' ..." << endl;
+     continue;
+    }
+
+    fseek( TheFile, 0L, SEEK_END );
+
+    string URL = RepositoryURL + "/" + FileList[ i ];
+
+    unsigned long FileSize = ftell( TheFile );
+
+    fseek( TheFile, 0L, SEEK_SET );
+
+    curl_easy_setopt( cURLHandle, CURLOPT_URL, URL.c_str() );
+    curl_easy_setopt( cURLHandle, CURLOPT_READDATA, TheFile );
+    curl_easy_setopt( cURLHandle, CURLOPT_INFILESIZE, FileSize );
+
+    CURLcode cURLResult = curl_easy_perform( cURLHandle );
+
+    if( cURLResult != CURLE_OK )
+     cout << endl << "Error uploading to '" << URL << "' ..." << endl;
+    else
+     cout << endl << "Uploaded to '" << URL << "' ..." << endl;
+
+    fflush( TheFile );
+    fclose( TheFile );
+   }
+
+  curl_easy_cleanup( cURLHandle );
+
+  cout << endl;
+ } 
+ else
+  return( 1 );
+ 
+ return( 0 ); 
 }
 
 // ----------------------------------------------------------------------
@@ -97,29 +302,16 @@ int main( int argc, char *argv[] )
   KeyFile = Job.GetKeyFile();
   CertificateFile = Job.GetCertificateFile();
   CACertificateFile = Job.GetCACertificateFile();
-  ServerURL = Job.GetThisProjectServer();
-  Project = Job.GetProject();
-
-  ResourceMode = 1;
-  Command = CMD_SERVE;
  }
 
  // if that didn't work, try and read default config from ~/.LGI...
- if( !ResourceMode )
+ if( KeyFile.empty() | CertificateFile.empty() | CACertificateFile.empty() )
  {
   string ConfigDir = string( getenv( "HOME" ) ) + "/.LGI";
-
-  User = ReadLineFromFile( ConfigDir + "/user" );
-  Groups = ReadLineFromFile( ConfigDir + "/groups" );
-  ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
-  Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
 
   if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
   if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
   if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
-
-  ResourceMode = 0;
-  Command = 0;
  }
 
  // read passed arguments here...
@@ -142,10 +334,6 @@ int main( int argc, char *argv[] )
      KeyFile = Job.GetKeyFile();
      CertificateFile = Job.GetCertificateFile();
      CACertificateFile = Job.GetCACertificateFile();
-     ServerURL = Job.GetThisProjectServer();
-     Project = Job.GetProject();
-
-     ResourceMode = 1;
     }
     else
     {
@@ -157,15 +345,9 @@ int main( int argc, char *argv[] )
     {
      string ConfigDir = string( argv[ i ] );
 
-     if( !ReadLineFromFile( ConfigDir + "/user" ).empty() ) User = ReadLineFromFile( ConfigDir + "/user" );
-     if( !ReadLineFromFile( ConfigDir + "/groups" ).empty() ) Groups = ReadLineFromFile( ConfigDir + "/groups" );
-     if( !ReadLineFromFile( ConfigDir + "/defaultserver" ).empty() ) ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
-     if( !ReadLineFromFile( ConfigDir + "/defaultproject" ).empty() ) Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
      if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
      if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
      if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
-
-     ResourceMode = 0;
     }
     else
     {
@@ -196,116 +378,72 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-S" ) ) {
-    if( argv[ ++i ] )
-     ServerURL = string( argv[ i ] );
-    else
+  } else if( !strcmp( argv[ i ], "-x" ) ) {
+    OutputXML = 1;
+  } else if( !strcmp( argv[ i ], "list" ) ) {
+    if( Command )
     {
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-P" ) ) {
-    if( argv[ ++i ] )
-     Project = string( argv[ i ] );
-    else
+    Command = CMD_LIST;
+  } else if( !strcmp( argv[ i ], "download" ) ) {
+    if( Command )
     {
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-U" ) ) {
-    if( argv[ ++i ] )
-    {
-     User = string( argv[ i ] );
-     ResourceMode = 0;
-    }
-    else
+    Command = CMD_DOWNLOAD;
+  } else if( !strcmp( argv[ i ], "upload" ) ) {
+    if( Command )
     {
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-G" ) ) {
-    if( argv[ ++i ] )
-    {
-     Groups = string( argv[ i ] );
-     ResourceMode = 0;
-    }
-    else
+    Command = CMD_UPLOAD;
+  } else if( !strcmp( argv[ i ], "delete" ) ) {
+    if( Command )
     {
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-m" ) ) {
-    ResourceMode = !ResourceMode;
-  } else if( !strcmp( argv[ i ], "serve" ) ) {
-    if( ResourceMode )
-     Command = CMD_SERVE;
-    else
-    {
-     PrintHelp( argv[ 0 ] );
-     return( 1 );
-    }
-  } else if( !strcmp( argv[ i ], "remove" ) ) {
-    if( argv[ ++i ] )
-    {
-     Command = CMD_REMOVE;
-     SourceFile = DestinationFile = string( argv[ i ] );
-    }
-    else
-    {
-     PrintHelp( argv[ 0 ] );
-     return( 1 );
-    }
-  } else if( !strcmp( argv[ i ], "move" ) ) {
-    if( argv[ ++i ] )
-     SourceFile = string( argv[ i ] );
-    else
-    {
-     PrintHelp( argv[ 0 ] );
-     return( 1 );
-    }
-    if( argv[ ++i ] )
-    {
-     Command = CMD_MOVE;
-     DestinationFile = string( argv[ i ] );
-    }
-    else
-    {
-     PrintHelp( argv[ 0 ] );
-     return( 1 );
-    }
-  } else if( !strcmp( argv[ i ], "copy" ) ) {
-    if( argv[ ++i ] )
-     SourceFile = string( argv[ i ] );
-    else
-    {
-     PrintHelp( argv[ 0 ] );
-     return( 1 );
-    }
-    if( argv[ ++i ] )
-    {
-     Command = CMD_COPY;
-     DestinationFile = string( argv[ i ] );
-    }
-    else
-    {
-     PrintHelp( argv[ 0 ] );
-     return( 1 );
-    }
+    Command = CMD_DELETE;
   } else {
-    PrintHelp( argv[ 0 ] );
-    return( 1 );
+    if( RepositoryURL.empty() )
+     RepositoryURL = string( argv[ i ] );
+    else
+     FileList.push_back( string( argv[ i ] ) ); 
   };
  }
 
- int Flag = 0;
+ int DirPos = 0, Flag = 0;
 
  if( KeyFile.empty() ) Flag = 1;
  if( CertificateFile.empty() ) Flag = 1;
  if( CACertificateFile.empty() ) Flag = 1;
- if( ServerURL.empty() ) Flag = 1;
- if( User.empty() && ( !ResourceMode ) ) Flag = 1;
- if( Groups.empty() && ( !ResourceMode ) ) Flag = 1;
+ if( RepositoryURL.empty() ) Flag = 1;
  if( !Command ) Flag = 1;
+ if( ( Command == CMD_LIST ) && FileList.size() ) Flag = 1;
+ if( ( Command != CMD_LIST ) && OutputXML ) Flag = 1;
+ if( ( Command != CMD_LIST ) && !FileList.size() ) Flag = 1;
+
+ if( RepositoryURL.find( "https://" ) != 0 ) 
+  Flag = 1;
+ else
+ {
+  DirPos = RepositoryURL.rfind( "/" );
+
+  if( DirPos <= 9 )
+   Flag = 1;
+  else
+  {
+   RepositoryServer = RepositoryURL.substr( 0, DirPos );
+   RepositoryDir = RepositoryURL.substr( DirPos + 1, RepositoryURL.length() - DirPos - 1);
+  }
+
+  if( RepositoryServer.empty() ) Flag = 1;
+  if( RepositoryDir.empty() ) Flag = 1;
+ }
 
  if( Flag )
  {
@@ -313,38 +451,15 @@ int main( int argc, char *argv[] )
   return( 1 );
  }
 
- // check if source and destination are okay... 
- if( ( Command & ( CMD_MOVE | CMD_COPY ) ) )
+ // Now check issued command...
+ switch( Command )
  {
-  if( ( SourceFile.find( ':' ) != string::npos ) && ( DestinationFile.find( ':' ) != string::npos ) )
-  {
-   cout << endl << "ERROR: both sourcefile and destination are remote." << endl << endl;
-   return( 1 );
-  }
-
-  if( ( SourceFile.find( ':' ) == string::npos ) && ( DestinationFile.find( ':' ) == string::npos ) )
-  {
-   cout << endl << "ERROR: both source and destination are local; use normal mv, cp or rm commands." << endl << endl;
-   return( 1 );
-  }
-
-  if( ( DestinationFile.find( ':' ) != string::npos ) && ( DestinationFile[ DestinationFile.size() - 1 ] != ':' ) )
-  {
-   cout << endl << "ERROR: destination cannot be a fully qualified remote file name." << endl << endl;
-   return( 1 );
-  }
- } 
-
- if( ( Command & ( CMD_REMOVE | CMD_MOVE | CMD_COPY ) ) && ( SourceFile[ SourceFile.size() - 1 ] == ':' ) )
- {
-  cout << endl << "ERROR: source is not a fully qualified remote file name." << endl << endl;
-  return( 1 );
+  case CMD_LIST:     return( ListRepository() );
+  case CMD_DOWNLOAD: return( DownLoadFilesFromRepository() );
+  case CMD_UPLOAD:   return( UpLoadFilesToRepository() );
+  case CMD_DELETE:   cout << "Not implemented yet..." << endl << endl;
+                     break;
  }
- 
 
- // ...
- // ...
- // ...
-
- return( 0 );
+ return( 1 );
 }
