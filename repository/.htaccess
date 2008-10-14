@@ -9,3 +9,9 @@ Deny from all
        Options +ExecCGI
        AddHandler cgi-script .cgi
 </Files>
+<Files "delete.cgi">
+       SSLRequireSSL
+       Allow from all
+       Options +ExecCGI
+       AddHandler cgi-script .cgi
+</Files>

@@ -177,6 +177,7 @@ and be your own X.509 CA.
         php_flag engine off
         SSLRequireSSL
         Script PUT /LGI/repository/put.cgi
+        Script DELETE /LGI/repository/delete.cgi
         <Limit GET PUT DELETE>
              Allow from all
         </Limit>
@@ -189,6 +190,12 @@ and be your own X.509 CA.
               Allow from all
          </Files>
          <Files "put.cgi">
+              SSLRequireSSL
+              Allow from all
+              Options +ExecCGI
+              AddHandler cgi-script .cgi
+         </Files>
+         <Files "delete.cgi">
               SSLRequireSSL
               Allow from all
               Options +ExecCGI
@@ -242,6 +249,12 @@ and be your own X.509 CA.
         Allow from all
   </Files>
   <Files "put.cgi">
+        SSLRequireSSL
+        Allow from all
+        Options +ExecCGI
+        AddHandler cgi-script .cgi
+  </Files>
+  <Files "delete.cgi">
         SSLRequireSSL
         Allow from all
         Options +ExecCGI
