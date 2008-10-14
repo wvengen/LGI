@@ -275,7 +275,10 @@ int UpLoadFilesToRepository( void )
     curl_easy_setopt( cURLHandle, CURLOPT_READDATA, TheFile );
     curl_easy_setopt( cURLHandle, CURLOPT_INFILESIZE, FileSize );
 
+    Response.clear();
+
     CURLcode cURLResult = curl_easy_perform( cURLHandle );
+
     int Status = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "status" ), "number" ) ).c_str() );
 
     if( ( cURLResult != CURLE_OK ) || ( Status != 200 ) )
@@ -327,7 +330,10 @@ int DeleteFilesFromRepository( void )
 
     curl_easy_setopt( cURLHandle, CURLOPT_URL, URL.c_str() );
 
+    Response.clear();
+
     CURLcode cURLResult = curl_easy_perform( cURLHandle );
+
     int Status = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "status" ), "number" ) ).c_str() );
 
     if( ( cURLResult != CURLE_OK ) || ( Status != 200 ) ) 
