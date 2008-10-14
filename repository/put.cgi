@@ -67,7 +67,7 @@ sub log
 {
  local($msg) = @_;
  local($stamp) = timestamp();
- open (LOG, ">> $deletelog") || return;
+ open (LOG, ">> $putlog") || return;
  print LOG "$stamp - $msg\n";
  close(LOG);
 }
