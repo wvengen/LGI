@@ -21,7 +21,7 @@ open(OUT, "> $filename") || &reply(500, "Cannot write to $filename");
 $toread = $clength;
 while ($toread > 0)
 {
-    $nread = read(STDIN, $data, $clength);
+    $nread = read(STDIN, $data, $toread);
     &reply(500, "Error reading content") if !defined($nread);
     $toread -= $nread;
     print OUT $data;
