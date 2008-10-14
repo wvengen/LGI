@@ -444,8 +444,7 @@ int main( int argc, char *argv[] )
     TimeStampStr = ctime( &TimeStamp );
     TimeStampStr[ 24 ] = '\0';
 
-    cout << Input.substr( 6, Input.length() - 7 ) << " " << NormalizeString( Parse_XML( Output, "size" ) ) << 
-            " " << TimeStampStr << " [" << TimeStamp << "]";
+    cout << Input.substr( 6, Input.length() - 7 ); 
 
     Output = Parse_XML( Response, "file", Input, Flag );
 

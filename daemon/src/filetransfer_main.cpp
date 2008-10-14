@@ -258,14 +258,14 @@ int UpLoadFilesToRepository( void )
 
     if( TheFile == NULL )
     {
-     cout << endl << "Error opening file '" <<  FileList[ i ] << "' ..." << endl;
+     cout << endl << "Error opening file '" << FileList[ i ] << "' ..." << endl;
      Flag = 1;
      continue;
     }
 
     fseek( TheFile, 0L, SEEK_END );
 
-    string URL = RepositoryURL + "/" + FileList[ i ];
+    string URL = RepositoryURL + "/" + basename( FileList[ i ].c_str() );
 
     unsigned long FileSize = ftell( TheFile );
 
