@@ -49,9 +49,20 @@ sub reply
 sub log
 {
  local($msg) = @_;
+ local($stamp) = timestamp();
  open (LOG, ">> $deletelog") || return;
- print LOG "$msg\n";
+ print LOG "$stamp - $msg\n";
  close(LOG);
 }
 
+#
+# Timestamps...
+#
+sub timestamp
+{
+ my ($y, $m, $d, $ss, $mm, $hh) = (localtime())[5,4,3,0,1,2];
+ $y += 1900;
+ $m += 1;
+ sprintf("%d/%02d/%02d %02d:%02d:%02d", $d, $m, $y, $hh, $mm, $ss);
+}
 
