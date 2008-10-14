@@ -100,10 +100,11 @@ void PrintHelp( char *ExeName )
 int ListRepository( void )
 {
  string Response, File, FileData, URL = RepositoryServer + "/repository_content.php?repository=" + RepositoryDir;
- CURL *cURLHandle = curl_easy_init();
  int Pos, FileNr;
  time_t TimeStamp;
  char *TimeStampStr;
+
+ CURL *cURLHandle = curl_easy_init();
 
  if( cURLHandle != NULL )
  {
@@ -176,6 +177,7 @@ int ListRepository( void )
 int DownLoadFilesFromRepository( void )
 {
  int Flag = 0;
+
  CURL *cURLHandle = curl_easy_init();
 
  if( cURLHandle != NULL )
@@ -232,7 +234,9 @@ int DownLoadFilesFromRepository( void )
 
 int UpLoadFilesToRepository( void )
 {
+ string Response;
  int Flag = 1;
+
  CURL *cURLHandle = curl_easy_init();
 
  if( cURLHandle != NULL )
@@ -244,6 +248,8 @@ int UpLoadFilesToRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_UPLOAD, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, &Response );
+  curl_easy_setopt( cURLHandle, CURLOPT_WRITEFUNCTION, WriteToStringCallBack );
 
   for( int i = 0; i < FileList.size(); ++i )
    if( !FileList[ i ].empty() )
@@ -270,8 +276,9 @@ int UpLoadFilesToRepository( void )
     curl_easy_setopt( cURLHandle, CURLOPT_INFILESIZE, FileSize );
 
     CURLcode cURLResult = curl_easy_perform( cURLHandle );
+    int Status = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "status" ), "number" ) ).c_str() );
 
-    if( cURLResult != CURLE_OK )
+    if( ( cURLResult != CURLE_OK ) || ( Status != 200 ) )
     {
      cout << endl << "Error uploading to '" << URL << "' ..." << endl;
      Flag = 1;
@@ -296,7 +303,9 @@ int UpLoadFilesToRepository( void )
 
 int DeleteFilesFromRepository( void )
 {
+ string Response;
  int Flag = 0;
+
  CURL *cURLHandle = curl_easy_init();
 
  if( cURLHandle != NULL )
@@ -308,6 +317,8 @@ int DeleteFilesFromRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_CUSTOMREQUEST, "DELETE" );
+  curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, &Response );
+  curl_easy_setopt( cURLHandle, CURLOPT_WRITEFUNCTION, WriteToStringCallBack );
 
   for( int i = 0; i < FileList.size(); ++i )
    if( !FileList[ i ].empty() )
@@ -317,8 +328,9 @@ int DeleteFilesFromRepository( void )
     curl_easy_setopt( cURLHandle, CURLOPT_URL, URL.c_str() );
 
     CURLcode cURLResult = curl_easy_perform( cURLHandle );
+    int Status = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "status" ), "number" ) ).c_str() );
 
-    if( cURLResult != CURLE_OK )
+    if( ( cURLResult != CURLE_OK ) || ( Status != 200 ) ) 
     {
      cout << endl << "Error deleting '" << URL << "' ..." << endl;
      Flag = 1;
