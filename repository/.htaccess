@@ -1,16 +1,19 @@
 Deny from all
 <Files "repository_content.php">
        SSLRequireSSL
+       SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
        Allow from all
 </Files>
 <Files "put.cgi">
        SSLRequireSSL
+       SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
        Allow from all
        Options +ExecCGI
        AddHandler cgi-script .cgi
 </Files>
 <Files "delete.cgi">
        SSLRequireSSL
+       SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
        Allow from all
        Options +ExecCGI
        AddHandler cgi-script .cgi

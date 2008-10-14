@@ -173,6 +173,7 @@ and be your own X.509 CA.
   <Directory "/var/www/html/LGI/repository/JOB_*">
         php_flag engine off
         SSLRequireSSL
+        SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
         Script PUT /LGI/repository/put.cgi
         Script DELETE /LGI/repository/delete.cgi
         <Limit GET PUT DELETE>
@@ -184,16 +185,19 @@ and be your own X.509 CA.
          Deny from all
          <Files "repository_content.php">
               SSLRequireSSL
+              SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
               Allow from all
          </Files>
          <Files "put.cgi">
               SSLRequireSSL
+              SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
               Allow from all
               Options +ExecCGI
               AddHandler cgi-script .cgi
          </Files>
          <Files "delete.cgi">
               SSLRequireSSL
+              SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
               Allow from all
               Options +ExecCGI
               AddHandler cgi-script .cgi
@@ -243,16 +247,19 @@ and be your own X.509 CA.
   Deny from all
   <Files "repository_content.php">
         SSLRequireSSL
+        SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
         Allow from all
   </Files>
   <Files "put.cgi">
         SSLRequireSSL
+        SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
         Allow from all
         Options +ExecCGI
         AddHandler cgi-script .cgi
   </Files>
   <Files "delete.cgi">
         SSLRequireSSL
+        SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
         Allow from all
         Options +ExecCGI
         AddHandler cgi-script .cgi
