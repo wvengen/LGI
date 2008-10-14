@@ -125,7 +125,7 @@ int ListRepository( void )
    return( cURLResult );
   }
 
-  if( OutputXML ) cout << Response;  
+  if( OutputXML ) cout << Response << endl;  
 
   Response = NormalizeString( Parse_XML( Response, "repository_content" ) );
 
@@ -163,7 +163,6 @@ int ListRepository( void )
    else
     cout << " <number_of_files> " << FileNr << " </number_of_files>" << endl;
   }
- 
 
  }
  else
@@ -176,6 +175,7 @@ int ListRepository( void )
 
 int DownLoadFilesFromRepository( void )
 {
+ int Flag = 0;
  CURL *cURLHandle = curl_easy_init();
 
  if( cURLHandle != NULL )
@@ -195,6 +195,7 @@ int DownLoadFilesFromRepository( void )
     if( TheFile == NULL )
     {
      cout << endl << "Error opening file '" <<  FileList[ i ] << "' ..." << endl;
+     Flag = 1;
      continue;
     }
 
@@ -206,10 +207,12 @@ int DownLoadFilesFromRepository( void )
     CURLcode cURLResult = curl_easy_perform( cURLHandle );
 
     if( cURLResult != CURLE_OK )
+    {
      cout << endl << "Error downloading from '" << URL << "' ..." << endl;
+     Flag = 1;
+    }
     else
      cout << endl << "Downloaded from '" << URL << "' ..." << endl;
-
 
     fflush( TheFile );
     fclose( TheFile );
@@ -222,13 +225,14 @@ int DownLoadFilesFromRepository( void )
  else
   return( 1 );
 
- return( 0 );
+ return( Flag );
 }
 
 // ----------------------------------------------------------------------
 
 int UpLoadFilesToRepository( void )
 {
+ int Flag = 1;
  CURL *cURLHandle = curl_easy_init();
 
  if( cURLHandle != NULL )
@@ -249,6 +253,7 @@ int UpLoadFilesToRepository( void )
     if( TheFile == NULL )
     {
      cout << endl << "Error opening file '" <<  FileList[ i ] << "' ..." << endl;
+     Flag = 1;
      continue;
     }
 
@@ -267,11 +272,13 @@ int UpLoadFilesToRepository( void )
     CURLcode cURLResult = curl_easy_perform( cURLHandle );
 
     if( cURLResult != CURLE_OK )
+    {
      cout << endl << "Error uploading to '" << URL << "' ..." << endl;
+     Flag = 1;
+    }
     else
      cout << endl << "Uploaded to '" << URL << "' ..." << endl;
 
-    fflush( TheFile );
     fclose( TheFile );
    }
 
@@ -282,7 +289,52 @@ int UpLoadFilesToRepository( void )
  else
   return( 1 );
  
- return( 0 ); 
+ return( Flag ); 
+}
+
+// ----------------------------------------------------------------------
+
+int DeleteFilesFromRepository( void )
+{
+ int Flag = 0;
+ CURL *cURLHandle = curl_easy_init();
+
+ if( cURLHandle != NULL )
+ {
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLCERT, CertificateFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_CUSTOMREQUEST, "DELETE" );
+
+  for( int i = 0; i < FileList.size(); ++i )
+   if( !FileList[ i ].empty() )
+   {
+    string URL = RepositoryURL + "/" + FileList[ i ];
+
+    curl_easy_setopt( cURLHandle, CURLOPT_URL, URL.c_str() );
+
+    CURLcode cURLResult = curl_easy_perform( cURLHandle );
+
+    if( cURLResult != CURLE_OK )
+    {
+     cout << endl << "Error deleting '" << URL << "' ..." << endl;
+     Flag = 1;
+    }
+    else
+     cout << endl << "Deleted '" << URL << "' ..." << endl;
+   }
+
+  curl_easy_cleanup( cURLHandle );
+
+  cout << endl;
+ }
+ else
+  return( 1 );
+
+ return( Flag );
 }
 
 // ----------------------------------------------------------------------
@@ -457,8 +509,7 @@ int main( int argc, char *argv[] )
   case CMD_LIST:     return( ListRepository() );
   case CMD_DOWNLOAD: return( DownLoadFilesFromRepository() );
   case CMD_UPLOAD:   return( UpLoadFilesToRepository() );
-  case CMD_DELETE:   cout << "Not implemented yet..." << endl << endl;
-                     break;
+  case CMD_DELETE:   return( DeleteFilesFromRepository() );
  }
 
  return( 1 );
