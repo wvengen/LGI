@@ -49,9 +49,9 @@ sub reply
 sub log
 {
  local($msg) = @_;
- local($stamp) = timestamp();
+ local($stamp) = &timestamp();
  open (LOG, ">> $deletelog") || return;
- print LOG "$stamp - $msg\n";
+ print LOG "[$stamp] $msg\n";
  close(LOG);
 }
 

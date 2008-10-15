@@ -3,6 +3,9 @@
 # A simple log file, must be writable by the user that this program runs as...
 $putlog = "put.log";
 
+# Set block size for file IO...
+$blocksize = 4096;
+
 # Check we are using PUT method...
 if ($ENV{'REQUEST_METHOD'} ne "PUT") { &reply(500, "Request method is not PUT"); }
 
@@ -12,7 +15,7 @@ if (!$filename) { &reply(500, "No PATH_TRANSLATED"); }
 
 # Check we got some content...
 $clength = $ENV{'CONTENT_LENGTH'};
-if (!$clength) { &reply(500, "Content-Length missing or zero ($clength)"); }
+if (!$clength) { &reply(500, "Content-Length missing or zero ($clength bytes)"); }
 
 # Open output file...
 open(OUT, "> $filename") || &reply(500, "Cannot write to $filename");
@@ -21,7 +24,7 @@ open(OUT, "> $filename") || &reply(500, "Cannot write to $filename");
 $toread = $clength;
 while ($toread > 0)
 {
-    $nread = read(STDIN, $data, $toread);
+    $nread = read(STDIN, $data, &min($toread, $blocksize) );
     &reply(500, "Error reading content") if !defined($nread);
     $toread -= $nread;
     print OUT $data;
@@ -31,9 +34,24 @@ while ($toread > 0)
 close(OUT);
 
 # Reply all OK...
-&reply(200, "Uploaded $filename");
+&reply(200, "Uploaded $filename ($clength bytes)");
 
 exit(0);
+
+#
+# Get minimum...
+#
+sub min
+{
+ if ($_[0] > $_[1])
+ {
+  $_[0];
+ }
+ else
+ {
+  $_[1];
+ }
+}
 
 #
 # Send back reply to client for a given status...
@@ -54,8 +72,7 @@ sub reply
  $remuser = $ENV{'REMOTE_USER'} || "-";
  $remhost = $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} || "-";
     
- $logline = "$remhost $remuser $filename status $status";
- $logline .= " ($message)" if ($status == 500);
+ $logline = "$remhost $remuser $filename status $status ($message)";
  &log($logline);
  exit(0);
 }
@@ -66,9 +83,9 @@ sub reply
 sub log
 {
  local($msg) = @_;
- local($stamp) = timestamp();
+ local($stamp) = &timestamp();
  open (LOG, ">> $putlog") || return;
- print LOG "$stamp - $msg\n";
+ print LOG "[$stamp] $msg\n";
  close(LOG);
 }
 
