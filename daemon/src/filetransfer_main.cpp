@@ -164,6 +164,8 @@ int ListRepository( void )
    else
     cout << " <number_of_files> " << FileNr << " </number_of_files>" << endl;
   }
+  else 
+   if( OutputXML ) cout << " <number_of_files> 0 </number_of_files>" << endl;
 
  }
  else
