@@ -9,17 +9,35 @@ cat > ./pbs_script << END_OF_PBS_SCRIPT
 
 setenv LGI_DIR /home/\${USER}/LGI
 setenv PRIVATE_KEY_FILE \${LGI_DIR}/certificates/mark\@harpertown.key
-setenv REPOSITORY \`\${LGI_DIR}/daemon/bin/xml repository < \${PBS_O_WORKDIR}/LGI_job_specifics\`
+
+setenv REPOSITORY_URL \`\${LGI_DIR}/daemon/bin/xml repository_url < \${PBS_O_WORKDIR}/LGI_job_specifics\`
 
 setenv NODES \`/bin/cat \${PBS_NODEFILE}\`
 cd /scratch/\${USER}/\${PBS_JOBID}
 
 setenv CWD \`pwd\`
 
-if ( \${REPOSITORY} != "" ) then
- setenv DATE \`date\`
- echo "VASP_PBS started retrieving repository \${REPOSITORY} to \${NODES}:\${CWD} at \${DATE}." 
- scp -qBri \${PRIVATE_KEY_FILE} "\${REPOSITORY}/*" .
+if ( \${REPOSITORY_URL} != "" ) then
+
+ setenv REPOSITORY_CONTENT \`\${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} -x list \${REPOSITORY_URL}\`
+
+ setenv NROFFILES \`echo \${REPOSITORY_CONTENT} | \${LGI_DIR}/daemon/bin/xml number_of_files\`
+ setenv FILE_LIST ""
+
+ foreach nr ( \`seq 1 \${NROFFILES}\` )
+    setenv FILE_ATTR  number=\\"\${nr}\\"
+    setenv FILE_DATA \`echo \${REPOSITORY_CONTENT} | \${LGI_DIR}/daemon/bin/xml file \${FILE_ATTR}\`
+    setenv FILE_NAME \`echo \${FILE_DATA} | \${LGI_DIR}/daemon/bin/xml file_name\`
+    setenv FILE_LIST "\${FILE_LIST} \${FILE_NAME}"
+ end
+
+ if ( "\${FILE_LIST}" != "" ) then
+    setenv DATE \`date\`
+    echo "VASP_PBS started retrieving repository \${REPOSITORY_URL} to \${NODES}:\${CWD} at \${DATE}." 
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${REPOSITORY_URL} \${FILE_LIST}
+ else
+    echo "No files found in repository."
+ endif
 
  if ( -f INCAR ) then
   echo "INCAR was uploaded into repository... Ignoring other input..."
@@ -29,13 +47,18 @@ if ( \${REPOSITORY} != "" ) then
  endif
 
  setenv DATE \`date\`
- echo "VASP_PBS started VASP on node \${NODES} at \${DATE}." 
- mpiexec /home/${USER}/VASP/Vasp.4.6/vasp > VASP.output 
+ echo "VASP_PBS started VASP on node \${NODES} at \${DATE}."
+ mpiexec /home/${USER}/VASP/Vasp.4.6/vasp > VASP.output
 
- setenv DATE \`date\`
- echo "VASP_PBS started sending back the output from \${NODES}:\${CWD} to repository \${REPOSITORY} at \${DATE}." 
- chmod 664 ./*
- scp -qBri \${PRIVATE_KEY_FILE} ./* \${REPOSITORY}
+ setenv FILE_LIST \`ls\`
+ if ( "\${FILE_LIST}" != "" ) then
+    setenv DATE \`date\`
+    echo "VASP_PBS started sending back the output from \${NODES}:\${CWD} to repository \${REPOSITORY_URL} at \${DATE}." 
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} ./*
+ else
+    echo "No files locally created."
+ endif
+
 else
  echo "ERROR: No repository was specified for job... Stopping..."
 endif

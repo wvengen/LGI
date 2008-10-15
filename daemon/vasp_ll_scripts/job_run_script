@@ -4,15 +4,34 @@ echo $$ > running
 
 setenv LGI_DIR /home/${USER}/LGI
 setenv PRIVATE_KEY_FILE ${LGI_DIR}/certificates/huygens.key
-setenv REPOSITORY `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository; cat repository_file`
 
+setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
 setenv CWD `pwd`
 
-if ( ${REPOSITORY} != "" ) then
- setenv DATE `date`
- echo "VASP_LL started retrieving repository ${REPOSITORY} to ${CWD}/repository at ${DATE}." >> LGI_output
+if ( ${REPOSITORY_URL} != "" ) then
  mkdir repository
- scp -qBri ${PRIVATE_KEY_FILE} "${REPOSITORY}/*" repository
+
+ ${LGI_DIR}/daemon/bin/LGI_filetransfer -x list ${REPOSITORY_URL} > repository_content
+
+ setenv NROFFILES `${LGI_DIR}/daemon/bin/xml -i repository_content -o repository_nr_of_files number_of_files; cat repository_nr_of_files`
+ setenv FILE_LIST ""
+
+ foreach nr ( `seq 1 ${NROFFILES}` )
+    setenv FILE_ATTR  number=\"${nr}\"
+    setenv FILE_DATA `${LGI_DIR}/daemon/bin/xml -i repository_content -o repository_file file ${FILE_ATTR}; cat repository_file`
+    setenv FILE_NAME `${LGI_DIR}/daemon/bin/xml -i repository_file -o repository_file_name file_name; cat repository_file_name`
+    setenv FILE_LIST "${FILE_LIST} ${FILE_NAME}"
+ end
+
+ if ( "${FILE_LIST}" != "" ) then
+   setenv DATE `date`
+   echo "VASP_LL started retrieving repository ${REPOSITORY_URL} to ${CWD}/repository at ${DATE}." >> LGI_output
+   cd repository
+   ${LGI_DIR}/daemon/bin/LGI_filetransfer download ${REPOSITORY_URL} ${FILE_LIST}
+   cd ..
+ else
+   echo "No files in repository."
+ endif
 
  cat > ./ll_submit_script << END_OF_LL_SUBMIT_SCRIPT
 #@ shell = /usr/bin/csh
@@ -53,10 +72,14 @@ END_OF_LL_SUBMIT_SCRIPT
    setenv FINISHED `llq ${ID} | grep ${ID}`
   end
 
-  setenv DATE `date`
-  echo "VASP_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY} at ${DATE}." >> LGI_output
-  chmod 664 ./repository/*
-  scp -qBri ${PRIVATE_KEY_FILE} ./repository/* ${REPOSITORY}
+  setenv FILE_LIST `ls ./repository/*`
+  if ( "${FILE_LIST}" != "" ) then
+      setenv DATE `date`
+      echo "VASP_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY_URL} at ${DATE}." >> LGI_output
+      ${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPOSITORY_URL} ./repository/*
+  else
+      echo "VASP_LL no locally created files found."
+  endif
 
  else
    echo "ERROR: Job could not be submitted to loadleveler." >> LGI_output
