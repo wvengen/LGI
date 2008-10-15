@@ -8,7 +8,6 @@ cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -o LGI_output
 
 setenv LGI_DIR /home/\${USER}/LGI
-setenv PRIVATE_KEY_FILE \${LGI_DIR}/certificates/mark\@harpertown.key
 
 setenv REPOSITORY_URL \`\${LGI_DIR}/daemon/bin/xml repository_url < \${PBS_O_WORKDIR}/LGI_job_specifics\`
 
