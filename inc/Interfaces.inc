@@ -65,8 +65,8 @@ function Interface_Verify( &$Project, $User, &$Groups, $ExitOnError = true )
  if( $CommonName != $User )
   return( LGI_Error_Response( 30, $ErrorMsgs[ 30 ], $ExitOnError ) );
 
- // check if certificate has any allowed groups listed...
- if( $CommonNameArray[ 0 ] >= 2 )
+ // check if certificate has any allowed groups and project listed...
+ if( $CommonNameArray[ 0 ] >= 3 )
  {
   // check which posted groups are allowed by the certificate list...
   $GroupArray = CommaSeparatedField2Array( $Groups, "," );
@@ -86,25 +86,26 @@ function Interface_Verify( &$Project, $User, &$Groups, $ExitOnError = true )
   
   // now only use the groups that are also allowed by the certificate...
   $Groups = substr( $NewGroupList, 2 );
- }
 
- // now check if certificate has any allowed projects listed...
- if( $CommonNameArray[ 0 ] >= 3 )
- {
-  // check if allowed...
+  // now check the allowed projects...
   if( FoundInCommaSeparatedField( $CommonNameArray[ 3 ], $Project, "," ) )
    return( Select_MySQL_DataBase( $Project, $ExitOnError ) );
   else
-    return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ], $ExitOnError ) );
+   return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ], $ExitOnError ) );
  }
- else
+
+ // check if certificate has any allowed projects listed...
+ if( $CommonNameArray[ 0 ] >= 2 )
  {
-  // otherwise just try the possibly posted Project...
-
-  return( Select_MySQL_DataBase( $Project, $ExitOnError ) );
+  // check if allowed...
+  if( FoundInCommaSeparatedField( $CommonNameArray[ 2 ], $Project, "," ) )
+   return( Select_MySQL_DataBase( $Project, $ExitOnError ) );
+  else
+   return( LGI_Error_Response( 37, $ErrorMsgs[ 37 ], $ExitOnError ) );
  }
-
- return( 0 );
+  
+ // otherwise just try the possibly posted Project...
+ return( Select_MySQL_DataBase( $Project, $ExitOnError ) );
 }
 
 // -------------------------------------------------------------------- 
