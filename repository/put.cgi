@@ -4,10 +4,17 @@
 $putlog = "put.log";
 
 # Set block size for file IO...
-$blocksize = 4096;
+$blocksize = 16384;
+
+# Set repository owners file name...
+$ownerfile = ".LGI_repository_owners";
+$ownerfile = "";
 
 # Check we are using PUT method...
 if ($ENV{'REQUEST_METHOD'} ne "PUT") { &reply(500, "Request method is not PUT"); }
+
+# Check use of SSL client certificate...
+if ($ENV{'SSL_CLIENT_VERIFY'} ne "SUCCESS") { &reply(500, "Client certificate failed"); }
 
 # Check we got a destination filename...
 $filename = $ENV{'PATH_TRANSLATED'};
@@ -17,13 +24,47 @@ if (!$filename) { &reply(500, "No PATH_TRANSLATED"); }
 $clength = $ENV{'CONTENT_LENGTH'};
 if (!$clength) { &reply(500, "Content-Length missing or zero ($clength bytes)"); }
 
+# If file specified, check owners of repository...
+if ($ownerfile) {
+
+ # Get owners fields from file...
+ ($dir,$file) = $filename =~ m|^(.*[/\\])([^/\\]+?)$|;
+ $ownersfile = $dir.$ownerfile;
+ open(OWNERS, $ownersfile) || &reply(500, "Cannot open $ownersfile file");
+ $owners = <OWNERS> || &reply(500, "Cannot read from $ownersfile file");
+ close(OWNERS);
+ @owners = &CSV2Array($owners, ",");
+
+ # Get certificate common name fields...
+ @certificate = &CSV2Array($ENV{'SSL_CLIENT_S_DN_CN'}, ";");
+ if($#certificate >= 3) {
+  @certificate = &CSV2Array( $certificate[ 0 ].", ".$certificate[ 1 ], ",");
+ }
+ else {
+  @certificate = ( $certificate[ 0 ] );
+ }
+
+ # Now check of allowed combination is found...
+ $allowed = 0;
+ foreach $o (@owners) {
+  chomp($o);
+  foreach $c (@certificate) {
+   chomp($c);
+   if($o =~ /^any$/i) { $allowed = 1; }
+   if($c =~ /^any$/i) { $allowed = 1; }
+   if($c =~ /^$o$/i) { $allowed = 1; }
+  }
+ }
+ 
+ if(!$allowed) { &reply(500, "Access to repository is denied, you are no owner"); }
+}
+
 # Open output file...
 open(OUT, "> $filename") || &reply(500, "Cannot write to $filename");
 
 # Read the content itself from stdin...
 $toread = $clength;
-while ($toread > 0)
-{
+while ($toread > 0) {
     $nread = read(STDIN, $data, &min($toread, $blocksize) );
     &reply(500, "Error reading content") if !defined($nread);
     $toread -= $nread;
@@ -43,12 +84,10 @@ exit(0);
 #
 sub min
 {
- if ($_[0] > $_[1])
- {
+ if($_[0] > $_[1]) {
   $_[0];
  }
- else
- {
+ else {
   $_[1];
  }
 }
@@ -94,9 +133,18 @@ sub log
 #
 sub timestamp
 {
- my ($y, $m, $d, $ss, $mm, $hh) = (localtime())[5,4,3,0,1,2];
+ local($y, $m, $d, $ss, $mm, $hh) = (localtime())[5,4,3,0,1,2];
  $y += 1900;
  $m += 1;
  sprintf("%d/%02d/%02d %02d:%02d:%02d", $d, $m, $y, $hh, $mm, $ss);
+}
+
+#
+# CSV2Array...
+#
+sub CSV2Array
+{
+ local($CSV, $S) = @_;
+ split(/\s*$S\s*/, $CSV)
 }
 
