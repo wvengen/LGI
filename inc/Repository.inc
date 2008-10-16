@@ -27,7 +27,7 @@ function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile 
 {
  global $Config;
 
- $RepositoryName = "JOB_".md5( uniqid( time() ) );
+ $RepositoryName = "JOB_".md5( uniqid( rand(), TRUE ) );
 
  if( ( $Config[ "REPOSITORY_SERVER_NAME" ] != "" ) && ( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" ) )
  {

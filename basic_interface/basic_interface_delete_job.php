@@ -60,10 +60,6 @@ else
 if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 58 ] );
 $Project = mysql_escape_string( $Project );
 
-// now verfiy the user using the basic browser interface... also make MySQL connection...
-$ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
-if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
-
 // check if job_id is set in request... 
 if( isset( $_GET[ "job_id" ] ) )
  $Job_ID = $_GET[ "job_id" ];
