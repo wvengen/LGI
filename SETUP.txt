@@ -171,6 +171,8 @@ and be your own X.509 CA.
   </Directory>
 
   <Directory "/var/www/html/LGI/repository/JOB_*">
+        AllowOverride None
+        Options -ExecCGI
         php_flag engine off
         SSLRequireSSL
         SSLRequire ( %{SSL_CLIENT_VERIFY} == "SUCCESS" )
@@ -280,6 +282,17 @@ and be your own X.509 CA.
   php_value post_max_size 16M
 
   Finally check your Apache configuration with the 'apachectl configtest' command.
+
+  !!!!! WORD OF CAUTION !!!!!
+
+  The above configuration of Apache seems superfluous but ensures a secure
+  environment. Please be very carefull when diverting from the above
+  suggested configuration. Web application security is a complicated matter
+  and a lot of care has been taken to ensure a secure default configuration
+  that will work out-of-the box.
+
+  !!!!! WORD OF CAUTION !!!!!
+
 
 - Now create a MySQL user and database for your project with the database
   name equal to your project name "exampleprojectname":
