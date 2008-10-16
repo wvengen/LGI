@@ -85,7 +85,7 @@ function CommaSeparatedField2Array( $Field, $Separator )
   } 
 
  // now remove possible leading spaces from all the elements in the array...
- for( $i = 1; ($i > 0) && ($i <= $Array[ 0 ]); $i++ )
+ for( $i = 1; $i <= $Array[ 0 ]; $i++ )
  {
   if( strlen( $Array[ $i ] ) != 0 )           
    while( $Array[ $i ][ 0 ] == ' ' )
