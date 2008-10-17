@@ -5,7 +5,9 @@ $deletelog = "delete.log";
 
 # Set repository owners file name...
 $ownerfile = ".LGI_repository_owners";
-$ownerfile = ""; 
+
+# Set resource list file name...
+$resourcesfile = ".LGI_resource_list";
 
 # Check we are using DELETE method...
 if ($ENV{'REQUEST_METHOD'} ne "DELETE") { &reply(500, "Request method is not DELETE"); }
@@ -17,16 +19,11 @@ if ($ENV{'SSL_CLIENT_VERIFY'} ne "SUCCESS") { &reply(500, "Client certificate fa
 $filename = $ENV{'PATH_TRANSLATED'};
 if (!$filename) { &reply(500, "No PATH_TRANSLATED"); }
 
-# If file specified, check owners of repository...
-if ($ownerfile) {
+# Do access checks if needed...
+if ($ownersfile || $resourcesfile) {
 
- # Get owners fields from file...
- ($dir,$file) = $filename =~ m|^(.*[/\\])([^/\\]+?)$|;
- $ownersfile = $dir.$ownerfile;
- open(OWNERS, $ownersfile) || &reply(500, "Cannot open $ownersfile file");
- $owners = <OWNERS> || &reply(500, "Cannot read from $ownersfile file");
- close(OWNERS);
- @owners = &CSV2Array($owners, ",");
+ # Default deny access...
+ $allowed = 0;
 
  # Get certificate common name fields...
  @certificate = &CSV2Array($ENV{'SSL_CLIENT_S_DN_CN'}, ";");
@@ -37,19 +34,52 @@ if ($ownerfile) {
   @certificate = ( $certificate[ 0 ] );
  }
 
- # Now check of allowed combination is found...
- $allowed = 0;
- foreach $o (@owners) {
-  chomp($o);
-  foreach $c (@certificate) {
-   chomp($c);
-   if($o =~ /^any$/i) { $allowed = 1; }
-   if($c =~ /^any$/i) { $allowed = 1; }
-   if($c =~ /^$o$/i) { $allowed = 1; }
+ # If file specified, check owners of repository...
+ if ($ownersfile) {
+
+  # Get owners fields from file...
+  ($dir,$file) = $filename =~ m|^(.*[/\\])([^/\\]+?)$|;
+  $ownersfile = $dir.$ownersfile;
+  open(OWNERS, $ownersfile) || &reply(500, "Cannot open $ownersfile file");
+  $owners = <OWNERS> || &reply(500, "Cannot read from $ownersfile file");
+  close(OWNERS);
+  @owners = &CSV2Array($owners, ",");
+
+  # Now check if allowed combination is found...
+  foreach $o (@owners) {
+   chomp($o);
+   foreach $c (@certificate) {
+    chomp($c);
+    if($o =~ /^any$/i) { $allowed = 1; }
+    if($c =~ /^any$/i) { $allowed = 1; }
+    if($c =~ /^$o$/i) { $allowed = 1; }
+   }
   }
  }
 
- if(!$allowed) { &reply(500, "Access to repository is denied, you are no owner"); }
+ # If file specified, check resources of project...
+ if ($resourcesfile) {
+
+  # Get owners fields from file...
+  open(RESOURCES, $resourcesfile) || &reply(500, "Cannot open $resourcesfile file");
+  $resources = <RESOURCES> || &reply(500, "Cannot read from $resourcesfile file");
+  close(RESOURCES);
+  @resources = &CSV2Array($resources, ",");
+
+  # Now check if allowed combination is found...
+  foreach $r (@resources) {
+   chomp($r);
+   foreach $c (@certificate) {
+    chomp($c);
+    if($r =~ /^any$/i) { $allowed = 1; }
+    if($c =~ /^any$/i) { $allowed = 1; }
+    if($c =~ /^$r$/i) { $allowed = 1; }
+   }
+  }
+ }
+
+ # Check if we have access...
+ if(!$allowed) { &reply(500, "Access to repository is denied, you are no owner or resource"); }
 }
 
 # Delete the file if possible...

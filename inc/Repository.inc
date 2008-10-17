@@ -23,7 +23,62 @@ require_once( '../inc/Utils.inc' );
 
 // --------------------------------------------------- 
 
-function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile )
+function CreateRepositoryResourceFile( $Resources = "" )
+{
+ global $Config;
+ 
+ if( !isset( $Resources ) || ( $Resources == "" ) ) return;
+
+ if( ( $Config[ "REPOSITORY_SERVER_NAME" ] != "" ) && ( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" ) )
+ {
+  $RepositoryURL = $Config[ "REPOSITORY_SERVER_NAME" ];
+  $RepositoryIDFile = $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ];
+ }
+ else
+ {
+  $RepositoryURL = Get_Server_Name();
+  $RepositoryIDFile = "";
+ }
+
+ if( $Config[ "REPOSITORY_DIRECTORY" ] != "" )
+  $RepositoryResourceFile = $Config[ "REPOSITORY_DIRECTORY" ]."/".$Config[ "REPOSITORY_RESOURCE_LIST_FILE" ];
+ else
+ {
+  $RepositoryResourceFile = getcwd()."/".$Config[ "REPOSITORY_RESOURCE_LIST_FILE" ];
+  $RepositoryURL = Get_Server_Name();
+  $RepositoryIDFile = "";
+ }
+
+ if( $Config[ "REPOSITORY_SSH_COMMAND" ] != "" )
+  $SSHCommand = $Config[ "REPOSITORY_SSH_COMMAND" ];
+ else
+ {
+  $RepositoryResourceFile = getcwd()."/".$Config[ "REPOSITORY_RESOURCE_LIST_FILE" ];
+  $RepositoryURL = Get_Server_Name();
+  $RepositoryIDFile = "";
+ }
+
+ if( ( $Config[ "REPOSITORY_SCP_COMMAND" ] == "" ) || ( $Config[ "REPOSITORY_URL" ] == "" ) )
+ {
+  $RepositoryResourceFile = getcwd()."/".$Config[ "REPOSITORY_RESOURCE_LIST_FILE" ];
+  $RepositoryURL = Get_Server_Name();
+  $RepositoryIDFile = "";
+ }
+
+ if( $RepositoryIDFile != "" )
+  exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"echo $Resources > $RepositoryResourceFile\"" );
+ else
+ {
+  $File = fopen( $RepositoryResourceFile, "w" );
+  fwrite( $File, $Resources );
+  fclose( $File );
+ }
+
+}
+
+// --------------------------------------------------- 
+
+function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile, $Owners = "any" )
 {
  global $Config;
 
@@ -66,13 +121,16 @@ function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile 
  }
 
  if( $RepositoryIDFile != "" )
-  exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir $RepositoryDir; chmod 770 $RepositoryDir\"" );
+  exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir $RepositoryDir; chmod 770 $RepositoryDir; echo $Owners > $RepositoryDir/.LGI_repository_owners\"" );
  else
  {
   if( !is_dir( $RepositoryDir ) )
   {
    $OldMask = umask( 0 );
    mkdir( $RepositoryDir, 0770 );
+   $File = fopen( "$RepositoryDir/.LGI_repository_owners", "w" );
+   fwrite( $File, $Owners );
+   fclose( $File );
    umask( $OldMask );
   }
  }

@@ -139,7 +139,7 @@ if( !$FoundPossibleOwner )
  return( LGI_Error_Response( 29, $ErrorMsgs[ 29 ] ) );
 
 // create a repository...
-CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile );
+CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile, $NewOwnersList );
 $RepositoryWWWURL = RepositoryURL2WWW( $RepositoryURL.":".$RepositoryDir );
 
 // now handle file uploads...

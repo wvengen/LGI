@@ -31,6 +31,7 @@ $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ]  = "../certificates/LGI+CA.crt";    
 $Config[ "REPOSITORY_DIRECTORY" ]     = "/mnt/sdb1/LGI/trunk/repository";        // location on filesystem of basic interface repository server
 $Config[ "REPOSITORY_SERVER_NAME" ]   = $Config[ "SERVER_NAME" ];                // on what server and user the basic interface repository is located 
 $Config[ "REPOSITORY_URL" ]           = $Config[ "SERVER_URL" ]."/repository";   // location on web of basic interface repository for browsing purposes
+$Config[ "REPOSITORY_RESOURCE_LIST_FILE" ] = ".LGI_resource_list";               // file with list of resources for repositories
 
 $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] = "";                 // the identity file to use to ssh RSA authorization to handle basic interface repository
 $Config[ "REPOSITORY_SSH_COMMAND" ]       = "/usr/bin/ssh -o ForwardX11='no' -o UserKnownHostsFile='../certificates/known_hosts'";   // the default location of the ssh command

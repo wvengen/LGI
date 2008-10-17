@@ -224,7 +224,7 @@ else
 }
 
 // create the job respository directory...
-CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile );
+CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile, $Owners );
 $RepositoryWWWURL = RepositoryURL2WWW( $RepositoryURL.":".$RepositoryDir );
 
 // now handle file uploads...

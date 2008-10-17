@@ -22,6 +22,7 @@ require_once( '../inc/Config.inc' );
 require_once( '../inc/Ssl.inc' );
 require_once( '../inc/Errors.inc' );
 require_once( '../inc/Response.inc' );
+require_once( '../inc/Repository.inc' );
 require_once( '../inc/MySQL.inc' );
 require_once( '../inc/Utils.inc' );
 
@@ -192,6 +193,9 @@ function Server_Check_And_Perform_Updates( )
   
  }
 
+ // now recreate the repository resource list file in case a new resource was added in an update...
+ Server_Create_Resource_List_For_Repository();
+
  return( 0 );
 }
 
@@ -249,6 +253,25 @@ function Server_Check_For_InActive_Resource_Sessions( )
  mysql_free_result( $TheSessions );
 
  return( 0 );
+}
+
+// -------------------------------------------------------------------- 
+
+function Server_Create_Resource_List_For_Repository( )
+{
+ $Resources = "";
+
+ $ListQuery = mysql_query( "SELECT resource_name FROM active_resources WHERE project_server=0" );
+
+ $NrOfResources = mysql_num_rows( $ListQuery );
+
+ for( $i = 0; $i < $NrOfResources; $i++ )
+ { 
+  $Name = mysql_fetch_object( $ListQuery );
+  $Resources .= ", ".$Name->resource_name;
+ }
+
+ CreateRepositoryResourceFile( substr( $Resources, 2 ) );
 }
 
 // -------------------------------------------------------------------- 
