@@ -349,6 +349,11 @@ You could also choose to use a different user account to setup your LGI
 project web-server. Just be sure that the user apache is part of the group the
 new user is part of too so that apache can serve the content. 
 
+If you happen to run several projects on the same server, please adapt
+the above cron_job.php file to correctly maintain all of them. This is 
+done by simply adding the project name to the array of projects as is
+demonstrated in cron_job.php.
+
 
 
 Part III : Howto setup a second slave project server 

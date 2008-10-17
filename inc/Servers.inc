@@ -193,9 +193,6 @@ function Server_Check_And_Perform_Updates( )
   
  }
 
- // now recreate the repository resource list file in case a new resource was added in an update...
- Server_Create_Resource_List_For_Repository();
-
  return( 0 );
 }
 
@@ -257,7 +254,7 @@ function Server_Check_For_InActive_Resource_Sessions( )
 
 // -------------------------------------------------------------------- 
 
-function Server_Create_Resource_List_For_Repository( )
+function Server_Resource_List_For_Repository( )
 {
  $Resources = "";
 
@@ -271,7 +268,7 @@ function Server_Create_Resource_List_For_Repository( )
   $Resources .= ", ".$Name->resource_name;
  }
 
- CreateRepositoryResourceFile( substr( $Resources, 2 ) );
+ return( substr( $Resources, 2 ) );
 }
 
 // -------------------------------------------------------------------- 
