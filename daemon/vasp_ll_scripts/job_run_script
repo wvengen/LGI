@@ -8,7 +8,6 @@ setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o reposit
 setenv CWD `pwd`
 
 if ( ${REPOSITORY_URL} != "" ) then
- mkdir repository
 
  ${LGI_DIR}/daemon/bin/LGI_filetransfer -x list ${REPOSITORY_URL} > repository_content
 
@@ -22,15 +21,18 @@ if ( ${REPOSITORY_URL} != "" ) then
     setenv FILE_LIST "${FILE_LIST} ${FILE_NAME}"
  end
 
+ mkdir repository
+ cd repository
+
  if ( "${FILE_LIST}" != "" ) then
    setenv DATE `date`
-   echo "VASP_LL started retrieving repository ${REPOSITORY_URL} to ${CWD}/repository at ${DATE}." >> LGI_output
-   cd repository
+   echo "VASP_LL started retrieving repository ${REPOSITORY_URL} to ${CWD}/repository at ${DATE}." >> ../LGI_output
    ${LGI_DIR}/daemon/bin/LGI_filetransfer -j ${CWD} download ${REPOSITORY_URL} ${FILE_LIST}
-   cd ..
  else
-   echo "No files in repository."
+   echo "No files in repository." >> ../LGI_output
  endif
+ 
+ cd ..
 
  cat > ./ll_submit_script << END_OF_LL_SUBMIT_SCRIPT
 #@ shell = /usr/bin/csh
@@ -47,9 +49,9 @@ if ( ${REPOSITORY_URL} != "" ) then
 cd \${LOADL_STEP_INITDIR}/repository
 
 if ( -f INCAR ) then
- echo "INCAR file downloaded from repository... Ignoring input..."
+ echo "INCAR file downloaded from repository... Ignoring input..." >> ../LGI_output
 else
- echo "No INCAR file present in repository... Using input..."
+ echo "No INCAR file present in repository... Using input..." >> ../LGI_output
  dos2unix -n \${LOADL_STEP_INITDIR}/LGI_input INCAR
 endif
 
@@ -75,9 +77,9 @@ END_OF_LL_SUBMIT_SCRIPT
   if ( "${FILE_LIST}" != "" ) then
       setenv DATE `date`
       echo "VASP_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY_URL} at ${DATE}." >> LGI_output
-      ${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPOSITORY_URL} ./repository/*
+      ${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPOSITORY_URL} ./repository/* > /dev/null
   else
-      echo "VASP_LL no locally created files found."
+      echo "VASP_LL no locally created files found." >> LGI_output
   endif
 
  else
