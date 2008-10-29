@@ -1,0 +1,86 @@
+#!/bin/csh
+
+cat > ./pbs_script << END_OF_PBS_SCRIPT
+#PBS -S /bin/csh
+#PBS -l nodes=01:ppn=08
+#PBS -q long_theor
+#PBS -N SA-DVR_pbs
+#PBS -o LGI_output
+
+setenv LGI_DIR /home/\${USER}/LGI
+
+setenv REPOSITORY_URL \`\${LGI_DIR}/daemon/bin/xml repository_url < \${PBS_O_WORKDIR}/LGI_job_specifics\`
+setenv RESTART_REPOSITORY_URL \`\${LGI_DIR}/daemon/bin/xml restart_repository_url < \${PBS_O_WORKDIR}/LGI_job_specifics\`
+
+setenv NODE \`hostname -f\`
+cd /scratch/\${USER}/\${PBS_JOBID}
+
+setenv CWD \`pwd\`
+
+if ( \${REPOSITORY_URL} != "" ) then
+
+ setenv REPOSITORY_CONTENT \`\${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} -x list \${REPOSITORY_URL}\`
+
+ setenv NROFFILES \`echo \${REPOSITORY_CONTENT} | \${LGI_DIR}/daemon/bin/xml number_of_files\`
+ setenv FILE_LIST ""
+
+ foreach nr ( \`seq 1 \${NROFFILES}\` )
+    setenv FILE_ATTR  number=\\"\${nr}\\"
+    setenv FILE_DATA \`echo \${REPOSITORY_CONTENT} | \${LGI_DIR}/daemon/bin/xml file \${FILE_ATTR}\`
+    setenv FILE_NAME \`echo \${FILE_DATA} | \${LGI_DIR}/daemon/bin/xml file_name\`
+    setenv FILE_LIST "\${FILE_LIST} \${FILE_NAME}"
+ end
+
+ if ( "\${FILE_LIST}" != "" ) then
+    setenv DATE \`date\`
+    echo "SA-DVR_PBS started retrieving repository \${REPOSITORY_URL} to \${NODE}:\${CWD} at \${DATE}." 
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${REPOSITORY_URL} \${FILE_LIST} > /dev/null
+ else
+    echo "No files found in repository."
+ endif
+
+ if ( \${RESTART_REPOSITORY_URL} != "" ) then
+    setenv DATE \`date\`
+    echo "SA-DVR_PBS started retrieving restart data from repository \${RESTART_REPOSITORY_URL} to \${NODE}:\${CWD} at \${DATE}." 
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${RESTART_REPOSITORY_URL} POT.dat > /dev/null
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${RESTART_REPOSITORY_URL} QOVERLAP.out > /dev/null; mv QOVERLAP.out QOVERLAP.in
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${RESTART_REPOSITORY_URL} WF.out > /dev/null; mv WF.out WF.in
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${RESTART_REPOSITORY_URL} BK.out > /dev/null; mv BK.out BK.in
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${RESTART_REPOSITORY_URL} SMATRIX.out > /dev/null; mv SMATRIX.out SMATRIX.in
+ endif
+
+ if ( -f DVR.inp ) then
+  echo "DVR.inp was uploaded into repository... Ignoring other input..."
+ else
+  echo "Creating DVR.inp from input..."
+  dos2unix -n \${PBS_O_WORKDIR}/LGI_input DVR.inp > /dev/null
+ endif
+
+ echo "Copying potential data files and executable..."
+ cp \${LGI_DIR}/daemon/SA-DVR/* .
+
+ setenv DATE \`date\`
+ echo "SA-DVR_PBS started SA-DVR on node \${NODE} at \${DATE}."
+ setenv OMP_NUM_THREADS 8
+ setenv OMP_NUM_DYNAMIC FALSE
+ ./SA-DVR.x > DVR.out
+
+ setenv FILE_LIST \`ls *.out *.dbg DVR.inp POT.dat\`
+ if ( "\${FILE_LIST}" != "" ) then
+    setenv DATE \`date\`
+    echo "SA-DVR_PBS started sending back the output from \${NODE}:\${CWD} to repository \${REPOSITORY_URL} at \${DATE}." 
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} \${FILE_LIST} > /dev/null
+ else
+    echo "No files locally created."
+ endif
+
+else
+ echo "ERROR: No repository was specified for job... Stopping..."
+endif
+
+setenv DATE \`date\`
+echo "SA-DVR_PBS finished at \${DATE}." 
+touch \${PBS_O_WORKDIR}/finished
+END_OF_PBS_SCRIPT
+
+qsub pbs_script > ./running

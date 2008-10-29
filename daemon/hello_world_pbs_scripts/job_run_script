@@ -7,9 +7,9 @@ cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -N hello_world_pbs
 #PBS -o LGI_output
 
-NODES=\`cat \${PBS_NODEFILE}\`
+NODE=\`hostname -f\`
 sleep 10
-echo -n "Hello_World_PBS running on nodes \${NODES} in directory \${PBS_O_WORKDIR} at " 
+echo -n "Hello_World_PBS running on node \${NODE} in directory \${PBS_O_WORKDIR} at " 
 sleep 20
 cat \${PBS_O_WORKDIR}/LGI_target_resources
 sleep 40

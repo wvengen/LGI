@@ -15,7 +15,7 @@ setenv LD_LIBRARY_PATH /home/g03/g03d01
 setenv g03root /home/g03/g03d01
 source /home/g03/g03d01/g03/bsd/g03.login
 
-setenv NODES \`/bin/cat \${PBS_NODEFILE}\`
+setenv NODE \`hostname -f\`
 cd /scratch/\${USER}/\${PBS_JOBID}
 
 setenv CWD \`pwd\`
@@ -36,8 +36,8 @@ if ( \${REPOSITORY_URL} != "" ) then
 
  if ( "\${FILE_LIST}" != "" ) then
     setenv DATE \`date\`
-    echo "G03_PBS started retrieving repository \${REPOSITORY_URL} to \${NODES}:\${CWD} at \${DATE}." 
-    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${REPOSITORY_URL} \${FILE_LIST}
+    echo "G03_PBS started retrieving repository \${REPOSITORY_URL} to \${NODE}:\${CWD} at \${DATE}." 
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${REPOSITORY_URL} \${FILE_LIST} > /dev/null
  else
     echo "No files found in repository."
  endif
@@ -45,14 +45,14 @@ if ( \${REPOSITORY_URL} != "" ) then
  dos2unix -n \${PBS_O_WORKDIR}/LGI_input g03.input
 
  setenv DATE \`date\`
- echo "G03_PBS started g03 on node \${NODES} at \${DATE}." 
+ echo "G03_PBS started g03 on node \${NODE} at \${DATE}." 
  g03 > g03.output < g03.input
 
  setenv FILE_LIST \`ls\`
  if ( "\${FILE_LIST}" != "" ) then
     setenv DATE \`date\`
-    echo "G03_PBS started sending back the output from \${NODES}:\${CWD} to repository \${REPOSITORY_URL} at \${DATE}." 
-    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} ./*
+    echo "G03_PBS started sending back the output from \${NODE}:\${CWD} to repository \${REPOSITORY_URL} at \${DATE}." 
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} \${FILE_LIST} > /dev/null
  else
     echo "No files locally created."
  endif

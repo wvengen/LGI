@@ -11,7 +11,7 @@ setenv LGI_DIR /home/\${USER}/LGI
 
 setenv REPOSITORY_URL \`\${LGI_DIR}/daemon/bin/xml repository_url < \${PBS_O_WORKDIR}/LGI_job_specifics\`
 
-setenv NODES \`/bin/cat \${PBS_NODEFILE}\`
+setenv NODE \`hostname -f\`
 cd /scratch/\${USER}/\${PBS_JOBID}
 
 setenv CWD \`pwd\`
@@ -32,8 +32,8 @@ if ( \${REPOSITORY_URL} != "" ) then
 
  if ( "\${FILE_LIST}" != "" ) then
     setenv DATE \`date\`
-    echo "VASP_PBS started retrieving repository \${REPOSITORY_URL} to \${NODES}:\${CWD} at \${DATE}." 
-    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${REPOSITORY_URL} \${FILE_LIST}
+    echo "VASP_PBS started retrieving repository \${REPOSITORY_URL} to \${NODE}:\${CWD} at \${DATE}." 
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${REPOSITORY_URL} \${FILE_LIST} > /dev/null
  else
     echo "No files found in repository."
  endif
@@ -46,14 +46,14 @@ if ( \${REPOSITORY_URL} != "" ) then
  endif
 
  setenv DATE \`date\`
- echo "VASP_PBS started VASP on node \${NODES} at \${DATE}."
+ echo "VASP_PBS started VASP on node \${NODE} at \${DATE}."
  mpiexec /home/${USER}/VASP/Vasp.4.6/vasp > VASP.output
 
  setenv FILE_LIST \`ls\`
  if ( "\${FILE_LIST}" != "" ) then
     setenv DATE \`date\`
-    echo "VASP_PBS started sending back the output from \${NODES}:\${CWD} to repository \${REPOSITORY_URL} at \${DATE}." 
-    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} ./*
+    echo "VASP_PBS started sending back the output from \${NODE}:\${CWD} to repository \${REPOSITORY_URL} at \${DATE}." 
+    \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} \${FILE_LIST} > /dev/null
  else
     echo "No files locally created."
  endif

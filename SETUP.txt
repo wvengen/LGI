@@ -78,8 +78,8 @@ Authority, or you can decide to be a sub project and thus be an X.509 sub-CA
 of the LGI-CA. In this part, it is shown how to become an independant project
 and be your own X.509 CA.
 
-- Make sure libcurl, PHP, MySQL, Apache and OpenSSL are installed on your
-  system.
+- Make sure libcurl, Perl, PHP, MySQL, Apache and OpenSSL are installed on 
+  your system.
 
 - Make sure MySQL is configured correctly and mysqld is running.
 
