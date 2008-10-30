@@ -70,7 +70,7 @@ endif
 
 setenv DATE \`date\`
 echo "SA-DVR_LL started SA-DVR at \${DATE}."  >> ../LGI_output
-setenv OMP_NUM_THREADS 8
+setenv OMP_NUM_THREADS 16
 setenv OMP_NUM_DYNAMIC FALSE
 ./SA-DVR.x > DVR.out
 
