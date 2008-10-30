@@ -36,7 +36,7 @@ if ( ${REPOSITORY_URL} != "" ) then
  endif
 
  if ( "${RESTART_REPOSITORY_URL}" != "" ) then
-   setenv DATE \`date\`
+   setenv DATE `date`
    echo "SA-DVR_LL started retrieving restart data from repository ${RESTART_REPOSITORY_URL} at ${DATE}."  >> ../LGI_output
    ${LGI_DIR}/daemon/bin/LGI_filetransfer -j ${CWD} download ${RESTART_REPOSITORY_URL} POT.dat > /dev/null
    ${LGI_DIR}/daemon/bin/LGI_filetransfer -j ${CWD} download ${RESTART_REPOSITORY_URL} QOVERLAP.out > /dev/null; mv QOVERLAP.out QOVERLAP.in
