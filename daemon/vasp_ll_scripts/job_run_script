@@ -27,7 +27,7 @@ if ( ${REPOSITORY_URL} != "" ) then
  if ( "${FILE_LIST}" != "" ) then
    setenv DATE `date`
    echo "VASP_LL started retrieving repository ${REPOSITORY_URL} to ${CWD}/repository at ${DATE}." >> ../LGI_output
-   ${LGI_DIR}/daemon/bin/LGI_filetransfer -j ${CWD} download ${REPOSITORY_URL} ${FILE_LIST}
+   ${LGI_DIR}/daemon/bin/LGI_filetransfer -j ${CWD} download ${REPOSITORY_URL} ${FILE_LIST} > /dev/null
  else
    echo "No files in repository." >> ../LGI_output
  endif
