@@ -1,0 +1,55 @@
+#!/usr/bin/php -q
+<?php
+
+$LGI_DIR = getcwd();
+
+chdir( "/home/boinc/Classical/html/user" );
+
+include_once( "../inc/db.inc" );
+include_once( "../inc/util.inc" );
+
+db_init();
+
+$config = get_config();
+
+$bin_dir = parse_config( $config, "<bin_dir>" );
+$download_dir = parse_config( $config, "<download_dir>" );
+$upload_dir = parse_config( $config, "<upload_dir>" );
+$template_dir = parse_config( $config, "<template_dir>" );
+$config_dir = parse_config( $config, "<project_dir>" );
+$createworkprogram = parse_config( $config, "<create_work_program>" );
+
+$extendedjobname = "LGI_classical_queue_job_".random_string();
+$extendedjobname = escapeshellcmd( $extendedjobname );
+
+$wu_template = $template_dir."/LGI_queue_classical_work_unit_template";
+$result_template = $template_dir."/LGI_queue_classical_result_unit_template";
+
+$temporaryinputfile = $extendedjobname;
+
+$command_to_submit = $bin_dir."/".$createworkprogram;
+$command_to_submit .= " -config_dir ".$config_dir;
+$command_to_submit .= " -appname classical -wu_name ".$extendedjobname;
+$command_to_submit .= " -wu_template ".$wu_template." -result_template ".$result_template;
+$command_to_submit .= " -priority 5 -batch 1 ";
+$command_to_submit .= $temporaryinputfile;
+$command_to_submit = escapeshellcmd( $command_to_submit );
+$command_to_submit = "cd ".$config_dir."; ".$command_to_submit." &> /dev/null";
+
+$temporaryinputfile = $download_dir."/".$temporaryinputfile;
+
+copy( "$LGI_DIR/LGI_input", $temporaryinputfile );
+
+system( $command_to_submit );
+
+unlink( $temporaryinputfile );
+
+chdir( $LGI_DIR );
+
+$workunit = mysql_fetch_object( mysql_query( "SELECT * FROM workunit WHERE name='".$extendedjobname."'" ) );
+
+$file = fopen( "running", "w" );
+fwrite( $file, $workunit -> id );
+fclose( $file );
+
+?>

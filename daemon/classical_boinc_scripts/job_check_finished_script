@@ -1,0 +1,79 @@
+#!/usr/bin/php -q
+<?php
+
+$LGI_HOME_DIR = "/home/boinc/LGI";
+
+$workunitid = file_get_contents( "running" );
+if( $workunitid === FALSE ) exit( 1 );
+$workunitid = intval( $workunitid );
+
+$LGI_DIR = getcwd();
+
+chdir( "/home/boinc/Classical/html/user" );
+
+include_once( "../inc/db.inc" );
+include_once( "../inc/util.inc" );
+
+$config = get_config();
+db_init();
+
+chdir( $LGI_DIR );
+
+$workunit = mysql_query( "SELECT * FROM workunit WHERE id=$workunitid" );
+if( !mysql_num_rows( $workunit ) ) exit( 0 );
+$workunit = mysql_fetch_object( $workunit );
+
+if( $workunit -> canonical_resultid || $workunit -> error_mask ) 
+{
+ // job was finished... copy back output...
+ mkdir( "$LGI_DIR/output" );
+  
+ $fanoutnr = parse_config( $config, "<uldl_dir_fanout>" );
+ $download_dir = parse_config( $config, "<download_dir>" );
+ $upload_dir = parse_config( $config, "<upload_dir>" );
+
+ $xmldoc = parse_element( $workunit -> xml_doc, "<file_info>" );
+ $filename = parse_element( $xmldoc, "<name>" );
+ $url = "$download_dir/".dechex( hexdec( substr( md5( $filename ), 1, 7 ) ) % $fanoutnr )."/$filename";
+ copy( $url, "$LGI_DIR/output/$filename.input" );
+
+ if( $workunit -> canonical_resultid )
+ {
+  $resultunit = mysql_fetch_object( mysql_query( "SELECT * FROM result WHERE id=".$workunit -> canonical_resultid ) );
+
+  $jobstderr = parse_element( $resultunit -> stderr_out, "<stderr_txt>" );
+  $file = fopen( "$LGI_DIR/output/$filename.error", "w" );
+  fwrite( $file,  $jobstderr );
+  fclose( $file );
+
+  $nroffiles = 0;
+  $cursor = 0;
+  $xmldoc = $resultunit -> xml_doc_out;
+
+  while( $tempfileinfo = parse_next_element( $xmldoc, "<file_info>", $cursor ) )
+   $outputfiles[ $nroffiles++ ] = parse_element( $tempfileinfo, "<name>" );
+ 
+  for( $index = 0; $index < $nroffiles; ++$index )
+  { 
+   $filename = $outputfiles[ $index ];
+   $url = $upload_dir."/".dechex( hexdec( substr( md5( $filename ), 1, 7 ) ) % $fanoutnr )."/".$filename;
+   copy( $url, "$LGI_DIR/output/$filename.output" );
+  }
+ }
+
+ // upload stuff to repository...
+ $specs =  file_get_contents( "$LGI_DIR/LGI_job_specifics" );
+ $repository = parse_element( $specs, "<repository_url>" );
+ if( $repository != "" ) system( "$LGI_HOME_DIR/daemon/bin/LGI_filetransfer -j $LGI_DIR upload $repository $LGI_DIR/output/*" );
+
+ // and remove from boinc DB...
+ $query = "UPDATE result SET batch=0 WHERE workunitid=".$workunit -> id;
+ mysql_query( $query );
+ $query = "UPDATE workunit SET batch=0,error_mask=error_mask|16,transition_time=".time(0)." WHERE id=".$workunit -> id;
+ mysql_query( $query );
+
+ exit( 0 );
+}
+
+exit( 1 );
+?>
