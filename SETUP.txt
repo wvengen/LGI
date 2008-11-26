@@ -41,7 +41,7 @@ following steps:
 - Edit the '~/LGI/daemon/LGI.cfg' example configuration file. It has been
   setup to run the hello_world application by just simple forking scripts.
   Other example scripts on how to use the 'hello_world' example using Torque
-  / PBS or LoadLeveler are included to in the corresponding '~LGI/daemon/
+  / PBS or LoadLeveler are included to in the corresponding '~/LGI/daemon/
   hello_world_XX_scripts' subdirectories. Please make sure you refer to
   the right LGI project server, use the correct project name and use the
   correct private key and certificate files from the '~/LGI/certificates'
