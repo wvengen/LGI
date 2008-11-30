@@ -6,6 +6,8 @@ cat > ./llsubmit_script << END_OF_LLSUBMIT_SCRIPT
 #@ job_type = serial
 #@ node_usage = shared
 #@ notification = never
+#@ node = 1
+#@ tasks_per_node = 1
 #@ output = LGI_output
 #@ wall_clock_limit = 00:15:00
 #@ queue

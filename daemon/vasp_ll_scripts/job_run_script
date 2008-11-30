@@ -5,6 +5,14 @@ echo $$ > running
 setenv LGI_DIR /home/${USER}/LGI
 
 setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
+setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; cat cpus_file`
+if ( ${CPUS} == "" ) then
+   setenv CPUS 8
+endif
+setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o walltime_file walltime; cat walltime_file`
+if ( ${WALLTIME} == "" ) then
+   setenv WALLTIME "24:00:00"
+endif
 setenv CWD `pwd`
 
 if ( ${REPOSITORY_URL} != "" ) then
@@ -39,11 +47,11 @@ if ( ${REPOSITORY_URL} != "" ) then
 #@ job_name = VASP_ll
 #@ job_type = parallel
 #@ node = 1
-#@ tasks_per_node = 8
+#@ tasks_per_node = ${CPUS}
 #@ node_usage = shared
 #@ notification = never
 #@ output = ll_output
-#@ wall_clock_limit = 24:00:00
+#@ wall_clock_limit = ${WALLTIME}
 #@ queue
 
 cd \${LOADL_STEP_INITDIR}/repository

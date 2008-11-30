@@ -3,7 +3,6 @@
 cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -S /bin/sh
 #PBS -l nodes=01:ppn=01,walltime=0:15:00
-#PBS -q small
 #PBS -N hello_world_pbs
 #PBS -o LGI_output
 

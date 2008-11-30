@@ -5,6 +5,14 @@ echo $$ > running
 setenv LGI_DIR /home/${USER}/LGI
 
 setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
+setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; cat cpus_file`
+if ( ${CPUS} == "" ) then
+   setenv CPUS 1
+endif
+setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o walltime_file walltime; cat walltime_file`
+if ( ${WALLTIME} == "" ) then
+   setenv WALLTIME "12:00:00"
+endif
 setenv CWD `pwd`
 
 if ( ${REPOSITORY_URL} != "" ) then
@@ -38,9 +46,11 @@ if ( ${REPOSITORY_URL} != "" ) then
 #@ job_name = g03_ll
 #@ job_type = serial
 #@ node_usage = shared
+#@ node = 1
+#@ tasks_per_node = ${CPUS}
 #@ notification = never
 #@ output = ll_output
-#@ wall_clock_limit = 12:00:00
+#@ wall_clock_limit = ${WALLTIME}
 #@ queue
 
 cd \${LOADL_STEP_INITDIR}/repository
