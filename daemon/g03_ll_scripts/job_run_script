@@ -5,11 +5,11 @@ echo $$ > running
 setenv LGI_DIR /home/${USER}/LGI
 
 setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
-setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; cat cpus_file`
+setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; grep -E '^([0-9]{1,2})$' cpus_file`
 if ( ${CPUS} == "" ) then
    setenv CPUS 1
 endif
-setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o walltime_file walltime; cat walltime_file`
+setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o walltime_file walltime; grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$' walltime_file`
 if ( ${WALLTIME} == "" ) then
    setenv WALLTIME "12:00:00"
 endif

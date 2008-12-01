@@ -5,8 +5,8 @@ echo $$ > running
 setenv LGI_DIR /home/${USER}/LGI
 
 setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
-setenv RESTART_REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o restart_repository_file restart_repository_url; cat restart_repository_file`
-setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; cat cpus_file`
+setenv RESTART_REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o restart_repository_file restart_repository_url; grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$' restart_repository_file`
+setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; grep -E '^([0-9]{1,2})$' cpus_file`
 if ( ${CPUS} == "" ) then
    setenv CPUS 16
 endif

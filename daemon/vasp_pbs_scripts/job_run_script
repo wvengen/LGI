@@ -1,11 +1,11 @@
 #!/bin/csh
 
 setenv LGI_DIR /home/${USER}/LGI
-setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics cpus`
+setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics cpus | grep -E '^([0-9]{1,2})$'`
 if ( ${CPUS} == "" ) then
    setenv CPUS 1
 endif
-setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics walltime`
+setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics walltime | grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$'`
 if ( ${WALLTIME} == "" ) then
    setenv WALLTIME "04:00:00"
 endif
