@@ -26,7 +26,7 @@ if( $RepoURL != "" )
 
  mkdir( "repository" );
  chdir( "repository" );
- shell_exec( "$LGI_HOME_DIR/daemon/bin/LGI_filetransfer download $RepoURL $FileList" );
+ shell_exec( "$LGI_HOME_DIR/daemon/bin/LGI_filetransfer download -j $LGI_DIR $RepoURL $FileList" );
  chdir( $LGI_DIR );
 }
 
