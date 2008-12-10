@@ -1,7 +1,37 @@
 #!/usr/bin/php -q
 <?php
 
+$LGI_HOME_DIR = "/home/boinc/LGI";
+
+include_once "$LGI_HOME_DIR/inc/Utils.inc";
+
 $LGI_DIR = getcwd();
+
+$JobSpecs = file_get_contents( "$LGI_DIR/LGI_job_specifics" );
+$RepoURL = Parse_XML( $JobSpecs, "repository_url", $Attrs );
+
+if( $RepoURL != "" )
+{
+ $RepoContent = shell_exec( "$LGI_HOME_DIR/daemon/bin/LGI_filetransfer list -x $RepoURL" );
+ $NrOfFiles = intval( Parse_XML( $RepoContent, "number_of_files", $Attrs ) );
+ $FileList = "";
+ $Pos = 0;
+
+ for( $f = 0; $f < $NrOfFiles; $f++ )
+ {
+  $FileData = Parse_XML_Extended( $RepoContent, "file", $Attr, $Pos );
+  $FileName = Parse_XML( $FileData, "file_name", $Attrs );
+  $FileList = "$FileList $FileName";
+ }
+
+ mkdir( "repository" );
+ chdir( "repository" );
+ shell_exec( "$LGI_HOME_DIR/daemon/bin/LGI_filetransfer download $RepoURL $FileList" );
+ chdir( $LGI_DIR );
+}
+
+$InputFile = "$LGI_DIR/repository/classical.in";
+if( !file_exists( $InputFile ) ) $InputFile = "$LGI_DIR/LGI_input";
 
 chdir( "/home/boinc/Classical/html/user" );
 
@@ -38,7 +68,7 @@ $command_to_submit = "cd ".$config_dir."; ".$command_to_submit." &> /dev/null";
 
 $temporaryinputfile = $download_dir."/".$temporaryinputfile;
 
-copy( "$LGI_DIR/LGI_input", $temporaryinputfile );
+copy( $InputFile, $temporaryinputfile );
 
 system( $command_to_submit );
 

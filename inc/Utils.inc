@@ -145,6 +145,14 @@ function FoundInCommaSeparatedField( $Field, $Value, $Separator )
 
 function Parse_XML( $XML, $Tag, &$Attributes )
 {
+ $StartPos = 0;
+ return( Parse_XML_Extended( $XML, $Tag, $Attributes, $StartPos ) );
+}
+
+// --------------------------------------------------- 
+
+function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
+{
  $XMLLength = strlen( $XML );
  $TagLength = strlen( $Tag );
 
@@ -152,8 +160,10 @@ function Parse_XML( $XML, $Tag, &$Attributes )
 
  if( $XMLLength <= 0 ) return( $Empty );
  if( $TagLength <= 0 ) return( $Empty );
+ if( $StartPos >= $XMLLength ) return( $Empty );
+ if( $StartPos < 0 ) return( $Empty );
 
- for( $Index = 0; $Index < $XMLLength; ++$Index )
+ for( $Index = $StartPos; $Index < $XMLLength; ++$Index )
   if( $XML[ $Index ] == '<' )
   {
 
@@ -199,6 +209,7 @@ function Parse_XML( $XML, $Tag, &$Attributes )
 
    if( $FoundTag == $Tag )
    {
+    $StartPos = $EndTagEnd + 1;
     $Attributes = substr( $XML, $AttributeStart, $AttributeEnd - $AttributeStart );
     return( substr( $XML, $AttributeEnd + 1, $EndTagStart - $AttributeEnd - 3 ) );
    }
@@ -236,7 +247,7 @@ function rmpath( $Path )
   $DirHandle = opendir( $Path );
 
   while( ( $Entry = readdir( $DirHandle ) ) !== FALSE )
-   if( $Entry[ 0 ] != "." )
+   if( ( $Entry != "." ) && ( $Entry != ".." ) )
     rmpath( $Path."/".$Entry );
 
   closedir( $DirHandle );
