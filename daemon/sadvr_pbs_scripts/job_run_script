@@ -70,7 +70,7 @@ if ( \${REPOSITORY_URL} != "" ) then
 
  setenv DATE \`date\`
  echo "SA-DVR_PBS started SA-DVR on node \${NODE} at \${DATE}."
- setenv OMP_NUM_THREADS 8
+ setenv OMP_NUM_THREADS ${CPUS}
  setenv OMP_NUM_DYNAMIC FALSE
  ./SA-DVR.x > DVR.out
 

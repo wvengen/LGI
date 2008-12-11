@@ -1,0 +1,139 @@
+#!/bin/csh
+
+echo $$ > running
+
+setenv LGI_DIR /home/${USER}/LGI
+
+setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
+setenv RESTART_REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o restart_repository_file restart_repository_url; cat restart_repository_file`
+setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; grep -E '^([0-9]{1,2})$' cpus_file`
+if ( ${CPUS} == "" ) then
+   setenv CPUS 16
+endif
+setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o walltime_file walltime; grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$' walltime_file`
+if ( ${WALLTIME} == "" ) then
+   setenv WALLTIME "96:00:00"
+endif
+setenv CWD `pwd`
+
+if ( ${REPOSITORY_URL} != "" ) then
+
+ ${LGI_DIR}/daemon/bin/LGI_filetransfer -x list ${REPOSITORY_URL} > repository_content
+
+ setenv NROFFILES `${LGI_DIR}/daemon/bin/xml -i repository_content -o repository_nr_of_files number_of_files; cat repository_nr_of_files`
+ setenv FILE_LIST ""
+
+ foreach nr ( `seq 1 ${NROFFILES}` )
+    setenv FILE_ATTR  number=\"${nr}\"
+    setenv FILE_DATA `${LGI_DIR}/daemon/bin/xml -i repository_content -o repository_file file ${FILE_ATTR}; cat repository_file`
+    setenv FILE_NAME `${LGI_DIR}/daemon/bin/xml -i repository_file -o repository_file_name file_name; cat repository_file_name`
+    setenv FILE_LIST "${FILE_LIST} ${FILE_NAME}"
+ end
+
+ if ( ${RESTART_REPOSITORY_URL} != "" ) then
+  ${LGI_DIR}/daemon/bin/LGI_filetransfer -x list ${RESTART_REPOSITORY_URL} > restart_repository_content
+
+  setenv RESTART_NROFFILES `${LGI_DIR}/daemon/bin/xml -i restart_repository_content -o restart_repository_nr_of_files number_of_files; cat restart_repository_nr_of_files`
+  setenv RESTART_FILE_LIST ""
+
+  foreach nr ( `seq 1 ${RESTART_NROFFILES}` )
+     setenv FILE_ATTR  number=\"${nr}\"
+     setenv FILE_DATA `${LGI_DIR}/daemon/bin/xml -i restart_repository_content -o restart_repository_file file ${FILE_ATTR}; cat restart_repository_file`
+     setenv FILE_NAME `${LGI_DIR}/daemon/bin/xml -i restart_repository_file -o restart_repository_file_name file_name; cat restart_repository_file_name`
+     setenv RESTART_FILE_LIST "${RESTART_FILE_LIST} ${FILE_NAME}"
+  end
+ else
+  setenv RESTART_FILE_LIST ""
+ endif
+
+ mkdir repository
+ cd repository
+
+ cp ${LGI_DIR}/daemon/SPO-DVR/* .
+
+ if ( "${RESTART_FILE_LIST}" != "" ) then
+   setenv DATE `date`
+   echo "SPO-DVR_LL started retrieving restart repository ${RESTART_REPOSITORY_URL} to ${CWD}/repository at ${DATE}." >> ../LGI_output
+   ${LGI_DIR}/daemon/bin/LGI_filetransfer -j ${CWD} download ${RESTART_REPOSITORY_URL} ${RESTART_FILE_LIST} > /dev/null
+
+   mv fort.21 fort.22
+   mv fort.9 fort.8
+ else
+   echo "No files in restart repository." >> ../LGI_output
+ endif
+
+ if ( "${FILE_LIST}" != "" ) then
+   setenv DATE `date`
+   echo "SPO-DVR_LL started retrieving repository ${REPOSITORY_URL} to ${CWD}/repository at ${DATE}." >> ../LGI_output
+   ${LGI_DIR}/daemon/bin/LGI_filetransfer -j ${CWD} download ${REPOSITORY_URL} ${FILE_LIST} > /dev/null
+ else
+   echo "No files in repository." >> ../LGI_output
+ endif
+
+ cd ..
+
+ cat > ./ll_submit_script << END_OF_LL_SUBMIT_SCRIPT
+#@ shell = /usr/bin/csh
+#@ job_name = SPO-DVR_ll
+#@ job_type = parallel
+#@ node = 1
+#@ tasks_per_node = ${CPUS}
+#@ node_usage = shared
+#@ notification = never
+#@ output = ll_output
+#@ wall_clock_limit = ${WALLTIME}
+#@ queue
+
+cd \${LOADL_STEP_INITDIR}/repository
+
+if ( -f DVR.inp ) then
+ echo "DVR.inp file downloaded from repository... Ignoring input..."  >> ../LGI_output
+else
+ echo "No DVR.inp file present in repository... Using input..."  >> ../LGI_output
+ dos2unix -n \${LOADL_STEP_INITDIR}/LGI_input DVR.inp
+endif
+
+setenv DATE \`date\`
+echo "SPO-DVR_LL started SPO-DVR at \${DATE}."  >> ../LGI_output
+setenv OMP_NUM_THREADS ${CPUS}
+setenv OMP_NUM_DYNAMIC FALSE
+./SPO-DVR.x > SPO-DVR.out
+rm SPO-DVR.x
+END_OF_LL_SUBMIT_SCRIPT
+
+ llsubmit ll_submit_script | awk '/submitted/ { print $4 }' | cut -d'.' -f5 | cut -d '"' -f1 > ll_running
+ setenv DATE `date`
+ echo "SPO-DVR_LL created loadleveler script and submitted at ${DATE}." >> LGI_output
+ 
+ setenv ID `cat ll_running`
+ if ( "${ID}" != "" ) then
+  sleep 5
+  setenv FINISHED `llq ${ID} | grep ${ID}`
+
+  while ( "${FINISHED}" != "" )
+   sleep 300 
+   setenv FINISHED `llq ${ID} | grep ${ID}`
+  end
+
+  setenv FILE_LIST `ls ./repository/*`
+  if ( "${FILE_LIST}" != "" ) then
+      setenv DATE `date`
+      echo "SPO-DVR_LL started sending back the output from ${CWD}/repository to repository ${REPOSITORY_URL} at ${DATE}." >> LGI_output
+      ${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPOSITORY_URL} ${FILE_LIST} > /dev/null
+  else
+      echo "SPO-DVR_LL no locally created files found." >> LGI_output
+  endif
+
+ else
+   echo "ERROR: Job could not be submitted to loadleveler." >> LGI_output
+ endif
+ 
+else
+ echo "ERROR: No repository was specified for job... Stopping..." >> LGI_output
+endif
+
+setenv DATE `date`
+echo "SPO-DVR_LL finished at ${DATE}." >> LGI_output
+rm running
+touch finished
+
