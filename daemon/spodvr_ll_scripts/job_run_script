@@ -49,8 +49,6 @@ if ( ${REPOSITORY_URL} != "" ) then
  mkdir repository
  cd repository
 
- cp ${LGI_DIR}/daemon/SPO-DVR/* .
-
  if ( "${RESTART_FILE_LIST}" != "" ) then
    setenv DATE `date`
    echo "SPO-DVR_LL started retrieving restart repository ${RESTART_REPOSITORY_URL} to ${CWD}/repository at ${DATE}." >> ../LGI_output
@@ -58,6 +56,7 @@ if ( ${REPOSITORY_URL} != "" ) then
 
    mv fort.21 fort.22
    mv fort.9 fort.8
+   rm SPO-DVR*.x DVR.inp .LGI_repository_owners
  else
    echo "No files in restart repository." >> ../LGI_output
  endif
@@ -69,6 +68,8 @@ if ( ${REPOSITORY_URL} != "" ) then
  else
    echo "No files in repository." >> ../LGI_output
  endif
+
+ cp ${LGI_DIR}/daemon/SPO-DVR/* .
 
  cd ..
 
