@@ -267,19 +267,23 @@ and be your own X.509 CA.
         AddHandler cgi-script .cgi
   </Files>
 
-  Make sure you also have an 'index.html' file in the above repository
-  directory with the content:
-
-  <html>
-    ! No browsing allowed !
-  </html>
-
   Make sure you have an .htaccess file in the directories
   '/var/www/html/LGI/basic_interface', '/var/www/html/LGI/interfaces' and
   '/var/www/html/LGI/resources' with the following content:
 
   php_value upload_max_filesize 16M
   php_value post_max_size 16M
+
+  Make sure you have an 'index.html' file in the subdirectories
+  '/var/www/html/LGI/repository', '/var/www/html/LGI/inc', 
+  '/var/www/html/LGI/interfaces', '/var/www/html/LGI/servers'
+  '/var/www/html/LGI/resources', '/var/www/html/LGI/daemon', 
+  '/var/www/html/LGI/tools' and '/var/www/html/LGI/certificates' 
+  with the content:
+
+  <html>
+    ! No browsing allowed !
+  </html>
 
   Finally check your Apache configuration with the 'apachectl configtest' command.
 
