@@ -87,19 +87,19 @@ if( isset( $Job_ID ) )               // we requested details on a job...
 
  Start_Table();
  Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
- Row2( "<b>Project:</b>", $Project ); 
+ Row2( "<b>Project:</b>", htmlentities( $Project ) ); 
  Row2( "<b>This project server:</b>", Get_Server_URL() ); 
  Row2( "<b>Project master server:</b>", "<a href=".Get_Master_Server_URL()."/basic_interface/index.php?project=$Project&groups=$Groups&sid=$SID>".Get_Master_Server_URL()."</a>" );
- Row2( "<b>User:</b>", $User ); 
- Row2( "<b>Groups:</b>", $Groups ); 
+ Row2( "<b>User:</b>", htmlentities( $User ) ); 
+ Row2( "<b>Groups:</b>", htmlentities( $Groups ) ); 
  Row1( "<center><font color='green' size='4'><b>Job details</b></font></center>" );
  Row2( "<b>Job ID:</b>", $Job_ID ); 
- Row2( "<b>Application:</b>", $JobSpecs -> application ); 
- Row2( "<b>State:</b>", $JobSpecs -> state ); 
+ Row2( "<b>Application:</b>", htmlentities( $JobSpecs -> application ) ); 
+ Row2( "<b>State:</b>", htmlentities( $JobSpecs -> state ) ); 
  Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_stamp )." UTC" ); 
- Row2( "<b>Owners:</b>", $JobSpecs -> owners ); 
- Row2( "<b>Read access:</b>", $JobSpecs -> read_access ); 
- Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources ); 
+ Row2( "<b>Owners:</b>", htmlentities( $JobSpecs -> owners ) ); 
+ Row2( "<b>Read access:</b>", htmlentities( $JobSpecs -> read_access ) ); 
+ Row2( "<b>Target resources:</b>", htmlentities( $JobSpecs -> target_resources ) ); 
  Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) ); 
  if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href=$RepositoryURL> $RepositoryURL </a>" ); 
  Row2( "<b>Input:</b>", nl2br( htmlentities( $JobSpecs -> input ) ) ); 
@@ -154,13 +154,13 @@ else
 
  Start_Table();
  Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
- Row2( "<b>Project:</b>", $Project ); 
+ Row2( "<b>Project:</b>", htmlentities( $Project ) ); 
  Row2( "<b>This project server:</b>", Get_Server_URL() ); 
  Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface/index.php?project=$Project&groups=$Groups&sid=$SID'>".Get_Master_Server_URL()."</a>" );
- Row2( "<b>User:</b>", $User ); 
- Row2( "<b>Groups:</b>", $Groups ); 
- Row2( "<b>Application:</b>", $Application ); 
- Row2( "<b>State:</b>", $State ); 
+ Row2( "<b>User:</b>", htmlentities( $User ) ); 
+ Row2( "<b>Groups:</b>", htmlentities( $Groups ) ); 
+ Row2( "<b>Application:</b>", htmlentities( $Application ) ); 
+ Row2( "<b>State:</b>", htmlentities( $State ) ); 
  Row2( "<b>Start index:</b>", $Start ); 
  Row2( "<b>Index limit:</b>", $Limit ); 
 

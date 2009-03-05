@@ -113,19 +113,19 @@ else
 
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
-Row2( "<b>Project:</b>", $Project ); 
+Row2( "<b>Project:</b>", htmlentities( $Project ) ); 
 Row2( "<b>This project server:</b>", Get_Server_URL() ); 
 Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface/index.php?project=$Project&groups=$Groups&sid=$SID'>".Get_Master_Server_URL()."</a>" );
-Row2( "<b>User:</b>", $User ); 
-Row2( "<b>Groups:</b>", $Groups ); 
+Row2( "<b>User:</b>", htmlentities( $User ) ); 
+Row2( "<b>Groups:</b>", htmlentities( $Groups ) ); 
 Row1( "<center><font color='green' size='4'><b>Job deleted or aborted</b></font></center>" );
 Row2( "<b>Job ID:</b>", $Job_ID );
-Row2( "<b>Application:</b>", $JobSpecs -> application );
-Row2( "<b>State:</b>", "<b>$JobState</b>" );
+Row2( "<b>Application:</b>", htmlentities( $JobSpecs -> application ) );
+Row2( "<b>State:</b>", "<b>".htmlentities( $JobState )."</b>" );
 Row2( "<b>State time stamp:</b>", "<b>".gmdate( "j M Y G:i", $JobStateTimeStamp )." UTC</b>" );
-Row2( "<b>Owners:</b>", $JobSpecs -> owners );
-Row2( "<b>Read access:</b>", $JobSpecs -> read_access );
-Row2( "<b>Target resources:</b>", $JobSpecs -> target_resources );
+Row2( "<b>Owners:</b>", htmlentities( $JobSpecs -> owners ) );
+Row2( "<b>Read access:</b>", htmlentities( $JobSpecs -> read_access ) );
+Row2( "<b>Target resources:</b>", htmlentities( $JobSpecs -> target_resources ) );
 Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) );
 End_Table();
 
