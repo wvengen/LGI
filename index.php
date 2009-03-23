@@ -14,8 +14,7 @@ $LGI_PROJECT = $Config[ "MYSQL_DEFAULT_DATABASE" ];
  style="text-decoration: underline;">L</span>eiden <span
  style="text-decoration: underline;">G</span>rid <span
  style="text-decoration: underline;">I</span>nfrastructure</h1>
-<h2 style="font-style: italic;">This is the "<?php echo $LGI_PROJECT ?>" project's
-project-server at "<?php echo $LGI_URL ?>".</h2>
+<h2 style="font-style: italic;">This is project "<?php echo $LGI_PROJECT ?>" on <?php echo $LGI_URL ?>.</h2>
 <br>
 <a href="#Main_introduction">[main]</a>
 <a href="#Screenshots">[screenshots]</a> <a href="#Documentation">[documentation]</a>
@@ -123,6 +122,9 @@ The documentation on how to setup and maintain an LGI project-server or
 an LGI resource can be found <a href="SETUP.txt">here</a>
 (ascii/text). <br>
 <br>
+The MySQL database structure can be found <a
+ href="LGI.db">here</a> (ascii/text).<br>
+<br>
 An example resource-daemon configuration file can be found <a
  href="docs/LGI.cfg">here</a> (ascii/text).<br>
 <br>
@@ -165,7 +167,7 @@ at most and typical calculations take days to weeks instead of minutes.
 Also the number of calculations was found to be small compared to the
 numbers for which other grid middleware software was designed. It
 appeared that a simple to use, easy to deploy and administrate
-middleware could be built in-house to circumvent the above issues. On
+middleware could be built in-house to circumvent the above issues. In
 short; most grid middlewares are designed for <a
  href="http://www.cs.wisc.edu/condor/htc.html">high throughput computing</a>
 rather than <a
@@ -205,7 +207,7 @@ The basic web-interface of this LGI project-server can be reached
 through <a href="<?php echo "$LGI_URL/basic_interface/index.php" ?>">this</a> link. You can
 only use the basic web-interface if you have a valid personal x509
 certificate signed by the LGI Certificate Authority of this project
-"<?php echo $LGG_PROJECT ?>". <br>
+"<?php echo $LGI_PROJECT ?>". <br>
 <br>
 To use the basic comman-line-interface, you need to <a href="#Dowload">download</a>
 the LGI software and compile it on your favourite POSIX system. Be sure
