@@ -1,0 +1,25 @@
+#!/bin/sh
+
+cat > ./pbs_script << END_OF_PBS_SCRIPT
+#PBS -S /bin/sh
+#PBS -l nodes=01:ppn=01,walltime=0:15:00
+#PBS -N hello_world_pbs
+#PBS -o LGI_output
+
+NODE=\`hostname -f\`
+sleep 10
+echo -n "Hello_World_PBS running on node \${NODE} in directory \${PBS_O_WORKDIR} at " 
+sleep 20
+cat \${PBS_O_WORKDIR}/LGI_target_resources
+sleep 40
+echo -n ". This job was submitted with input: "
+sleep 80
+cat \${PBS_O_WORKDIR}/LGI_input
+sleep 160
+echo "."
+
+touch \${PBS_O_WORKDIR}/finished
+
+END_OF_PBS_SCRIPT
+
+qsub pbs_script > ./running
