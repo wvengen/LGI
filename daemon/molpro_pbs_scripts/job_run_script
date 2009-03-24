@@ -13,7 +13,7 @@ endif
 cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -S /bin/csh
 #PBS -l nodes=01:ppn=${CPUS},walltime=${WALLTIME}
-#PBS -N TURBOMOL_pbs
+#PBS -N MOLPRO_pbs
 #PBS -o LGI_output
 
 setenv LGI_DIR /home/\${USER}/LGI
@@ -41,25 +41,25 @@ if ( \${REPOSITORY_URL} != "" ) then
 
  if ( "\${FILE_LIST}" != "" ) then
     setenv DATE \`date\`
-    echo "TURBOMOL_PBS started retrieving repository \${REPOSITORY_URL} to \${NODE}:\${CWD} at \${DATE}." 
+    echo "MOLPRO_PBS started retrieving repository \${REPOSITORY_URL} to \${NODE}:\${CWD} at \${DATE}." 
     \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} download \${REPOSITORY_URL} \${FILE_LIST} > /dev/null
  else
     echo "No files found in repository."
  endif
 
- dos2unix -n \${PBS_O_WORKDIR}/LGI_input TURBOMOL.input
+ dos2unix -n \${PBS_O_WORKDIR}/LGI_input MOLPRO.input
 
  setenv DATE \`date\`
- echo "TURBOMOL_PBS started TURBOMOL on node \${NODE} at \${DATE}."
+ echo "MOLPRO_PBS started MOLPRO on node \${NODE} at \${DATE}."
 
  setenv MOLPRO_KEY "id=leiden,date=:2038/01/17,version=:2008,mpp=32767,modules=mpp&mvXddz0FcF3QN8DS"
 
- mpiexec /home/molpro2008.1/bin/molpro.exe < TURBOMOL.input > TURBOMOL.output
+ mpiexec /home/molpro2008.1/bin/molpro.exe < MOLPRO.input > MOLPRO.output
 
  setenv FILE_LIST \`ls\`
  if ( "\${FILE_LIST}" != "" ) then
     setenv DATE \`date\`
-    echo "TURBOMOL_PBS started sending back the output from \${NODE}:\${CWD} to repository \${REPOSITORY_URL} at \${DATE}." 
+    echo "MOLPRO_PBS started sending back the output from \${NODE}:\${CWD} to repository \${REPOSITORY_URL} at \${DATE}." 
     \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} \${FILE_LIST} > /dev/null
  else
     echo "No files locally created."
@@ -70,7 +70,7 @@ else
 endif
 
 setenv DATE \`date\`
-echo "TURBOMOL_PBS finished at \${DATE}." 
+echo "MOLPRO_PBS finished at \${DATE}." 
 touch \${PBS_O_WORKDIR}/finished
 END_OF_PBS_SCRIPT
 
