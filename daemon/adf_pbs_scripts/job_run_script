@@ -7,7 +7,7 @@ if ( ${CPUS} == "" ) then
 endif
 setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics walltime | grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$'`
 if ( ${WALLTIME} == "" ) then
-   setenv WALLTIME "06:00:00"
+   setenv WALLTIME "96:00:00"
 endif
 
 cat > ./pbs_script << END_OF_PBS_SCRIPT
@@ -55,9 +55,22 @@ if ( \${REPOSITORY_URL} != "" ) then
 
  dos2unix -n \${PBS_O_WORKDIR}/LGI_input adf.input
 
+ echo "Creating and running logfile upload script on background."
+ cat > upload_log_script << END_OF_UPLOAD_SCRIPT
+     while ( 1 )
+           sleep 600
+           \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} logfile* > /dev/null
+           sleep 1200
+     end
+END_OF_UPLOAD_SCRIPT
+ /bin/csh upload_log_script &
+
  setenv DATE \`date\`
  echo "ADF_PBS started adf on node \${NODE} at \${DATE}." 
  \${ADFBIN}/adf -n ${CPUS} > adf.output < adf.input
+
+ echo "Killing background logfile upload script."
+ kill %1
 
  setenv FILE_LIST \`ls\`
  if ( "\${FILE_LIST}" != "" ) then
