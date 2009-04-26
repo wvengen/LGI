@@ -59,7 +59,8 @@ if ( \${REPOSITORY_URL} != "" ) then
  cat > upload_log_script << END_OF_UPLOAD_SCRIPT
      while ( 1 )
            sleep 600
-           \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} logfile* > /dev/null
+           cp logfile__0 logfile > /dev/null
+           \${LGI_DIR}/daemon/bin/LGI_filetransfer -j \${PBS_O_WORKDIR} upload \${REPOSITORY_URL} logfile > /dev/null
            sleep 1200
      end
 END_OF_UPLOAD_SCRIPT
@@ -71,6 +72,7 @@ END_OF_UPLOAD_SCRIPT
 
  echo "Killing background logfile upload script."
  kill %1
+ rm -f upload_log_script > /dev/null
 
  setenv FILE_LIST \`ls\`
  if ( "\${FILE_LIST}" != "" ) then
