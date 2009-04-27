@@ -22,6 +22,8 @@
 
 #include <iostream>
 #include <iomanip>
+#include <cstring>
+#include <cstdlib>
 
 #include "logger.h"
 #include "interface_server_api.h"

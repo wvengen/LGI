@@ -26,6 +26,7 @@
 #include <iostream>
 #include <iomanip>
 #include <cstdio>
+#include <cstring>
 
 #include "logger.h"
 #include "resource_server_api.h"

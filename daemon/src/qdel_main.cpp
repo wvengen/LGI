@@ -19,6 +19,8 @@
 
 #include <signal.h>
 #include <sys/wait.h>
+#include <cstring>
+#include <cstdlib>
 
 #include "logger.h"
 #include "interface_server_api.h"
