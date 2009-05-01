@@ -92,7 +92,7 @@ if( $ProjectServer != 0 )
  for( $i = 1; $i <= $Number; $i++ )
  {
   $Server = mysql_fetch_object( $ServerListQuery );
-  Row3( "<center>$Server->resource_name</center>", "<center><a href=$Server->url/basic_interface/index.php?project=$Project&groups=$Groups&sid=$SID>$Server->url</a></center>", "<center>".gmdate( "j M Y G:i", $Server->last_call_time )." UTC </center>" );
+  Row3( "<center>$Server->resource_name</center>", "<center><a href='$Server->url/basic_interface/index.php?project=$Project&groups=$Groups&sid=$SID'>$Server->url</a></center>", "<center>".gmdate( "j M Y G:i", $Server->last_call_time )." UTC </center>" );
  }
 
  mysql_free_result( $ServerListQuery );
