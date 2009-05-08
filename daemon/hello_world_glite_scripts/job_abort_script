@@ -1,0 +1,25 @@
+#!/bin/bash
+if [ -f running ]
+then
+ ID=`cat running`
+ FINISHED=`glite-wms-job-status ${ID} | grep "Current Status" | grep -E "Done|Cancelled|Cleared"`
+ if [ "$FINISHED" != "" ]
+ then
+  if [ -f aborted ]
+  then
+   exit 0
+  fi
+  if [ -f finished ]
+  then
+    exit 1
+  else
+   exit 1
+  fi
+ else
+  glite-wms-job-cancel --noint $ID &> /dev/null
+  touch aborted
+  exit 1
+ fi
+else
+ exit 1
+fi
