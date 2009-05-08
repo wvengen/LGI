@@ -1,0 +1,28 @@
+#!/bin/sh
+
+cat > ./sge_script << END_OF_SGE_SCRIPT
+#$ -S /bin/sh
+#$ -cwd
+#$ -m n
+#$ -N sge_hello
+#$ -l h_cpu=00:10:00
+#$ -o LGI_output
+
+NODE=\`hostname -f\`
+WORKDIR=\`pwd\`
+sleep 10
+echo -n "Hello_World_PBS running on node \${NODE} in directory \${WORKDIR} at " 
+sleep 20
+cat \${WORKDIR}/LGI_target_resources
+sleep 40
+echo -n ". This job was submitted with input: "
+sleep 80
+cat \${WORKDIR}/LGI_input
+sleep 160
+echo "."
+
+touch \${WORKDIR}/finished
+
+END_OF_SGE_SCRIPT
+
+qsub sge_script | cut -d" " -f 3 > ./running
