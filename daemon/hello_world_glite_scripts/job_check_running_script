@@ -2,7 +2,7 @@
 if [ -f running ]
 then
  ID=`cat running`
- FINISHED=`glite-wms-job-status ${ID} | grep "Current Status" | grep grep -E "Done|Cancelled|Cleared"`
+ FINISHED=`glite-wms-job-status ${ID} | grep "Current Status" | grep -E "Done|Cancelled|Cleared"`
  if [ "$FINISHED" != "" ]
  then
   if [ -f aborted ]
