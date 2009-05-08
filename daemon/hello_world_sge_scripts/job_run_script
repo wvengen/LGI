@@ -11,7 +11,7 @@ cat > ./sge_script << END_OF_SGE_SCRIPT
 NODE=\`hostname -f\`
 WORKDIR=\`pwd\`
 sleep 10
-echo -n "Hello_World_PBS running on node \${NODE} in directory \${WORKDIR} at " 
+echo -n "Hello_World_SGE running on node \${NODE} in directory \${WORKDIR} at " 
 sleep 20
 cat \${WORKDIR}/LGI_target_resources
 sleep 40
