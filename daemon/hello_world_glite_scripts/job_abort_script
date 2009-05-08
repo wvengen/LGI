@@ -16,8 +16,8 @@ then
    exit 1
   fi
  else
-  glite-wms-job-cancel --noint $ID &> /dev/null
   touch aborted
+  glite-wms-job-cancel --noint $ID &> /dev/null
   exit 1
  fi
 else
