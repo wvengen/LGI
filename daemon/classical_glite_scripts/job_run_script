@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# some settings...
+export CERT_PASSWD="m@rks0m3rs007"
+export VOMS="ncf"
+export LGI_DIR="${HOME}/LGI"
+
+# get repository url and download input...
+export REPO_URL=`${LGI_DIR}/daemon/bin/xml repository_url < LGI_job_specifics`
+${LGI_DIR}/daemon/bin/LGI_filetransfer download ${REPO_URL} classical.in > /dev/null
+if [ -f classical.in ]
+then
+ echo Input file classical.in has been downloaded from repository ${REPO_URL}... > LGI_output
+else
+ cp LGI_input classical.in > /dev/null
+ echo Input copied... > LGI_output
+fi
+
+# now copy executable...
+cp ${LGI_DIR}/daemon/CLASSICAL/ClassicalDynamics_Linux.x . > /dev/null
+
+# create new proxy cert for 196 hours...
+echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &> /dev/null
+
+# delegate it to the wms...
+glite-wms-job-delegate-proxy -d ${USER} &> /dev/null
+
+# create job script...
+cat > classical.submitted.sh << EOF_SCRIPT
+chmod +x ClassicalDynamics_Linux.x
+./ClassicalDynamics_Linux.x classical.in classical.out
+EOF_SCRIPT
+
+# create JDL for this job script...
+cat > classical.submitted.jdl << EOF_JDL
+type = "Job";
+jobtype = "Normal";
+executable = "/bin/bash";
+arguments = "classical.submitted.sh";
+stdoutput = "stdout";
+stderror = "stderr";
+outputsandbox = { "classical.out", "stdout", "stderr" };
+inputsandbox = { "classical.submitted.sh", "ClassicalDynamics_Linux.x", "classical.in" };
+shallowretrycount = 3;
+EOF_JDL
+
+# create and submit new job from JDL...
+glite-wms-job-submit -d ${USER} -o ${HOME}/my-glite-jobs classical.submitted.jdl | grep https | tail -1 &> ./running
+export JOB_ID=`cat ./running`
+echo Job ${JOB_ID} submitted to glite... >> LGI_output
+
+# wait until job is finished, sleep a bit...
+export JOB_STATE=""
+while [ "${JOB_STATE}" == "" ]
+do
+    sleep 300
+    export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -E "Done|Cancelled|Cleared"`
+done
+echo Job $J{OB_ID} finished, retrieving output... >> LGI_output
+
+# retrieve the output now...
+glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
+
+# send back the output to LGI server...
+${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPO_URL} ./output-files/* > /dev/null
+echo Uploaded output to repository ${REPO_URL}... >> LGI_output
+
+# and we are finished...
+touch ./finished
