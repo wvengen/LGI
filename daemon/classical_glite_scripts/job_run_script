@@ -56,7 +56,7 @@ do
     sleep 300
     export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -E "Done|Cancelled|Cleared"`
 done
-echo Job $J{OB_ID} finished, retrieving output... >> LGI_output
+echo Job ${JOB_ID} finished, retrieving output... >> LGI_output
 
 # retrieve the output now...
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
