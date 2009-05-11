@@ -7,13 +7,13 @@ then
  then
   if [ -f aborted ]
   then
-   exit 1
+   exit 0
   fi
   if [ -f finished ]
   then
    exit 1
   else
-   exit 0 
+   exit 1
   fi
  else
   exit 0
