@@ -207,10 +207,10 @@ if( isset( $_POST[ "read_access" ] ) && ( $_POST[ "read_access" ] != "" ) )
 {
  if( strlen( $_POST[ "read_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 51, $ErrorMsgs[ 51 ] ) );
- $InsertQuery .= ", read_access='".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "read_access" ], "," ) )."'";
+ $InsertQuery .= ", read_access='"$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "read_access" ], "," ) )."'";
 }
 else
- $InsertQuery .= ", read_access='".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "owners" ], "," ) )."'";
+ $InsertQuery .= ", read_access='"$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "owners" ], "," ) )."'";
 
 // insert the job into the database...
 $queryresult = mysql_query( $InsertQuery );
