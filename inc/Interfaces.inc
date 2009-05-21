@@ -275,7 +275,7 @@ function Interface_User_In_Group_Is_Allowed_To_Submit( $User, $Group, $Applicati
 
 // -------------------------------------------------------------------- 
 
-function Interface_Count_Owners_Jobs_In_Queue( $Owner, $Application, &$TotalNrOfJobs, &$NrOfRunningJobs )
+function Interface_Count_Jobs_In_Queue( $Owner, $Application, &$TotalNrOfJobs, &$NrOfRunningJobs, $SearchFor = "owners" )
 {
  
  // first escape the variables...
@@ -285,7 +285,7 @@ function Interface_Count_Owners_Jobs_In_Queue( $Owner, $Application, &$TotalNrOf
  $TheRegExpression = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
 
  // query for number of 'running' jobs in job_queue of given owner and application..
- $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE owners REGEXP '".$TheRegExpression."' AND application='".$Application."' AND ( state='running' OR state='queued' )" );
+ $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE $SearchFor REGEXP '".$TheRegExpression."' AND application='".$Application."' AND ( state='running' OR state='queued' )" );
  $querydata = mysql_fetch_object( $queryresult );
 
  $NrOfRunningJobs = $querydata -> N;
@@ -293,7 +293,7 @@ function Interface_Count_Owners_Jobs_In_Queue( $Owner, $Application, &$TotalNrOf
  mysql_free_result( $queryresult );
 
  // query for number of 'running' jobs in job_queue of given owner and application..
- $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE owners REGEXP '".$TheRegExpression."' AND application='".$Application."'" );
+ $queryresult = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue WHERE $SearchFor REGEXP '".$TheRegExpression."' AND application='".$Application."'" );
  $querydata = mysql_fetch_object( $queryresult );
 
  $TotalNrOfJobs = $querydata -> N;

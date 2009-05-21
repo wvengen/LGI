@@ -156,9 +156,9 @@ for( $i = 1; $i <= $GroupsArray[ 0 ]; $i++ )
   {
 
    if( $LimitType == 1 )          // was it a limit defined from the user tables or the group tables...
-    Interface_Count_Owners_Jobs_In_Queue( $User, $Application, $TotalNrOfJobs, $NrOfRunningJobs );
+    Interface_Count_Jobs_In_Queue( $User, $Application, $TotalNrOfJobs, $NrOfRunningJobs, "owners" );
    else
-    Interface_Count_Owners_Jobs_In_Queue( $GroupsArray[ $i ], $Application, $TotalNrOfJobs, $NrOfRunningJobs );
+    Interface_Count_Jobs_In_Queue( $GroupsArray[ $i ], $Application, $TotalNrOfJobs, $NrOfRunningJobs, "read_access" );
 
    if( $NumberOfJobsAllowed > 0 )
    {
