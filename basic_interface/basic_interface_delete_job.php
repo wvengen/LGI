@@ -40,8 +40,8 @@ else
 if( strlen( $User ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 57 ] );
 $User = mysql_escape_string( $User );
 
-// check if groups is set in request... or default to user's group...
-$Groups = $User;
+// check if groups is set in request... or default to data from cert...
+$Groups = Interface_Get_Groups_From_Common_Name( SSL_Get_Common_Name() );
 if( isset( $_GET[ "groups" ] ) )
  $Groups = $_GET[ "groups" ];
 else

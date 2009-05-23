@@ -79,6 +79,12 @@ if( isset( $_POST[ "number_of_uploaded_files" ] ) && is_numeric( $_POST[ "number
 if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )
  return( LGI_Error_Response( 17, $ErrorMsgs[ 17 ] ) );
 
+// Check if application is known...
+$QueryResult = mysql_query( "SELECT COUNT(resource_id) AS count FROM active_resources WHERE resource_capabilities LIKE '<".$Application.">'" );
+$QueryData = mysql_fetch_object( $QueryResult );
+mysql_free_result( $QueryResult);
+if( $QueryData -> count <= 0 ) return( LGI_Error_Response( 70, $ErrorMsgs[ 70 ] ) );
+
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $JobTargetResources, "," );
 

@@ -39,8 +39,8 @@ else
   $User = $_POST[ "user" ];
 if( strlen( $User ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 57 ] );
 
-// check if groups is set in request... or default to user's group...
-$Groups = $User;
+// check if groups is set in request... or default to data from cert...
+$Groups = Interface_Get_Groups_From_Common_Name( SSL_Get_Common_Name() );
 if( isset( $_GET[ "groups" ] ) )
  $Groups = $_GET[ "groups" ];
 else
@@ -66,6 +66,12 @@ else
   $Application = $_POST[ "application" ];
 if( $Application == "" ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 18 ] );
 if( strlen( $Application ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 46 ] );
+
+// Check if application is known...
+$QueryResult = mysql_query( "SELECT COUNT(resource_id) AS count FROM active_resources WHERE resource_capabilities LIKE '<".$Application.">'" );
+$QueryData = mysql_fetch_object( $QueryResult );
+mysql_free_result( $QueryResult);
+if( $QueryData -> count <= 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 70 ] );
 
 // check if target_resources was given...
 $TargetResources = "";

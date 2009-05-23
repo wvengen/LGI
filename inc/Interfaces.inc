@@ -495,4 +495,26 @@ function Interface_Found_Id_In_List( $JobIdArray, $JobId )
 
 // -------------------------------------------------------------------- 
 
+function Interface_Get_Groups_From_Common_Name( $CommonName )
+{
+ $CommonNameArray = CommaSeparatedField2Array( $CommonName, ';' );
+
+ if( $CommonNameArray[ 0 ] >= 3 )     // see if we have a group list in the cert...
+ {
+  $Groups = $CommonNameArray[ 1 ];      // by default add user's personal group into the list...
+
+  $GroupArray = CommaSeparatedField2Array( $CommonNameArray[ 2 ] , "," );
+ 
+  for( $i = 1; $i < $GroupArray[ 0 ]; $i++ )
+   if( $GroupArray[ $i ] != "any" )
+    $Groups = $Groups.", ".$GroupArray[ $i ]       // only add group if not 'any' ...
+
+  return( $Groups );
+ }
+ else
+  return( $CommonNameArray[ 1 ] );    // if not default to user name...
+}
+
+// -------------------------------------------------------------------- 
+
 ?>
