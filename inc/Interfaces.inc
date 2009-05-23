@@ -505,7 +505,7 @@ function Interface_Get_Groups_From_Common_Name( $CommonName )
 
   $GroupArray = CommaSeparatedField2Array( $CommonNameArray[ 2 ] , "," );
  
-  for( $i = 1; $i < $GroupArray[ 0 ]; $i++ )
+  for( $i = 1; $i <= $GroupArray[ 0 ]; $i++ )
    if( $GroupArray[ $i ] != "any" )
     $Groups = $Groups.", ".$GroupArray[ $i ];       // only add group if not 'any' ...
 
