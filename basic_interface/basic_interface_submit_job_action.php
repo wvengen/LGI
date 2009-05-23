@@ -67,12 +67,6 @@ else
 if( $Application == "" ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 18 ] );
 if( strlen( $Application ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 46 ] );
 
-// Check if application is known...
-$QueryResult = mysql_query( "SELECT COUNT(resource_id) AS count FROM active_resources WHERE resource_capabilities LIKE '<".$Application.">'" );
-$QueryData = mysql_fetch_object( $QueryResult );
-mysql_free_result( $QueryResult);
-if( $QueryData -> count <= 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 70 ] );
-
 // check if target_resources was given...
 $TargetResources = "";
 if( isset( $_GET[ "target_resources" ] ) )
@@ -128,6 +122,12 @@ if( $NrOfUploadedFiles < 0 ) Exit_With_Text( "ERROR: Hidden field number_of_uplo
 // now verfiy the user using the basic browser interface... also make MySQL connection...
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
+
+// Check if application is known...
+$QueryResult = mysql_query( "SELECT COUNT(resource_id) AS count FROM active_resources WHERE resource_capabilities LIKE '%<".$Application.">%'" );
+$QueryData = mysql_fetch_object( $QueryResult );
+mysql_free_result( $QueryResult);
+if( $QueryData -> count <= 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 70 ] );
 
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $TargetResources, "," );

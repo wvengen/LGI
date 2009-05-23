@@ -58,7 +58,7 @@ if( isset( $_POST[ "number_of_uploaded_files" ] ) && is_numeric( $_POST[ "number
  $NrOfUploadedFiles = $_POST[ "number_of_uploaded_files" ];
 
 // Check if application is known...
-$QueryResult = mysql_query( "SELECT COUNT(resource_id) AS count FROM active_resources WHERE resource_capabilities LIKE '<".$Application.">'" );
+$QueryResult = mysql_query( "SELECT COUNT(resource_id) AS count FROM active_resources WHERE resource_capabilities LIKE '%<".$JobApplication.">%'" );
 $QueryData = mysql_fetch_object( $QueryResult );
 mysql_free_result( $QueryResult);
 if( $QueryData -> count <= 0 ) return( LGI_Error_Response( 70, $ErrorMsgs[ 70 ] ) );
