@@ -32,6 +32,10 @@ function Resource_Verify_Session( &$ResourceData )
  global $Config;
  global $ErrorMsgs;
 
+ // check if session was verified allready...
+ if( isset( $ResourceData -> SessionVerified ) && ( $ResourceData -> SessionVerified == $ResourceData -> SessionID ) )
+  return( 0 );
+
  // check if variable was set correctly...
  if( !isset( $ResourceData -> SessionID ) || ( $ResourceData -> SessionID == "" ) || !is_numeric( $ResourceData -> SessionID ) )
   return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ] ) );
@@ -53,6 +57,9 @@ function Resource_Verify_Session( &$ResourceData )
 
  // update session_time_stamp...
  $query = mysql_query( "UPDATE running_sessions SET session_time_stamp=UNIX_TIMESTAMP() WHERE session_id=".$ResourceData->SessionID );
+
+ // mark the verification for speedup...
+ $ResourceData -> SessionVerified = $ResourceData -> SessionID;
 
  return( 0 );
 }
@@ -78,6 +85,7 @@ function Resource_Setup_Session( &$ResourceData )
 
  // and set value into structure...
  $ResourceData -> SessionID = $querydata -> session_id;
+ $ResourceData -> SessionVerified = $querydata -> session_id;
 
  return( 0 );
 }
@@ -99,6 +107,7 @@ function Resource_Kill_Session( &$ResourceData )
 
  // invalidate data in structure...
  unset( $ResourceData -> SessionID );
+ unset( $ResourceData -> SessionVerified );
 
  return( 0 );
 }
@@ -182,6 +191,7 @@ function Resource_Verify( &$Project, $SessionID = "", $Capabilities = "" )
   if( strlen( $SessionID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
    return( LGI_Error_Response( 62, $ErrorMsgs[ 62 ] ) );
   $Data -> SessionID = $SessionID;
+  unset( $Data -> SessionVerified );
  }
 
  return( $Data );
