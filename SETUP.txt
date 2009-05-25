@@ -83,7 +83,10 @@ and be your own X.509 CA.
 
 - Make sure MySQL is configured correctly and mysqld is running.
 
-- Make sure PHP is configured correctly.
+- Make sure PHP is configured correctly. It is highly recommended that you
+  also correctly instal PHP PEAR so that you can install the APC PHP PECL 
+  module too. It will enable caching of PHP bytecode from the ZEND engine
+  and enhance the PHP performance significantly.
 
 - Switch to the user apache and make sure you install the source tree
   into the home of user apache where it will be served:
