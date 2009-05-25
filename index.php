@@ -201,6 +201,7 @@ The LGI middleware source code and documentation can be downloaded from
 <br>
 <a href="#Leiden_Grid_Infrastructure">[top]</a><br>
 <br>
+<br>
 <h3><a name="Basic_interface"></a>Basic interfaces of project "<?php echo $LGI_PROJECT ?>"<br>
 </h3>
 The basic web-interface of this LGI project-server can be reached
@@ -209,7 +210,7 @@ only use the basic web-interface if you have a valid personal x509
 certificate signed by the LGI Certificate Authority of this project
 "<?php echo $LGI_PROJECT ?>". <br>
 <br>
-To use the basic comman-line-interface, you need to <a href="#Dowload">download</a>
+To use the basic command-line-interface, you need to <a href="#Dowload">download</a>
 the LGI software and compile it on your favourite POSIX system. Be sure
 you have installed libcurl too (get it from <a
  href="http://curl.haxx.se/libcurl/">http://curl.haxx.se/libcurl/</a>).
