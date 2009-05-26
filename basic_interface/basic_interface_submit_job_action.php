@@ -124,7 +124,7 @@ $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
 // Check if application is known...
-$QueryResult = mysql_query( "SELECT COUNT(resource_id) AS count FROM active_resources WHERE resource_capabilities LIKE '%<".$Application.">%'" );
+$QueryResult = mysql_query( "SELECT COUNT(resource_id) AS count FROM active_resources WHERE resource_capabilities LIKE '%<".$Application.">%</".$Application.">%'" );
 $QueryData = mysql_fetch_object( $QueryResult );
 mysql_free_result( $QueryResult);
 if( $QueryData -> count <= 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 70 ] );
