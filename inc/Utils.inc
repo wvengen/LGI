@@ -22,22 +22,17 @@
 
 function hexbin( $hex )
 {
- $HEXDIGITS = "0123456789ABCDEF";
-
- $Length = strlen( $hex );
  $bin = "";
 
+ $Length = strlen( $hex );
+
  $i = 0; 
- while( $hex[ $i ] == ' ' ) $i++;
+
+ while( ( $hex[ $i ] == ' ' ) && $i < $Length ) $i++;
 
  for( ; $i < $Length; $i += 2 )
  {
-  $HighNibble = strpos( $HEXDIGITS, ucfirst( $hex[ $i ] ) );
-  if( $HighNibble === FALSE ) return( "" );
-  $LowNibble  = strpos( $HEXDIGITS, ucfirst( $hex[ $i + 1 ] ) );
-  if( $LowNibble === FALSE ) return( "" );
-  $Byte       = ( $HighNibble << 4 ) | $LowNibble;
-  $bin       .= chr( $Byte );
+  $bin .= chr( ( hexdec( $hex[ $i ] ) << 4 ) | hexdec( $hex[ $i + 1 ] ) );
  }
 
  return( $bin );
