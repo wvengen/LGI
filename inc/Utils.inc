@@ -32,7 +32,7 @@ function hexbin( $hex )
 
  for( ; $i < $Length; $i += 2 )
  {
-  $bin .= chr( ( hexdec( $hex[ $i ] ) << 4 ) | hexdec( $hex[ $i + 1 ] ) );
+  $bin .= chr( hexdec( $hex[ $i ].$hex[ $i + 1 ] ) );
  }
 
  return( $bin );
