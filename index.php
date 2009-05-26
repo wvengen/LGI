@@ -186,7 +186,7 @@ any type of hardware.<br>
 and the command-line-interface tools written in C++ using the Standard
 Template Library?<br style="font-weight: bold;">
 <span style="font-weight: bold;">A:</span> C++ and the STL, together
-with libburl, are well supported on any system. The standard C++ code
+with libcurl, are well supported on any system. The standard C++ code
 is therefore very portable and installation only requires a single
 'make' command to be issued.<br>
 <span style="font-weight: bold;"></span><br>
