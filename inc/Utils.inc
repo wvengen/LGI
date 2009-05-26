@@ -32,9 +32,9 @@ function hexbin( $hex )
 
  for( ; $i < $Length; $i += 2 )
  {
-  $HighNibble = strpos( $HEXDIGITS, $hex[ $i ] );
+  $HighNibble = strpos( $HEXDIGITS, ucfirst( $hex[ $i ] ) );
   if( $HighNibble === FALSE ) return( "" );
-  $LowNibble  = strpos( $HEXDIGITS, $hex[ $i + 1 ] );
+  $LowNibble  = strpos( $HEXDIGITS, ucfirst( $hex[ $i + 1 ] ) );
   if( $LowNibble === FALSE ) return( "" );
   $Byte       = ( $HighNibble << 4 ) | $LowNibble;
   $bin       .= chr( $Byte );
@@ -47,20 +47,7 @@ function hexbin( $hex )
 
 function binhex( $bin )
 {
- $HEXDIGITS = "0123456789ABCDEF";
-
- $Length = strlen( $bin );
- $hex = "";
-
- for( $i = 0; $i < $Length; $i++ )
- {
-  $Byte       = ord( $bin[ $i ] ) & 0xFF;
-  $HighNibble = $Byte >> 4;
-  $LowNibble  = $Byte & 0x0F;
-  $hex       .= $HEXDIGITS[ $HighNibble ].$HEXDIGITS[ $LowNibble ];
- }
-
- return( $hex );
+ return( bin2hex( $bin ) );
 }
 
 // --------------------------------------------------- 
