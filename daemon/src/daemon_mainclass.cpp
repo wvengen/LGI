@@ -555,13 +555,18 @@ int Daemon::RequestWorkCycle( void )
          {
           VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No job limits were encountered for job " << Job_Id );
 
-          // there are no limits and job is ready to be included for running...
-          AddJobToDaemonLists( TempJob );
-
           // set job into running state on server and through this we now also get input...
           TempJob.SetSessionID( SessionID );
-          TempJob.UpdateJob( "running", NormalizeString( Parse_XML( JobResponse, "resource" ) ), "", "", "" );
+          if( !TempJob.UpdateJob( "running", NormalizeString( Parse_XML( JobResponse, "resource" ) ), "", "", "" ) )
+          {
+           CRITICAL_LOG( "Daemon::RequestWorkCycle; Job with directory " << TempJob.GetJobDirectory() << " could not be accepted" );
+           UnlinkDirectoryRecursively( TempJob.GetJobDirectory() );
+           continue;
+          }
           TempJob.SetSessionID( "" );
+
+          // there are no limits and job was successfully accepted...
+          AddJobToDaemonLists( TempJob );
           
           NORMAL_LOG( "Daemon::RequestWorkCycle; Job with directory " << TempJob.GetJobDirectory() << " accepted" );
 
