@@ -265,9 +265,14 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
  chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
- // we specifically do NOT write the input and output files yet because they are not present in the current
- // data and it allows the dameon detect the temporary job dir as being corrupted the next time it is 
- // restarted. if the job is accepted, the update cyle will generate these files with correct content.
+ // we specifically do NOT write the input file yet because it is not present in the current
+ // data and it allows the daemon to detect the temporary job dir as being incomplete the next 
+ // time it is restarted and will ignore it. if the job is accepted, the update cyle will 
+ // generate the file with correct content... do make sure we 'touch' an output file here...
+
+ WriteStringToFile( "", JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), S_IRUSR | S_IWUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), UID, UID );
 
  // then dump the scripts there...
  TheScript = ReadStringFromFile( Application.Job_Check_Limits_Script() );
