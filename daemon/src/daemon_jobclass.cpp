@@ -265,19 +265,9 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
  chown( ( JobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
- HexBin( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "input" ) ), TheScript );
- WriteStringToHashedFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), S_IRUSR );
- chown( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE ).c_str(), UID, UID );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
- chown( ( JobDirectory + "/" + LGI_JOBDAEMON_INPUT_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
-
- HexBin( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "output" ) ), TheScript );
- WriteStringToFile( TheScript, JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), S_IRUSR | S_IWUSR );
- chown( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE ).c_str(), UID, UID );
- chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
- chown( ( JobDirectory + "/" + LGI_JOBDAEMON_OUTPUT_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+ // we specifically do NOT write the input and output files yet because they are not present in the current
+ // data and it allows the dameon detect the temporary job dir as being corrupted the next time it is 
+ // restarted. if the job is accepted, the update cyle will generate these files with correct content.
 
  // then dump the scripts there...
  TheScript = ReadStringFromFile( Application.Job_Check_Limits_Script() );
