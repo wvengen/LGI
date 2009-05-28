@@ -507,13 +507,17 @@ int Daemon::RequestWorkCycle( void )
        sprintf( LimitStr, "%d", Limit );
 
        VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Performing work request with Offset=" << OffsetStr << " at server " << (*ServerPointer) );
-       if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, TheApplication.Application_Name(), OffsetStr, LimitStr ) != CURLE_OK ) continue;
+       if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, TheApplication.Application_Name(), OffsetStr, LimitStr ) != CURLE_OK ) break;
 
        string JobResponse = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
-       if( JobResponse.empty() ) continue;
+       if( JobResponse.empty() ) break;
 
-       if( !Parse_XML( JobResponse, "error" ).empty() ) continue;
+       if( !Parse_XML( JobResponse, "error" ).empty() )
+       { 
+        CRITICAL_LOG( "Daemon::RequestWorkCycle; Unable to request work at server " << (*ServerPointer) << " for project " << TheProject.Project_Name() << "for application " << TheApplication.Application_Name()<< ": " << Parse_XML( Parse_XML( JobResponse, "error" ), "message" ) ); 
+        break;
+       };
 
        NrOfJobs = atoi( NormalizeString( Parse_XML( JobResponse, "number_of_jobs" ) ).c_str() );
        
@@ -600,8 +604,8 @@ int Daemon::RequestWorkCycle( void )
 
     if( ServerAPI.Resource_SignOff_Resource( Response, (*ServerPointer), TheProject.Project_Name(), SessionID ) != CURLE_OK )
      Response.clear();
-
-    VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed off from server " << (*ServerPointer) );
+    else
+     VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Signed off from server " << (*ServerPointer) );
    }
 
    if( (++ServerPointer) != ServerList.end() && ReadyForScheduling )         // go to next server in list and sign up there...
@@ -623,7 +627,7 @@ int Daemon::RequestWorkCycle( void )
 
      if( !Parse_XML( Response, "error" ).empty() )
      {
-      DEBUG_LOG( "Daemon::RequestWorkCycle; Unable to sign up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) );
+      CRITICAL_LOG( "Daemon::RequestWorkCycle; Unable to sign up: " << Parse_XML( Parse_XML( Response, "error" ), "message" ) );
       Response.clear();
       ServerMaxFieldSize.clear();
       SessionID.clear();
