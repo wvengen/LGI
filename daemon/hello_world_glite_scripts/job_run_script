@@ -40,7 +40,7 @@ export JOB_STATE=""
 while [ "${JOB_STATE}" == "" ]
 do
     sleep 60
-    export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -E "Done|Cancelled|Cleared"`
+    export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
 done
 
 # retrieve the output now...
