@@ -45,7 +45,7 @@ stderror = "stderr";
 outputsandbox = { "classical.out", "stdout", "stderr" };
 inputsandbox = { "classical.submitted.sh", "ClassicalDynamics_Linux.x", "classical.in" };
 shallowretrycount = 3;
-requirements = ( other.glueceinfototalspus == 1 && other.gluecepolicymaxcputime > 240 );
+requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 240 );
 myproxyserver = "px.grid.sara.nl";
 EOF_JDL
 
