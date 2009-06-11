@@ -20,12 +20,12 @@
 
 global $Config;
 
-$Config[ "SERVER_URL" ]            = "https://fwnc7003.wks.gorlaeus.net/LGI";     // the URL of this project server
+$Config[ "SERVER_URL" ]            = "https://fwnc7003.leidenuniv.nl/LGI";     // the URL of this project server
 $Config[ "SERVER_NAME" ]           = "LGI@fwnc7003.wks.gorlaeus.net";          // the unique name of this project server
 
 $Config[ "SERVER_SSL_CERTIFICATE_FILE" ]     = "../certificates/LGI@fwnc7003.crt";      // the certificate of this server
 $Config[ "SERVER_SSL_KEY" ]                  = "../certificates/LGI@fwnc7003.key";      // the certificate key file of this server
-$Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ]   = "http://fwnc7003.wks.gorlaeus.net/LGI/LGI+CA.crt";   // the certificate of the CA server
+$Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ]   = "http://fwnc7003.leidenuniv.nl/LGI/LGI+CA.crt";   // the certificate of the CA server
 $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ]  = "../certificates/LGI+CA.crt";           // the local certificate of the CA server
 
 $Config[ "REPOSITORY_DIRECTORY" ]     = "/mnt/sdb1/LGI/trunk/repository";        // location on filesystem of basic interface repository server
