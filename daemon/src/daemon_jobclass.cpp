@@ -583,7 +583,7 @@ string DaemonJob::GetStateTimeStampFromServer( void )
 
  if( ErrorNumber ) CRITICAL_LOG_RETURN( "", "DaemonJob::GetStateTimeStampFromServer; Error from server Response=" << Response );
 
- Response = Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" );
+ Response = NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state_time_stamp" ) );
 
  VERBOSE_DEBUG_LOG_RETURN( Response, "DaemonJob::GetStateTimeStampFromServer; Returned " << Response );
 }
