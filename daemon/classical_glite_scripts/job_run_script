@@ -19,6 +19,9 @@ fi
 # now copy executable...
 cp ${LGI_DIR}/daemon/CLASSICAL/ClassicalDynamics_Linux.x . > /dev/null
 
+# register at myproxy px.grid.sara.nl...
+echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
+
 # create new proxy cert for 196 hours...
 echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &> /dev/null
 
@@ -42,6 +45,8 @@ stderror = "stderr";
 outputsandbox = { "classical.out", "stdout", "stderr" };
 inputsandbox = { "classical.submitted.sh", "ClassicalDynamics_Linux.x", "classical.in" };
 shallowretrycount = 3;
+requirements = ( other.glueceinfototalspus == 1 && other.gluecepolicymaxcputime > 240 );
+myproxyserver = "px.grid.sara.nl";
 EOF_JDL
 
 # create and submit new job from JDL...
