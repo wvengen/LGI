@@ -46,6 +46,8 @@ CURL *Resource_Server_API::SetupcURLForPost( string &PostURL )
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+  //  curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_ERRORBUFFER, CURLErrorBuffer );
   DEBUG_LOG_RETURN( cURLHandle, "Resource_Server_API::SetupcURLForPost; Obtained cURL handle for PostURL=" << PostURL );
  }
 
@@ -83,7 +85,7 @@ CURLcode Resource_Server_API::PerformcURLPost( string &Response, CURL *cURLHandl
   if( PostList != NULL ) curl_formfree( PostList );
 
   if( cURLResult != CURLE_OK )
-   CRITICAL_LOG_RETURN( cURLResult, "Resource_Server_API::PerformcURLPost; Could not perform post, returned " << cURLResult )
+   CRITICAL_LOG_RETURN( cURLResult, "Resource_Server_API::PerformcURLPost; Could not perform post, returned " << cURLResult << " with error buffer: " << CURLErrorBuffer )
   else
   {
    DEBUG_LOG( "Resource_Server_API::PerformcURLPost; Performed post" ); 

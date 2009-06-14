@@ -62,6 +62,7 @@ class Resource_Server_API
        string PrivateKeyFile;
        string PublicCertificateFile;
        string CAChainFile;
+       char   CURLErrorBuffer[ CURL_ERROR_SIZE ];
       }; 
   
 // ------------------------------------------------------------------------------
