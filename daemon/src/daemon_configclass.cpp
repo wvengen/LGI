@@ -51,8 +51,8 @@ int DaemonConfig::IsValidConfigured( void )
  if( ReadStringFromFile( Resource_Certificate_File() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Cannot read form file " << Resource_Certificate_File() );
 
  if( RunDirectory().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; RunDirectory() empty" );
- if( Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Owner_Allow() empty" );
- if( Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfig::IsValidConfigured; Warning: Owner_Deny() empty" );
+ if( Owner_Allow().empty() ) DEBUG_LOG( "DaemonConfig::IsValidConfigured; Warning: Owner_Allow() empty" );
+ if( Owner_Deny().empty() ) DEBUG_LOG( "DaemonConfig::IsValidConfigured; Warning: Owner_Deny() empty" );
  if( Number_Of_Projects() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Number_Of_Projects() returned 0 or less" );
  if( Job_Limit() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; Job_Limit() returned 0 or less" );
 
@@ -112,7 +112,7 @@ string DaemonConfig::Owner_Allow( void )
 {
  string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "owner_allow" ) );
  if( Data.empty() )
-  CRITICAL_LOG_RETURN( Data, "DaemonConfig::Owner_Allow; No data in owner_allow tag found" )
+  DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Allow; No data in owner_allow tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Allow; Returned " << Data );
 }
@@ -123,7 +123,7 @@ string DaemonConfig::Owner_Deny( void )
 {
  string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "owner_deny" ) );
  if( Data.empty() )
-  CRITICAL_LOG_RETURN( Data, "DaemonConfig::Owner_Deny; No data in owner_deny tag found" )
+  DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Deny; No data in owner_deny tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Deny; Returned " << Data );
 }
@@ -226,8 +226,8 @@ int DaemonConfigProject::IsValidConfigured( void )
 {
  if( Project_Name().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Project_Name() empty" );
  if( Project_Master_Server().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Project_Master_Server() empty" );
- if( Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Owner_Allow() empty" );
- if( Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfigProject::IsValidConfigured; Warning: Owner_Deny() empty" );
+ if( Owner_Allow().empty() ) DEBUG_LOG( "DaemonConfigProject::IsValidConfigured; Warning: Owner_Allow() empty" );
+ if( Owner_Deny().empty() ) DEBUG_LOG( "DaemonConfigProject::IsValidConfigured; Warning: Owner_Deny() empty" );
  if( Number_Of_Applications() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Number_Of_Applications()returned 0 or less" );
  if( Job_Limit() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Job_Limit()returned 0 or less" );
 
@@ -265,7 +265,7 @@ string DaemonConfigProject::Owner_Allow( void )
 {
  string Data = NormalizeString( Parse_XML( ProjectCache, "owner_allow" ) );
  if( Data.empty() )
-  CRITICAL_LOG_RETURN( Data, "DaemonConfigProject::Owner_Allow; No data in owner_allow tag found" )
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Allow; No data in owner_allow tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Allow; Returned " << Data );
 }
@@ -276,7 +276,7 @@ string DaemonConfigProject::Owner_Deny( void )
 {
  string Data = NormalizeString( Parse_XML( ProjectCache, "owner_deny" ) );
  if( Data.empty() )
-  CRITICAL_LOG_RETURN( Data, "DaemonConfigProject::Owner_Deny; No data in owner_deny tag found" )
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Deny; No data in owner_deny tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Deny; Returned " << Data );
 }
@@ -374,8 +374,8 @@ DaemonConfigProjectApplication::DaemonConfigProjectApplication( DaemonConfigProj
 int DaemonConfigProjectApplication::IsValidConfigured( void )
 {
  if( Application_Name().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Application_Name() empty" );
- if( Owner_Allow().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Owner_Allow() empty" );
- if( Owner_Deny().empty() ) CRITICAL_LOG( "DaemonConfigProjectApplication::IsValidConfigured; Warning: Owner_Deny() empty" );
+ if( Owner_Allow().empty() ) DEBUG_LOG( "DaemonConfigProjectApplication::IsValidConfigured; Warning: Owner_Allow() empty" );
+ if( Owner_Deny().empty() ) DEBUG_LOG( "DaemonConfigProjectApplication::IsValidConfigured; Warning: Owner_Deny() empty" );
  if( Job_Limit() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Job_Limit() returned 0 or less" );
  if( Max_Output_Size() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Max_Output_Size() returned 0 or less" );
 
@@ -418,7 +418,7 @@ string DaemonConfigProjectApplication::Owner_Allow( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "owner_allow" ) );
  if( Data.empty() )
-  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; No data in owner_allow tag found" )
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; No data in owner_allow tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; Returned " << Data );
 }
@@ -429,7 +429,7 @@ string DaemonConfigProjectApplication::Owner_Deny( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "owner_deny" ) );
  if( Data.empty() )
-  CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; No data in owner_deny tag found" )
+  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; No data in owner_deny tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; Returned " << Data );
 }
