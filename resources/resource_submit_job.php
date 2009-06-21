@@ -216,7 +216,7 @@ if( isset( $_POST[ "read_access" ] ) && ( $_POST[ "read_access" ] != "" ) )
  $InsertQuery .= ", read_access='".$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "read_access" ], "," ) )."'";
 }
 else
- $InsertQuery .= ", read_access='".$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "owners" ], "," ) )."'";
+ $InsertQuery .= ", read_access='".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "owners" ], "," ) )."'";
 
 if( isset( $_POST[ "write_access" ] ) && ( $_POST[ "write_access" ] != "" ) )
 {
