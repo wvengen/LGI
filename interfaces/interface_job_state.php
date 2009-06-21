@@ -109,7 +109,10 @@ if( !$DetailMode )
  // do the specific query for this owner array...
  $queryresult = mysql_query( Interface_Make_Query_For_Work_For_Owners( $PossibleJobOwnersArray, $JobState, $JobApplication, $JobStart, $JobLimit ) );
   
- $NrOfResults = mysql_num_rows( $queryresult );
+ if( $queryresult ) 
+  $NrOfResults = mysql_num_rows( $queryresult );
+ else
+  $NrOfResults = 0;
 
  // we have some jobs in the table to report... 
  if( $NrOfResults >= 1 ) 

@@ -40,7 +40,10 @@ $Response .= " <this_project_server> ".Get_Server_URL()." </this_project_server>
 
 $queryresult = mysql_query( "SELECT resource_name,last_call_time,resource_capabilities FROM active_resources WHERE project_server=0" );
 
-$NumberOfResources = mysql_num_rows( $queryresult );
+if( $queryresult ) 
+ $NumberOfResources = mysql_num_rows( $queryresult );
+else
+ $NumberOfResources = 0;
 
 $Response .= " <number_of_resources> ".$NumberOfResources." </number_of_resources>";
 

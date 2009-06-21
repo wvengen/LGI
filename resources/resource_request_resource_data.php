@@ -40,10 +40,13 @@ else
 
 // query for the job specs...
 $ResourceQuery = mysql_query( "SELECT * FROM active_resources WHERE resource_name='".$ResourceName."'" );
-
-if( mysql_num_rows( $ResourceQuery ) != 1 )
+if( $ResourceQuery )
+ $NrRows = mysql_num_rows( $ResourceQuery );
+else
+ $NrRows = 0;
+if( $NrRows != 1 )
 {
- if(  mysql_num_rows( $ResourceQuery ) ) mysql_free_result( $ResourceQuery );
+ if( $NrRows ) mysql_free_result( $ResourceQuery );
  return( LGI_Error_Response( 5, $ErrorMsgs[ 5 ] ) );
 }
 

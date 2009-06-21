@@ -81,7 +81,10 @@ $Application = mysql_escape_string( $Application );
 
 $TheWorkQuery = mysql_query( "SELECT job_id FROM job_queue WHERE application='".$Application."' AND state='queued' AND lock_state=0 AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' ) ORDER BY state_time_stamp LIMIT ".$JobIdLimit." OFFSET ".$JobIdStart );
 
-$NrOfPossibleJobs = mysql_num_rows( $TheWorkQuery );
+if( $TheWorkQuery )
+ $NrOfPossibleJobs = mysql_num_rows( $TheWorkQuery );
+else
+ $NrOfPossibleJobs = 0;
 
 // now if there is work...
 if( $NrOfPossibleJobs >= 1 )  

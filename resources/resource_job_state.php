@@ -40,10 +40,14 @@ else
 
 // query for the job specs...
 $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobId );
+if( $JobQuery ) 
+ $NrRows =  mysql_num_rows( $JobQuery );
+else
+ $NrRows = 0;
 
-if( mysql_num_rows( $JobQuery ) != 1 )
+if( $NrRows != 1 )
 {
- if( mysql_num_rows( $JobQuery ) ) mysql_free_result( $JobQuery );
+ if( $NrRows ) mysql_free_result( $JobQuery );
  return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ] ) );
 }
 

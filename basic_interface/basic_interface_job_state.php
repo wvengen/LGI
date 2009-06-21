@@ -99,7 +99,7 @@ if( isset( $Job_ID ) )               // we requested details on a job...
  Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_stamp )." UTC" ); 
  Row2( "<b>Owners:</b>", htmlentities( $JobSpecs -> owners ) ); 
  Row2( "<b>Read access:</b>", htmlentities( $JobSpecs -> read_access ) ); 
- Row2( "<b>Write access:</b>", htmlentities( $JobSpecs -> Write_access ) ); 
+ Row2( "<b>Write access:</b>", htmlentities( $JobSpecs -> write_access ) ); 
  Row2( "<b>Target resources:</b>", htmlentities( $JobSpecs -> target_resources ) ); 
  Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) ); 
  if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href='$RepositoryURL'> $RepositoryURL </a>" ); 
@@ -171,8 +171,12 @@ else
 
  // do the query and get number of jobs to list...
  $QueryResult = mysql_query( $Query );
- $Number = mysql_num_rows( $QueryResult );
- 
+
+ if( $QueryResult ) 
+  $Number = mysql_num_rows( $QueryResult );
+ else 
+  $Number = 0;
+
  Row2( "<b>Number of jobs listed:</b>", $Number ); 
 
  Row6( "<center><font color='green' size='4'><b>job id</b></font></center>", "<center><font color='green' size='4'><b>job state</b></font></center>", "<center><font color='green' size='4'><b>target resources</b></font></center>", "<center><font color='green' size='4'><b>application</b></font></center>", "<center><font color='green' size='4'><b>time stamp</b></font></center>", "<center><font color='green' size='4'><b>owners</b></font></center>" );

@@ -425,11 +425,11 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
  $State = mysql_escape_string( $State );
  $Application = mysql_escape_string( $Application );
 
- $Query = "SELECT job_id,state,application,state_time_stamp,target_resources,owners,read_access,write_access,job_specifics FROM job_queue WHERE";
+ $Query = "SELECT job_id,state,application,state_time_stamp,target_resources,owners,read_access,write_access,job_specifics FROM job_queue WHERE ( ";
 
  $Owner = mysql_escape_string( $OwnerArray[ 1 ] );
  $RegExpUser = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
- $Query .= "( read_access REGEXP '".$RegExpUser."' )";
+ $Query .= " ( read_access REGEXP '".$RegExpUser."' )";
  for( $o = 2; $o <= $OwnerArray[ 0 ]; $o++ )
  {
   $Owner = mysql_escape_string( $OwnerArray[ $o ] );

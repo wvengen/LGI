@@ -57,7 +57,7 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
 
  // check latest update we have...
  $mysqlresult = mysql_query( "SELECT MAX(version) AS max FROM updates" );
- if( mysql_num_rows( $mysqlresult ) == 1 )
+ if( $mysqlresult )
  {
   $MaxVersion = mysql_fetch_object( $mysqlresult );
 
@@ -96,7 +96,7 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
 
  // get latest update we now have on this project-server...
  $mysqlresult = mysql_query( "SELECT MAX(version) AS max FROM updates" );
- if( mysql_num_rows( $mysqlresult ) == 1 )
+ if( $mysqlresult )
  {
   $UpdateData = mysql_fetch_object( $mysqlresult );
   mysql_free_result( $mysqlresult );
@@ -113,7 +113,7 @@ Server_Check_And_Perform_Updates();
 
 $mysqlresult = mysql_query( "SELECT MAX(version) AS max FROM updates" );
 $MaxVersion = mysql_fetch_object( $mysqlresult );
-if( mysql_num_rows( $mysqlresult ) == 1 ) 
+if( $mysqlresult ) 
  mysql_free_result( $mysqlresult );
 else
  $MaxVersion = -1;

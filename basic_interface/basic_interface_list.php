@@ -84,7 +84,10 @@ Row2( "<b>Groups:</b>", htmlentities( $Groups ) );
 if( $ProjectServer != 0 )
 {
  $ServerListQuery = mysql_query( "SELECT resource_name,url,last_call_time FROM active_resources WHERE project_server<>0" );
- $Number = mysql_num_rows( $ServerListQuery );
+ if( $ServerListQuery )
+  $Number = mysql_num_rows( $ServerListQuery );
+ else
+  $Number = 0;
 
  Row2( "<b>Number of servers:</b>", $Number );
  Row3( "<center><font color='green' size='4'><b>Server name</b></font></center>", "<center><font color='green' size='4'><b>URL</b></font></center>", "<center><font color='green' size='4'><b>Time stamp</b></font></center>" ); 
@@ -104,7 +107,10 @@ if( $ProjectServer != 0 )
 else
 {
  $ResourceListQuery = mysql_query( "SELECT resource_name,last_call_time,resource_capabilities FROM active_resources WHERE project_server=0" );
- $Number = mysql_num_rows( $ResourceListQuery );
+ if( $ResourceListQuery )
+  $Number = mysql_num_rows( $ResourceListQuery );
+ else
+  $Number = 0;
 
  Row2( "<b>Number of resources:</b>", $Number );
  Row3( "<center><font color='green' size='4'><b>Resource name</b></font></center>", "<center><font color='green' size='4'><b>Time stamp</b></font></center>", "<center><font color='green' size='4'><b>Resource capabilities</b></font></center>" ); 

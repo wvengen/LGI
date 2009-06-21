@@ -47,12 +47,16 @@ $Response .= "<requesting_project_server_version> ".$ServerVersionNumber." </req
 
 // query db for possible updates...
 $mysqlresult = mysql_query( "SELECT * FROM updates WHERE version>".$ServerVersionNumber." ORDER BY version ASC" );
+if( $mysqlresult )
+ $NrOfUpdates = mysql_num_rows( $mysqlresult );
+else 
+ $NrOfUpdates = 0;
 
 // if there are any updates, report the first one to be done...
-if( mysql_num_rows( $mysqlresult ) >= 1 )
+if( $NrOfUpdates >= 1 )
 {
  $UpDateData = mysql_fetch_object( $mysqlresult );
- $Response .= "<update> <updates> ".mysql_num_rows( $mysqlresult )." </updates> ";
+ $Response .= "<update> <updates> ".$NrOfUpdates." </updates> ";
  $Response .= "<update_version> ".$UpDateData->version." </update_version> ";
  $Response .= "<target_servers> ".$UpDateData->servers." </target_servers> ";
  $Response .= "<update_query> ".binhex( $UpDateData->update_query )." </update_query> </update>";
@@ -65,7 +69,7 @@ else
 
  // get latest update we have on this project-server...
  $mysqlresult = mysql_query( "SELECT MAX(version) AS max FROM updates" );
- if( mysql_num_rows( $mysqlresult ) == 1 )
+ if( $mysqlresult )
  {
   $UpDateData = mysql_fetch_object( $mysqlresult );
   $Response .= "<update_version> ".$UpDateData->max." </update_version> </update>";

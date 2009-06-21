@@ -43,8 +43,10 @@ $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_mas
 $Response .= " <this_project_server> ".Get_Server_URL()." </this_project_server>";
 
 $queryresult = mysql_query( "SELECT url FROM active_resources WHERE project_server=2" );
-
-$NumberOfServers = mysql_num_rows( $queryresult );
+if( $queryresult )
+ $NumberOfServers = mysql_num_rows( $queryresult );
+else 
+ $NumberOfServers = 0;
 
 $Response .= " <number_of_slave_servers> ".$NumberOfServers." </number_of_slave_servers>";
 
