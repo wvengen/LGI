@@ -119,11 +119,7 @@ if( $NrOfPossibleJobs >= 1 )
  $Response .= " <number_of_jobs> ".$ActualNrOfJobs." </number_of_jobs>".$ResponseJobs;
 } 
 else
-{
- // there was no work...
- mysql_free_result( $TheWorkQuery );
- $Response .= " <number_of_jobs> 0 </number_of_jobs>";
-}
+ $Response .= " <number_of_jobs> 0 </number_of_jobs>"; // there was no work...
 
 // return the response...
 return( LGI_Response( $Response ) );

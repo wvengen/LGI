@@ -95,7 +95,7 @@ if( $ProjectServer != 0 )
   Row3( "<center>$Server->resource_name</center>", "<center><a href='$Server->url/basic_interface/index.php?project=$Project&groups=$Groups&sid=$SID'>$Server->url</a></center>", "<center>".gmdate( "j M Y G:i", $Server->last_call_time )." UTC </center>" );
  }
 
- mysql_free_result( $ServerListQuery );
+ if( $Number ) mysql_free_result( $ServerListQuery );
 
  End_Table();
 
@@ -115,7 +115,7 @@ else
   Row3( "<center>$Resource->resource_name</center>", "<center>".gmdate( "j M Y G:i", $Resource ->last_call_time )." UTC </center>", "<center>".nl2br( htmlentities( $Resource->resource_capabilities ) )."</center>" );
  }
 
- mysql_free_result( $ResourceListQuery );
+ if( $Number ) mysql_free_result( $ResourceListQuery );
  End_Table();
 
  echo "<br><a href='basic_interface_list.php?project_server=1&project=$Project&groups=$Groups&sid=$SID'>Show project server list</a>\n";

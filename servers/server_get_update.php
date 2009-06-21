@@ -56,12 +56,11 @@ if( mysql_num_rows( $mysqlresult ) >= 1 )
  $Response .= "<update_version> ".$UpDateData->version." </update_version> ";
  $Response .= "<target_servers> ".$UpDateData->servers." </target_servers> ";
  $Response .= "<update_query> ".binhex( $UpDateData->update_query )." </update_query> </update>";
+ mysql_free_result( $mysqlresult );
 }
 else
 {
  // there are no updates for the requesting project-server here...
- mysql_free_result( $mysqlresult );
-
  $Response .= "<update> <updates> 0 </updates> ";
 
  // get latest update we have on this project-server...
@@ -70,12 +69,11 @@ else
  {
   $UpDateData = mysql_fetch_object( $mysqlresult );
   $Response .= "<update_version> ".$UpDateData->max." </update_version> </update>";
+  mysql_free_result( $mysqlresult );
  }
  else
   $Response .= "<update_version> -1 </update_version> </update>";
-
 }
-mysql_free_result( $mysqlresult );
 
 // return the response...
 return( LGI_Response( $Response ) );

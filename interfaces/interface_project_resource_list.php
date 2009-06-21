@@ -52,7 +52,7 @@ for( $i = 1; $i <= $NumberOfResources; $i++ )
  $Response .= " <last_call_time> $Resource->last_call_time </last_call_time> </resource>";
 }
 
-mysql_free_result( $queryresult );
+if( $NumberOfResources ) mysql_free_result( $queryresult );
 
 // return the response...
 return( LGI_Response( $Response ) );

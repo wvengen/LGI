@@ -54,7 +54,7 @@ for( $i = 1; $i <= $NumberOfServers; $i++ )
  $Response .= " <project_server number='".$i."'> ".$Server->url." </project_server>";
 }
 
-mysql_free_result( $queryresult );
+if( $NumberOfServers ) mysql_free_result( $queryresult );
 
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 

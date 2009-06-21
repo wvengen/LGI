@@ -43,7 +43,7 @@ $ResourceQuery = mysql_query( "SELECT * FROM active_resources WHERE resource_nam
 
 if( mysql_num_rows( $ResourceQuery ) != 1 )
 {
- mysql_free_result( $ResourceQuery );
+ if(  mysql_num_rows( $ResourceQuery ) ) mysql_free_result( $ResourceQuery );
  return( LGI_Error_Response( 5, $ErrorMsgs[ 5 ] ) );
 }
 

@@ -172,19 +172,21 @@ else
  // do the query and get number of jobs to list...
  $QueryResult = mysql_query( $Query );
  $Number = mysql_num_rows( $QueryResult );
- if( !isset( $Number ) ) $Number = 0;
  
  Row2( "<b>Number of jobs listed:</b>", $Number ); 
 
  Row6( "<center><font color='green' size='4'><b>job id</b></font></center>", "<center><font color='green' size='4'><b>job state</b></font></center>", "<center><font color='green' size='4'><b>target resources</b></font></center>", "<center><font color='green' size='4'><b>application</b></font></center>", "<center><font color='green' size='4'><b>time stamp</b></font></center>", "<center><font color='green' size='4'><b>owners</b></font></center>" );
 
- for( $i = 1; $i <= $Number; $i++ )
+ if( $Number >= 1 )
  {
-  $Job = mysql_fetch_object( $QueryResult );
-  Row6( "<center><a href='basic_interface_job_state.php?job_id=$Job->job_id&groups=$Groups&project=$Project&sid=$SID'>$Job->job_id</a></center>", "<center>$Job->state</center>", "<center>$Job->target_resources</center>", "<center>$Job->application</center>", "<center>".gmdate( "j M Y G:i", $Job->state_time_stamp )." UTC </center>", "<center>$Job->owners</center>" );
- }
+  for( $i = 1; $i <= $Number; $i++ )
+  {
+   $Job = mysql_fetch_object( $QueryResult );
+   Row6( "<center><a href='basic_interface_job_state.php?job_id=$Job->job_id&groups=$Groups&project=$Project&sid=$SID'>$Job->job_id</a></center>", "<center>$Job->state</center>", "<center>$Job->target_resources</center>", "<center>$Job->application</center>", "<center>".gmdate( "j M Y G:i", $Job->state_time_stamp )." UTC </center>", "<center>$Job->owners</center>" );
+  }
 
- mysql_free_result( $QueryResult ); 
+  mysql_free_result( $QueryResult ); 
+ }
 
  End_Table();
 

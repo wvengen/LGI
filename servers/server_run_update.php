@@ -67,7 +67,6 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
   if( $UpdateVersion > $MaxVersion->max + 1 )
   {
    Server_Check_And_Perform_Updates();
-   mysql_free_result( $mysqlresult );
    $mysqlresult = mysql_query( "SELECT MAX(version) AS max FROM updates" );
    $MaxVersion = mysql_fetch_object( $mysqlresult );
    mysql_free_result( $mysqlresult );
@@ -83,13 +82,14 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
   }
  }
   
- mysql_free_result( $mysqlresult );
-
  $UpdateQuery = hexbin( $UpdateQuery );
 
  // perform the update on the DB if needed...
  if( FoundInCommaSeparatedField( $TargetServers, Get_Server_Name(), "," ) )
+ {
   $mysqlresult = mysql_query( $UpdateQuery );
+  mysql_free_result( $mysqlresult );
+ }
 
  // insert this update into the DB...
  mysql_query( "INSERT INTO updates SET version=".$UpdateVersion.", servers='".mysql_escape_string( $TargetServers )."', update_query='".mysql_escape_string( $UpdateQuery )."'" );
@@ -99,12 +99,12 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
  if( mysql_num_rows( $mysqlresult ) == 1 )
  {
   $UpdateData = mysql_fetch_object( $mysqlresult );
+  mysql_free_result( $mysqlresult );
   $Response .= "<update> <did_update_cyle> 0 </did_update_cyle> <update_version> ".$UpdateData->max." </update_version> </update>";
  }
  else
   $Response .= "<update> <did_update_cyle> 0 </did_update_cyle> <update_version> -1 </update_version> </update>";
 
- mysql_free_result( $mysqlresult );
  return( LGI_Response( $Response ) );
 }
 
@@ -113,7 +113,10 @@ Server_Check_And_Perform_Updates();
 
 $mysqlresult = mysql_query( "SELECT MAX(version) AS max FROM updates" );
 $MaxVersion = mysql_fetch_object( $mysqlresult );
-mysql_free_result( $mysqlresult );
+if( mysql_num_rows( $mysqlresult ) == 1 ) 
+ mysql_free_result( $mysqlresult );
+else
+ $MaxVersion = -1;
 $Response = "<project> ".Get_Selected_MySQL_DataBase()." </project> ";
 $Response .= "<project_master_server> ".Get_Master_Server_URL()." </project_master_server> ";
 $Response .= "<requesting_project_server> ".$ServerData->resource_name." </requesting_project_server> ";

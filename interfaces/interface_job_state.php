@@ -113,6 +113,7 @@ if( !$DetailMode )
 
  // we have some jobs in the table to report... 
  if( $NrOfResults >= 1 ) 
+ {
   for( $job = 0; ( $job < $NrOfResults ) && ( $NrOfJobsReported < $JobLimit ); $job++ )
   {
    $JobData = mysql_fetch_object( $queryresult );
@@ -136,7 +137,8 @@ if( !$DetailMode )
    $JobResponses .= " <application> ".$JobData->application." </application> </job>";
   }
 
- mysql_free_result( $queryresult );
+  mysql_free_result( $queryresult );
+ }
 
  $Response .= " <number_of_jobs> ".$NrOfJobsReported." </number_of_jobs> ".$JobResponses;
 }
