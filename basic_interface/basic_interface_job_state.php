@@ -99,6 +99,7 @@ if( isset( $Job_ID ) )               // we requested details on a job...
  Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_stamp )." UTC" ); 
  Row2( "<b>Owners:</b>", htmlentities( $JobSpecs -> owners ) ); 
  Row2( "<b>Read access:</b>", htmlentities( $JobSpecs -> read_access ) ); 
+ Row2( "<b>Write access:</b>", htmlentities( $JobSpecs -> Write_access ) ); 
  Row2( "<b>Target resources:</b>", htmlentities( $JobSpecs -> target_resources ) ); 
  Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) ); 
  if( $RepositoryURL != "" ) Row2( "<b>Repository:</b>", "<a href='$RepositoryURL'> $RepositoryURL </a>" ); 
@@ -171,6 +172,7 @@ else
  // do the query and get number of jobs to list...
  $QueryResult = mysql_query( $Query );
  $Number = mysql_num_rows( $QueryResult );
+ if( !isset( $Number ) ) $Number = 0;
  
  Row2( "<b>Number of jobs listed:</b>", $Number ); 
 

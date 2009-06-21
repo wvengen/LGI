@@ -70,7 +70,7 @@ if( !isset( $Job_ID ) ) Exit_With_Text( "ERROR: Job_id was not posted" );
 if( strlen( $Job_ID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 47 ] );
 if( !is_numeric( $Job_ID ) ) Exit_With_Text( "ERROR: Job_id is not a number" );
 
-// now verfiy the user using the basic browser interface... also make MySQL connection...
+// now verify the user using the basic browser interface... also make MySQL connection...
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
 if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 
@@ -125,6 +125,7 @@ Row2( "<b>State:</b>", "<b>".htmlentities( $JobState )."</b>" );
 Row2( "<b>State time stamp:</b>", "<b>".gmdate( "j M Y G:i", $JobStateTimeStamp )." UTC</b>" );
 Row2( "<b>Owners:</b>", htmlentities( $JobSpecs -> owners ) );
 Row2( "<b>Read access:</b>", htmlentities( $JobSpecs -> read_access ) );
+Row2( "<b>Write access:</b>", htmlentities( $JobSpecs -> write_access ) );
 Row2( "<b>Target resources:</b>", htmlentities( $JobSpecs -> target_resources ) );
 Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) );
 End_Table();
