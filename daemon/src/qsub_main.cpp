@@ -431,6 +431,7 @@ int main( int argc, char *argv[] )
   cout << "Target resources      : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "target_resources" ) ) << endl;
   cout << "Job owners            : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "owners" ) ) << endl;
   cout << "Read access on job    : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "read_access" ) ) << endl;
+  cout << "Write access on job   : " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "write_access" ) ) << endl;
   cout << "Time stamp            : " << TimeStampStr << " [" << TimeStamp << "]" << endl;
   HexBin(  NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "input" ) ), Input );
   cout << "Input                 : " << Input << endl;
