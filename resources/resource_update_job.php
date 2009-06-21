@@ -123,6 +123,7 @@ $Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id>";
 $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
 $Response .= " <owners> ".$JobSpecs->owners." </owners>";
 $Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
+$Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
 $Response .= " <application> ".$JobSpecs->application." </application>";
 $Response .= " <state> ".$JobSpecs->state." </state>";
 $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";

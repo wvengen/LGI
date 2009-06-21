@@ -57,7 +57,7 @@ if( !isset( $_POST[ "owners" ] ) || ( $_POST[ "owners" ] == "" ) )
 else
 {
  if( strlen( $_POST[ "owners" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-  return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ] ) );
+  return( LGI_Error_Response( 71, $ErrorMsgs[ 71 ] ) );
  $JobOwners = NormalizeCommaSeparatedField( $_POST[ "owners" ], "," );
 }
 
@@ -92,7 +92,7 @@ $NewTargetResourceList = "";
 $FoundResourceFlag = 0;
 
 for( $i = 1; $i <= $Resources[ 0 ]; $i++ )
- if( Resource_Is_Target_Resource_Known( $Resources[ $i ] ) )
+ if( Resource_Is_Target_Resource_Known( $Resources[ $i ], $JobApplication ) )
  {
   $NewTargetResourceList .= ", ".$Resources[ $i ];
   $FoundResourceFlag = 1;
@@ -213,10 +213,19 @@ if( isset( $_POST[ "read_access" ] ) && ( $_POST[ "read_access" ] != "" ) )
 {
  if( strlen( $_POST[ "read_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 51, $ErrorMsgs[ 51 ] ) );
- $InsertQuery .= ", read_access='"$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "read_access" ], "," ) )."'";
+ $InsertQuery .= ", read_access='".$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "read_access" ], "," ) )."'";
 }
 else
- $InsertQuery .= ", read_access='"$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "owners" ], "," ) )."'";
+ $InsertQuery .= ", read_access='".$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "owners" ], "," ) )."'";
+
+if( isset( $_POST[ "write_access" ] ) && ( $_POST[ "write_access" ] != "" ) )
+{
+ if( strlen( $_POST[ "write_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ] ) );
+ $InsertQuery .= ", write_access='".$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "write_access" ], "," ) )."'";
+}
+else
+ $InsertQuery .= ", write_access='".$JobOwners."'";
 
 // insert the job into the database...
 $queryresult = mysql_query( $InsertQuery );
@@ -242,6 +251,7 @@ $Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id>";
 $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
 $Response .= " <owners> ".$JobSpecs->owners." </owners>";
 $Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
+$Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
 $Response .= " <application> ".$JobSpecs->application." </application>";
 $Response .= " <state> ".$JobSpecs->state." </state>";
 $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";

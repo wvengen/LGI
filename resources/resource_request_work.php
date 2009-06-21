@@ -97,7 +97,7 @@ if( $NrOfPossibleJobs >= 1 )
   if( !Resource_Lock_Job( $ResourceData, $JobId->job_id ) )    
   {
    // we were able to get the lock... include this job into the response...
-   $JobQuery = mysql_query( "SELECT job_id,target_resources,owners,read_access,state_time_stamp,job_specifics FROM job_queue WHERE job_id=".$JobId->job_id );
+   $JobQuery = mysql_query( "SELECT job_id,target_resources,owners,read_access,write_access,state_time_stamp,job_specifics FROM job_queue WHERE job_id=".$JobId->job_id );
    $JobSpecs = mysql_fetch_object( $JobQuery );
 
    // build job record for this job...
@@ -106,6 +106,7 @@ if( $NrOfPossibleJobs >= 1 )
    $ResponseJobs .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>"; 
    $ResponseJobs .= " <owners> ".$JobSpecs->owners." </owners>"; 
    $ResponseJobs .= " <read_access> ".$JobSpecs->read_access." </read_access>"; 
+   $ResponseJobs .= " <write_access> ".$JobSpecs->write_access." </write_access>"; 
    $ResponseJobs .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>"; 
    $ResponseJobs .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>"; 
 
