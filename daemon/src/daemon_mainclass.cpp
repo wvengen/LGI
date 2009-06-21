@@ -533,22 +533,25 @@ int Daemon::RequestWorkCycle( void )
         if( Job_Id.empty() ) continue;
 
         // now check if any of the owners is denied serving...
-        int OwnerIndex;
+        int OwnerIndex, OwnerFlag;
         vector<string> Owners = CommaSeparatedValues2Array( Parse_XML( JobData, "owners" ) );
 
-        for( OwnerIndex = 0; OwnerIndex < Owners.size(); ++OwnerIndex )
+        for( OwnerFlag = OwnerIndex = 0; OwnerIndex < Owners.size(); ++OwnerIndex )
         {
          // check if limits are reached... 
          if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) break;
          if( TheProject.Job_Limit() <= Accounting[ "; TOTALS; " + TheProject.Project_Name() ] ) break;
          if( TheApplication.Job_Limit() <= Accounting[ "; TOTALS; " + TheProject.Project_Name() + "; " + TheApplication.Application_Name() ] ) break;
 
-         // check if owner specific limits are reached... 
+         // check if owner is denied... 
          if( IsOwnerDenied( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
-         if( IsOwnerRunningToMuch( Owners[ OwnerIndex ], TheProject, TheApplication ) == ... ) break;
+
+         // check if owner specific limits are reached... 
+         OwnerFlag |= IsOwnerRunningToMuch( Owners[ OwnerIndex ], TheProject, TheApplication );
+         if( OwnerFlag & 3 ) break; 
         }
 
-        if( OwnerIndex == Owners.size() )      // no denials or limits reached for any of the owners...
+        if( ( OwnerIndex == Owners.size() ) && ( OwnerFlag & 8 ) )    // no denials or limits reached for any of the owners...
         {
          VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No owners were denied service for job " << Job_Id );
 
@@ -707,19 +710,21 @@ int Daemon::IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, Da
  string ApplicationLimit = NormalizeString( Parse_XML( Application.Owner_Allow(), Owner ) );
  if( ApplicationLimit.empty() ) ApplicationLimit = NormalizeString( Parse_XML( Application.Owner_Allow(), "any" ) );
 
- // if no limits for this owners, then signal this...
- if( ConfigLimit.empty() && ProjectLimit.empty() && ApplicationLimit.empty() ) return( 2 );
+ // if no limits for this owner defined, then signal this...
+ if( ConfigLimit.empty() && ProjectLimit.empty() && ApplicationLimit.empty() ) return( 4 );
 
+ // then check limits that have been found for this owner...
  if( !ConfigLimit.empty() ) 
-  if( atoi( ConfigLimit.c_str() ) <= Accounting[ Owner ] ) return( 1 );
+  if( atoi( ConfigLimit.c_str() ) <= Accounting[ Owner ] ) return( 2 );
 
  if( !ProjectLimit.empty() ) 
-  if( atoi( ProjectLimit.c_str() ) <= Accounting[ Owner + ", " + Project.Project_Name() ] ) return( 1 );
+  if( atoi( ProjectLimit.c_str() ) <= Accounting[ Owner + ", " + Project.Project_Name() ] ) return( 2 );
 
  if( !ApplicationLimit.empty() ) 
-  if( atoi( ApplicationLimit.c_str() ) <= Accounting[ Owner + ", " + Project.Project_Name() + ", " + Application.Application_Name() ] ) return( 1 );
+  if( atoi( ApplicationLimit.c_str() ) <= Accounting[ Owner + ", " + Project.Project_Name() + ", " + Application.Application_Name() ] ) return( 2 );
 
- return( 0 );
+ // otherwise signal that no limit was encountered for this owner...
+ return( 8 );
 }
 
 // -----------------------------------------------------------------------------
