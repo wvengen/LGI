@@ -59,6 +59,7 @@ using namespace std;
 #define LGI_JOBDAEMON_JOB_ID_FILE                  "LGI_job_id"
 #define LGI_JOBDAEMON_OWNERS_FILE                  "LGI_owners"
 #define LGI_JOBDAEMON_READ_ACCESS_FILE             "LGI_read_access"
+#define LGI_JOBDAEMON_WRITE_ACCESS_FILE            "LGI_write_access"
 #define LGI_JOBDAEMON_JOB_SPECIFICS_FILE           "LGI_job_specifics"
 #define LGI_JOBDAEMON_TARGET_RESOURCES_FILE        "LGI_target_resources"
 #define LGI_JOBDAEMON_INPUT_FILE                   "LGI_input"
@@ -105,8 +106,9 @@ using namespace std;
 #define LGI_JOBDAEMON_CA_CERTIFICATE_FILE_BIT_VALUE         4194304
 #define LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE_BIT_VALUE        8388608
 #define LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE_BIT_VALUE        16777216
+#define LGI_JOBDAEMON_WRITE_ACCESS_FILE_BIT_VALUE           33554432 
 
-#define LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER               33554431
+#define LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER               67108863
 
 // -----------------------------------------------------------------------------
 
@@ -128,6 +130,7 @@ class DaemonJob
               string GetJobId( void );
               string GetOwners( void );
               string GetReadAccess( void );
+              string GetWriteAccess( void );
               string GetJobSpecifics( void );               // volatile data
               string GetTargetResources( void );            // volatile data
               string GetInput( void );                      // volatile data

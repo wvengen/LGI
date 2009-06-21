@@ -98,6 +98,7 @@ DaemonJob::DaemonJob( string TheJobDirectory )
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_ID_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_ID_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_OWNERS_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_OWNERS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_READ_ACCESS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_WRITE_ACCESS_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_WRITE_ACCESS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_STATE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_STATE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_STATE_TIME_STAMP_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_STATE_TIME_STAMP_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_SPECIFICS_FILE << " seems corrupt in " << TheJobDirectory ); return; }
@@ -244,6 +245,12 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  chown( ( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE ).c_str(), UID, UID );
  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
  chown( ( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
+ WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "write_access" ) ), JobDirectory + "/" + LGI_JOBDAEMON_WRITE_ACCESS_FILE );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_WRITE_ACCESS_FILE ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_WRITE_ACCESS_FILE ).c_str(), UID, UID );
+ chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_WRITE_ACCESS_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ chown( ( JobDirectory + "/" + LGI_JOBDAEMON_WRITE_ACCESS_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  WriteStringToHashedFile( NormalizeString( Parse_XML( Parse_XML( TheXML, "job" ), "job_specifics" ) ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE );
  chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_SPECIFICS_FILE ).c_str(), S_IRUSR );
@@ -441,6 +448,15 @@ string DaemonJob::GetReadAccess( void )
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetReadAccess; JobDirectory empty" );
  string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_READ_ACCESS_FILE, Data );
  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetReadAccess; Returned " << Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetWriteAccess( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetWriteAccess; JobDirectory empty" );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_WRITE_ACCESS_FILE, Data );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetWriteAccess; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------

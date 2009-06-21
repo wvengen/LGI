@@ -40,7 +40,7 @@ string KeyFile, CertificateFile, CACertificateFile,
        ServerURL, Project, Response, ConfigDir,
        Application, Target_Resources( "any" ), 
        Job_Specifics, Owners, Read_Access, Input, 
-       Output, User, Groups;
+       Write_Access, Output, User, Groups;
 
 // ----------------------------------------------------------------------
 
@@ -65,9 +65,9 @@ void PrintHelp( char *ExeName )
  cout << "-a application          specify the application." << endl;
  cout << "-t targetresources      specify the target resources." << endl;
  cout << "-s jobspecs             specify the job specifics." << endl;
- cout << "-o owners               specify the job owners." << endl;
  cout << "-i inputfile            specify the job input file." << endl;
  cout << "-r readaccesslist       specify the job readaccess list." << endl;
+ cout << "-w writeaccesslist      specify the job writeaccess list." << endl;
  cout << "-c directory            specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
  cout << "-j jobdirectory         specify job directory to use. if not specified try current directory or specify the following options." << endl;
  cout << "-K keyfile              specify key file." << endl;
@@ -109,6 +109,7 @@ int main( int argc, char *argv[] )
   Project = Job.GetProject();
   Owners = Job.GetOwners();
   Read_Access = Job.GetReadAccess();
+  Write_Access = Job.GetWriteAccess();
 
   ResourceMode = 1;
  }
@@ -176,6 +177,7 @@ int main( int argc, char *argv[] )
      Project = Job.GetProject();
      Owners = Job.GetOwners();
      Read_Access = Job.GetReadAccess();
+     Write_Access = Job.GetWriteAccess();
 
      ResourceMode = 1;
     }
@@ -232,9 +234,9 @@ int main( int argc, char *argv[] )
      PrintHelp( argv[ 0 ] );
      return( 1 );
     }
-  } else if( !strcmp( argv[ i ], "-o" ) ) {
+  } else if( !strcmp( argv[ i ], "-w" ) ) {
     if( argv[ ++i ] )
-     Owners = string( argv[ i ] );
+     Write_Access = string( argv[ i ] );
     else
     {
      PrintHelp( argv[ 0 ] );
@@ -352,7 +354,7 @@ int main( int argc, char *argv[] )
   // we are signed on and have a session running now...
   string SessionID = NormalizeString( Parse_XML( Response, "session_id" ) );
 
-  Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, SessionID, Application, "queued", Owners, Target_Resources, Read_Access, Job_Specifics, Input, "", FilesToUpload );
+  Flag = ServerAPI.Resource_Submit_Job( Response, ServerURL, Project, SessionID, Application, "queued", Owners, Target_Resources, Read_Access, Write_Access, Job_Specifics, Input, "", FilesToUpload );
   if( Flag != CURLE_OK )
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
   else
@@ -388,7 +390,7 @@ int main( int argc, char *argv[] )
  {
   Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
 
-  Flag = ServerAPI.Interface_Submit_Job( Response, ServerURL, Project, User, Groups, Application, Target_Resources, Job_Specifics, Input, Read_Access, Owners, "", FilesToUpload );
+  Flag = ServerAPI.Interface_Submit_Job( Response, ServerURL, Project, User, Groups, Application, Target_Resources, Job_Specifics, Input, Read_Access, Write_Access, "", FilesToUpload );
   if( Flag != CURLE_OK )
   {
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;

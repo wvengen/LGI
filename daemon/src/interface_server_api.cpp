@@ -220,9 +220,9 @@ int Interface_Server_API::Interface_Delete_Job( string &Response, string ServerU
 
 // ------------------------------------------------------------------------------
 
-int Interface_Server_API::Interface_Submit_Job( string &Response, string ServerURL, string Project, string User, string Groups, string Application, string Target_Resources, string Job_Specifics, string Input, string Read_Access, string Owners, string Output, vector<string> FilesToUpload )
+int Interface_Server_API::Interface_Submit_Job( string &Response, string ServerURL, string Project, string User, string Groups, string Application, string Target_Resources, string Job_Specifics, string Input, string Read_Access, string Write_Access, string Output, vector<string> FilesToUpload )
 {
- DEBUG_LOG( "Interface_Server_API::Interface_Submit_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", User=" << User << ", Groups=" << Groups  << ", Application=" << Application << ", Target_Resources=" << Target_Resources << ", Job_Specifics=" << Job_Specifics << ", Input=" << Input << ", Read_Access= " << Read_Access << ", Owners=" << Owners << ", Output=" << Output );
+ DEBUG_LOG( "Interface_Server_API::Interface_Submit_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", User=" << User << ", Groups=" << Groups  << ", Application=" << Application << ", Target_Resources=" << Target_Resources << ", Job_Specifics=" << Job_Specifics << ", Input=" << Input << ", Read_Access= " << Read_Access << ", Write_Access=" << Write_Access << ", Output=" << Output );
 
  string PostURL = ServerURL + "/interfaces/interface_submit_job.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -241,7 +241,7 @@ int Interface_Server_API::Interface_Submit_Job( string &Response, string ServerU
   if( !Job_Specifics.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_specifics", CURLFORM_PTRCONTENTS, Job_Specifics.c_str(), CURLFORM_END );
   if( !Input.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "input", CURLFORM_PTRCONTENTS, Input.c_str(), CURLFORM_END );
   if( !Read_Access.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "read_access", CURLFORM_PTRCONTENTS, Read_Access.c_str(), CURLFORM_END );
-  if( !Owners.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "owners", CURLFORM_PTRCONTENTS, Owners.c_str(), CURLFORM_END );
+  if( !Write_Access.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "write_access", CURLFORM_PTRCONTENTS, Write_Access.c_str(), CURLFORM_END );
   if( !Output.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "output", CURLFORM_PTRCONTENTS, Output.c_str(), CURLFORM_END );
 
   if( FilesToUpload.size() )          // there are files to be uploaded too...

@@ -71,6 +71,7 @@ int Daemon::ScanDirectoryForJobs( string Directory )
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_JOB_ID_FILE ) ) FileMask |= LGI_JOBDAEMON_JOB_ID_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_OWNERS_FILE ) ) FileMask |= LGI_JOBDAEMON_OWNERS_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_READ_ACCESS_FILE ) ) FileMask |= LGI_JOBDAEMON_READ_ACCESS_FILE_BIT_VALUE;
+   if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_WRITE_ACCESS_FILE ) ) FileMask |= LGI_JOBDAEMON_WRITE_ACCESS_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_JOB_SPECIFICS_FILE ) ) FileMask |= LGI_JOBDAEMON_JOB_SPECIFICS_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_TARGET_RESOURCES_FILE ) ) FileMask |= LGI_JOBDAEMON_TARGET_RESOURCES_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_INPUT_FILE ) ) FileMask |= LGI_JOBDAEMON_INPUT_FILE_BIT_VALUE;
@@ -544,7 +545,7 @@ int Daemon::RequestWorkCycle( void )
 
          // check if owner specific limits are reached... 
          if( IsOwnerDenied( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
-         if( IsOwnerRunningToMuch( Owners[ OwnerIndex ], TheProject, TheApplication ) ) break;
+         if( IsOwnerRunningToMuch( Owners[ OwnerIndex ], TheProject, TheApplication ) == ... ) break;
         }
 
         if( OwnerIndex == Owners.size() )      // no denials or limits reached for any of the owners...
@@ -706,8 +707,8 @@ int Daemon::IsOwnerRunningToMuch( string Owner, DaemonConfigProject &Project, Da
  string ApplicationLimit = NormalizeString( Parse_XML( Application.Owner_Allow(), Owner ) );
  if( ApplicationLimit.empty() ) ApplicationLimit = NormalizeString( Parse_XML( Application.Owner_Allow(), "any" ) );
 
- // if no limits for this owners, then default to denial...
- if( ConfigLimit.empty() && ProjectLimit.empty() && ApplicationLimit.empty() ) return( 1 );
+ // if no limits for this owners, then signal this...
+ if( ConfigLimit.empty() && ProjectLimit.empty() && ApplicationLimit.empty() ) return( 2 );
 
  if( !ConfigLimit.empty() ) 
   if( atoi( ConfigLimit.c_str() ) <= Accounting[ Owner ] ) return( 1 );

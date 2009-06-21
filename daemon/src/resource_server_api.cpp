@@ -294,9 +294,9 @@ int Resource_Server_API::Resource_Update_Job( string &Response, string ServerURL
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL, string Project, string SessionID, string Application, string State, string Owners, string Target_Resources, string Read_Access, string Job_Specifics, string Input, string Output, vector<string> FilesToUpload )
+int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL, string Project, string SessionID, string Application, string State, string Owners, string Target_Resources, string Read_Access, string Write_Access, string Job_Specifics, string Input, string Output, vector<string> FilesToUpload )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_Submit_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Application=" << Application << ", State=" << State << ", Owners=" << Owners << ", Target_Resources=" << Target_Resources << ", Read_Access=" << Read_Access << ", Input=" << Input << ", Output=" << Output << ", Job_Specifics=" << Job_Specifics );
+ DEBUG_LOG( "Resource_Server_API::Resource_Submit_Job; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Application=" << Application << ", State=" << State << ", Owners=" << Owners << ", Target_Resources=" << Target_Resources << ", Read_Access=" << Read_Access << ", Write_Access=" << Write_Access << ", Input=" << Input << ", Output=" << Output << ", Job_Specifics=" << Job_Specifics );
 
  string PostURL = ServerURL + "/resources/resource_submit_job.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -313,6 +313,7 @@ int Resource_Server_API::Resource_Submit_Job( string &Response, string ServerURL
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "owners", CURLFORM_PTRCONTENTS, Owners.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "target_resources", CURLFORM_PTRCONTENTS, Target_Resources.c_str(), CURLFORM_END );
   if( !Read_Access.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "read_access", CURLFORM_PTRCONTENTS, Read_Access.c_str(), CURLFORM_END );
+  if( !Write_Access.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "write_access", CURLFORM_PTRCONTENTS, Write_Access.c_str(), CURLFORM_END );
   if( !Job_Specifics.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "job_specifics", CURLFORM_PTRCONTENTS, Job_Specifics.c_str(), CURLFORM_END );
   if( !Input.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "input", CURLFORM_PTRCONTENTS, Input.c_str(), CURLFORM_END );
   if( !Output.empty() ) curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "output", CURLFORM_PTRCONTENTS, Output.c_str(), CURLFORM_END );
