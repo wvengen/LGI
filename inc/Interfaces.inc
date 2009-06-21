@@ -303,7 +303,7 @@ function Interface_Count_Jobs_In_Queue( $Owner, $Application, &$TotalNrOfJobs, &
 
 // -------------------------------------------------------------------- 
 
-function Interface_Is_Target_Resource_Known( $Resource )
+function Interface_Is_Target_Resource_Known( $Resource, $Application = "" )
 {
  if( $Resource == "any" ) return( 1 );
 
@@ -311,7 +311,11 @@ function Interface_Is_Target_Resource_Known( $Resource )
 
  $ReturnValue = 0;
 
- $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name='".$Resource."'" );
+ if( $Application === "" )
+  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name='".$Resource."'" );
+ else
+  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name='".$Resource."' AND resource_capabilities LIKE '%<".$Application.">%</".$Application.">%'" );
+
  if( mysql_num_rows( $queryresult ) >= 1 )
   $ReturnValue = 1;
 
@@ -421,16 +425,16 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
  $State = mysql_escape_string( $State );
  $Application = mysql_escape_string( $Application );
 
- $Query = "SELECT job_id,state,application,state_time_stamp,target_resources,owners,read_access,job_specifics FROM job_queue WHERE";
+ $Query = "SELECT job_id,state,application,state_time_stamp,target_resources,owners,read_access,write_access,job_specifics FROM job_queue WHERE";
 
  $Owner = mysql_escape_string( $OwnerArray[ 1 ] );
  $RegExpUser = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
- $Query .= "( ( owners REGEXP '".$RegExpUser."' ) OR ( read_access REGEXP '".$RegExpUser."' )";
+ $Query .= "( read_access REGEXP '".$RegExpUser."' )";
  for( $o = 2; $o <= $OwnerArray[ 0 ]; $o++ )
  {
   $Owner = mysql_escape_string( $OwnerArray[ $o ] );
   $RegExpUser = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
-  $Query .= " OR ( owners REGEXP '".$RegExpUser."' ) OR ( read_access REGEXP '".$RegExpUser."' )";
+  $Query .= " OR ( read_access REGEXP '".$RegExpUser."' )";
  }
 
  if( isset( $State ) && ( $State != "" ) && ( $State != "any" ) )
@@ -462,7 +466,7 @@ function Interface_Is_User_Allowed_To_Read_Job( $JobSpecs, $User, $Groups )
  $MatchFlag = 0;
 
  for( $i = 1; $i <= $PossibleJobOwnersArray[ 0 ]; $i++ )
-  if( FoundInCommaSeparatedField( $JobSpecs->owners, $PossibleJobOwnersArray[ $i ], "," ) || FoundInCommaSeparatedField( $JobSpecs->read_access, $PossibleJobOwnersArray[ $i ], "," ) )
+  if( FoundInCommaSeparatedField( $JobSpecs->read_access, $PossibleJobOwnersArray[ $i ], "," ) )
    $MatchFlag = 1;
 
  return( $MatchFlag );
@@ -476,7 +480,7 @@ function Interface_Is_User_Allowed_To_Modify_Job( $JobSpecs, $User, $Groups )
  $MatchFlag = 0;
 
  for( $i = 1; $i <= $PossibleJobOwnersArray[ 0 ]; $i++ )
-  if( FoundInCommaSeparatedField( $JobSpecs->owners, $PossibleJobOwnersArray[ $i ], "," ) )
+  if( FoundInCommaSeparatedField( $JobSpecs->write_access, $PossibleJobOwnersArray[ $i ], "," ) )
    $MatchFlag = 1;
 
  return( $MatchFlag );
