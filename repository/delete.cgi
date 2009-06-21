@@ -3,8 +3,8 @@
 # A simple log file, must be writable by the user that this program runs as...
 $deletelog = "delete.log";
 
-# Set repository owners file name...
-$ownerfile = ".LGI_repository_owners";
+# Set repository access file name...
+$accessfile = ".LGI_repository_write_access";
 
 # Set resource list file name...
 $resourcesfile = ".LGI_resource_list";
@@ -20,7 +20,7 @@ $filename = $ENV{'PATH_TRANSLATED'};
 if (!$filename) { &reply(500, "No PATH_TRANSLATED"); }
 
 # Do access checks if needed...
-if ($ownersfile || $resourcesfile) {
+if ($accessfile || $resourcesfile) {
 
  # Default deny access...
  $allowed = 0;
@@ -34,25 +34,25 @@ if ($ownersfile || $resourcesfile) {
   @certificate = ( $certificate[ 0 ] );
  }
 
- # If file specified, check owners of repository...
- if ($ownersfile) {
+ # If file specified, check write access of repository...
+ if ($accessfile) {
 
-  # Get owners fields from file...
+  # Get write access fields from file...
   ($dir,$file) = $filename =~ m|^(.*[/\\])([^/\\]+?)$|;
-  $ownersfile = $dir.$ownersfile;
-  open(OWNERS, $ownersfile) || &reply(500, "Cannot open $ownersfile file");
-  $owners = <OWNERS> || &reply(500, "Cannot read from $ownersfile file");
-  close(OWNERS);
-  @owners = &CSV2Array($owners, ",");
+  $accessfile = $dir.$accessfile;
+  open(ACCESS, $accessfile) || &reply(500, "Cannot open $accessfile file");
+  $access = <ACCESS> || &reply(500, "Cannot read from $accessfile file");
+  close(ACCESS);
+  @access = &CSV2Array($access, ",");
 
   # Now check if allowed combination is found...
-  foreach $o (@owners) {
-   chomp($o);
+  foreach $a (@access) {
+   chomp($a);
    foreach $c (@certificate) {
     chomp($c);
-    if($o =~ /^any$/i) { $allowed = 1; }
+    if($a =~ /^any$/i) { $allowed = 1; }
     if($c =~ /^any$/i) { $allowed = 1; }
-    if($c =~ /^$o$/i) { $allowed = 1; }
+    if($c =~ /^$a$/i) { $allowed = 1; }
    }
   }
  }
@@ -60,7 +60,7 @@ if ($ownersfile || $resourcesfile) {
  # If file specified, check resources of project...
  if ($resourcesfile) {
 
-  # Get owners fields from file...
+  # Get fields from file...
   open(RESOURCES, $resourcesfile) || &reply(500, "Cannot open $resourcesfile file");
   $resources = <RESOURCES> || &reply(500, "Cannot read from $resourcesfile file");
   close(RESOURCES);
@@ -79,7 +79,7 @@ if ($ownersfile || $resourcesfile) {
  }
 
  # Check if we have access...
- if(!$allowed) { &reply(500, "Access to repository is denied, you are no owner or resource"); }
+ if(!$allowed) { &reply(500, "Access to repository is denied"); }
 }
 
 # Delete the file if possible...

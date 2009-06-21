@@ -67,6 +67,7 @@ CREATE TABLE job_queue (
   application tinytext NOT NULL,
   owners tinytext NOT NULL,
   read_access tinytext NOT NULL,
+  write_access tinytext NOT NULL,
   target_resources tinytext NOT NULL,
   input blob NOT NULL,
   output blob NOT NULL,

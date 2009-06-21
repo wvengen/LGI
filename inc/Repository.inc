@@ -78,7 +78,7 @@ function CreateRepositoryResourceFile( $Resources = "" )
 
 // --------------------------------------------------- 
 
-function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile, $Owners = "any" )
+function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile, $WriteAccess = "any" )
 {
  global $Config;
 
@@ -121,15 +121,15 @@ function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile,
  }
 
  if( $RepositoryIDFile != "" )
-  exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir $RepositoryDir; chmod 770 $RepositoryDir; echo $Owners > $RepositoryDir/.LGI_repository_owners\"" );
+  exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir $RepositoryDir; chmod 770 $RepositoryDir; echo $WriteAccess > $RepositoryDir/.LGI_repository_write_access\"" ); 
  else
  {
   if( !is_dir( $RepositoryDir ) )
   {
    $OldMask = umask( 0 );
    mkdir( $RepositoryDir, 0770 );
-   $File = fopen( "$RepositoryDir/.LGI_repository_owners", "w" );
-   fwrite( $File, $Owners );
+   $File = fopen( "$RepositoryDir/.LGI_repository_write_access", "w" );
+   fwrite( $File, $WriteAccess );
    fclose( $File );
    umask( $OldMask );
   }
