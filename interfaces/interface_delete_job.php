@@ -82,6 +82,7 @@ $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resou
 $Response .= " <application> ".$JobSpecs->application." </application>";
 $Response .= " <owners> ".$JobSpecs->owners." </owners>";
 $Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
+$Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
 $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
 $Response .= " <state> ".$JobState." </state> <state_time_stamp> ".$JobStateTimeStamp." </state_time_stamp> </job>";
 

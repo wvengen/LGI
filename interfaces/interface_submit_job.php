@@ -65,20 +65,16 @@ if( $QueryData -> count <= 0 ) return( LGI_Error_Response( 70, $ErrorMsgs[ 70 ] 
 
 // check if any of posted target resources is allowed...
 $Resources = CommaSeparatedField2Array( $JobTargetResources, "," );
-
 $NewTargetResourceList = "";
 $FoundResourceFlag = 0;
-
 for( $i = 1; $i <= $Resources[ 0 ]; $i++ )
- if( Interface_Is_Target_Resource_Known( $Resources[ $i ] ) )
+ if( Interface_Is_Target_Resource_Known( $Resources[ $i ], $JobApplication ) )
  {
   $NewTargetResourceList .= ", ".$Resources[ $i ];
   $FoundResourceFlag = 1;
  }
-
 if( !$FoundResourceFlag )
  return( LGI_Error_Response( 28, $ErrorMsgs[ 28 ] ) );
-
 $JobTargetResources = substr( $NewTargetResourceList, 2 );
 
 // check if any of the posted combinations of user+groups or just the user is allowed to submit a job...
@@ -103,9 +99,9 @@ for( $i = 1; $i <= $GroupsArray[ 0 ]; $i++ )
   {
 
    if( $LimitType == 1 )          // was it a limit defined from the user tables or the group tables...
-    Interface_Count_Jobs_In_Queue( $JobUser, $JobApplication, $TotalNrOfJobs, $NrOfRunningJobs, "owners" );
+    Interface_Count_Jobs_In_Queue( $JobUser, $JobApplication, $TotalNrOfJobs, $NrOfRunningJobs );
    else
-    Interface_Count_Jobs_In_Queue( $GroupsArray[ $i ], $JobApplication, $TotalNrOfJobs, $NrOfRunningJobs, "read_access" );
+    Interface_Count_Jobs_In_Queue( $GroupsArray[ $i ], $JobApplication, $TotalNrOfJobs, $NrOfRunningJobs );
 
    if( $NumberOfJobsAllowed > 0 )
    {
@@ -138,49 +134,29 @@ if( $FoundPossibleGroup )
 else
  return( LGI_Error_Response( 33, $ErrorMsgs[ 33 ] ) );
 
-// now determine the owners and read_access fields based on the possibly posted data and the user+groups data...
+// now determine the read_access and write_access fields based on the possibly posted data and the user+groups data...
 if( isset( $_POST[ "read_access" ] ) && ( $_POST[ "read_access" ] != "" ) )
 {
  if( strlen( $_POST[ "read_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 51, $ErrorMsgs[ 51 ] ) );
 
- if( isset( $_POST[ "owners" ] ) && ( $_POST[ "owners" ] != "" ) )
- {
-  if( strlen( $_POST[ "owners" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-   return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ] ) );
-
-  // if owners and read_access were posted...
-  $JobOwners = $JobUser.", ".$_POST[ "owners" ];
-  $JobReadAccess = $JobUser.", ".$JobGroups.", ".$_POST[ "read_access" ].", ".$_POST[ "owners" ];
- }
- else
- {
-  // if only read_access was posted...
-  $JobOwners = $JobUser;
-  $JobReadAccess = $JobUser.", ".$JobGroups.", ".$_POST[ "read_access" ];
- }
+ $JobReadAccess = $JobUser.", ". $_POST[ "read_access" ];
 }
 else
-{
- if( isset( $_POST[ "owners" ] ) && ( $_POST[ "owners" ] != "" ) )
- {
-  if( strlen( $_POST[ "owners" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
-   return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ] ) );
+ $JobReadAccess = $JobUser;
 
-  // if only owners was posted...
-  $JobOwners = $JobUser.", ".$_POST[ "owners" ];
-  $JobReadAccess = $JobUser.", ".$JobGroups.", ".$_POST[ "owners" ];
- }
- else
- {
-  // if neither owners nor read_access were posted...
-  $JobOwners = $JobUser;
-  $JobReadAccess = $JobUser.", ".$JobGroups;
- }
+if( isset( $_POST[ "write_access" ] ) && ( $_POST[ "write_access" ] != "" ) )
+{
+ if( strlen( $_POST[ "write_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ] ) );
+
+ $JobWriteAccess = $JobUser.", ".$_POST[ "write_access" ];
 }
+else
+ $JobWriteAccess = $JobUser;
 
 // create the job respository directory...
-CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile, $JobOwners );
+CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile, $JobWriteAccess );
 $RepositoryWWWURL = RepositoryURL2WWW( $RepositoryURL.":".$RepositoryDir );
 
 // now handle file uploads...
@@ -212,13 +188,14 @@ for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
 }
 
 // make sure that future REGEXP's do work...
-$JobOwners = mysql_escape_string( NormalizeCommaSeparatedField( $JobOwners, "," ) );
+$JobOwners = mysql_escape_string( NormalizeCommaSeparatedField( $JobUser.", ".$JobGroups, "," ) );
 $JobReadAccess = mysql_escape_string( NormalizeCommaSeparatedField( $JobReadAccess, "," ) );
+$JobWriteAccess = mysql_escape_string( NormalizeCommaSeparatedField( $JobWriteAccess, "," ) );
 $JobApplication = mysql_escape_string( $JobApplication );
 $JobTargetResources = mysql_escape_string( $JobTargetResources );
 
 // start building the insert query based on all possible posted fields...
-$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$JobApplication."', owners='".$JobOwners."', read_access='".$JobReadAccess."', target_resources='".$JobTargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP()";
+$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$JobApplication."', owners='".$JobOwners."', read_access='".$JobReadAccess."', write_access='".$JobWriteAccess."', target_resources='".$JobTargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP()";
 
 if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
 {
@@ -264,6 +241,7 @@ $Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id>";
 $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
 $Response .= " <owners> ".$JobSpecs->owners." </owners>";
 $Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
+$Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
 $Response .= " <application> ".$JobSpecs->application." </application>";
 $Response .= " <state> ".$JobSpecs->state." </state>";
 $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";

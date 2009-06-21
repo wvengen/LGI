@@ -131,6 +131,7 @@ if( !$DetailMode )
    $JobResponses .= " <target_resources> ".$JobData->target_resources." </target_resources>";
    $JobResponses .= " <owners> ".$JobData->owners." </owners>";
    $JobResponses .= " <read_access> ".$JobData->read_access." </read_access>";
+   $JobResponses .= " <write_access> ".$JobData->write_access." </write_access>";
    $JobResponses .= " <job_specifics> ".$JobData->job_specifics." </job_specifics>";
    $JobResponses .= " <application> ".$JobData->application." </application> </job>";
   }
@@ -157,6 +158,7 @@ else
  $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
  $Response .= " <owners> ".$JobSpecs->owners." </owners>";
  $Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
+ $Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
  $Response .= " <application> ".$JobSpecs->application." </application>";
  $Response .= " <state> ".$JobSpecs->state." </state>";
  $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";
