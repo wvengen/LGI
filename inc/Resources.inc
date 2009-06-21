@@ -368,6 +368,15 @@ function Get_Server_URL( )
  return( $Config[ "SERVER_URL" ] );
 }
 
+// --------------------------------------------------------------------
+
+function Get_Server_Name( )
+{
+ global $Config;
+
+ return( $Config[ "SERVER_NAME" ] );
+}
+
 // -------------------------------------------------------------------- 
 
 function Get_Master_Server_URL( )
@@ -554,5 +563,5 @@ function Resource_Count_Owners_Jobs_In_Queue( $Owner, $Application, &$TotalNrOfJ
 }
 
 // -------------------------------------------------------------------- 
-
+ 
 ?>
