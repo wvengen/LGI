@@ -31,6 +31,9 @@ function SSL_Verify_Client( $ExitOnError = true )
 
  // See if a valid CA-signed client certificate was used to connect
 
+ if( !isset( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_VERIFY" ] ) )
+  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], $ExitOnError ) );
+
  if( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_VERIFY" ] != "SUCCESS" )
   return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], $ExitOnError ) );
 
@@ -41,21 +44,30 @@ function SSL_Verify_Client( $ExitOnError = true )
 
 function SSL_Get_Common_Name( )
 {
- return( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_S_DN_CN" ] );
+ if( isset(  $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_S_DN_CN" ] ) )
+  return( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_S_DN_CN" ] );
+ else
+  return( "" );
 }
 
 // -------------------------------------------------------------------- 
 
 function SSL_Get_Full_Client_Certificate( )
 {
- return( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_CERT" ] );
+ if( isset( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_CERT" ] ) )
+  return( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_CERT" ] );
+ else
+  return( "" );
 }
 
 // -------------------------------------------------------------------- 
 
 function SSL_Get_Full_Server_Certificate( )
 {
- return( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_SERVER_CERT" ] );
+ if( isset( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_SERVER_CERT" ] ) )
+  return( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_SERVER_CERT" ] );
+ else
+  return( "" );
 }
 
 // --------------------------------------------------------------------
