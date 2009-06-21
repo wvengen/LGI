@@ -140,6 +140,8 @@ if( isset( $_POST[ "read_access" ] ) && ( $_POST[ "read_access" ] != "" ) )
  if( strlen( $_POST[ "read_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 51, $ErrorMsgs[ 51 ] ) );
 
+ // check perhaps if read_access is part of owners=user+groups allowed to submit?
+
  $JobReadAccess = $JobUser.", ". $_POST[ "read_access" ];
 }
 else
@@ -149,6 +151,8 @@ if( isset( $_POST[ "write_access" ] ) && ( $_POST[ "write_access" ] != "" ) )
 {
  if( strlen( $_POST[ "write_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ] ) );
+ 
+ // check perhaps if write_access is part of owners=user+groups allowed to submit?
 
  $JobWriteAccess = $JobUser.", ".$_POST[ "write_access" ];
 }

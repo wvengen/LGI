@@ -48,7 +48,7 @@ $ErrorMsgs[ 24 ] = "Resource is not allowed to get job state";
 $ErrorMsgs[ 25 ] = "Compulsory state field was not posted"; 
 $ErrorMsgs[ 26 ] = "Compulsory owners field was not posted"; 
 $ErrorMsgs[ 27 ] = "Compulsory target_resources field was not posted"; 
-$ErrorMsgs[ 28 ] = "None of the target_resources were found in the database"; 
+$ErrorMsgs[ 28 ] = "None of the target_resources were found in the database or had the application configured"; 
 $ErrorMsgs[ 29 ] = "None of the owners is allowed to submit a job"; 
 $ErrorMsgs[ 30 ] = "Posted user field does not match the client-certificate"; 
 $ErrorMsgs[ 31 ] = "Compulsory groups field was not posted"; 
@@ -91,5 +91,6 @@ $ErrorMsgs[ 67 ] = "Suspected cross-site-scripting (XSS) attack";
 $ErrorMsgs[ 68 ] = "Error in file upload to repository"; 
 $ErrorMsgs[ 69 ] = "Resource capabilities field posted to big"; 
 $ErrorMsgs[ 70 ] = "Application not configured on any of the known resources"; 
+$ErrorMsgs[ 71 ] = "Owners field posted too big"; 
 
 ?>
