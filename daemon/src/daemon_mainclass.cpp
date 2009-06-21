@@ -590,7 +590,7 @@ int Daemon::RequestWorkCycle( void )
           
         }
         else
-         VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Denied service for job " << Job_Id );
+         VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Denied service for job " << Job_Id << ", flag=" << OwnerFlag << ", index=" << OwnerIndex );
 
         if( ServerAPI.Resource_UnLock_Job( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, Job_Id ) != CURLE_OK ) JobIndex = NrOfJobs;
        }
