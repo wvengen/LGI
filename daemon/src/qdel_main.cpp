@@ -220,7 +220,7 @@ int main( int argc, char *argv[] )
 
   if( !Parse_XML( Response, "error" ).empty() )
   {
-   cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) )<< endl << endl;
+   cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) )<< endl;
    continue;
   }
 
@@ -228,20 +228,19 @@ int main( int argc, char *argv[] )
   if( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) == "deleted" )
   {
    cout << endl << "Job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " deleted from project ";
-   cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl << endl;
+   cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
    continue;
   }
 
   if( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) == "aborting" )
   {
    cout << endl << "Aborting job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " in project ";
-   cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl << endl;
+   cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
    continue;
   }
 
   cout << endl << "Could not abort or delete job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " from project ";
-  cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl << endl;
-
+  cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
  }
 
  cout << endl;
