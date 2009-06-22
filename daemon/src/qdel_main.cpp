@@ -21,6 +21,7 @@
 #include <sys/wait.h>
 #include <cstring>
 #include <cstdlib>
+#include <vector>
 
 #include "logger.h"
 #include "interface_server_api.h"
@@ -31,7 +32,8 @@
 // ----------------------------------------------------------------------
 
 string KeyFile, CertificateFile, CACertificateFile, ServerURL, Response,
-       Project, State, Application, User, Groups, Job_Id, ConfigDir;
+       Project, State, Application, User, Groups, ConfigDir;
+vector<string> Job_Ids;
 
 // ----------------------------------------------------------------------
 
@@ -171,7 +173,7 @@ int main( int argc, char *argv[] )
     int Dummy;
 
     if( sscanf( argv[ i ], "%d", &Dummy ) == 1 )
-     Job_Id = string( argv[ i ] );
+     Job_Ids.push_back( string( argv[ i ] ) );
     else
     {
      PrintHelp( argv[ 0 ] );
@@ -189,7 +191,7 @@ int main( int argc, char *argv[] )
  if( ServerURL.empty() ) Flag = 1;
  if( User.empty() ) Flag = 1;
  if( Groups.empty() ) Flag = 1;
- if( Job_Id.empty() ) Flag = 1;
+ if( Job_Ids.size() <= 0 ) Flag = 1;
 
  if( Flag )
  {
@@ -200,41 +202,48 @@ int main( int argc, char *argv[] )
  // now start contacting the server...
  Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );
 
- // try and delete job from server...
- if( ( Flag = ServerAPI.Interface_Delete_Job( Response, ServerURL, Project, User, Groups, Job_Id ) ) != CURLE_OK )
+
+ for( int j = 0; j < Job_Ids.size(); ++j )
  {
-  cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
-  return( 1 );
- }
+ 
+  // try and delete job from server...
+  if( ( Flag = ServerAPI.Interface_Delete_Job( Response, ServerURL, Project, User, Groups, Job_Ids[ j ] ) ) != CURLE_OK )
+  {
+   cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+   return( 1 );
+  }
 
- // now show response obtained...
- Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
+  // now show response obtained...
+  Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
- if( Response.empty() ) return( 1 );
+  if( Response.empty() ) continue;
 
- if( !Parse_XML( Response, "error" ).empty() )
- {
-  cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) )<< endl << endl;
-  return( 1 );
- }
+  if( !Parse_XML( Response, "error" ).empty() )
+  {
+   cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) )<< endl << endl;
+   continue;
+  }
 
- // check if deleted okay ....
- if( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) == "deleted" )
- {
-  cout << endl << "Job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " deleted from project ";
+  // check if deleted okay ....
+  if( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) == "deleted" )
+  {
+   cout << endl << "Job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " deleted from project ";
+   cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl << endl;
+   continue;
+  }
+
+  if( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) == "aborting" )
+  {
+   cout << endl << "Aborting job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " in project ";
+   cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl << endl;
+   continue;
+  }
+
+  cout << endl << "Could not abort or delete job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " from project ";
   cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl << endl;
-  return( 0 );
+
  }
 
- if( NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "state" ) ) == "aborting" )
- {
-  cout << endl << "Aborting job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " in project ";
-  cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl << endl;
-  return( 0 );
- }
-
- cout << endl << "Could not abort or delete job " << NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "job_id" ) ) << " from project ";
- cout << NormalizeString( Parse_XML( Response, "project" ) ) << " on server " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl << endl;
-
- return( 1 );
+ cout << endl;
+ return( 0 );
 }
