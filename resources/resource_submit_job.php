@@ -176,7 +176,7 @@ for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
  }
 }
 
-$JobOwners = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( substr( $NewOwnersList, 2 ), "," );
+$JobOwners = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( substr( $NewOwnersList, 2 ), "," ) );
 $JobState = mysql_escape_string( $JobState );
 $JobApplication = mysql_escape_string( $JobApplication );
 $JobTargetResources = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $JobTargetResources, "," ) );
