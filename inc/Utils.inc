@@ -47,7 +47,7 @@ function binhex( $bin )
 
 // --------------------------------------------------- 
 
-function CommaSeparatedField2Array( $Field, $Separator )
+function CommaSeparatedField2Array( $Field, $Separator = ',' )
 {
  if( !isset( $Separator ) || ( $Separator == "" ) ) $Separator = ',';
 
@@ -86,7 +86,7 @@ function CommaSeparatedField2Array( $Field, $Separator )
 
 // --------------------------------------------------- 
 
-function MakeRegularExpressionForCommaSeparatedField( $Field, $Separator )
+function MakeRegularExpressionForCommaSeparatedField( $Field, $Separator = ',' )
 {
  if( !isset( $Separator ) || ( $Separator == "" ) ) $Separator = ',';
  
@@ -95,7 +95,7 @@ function MakeRegularExpressionForCommaSeparatedField( $Field, $Separator )
 
 // --------------------------------------------------- 
 
-function NormalizeCommaSeparatedField( $Field, $Separator )
+function NormalizeCommaSeparatedField( $Field, $Separator = ',' )
 {
  if( !isset( $Separator ) || ( $Separator == "" ) ) $Separator = ',';
 
@@ -110,7 +110,7 @@ function NormalizeCommaSeparatedField( $Field, $Separator )
 
 // --------------------------------------------------- 
 
-function FoundInCommaSeparatedField( $Field, $Value, $Separator )
+function FoundInCommaSeparatedField( $Field, $Value, $Separator = ',' )
 {
  if( !isset( $Separator ) || ( $Separator == "" ) ) $Separator = ',';
 
@@ -121,6 +121,36 @@ function FoundInCommaSeparatedField( $Field, $Value, $Separator )
    return( 1 );
 
  return( 0 );
+}
+
+// --------------------------------------------------- 
+
+function RemoveDoubleEntriesFromCommaSeparatedField( $Field, $Separator = ',' )
+{
+ if( !isset( $Separator ) || ( $Separator == "" ) ) $Separator = ',';
+
+ $Array = CommaSeparatedField2Array( $Field, $Separator );
+
+ if( $Array[ 0 ] <= 1 ) return( $Field );
+
+ $NewList = $Array[ 1 ];
+ $AccountedFor[ 0 ] = 1;
+ $AccountedFor[ 1 ] = $Array[ 1 ];
+
+ for( $i = 2; $i <= $Array[ 0 ]; $i++ )
+ {
+  for( $j = 1; $j <= $AccountedFor[ 0 ]; $j++ )
+   if( $AccountedFor[ $j ] == $Array[ $i ] ) break;
+
+  if( $j <= $AccountedFor[ 0 ] ) continue;
+
+  $NewList .= $Separator." ".$Array[ $i ];
+
+  $AccountedFor[ 0 ]++;
+  $AccountedFor[ $AccountedFor[ 0 ] ] = $Array[ $i ];
+ }
+
+ return( $NewList );
 }
 
 // --------------------------------------------------- 

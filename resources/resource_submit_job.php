@@ -176,10 +176,10 @@ for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
  }
 }
 
-$JobOwners = mysql_escape_string( substr( $NewOwnersList, 2 ) );
+$JobOwners = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( substr( $NewOwnersList, 2 ), "," );
 $JobState = mysql_escape_string( $JobState );
 $JobApplication = mysql_escape_string( $JobApplication );
-$JobTargetResources = mysql_escape_string( $JobTargetResources );
+$JobTargetResources = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $JobTargetResources, "," ) );
 
 // start building the insert query based on all possible posted fields...
 $InsertQuery = "INSERT INTO job_queue SET state='".$JobState."', application='".$JobApplication."', owners='".$JobOwners."', target_resources='".$JobTargetResources."', lock_state=1, state_time_stamp=UNIX_TIMESTAMP()";
@@ -213,19 +213,23 @@ if( isset( $_POST[ "read_access" ] ) && ( $_POST[ "read_access" ] != "" ) )
 {
  if( strlen( $_POST[ "read_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 51, $ErrorMsgs[ 51 ] ) );
- $InsertQuery .= ", read_access='".$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "read_access" ], "," ) )."'";
+ $ReadAccess = $JobOwners.", ".$_POST[ "read_access" ];
 }
 else
- $InsertQuery .= ", read_access='".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "owners" ], "," ) )."'";
+ $ReadAccess = $JobOwners;
 
 if( isset( $_POST[ "write_access" ] ) && ( $_POST[ "write_access" ] != "" ) )
 {
  if( strlen( $_POST[ "write_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ] ) );
- $InsertQuery .= ", write_access='".$JobOwners.", ".mysql_escape_string( NormalizeCommaSeparatedField( $_POST[ "write_access" ], "," ) )."'";
+ $WriteAccess = $JobOwners.", ".$_POST[ "write_access" ];
 }
 else
- $InsertQuery .= ", write_access='".$JobOwners."'";
+ $WriteAccess = $JobOwners;
+
+$ReadAccess = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $ReadAccess, "," ) );
+$WriteAccess = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $WriteAccess, "," ) );
+$InsertQuery .= ", read_access='".$ReadAccess."', write_access='".$WriteAccess."'";
 
 // insert the job into the database...
 $queryresult = mysql_query( $InsertQuery );

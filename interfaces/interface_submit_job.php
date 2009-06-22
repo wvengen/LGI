@@ -192,11 +192,11 @@ for( $i = 1; $i <= $NrOfUploadedFiles; $i++ )
 }
 
 // make sure that future REGEXP's do work...
-$JobOwners = mysql_escape_string( NormalizeCommaSeparatedField( $JobUser.", ".$JobGroups, "," ) );
-$JobReadAccess = mysql_escape_string( NormalizeCommaSeparatedField( $JobReadAccess, "," ) );
-$JobWriteAccess = mysql_escape_string( NormalizeCommaSeparatedField( $JobWriteAccess, "," ) );
+$JobOwners = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $JobUser.", ".$JobGroups, "," ) );
+$JobReadAccess = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $JobReadAccess, "," ) );
+$JobWriteAccess = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $JobWriteAccess, "," ) );
 $JobApplication = mysql_escape_string( $JobApplication );
-$JobTargetResources = mysql_escape_string( $JobTargetResources );
+$JobTargetResources = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $JobTargetResources, "," ) );
 
 // start building the insert query based on all possible posted fields...
 $InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$JobApplication."', owners='".$JobOwners."', read_access='".$JobReadAccess."', write_access='".$JobWriteAccess."', target_resources='".$JobTargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP()";
