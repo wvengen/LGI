@@ -7,7 +7,23 @@ export LGI_DIR="${HOME}/LGI"
 
 # get repository url and download input...
 export REPO_URL=`${LGI_DIR}/daemon/bin/xml repository_url < LGI_job_specifics`
-${LGI_DIR}/daemon/bin/LGI_filetransfer download ${REPO_URL} classical.in > /dev/null
+export REPO_CONTENT=`${LGI_DIR}/daemon/bin/LGI_filetransfer list -x ${REPO_URL}`
+export FILE_LIST=""
+export NR_FILES=`echo ${REPO_CONTENT} | ${LGI_DIR}/daemon/bin/xml number_of_files`
+
+for nr in `seq 1 ${NR_FILES}`
+do
+  export FILE_ATTR="number=\"${nr}\""
+  export FILE_DATA=`echo ${REPO_CONTENT} | ${LGI_DIR}/daemon/bin/xml file ${FILE_ATTR}`
+  export FILE_NAME=`echo ${FILE_DATA} | ${LGI_DIR}/daemon/bin/xml file_name`
+  export FILE_LIST="${FILE_LIST} ${FILE_NAME}"
+done
+
+if [ "${FILE_LIST}" != "" ]
+then
+ ${LGI_DIR}/daemon/bin/LGI_filetransfer download ${REPO_URL} ${FILE_LIST} > /dev/null
+fi
+
 if [ -f classical.in ]
 then
  echo Input file classical.in has been downloaded from repository ${REPO_URL}... > LGI_output
