@@ -42,9 +42,6 @@ echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
 # create new proxy cert for 196 hours...
 echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &> /dev/null
 
-# delegate it to the wms...
-glite-wms-job-delegate-proxy -d ${USER}_classical &> /dev/null
-
 # create job script...
 cat > classical.submitted.sh << EOF_SCRIPT
 chmod +x ClassicalDynamics_Linux.x
@@ -67,7 +64,7 @@ myproxyserver = "px.grid.sara.nl";
 EOF_JDL
 
 # create and submit new job from JDL...
-glite-wms-job-submit -d ${USER}_classical -o ${HOME}/my-glite-jobs classical.submitted.jdl | grep https | tail -1 &> ./running
+glite-wms-job-submit -a -o ${HOME}/my-glite-jobs classical.submitted.jdl | grep https | tail -1 &> ./running
 export JOB_ID=`cat ./running`
 echo Job ${JOB_ID} submitted to glite... >> LGI_output
 
