@@ -1,4 +1,5 @@
 #!/bin/sh
+export X509_USER_PROXY=./x509_proxy_cert
 if [ -f running ]
 then
  ID=`cat running`

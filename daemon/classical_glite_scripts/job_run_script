@@ -4,6 +4,7 @@
 export CERT_PASSWD="m@rks0m3rs007"
 export VOMS="ncf"
 export LGI_DIR="${HOME}/LGI"
+export X509_USER_PROXY=./x509_proxy_cert
 
 # get repository url and download input...
 export REPO_URL=`${LGI_DIR}/daemon/bin/xml repository_url < LGI_job_specifics`
@@ -34,15 +35,6 @@ fi
 
 # now copy executable...
 cp ${LGI_DIR}/daemon/CLASSICAL/ClassicalDynamics_Linux.x . > /dev/null
-
-# check if another job is generating a proxy...
-while [ -f /tmp/gLiteProxyLocked_${USER} ]
- do
-   sleep 10
- done
-
-# set lock...
-touch /tmp/gLiteProxyLocked_${USER}
 
 # register at myproxy px.grid.sara.nl...
 echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
@@ -79,9 +71,6 @@ glite-wms-job-submit -d ${USER}_classical -o ${HOME}/my-glite-jobs classical.sub
 export JOB_ID=`cat ./running`
 echo Job ${JOB_ID} submitted to glite... >> LGI_output
 
-# remove lock...
-rm -rf /tmp/gLiteProxyLocked_${USER}
-
 # wait until job is finished, sleep a bit...
 export JOB_STATE=""
 while [ "${JOB_STATE}" == "" ]
@@ -91,23 +80,8 @@ do
 done
 echo Job ${JOB_ID} finished, retrieving output... >> LGI_output
 
-# check if another job is generating a proxy...
-while [ -f /tmp/gLiteProxyLocked_${USER} ]
- do
-   sleep 10
- done
-
-# set lock...
-touch /tmp/gLiteProxyLocked_${USER}
-
-# create new proxy cert for 1 hours...
-echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 01:00 -pwstdin -q &> /dev/null
-
 # retrieve the output now...
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
-
-# remove lock...
-rm -rf /tmp/gLiteProxyLocked_${USER}
 
 # send back the output to LGI server...
 ${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPO_URL} ./output-files/* > /dev/null
