@@ -136,6 +136,9 @@ while [ -f /tmp/gLiteProxyLocked_${USER} ]
 # set lock...
 touch /tmp/gLiteProxyLocked_${USER}
 
+# create new proxy cert for 1 hours...
+echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 01:00 -pwstdin -q &> /dev/null
+
 # retrieve the output now...
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
 
