@@ -2,7 +2,7 @@
 
 # some settings...
 export CERT_PASSWD="m@rks0m3rs007"
-export VOMS="ncf"
+export VOMS="gaussian"
 export LGI_DIR="${HOME}/LGI"
 
 # get repository url and download input...
@@ -24,16 +24,13 @@ then
  ${LGI_DIR}/daemon/bin/LGI_filetransfer download ${REPO_URL} ${FILE_LIST} > /dev/null
 fi
 
-if [ -f classical.in ]
+if [ -f g03.inp ]
 then
- echo Input file classical.in has been downloaded from repository ${REPO_URL}... > LGI_output
+ echo Input file g03.inp has been downloaded from repository ${REPO_URL}... > LGI_output
 else
- cp LGI_input classical.in > /dev/null
+ cp LGI_input g03.inp > /dev/null
  echo Input copied... > LGI_output
 fi
-
-# now copy executable...
-cp ${LGI_DIR}/daemon/CLASSICAL/ClassicalDynamics_Linux.x . > /dev/null
 
 # check if another job is generating a proxy...
 while [ -f /tmp/gLiteProxyLocked_${USER} ]
@@ -44,42 +41,80 @@ while [ -f /tmp/gLiteProxyLocked_${USER} ]
 # set lock...
 touch /tmp/gLiteProxyLocked_${USER}
 
-# register at myproxy px.grid.sara.nl...
-echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
+# register at myproxy myproxy.grid.cyf-kr.edu.pl...
+echo ${CERT_PASSWD} | myproxy-init -s myproxy.grid.cyf-kr.edu.pl -d -n -S > /dev/null
 
 # create new proxy cert for 196 hours...
 echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &> /dev/null
 
 # delegate it to the wms...
-glite-wms-job-delegate-proxy -d ${USER}_classical &> /dev/null
+glite-wms-job-delegate-proxy -d ${USER}_g03 &> /dev/null
 
 # create job script...
-cat > classical.submitted.sh << EOF_SCRIPT
-chmod +x ClassicalDynamics_Linux.x
-./ClassicalDynamics_Linux.x classical.in classical.out
+cat > g03.sh << EOF_SCRIPT
+if [ "\${g03root}" == "" ]
+then
+    if [ "\${VO_GAUSSIAN_SW_DIR}" != "" ]
+    then
+        export g03root=\${VO_GAUSSIAN_SW_DIR}
+    else
+        echo No g03root or VO_GAUSSIAN_SW_DIR environment setting found...
+        exit
+    fi
+fi
+
+if [ -f \${g03root}/g03/bsd/g03.profile ]
+then
+ source \${g03root}/g03/bsd/g03.profile
+
+ export GAUSS_SCRDIR=/tmp/gaussian_\$\$
+ mkdir -p \$GAUSS_SCRDIR
+
+ date
+ g03 < g03.inp
+ date
+
+ rm -rf \$GAUSS_SCRDIR
+else
+ export HOST=`hostname -f`
+ echo Could not source G03 profile script...
+ echo
+ echo Hostname: \${HOST}
+ echo
+ echo g03root: \${g03root}
+ echo
+ echo ls -laFR \${g03root}:
+ echo
+ ls -laFr \${g03root}
+ echo
+ echo Environment:
+ echo
+ env
+ echo
+ echo
+fi
 EOF_SCRIPT
 
 # create JDL for this job script...
-cat > classical.submitted.jdl << EOF_JDL
+cat > g03.jdl << EOF_JDL
 type = "Job";
 jobtype = "Normal";
 executable = "/bin/bash";
-arguments = "classical.submitted.sh";
-stdoutput = "stdout";
-stderror = "stderr";
-outputsandbox = { "classical.out", "stdout", "stderr" };
-inputsandbox = { "classical.submitted.sh", "ClassicalDynamics_Linux.x", "classical.in" };
+arguments = "g03.sh";
+stdoutput = "g03.stdout";
+stderror = "g03.stderr";
+outputsandbox = { "g03.stdout", "g03.stderr" };
+inputsandbox = { "g03.inp", "g03.sh" };
 shallowretrycount = 3;
-requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 240 );
-myproxyserver = "px.grid.sara.nl";
+requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 720 );
 EOF_JDL
 
 # create and submit new job from JDL...
-glite-wms-job-submit -d ${USER}_classical -o ${HOME}/my-glite-jobs classical.submitted.jdl | grep https | tail -1 &> ./running
+glite-wms-job-submit -d ${USER}_g03 -o ${HOME}/my-glite-jobs g03.jdl | grep https | tail -1 &> ./running
 export JOB_ID=`cat ./running`
 echo Job ${JOB_ID} submitted to glite... >> LGI_output
 
-# remove lock...
+# remove proxy lock...
 rm -rf /tmp/gLiteProxyLocked_${USER}
 
 # wait until job is finished, sleep a bit...

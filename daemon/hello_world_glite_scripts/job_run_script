@@ -4,6 +4,15 @@
 export CERT_PASSWD="m@rks0m3rs007"
 export VOMS="ncf"
 
+# check if another job is generating a proxy...
+while [ -f /tmp/gLiteProxyLocked_${USER} ]
+ do
+   sleep 10
+ done
+
+# set lock...
+touch /tmp/gLiteProxyLocked_${USER}
+
 # register at myproxy px.grid.sara.nl...
 echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
 
@@ -11,7 +20,7 @@ echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
 echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &> /dev/null
 
 # delegate it to the wms...
-glite-wms-job-delegate-proxy -d ${USER} &> /dev/null
+glite-wms-job-delegate-proxy -d ${USER}_hello &> /dev/null
 
 # create job script...
 cat > hello.submitted.sh << EOF_SCRIPT
@@ -37,8 +46,11 @@ myproxyserver = "px.grid.sara.nl";
 EOF_JDL
 
 # create and submit new job from JDL...
-glite-wms-job-submit -d ${USER} -o ${HOME}/my-glite-jobs hello.submitted.jdl | grep https | tail -1 &> ./running
+glite-wms-job-submit -d ${USER}_hello -o ${HOME}/my-glite-jobs hello.submitted.jdl | grep https | tail -1 &> ./running
 export JOB_ID=`cat ./running`
+
+# remove lock...
+rm -rf /tmp/gLiteProxyLocked_${USER}
 
 # wait until job is finished, sleep a bit...
 export JOB_STATE=""
