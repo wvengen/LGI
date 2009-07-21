@@ -176,16 +176,24 @@ int Daemon::RemoveJobFromDaemonLists( DaemonJob Job )
  // update the accounting tables... 
  string Application = Job.GetApplication();
  vector<string> Owners = CommaSeparatedValues2Array( Job.GetOwners() );
+ vector<string> AccountedFor;
 
- for( int i = 0; i < Owners.size(); ++i )
+ for( int i = 0, j = 0; i < Owners.size(); ++i )
  {
+  for( j = 0; j < AccountedFor.size(); j++ )         // check if this owner has already been accounted for...
+   if( AccountedFor[ j ] == Owners[ i ] ) break;
+  if( j < AccountedFor.size() ) continue;
+
+  AccountedFor.push_back( Owners[ i ] );
+
   Accounting[ Owners[ i ] ]--;
   Accounting[ Owners[ i ] + ", " + Project ]--;
   Accounting[ Owners[ i ] + ", " + Project + ", " + Application ]--;
-  Accounting[ "; TOTALS;" ]--;
-  Accounting[ "; TOTALS; " + Project ]--;
-  Accounting[ "; TOTALS; " + Project + "; " + Application ]--;
  }
+
+ Accounting[ "; TOTALS;" ]--;
+ Accounting[ "; TOTALS; " + Project ]--;
+ Accounting[ "; TOTALS; " + Project + "; " + Application ]--;
 
  // and now remove the job from the daemon lists...
  Jobs[ Ref ].erase( Location );
