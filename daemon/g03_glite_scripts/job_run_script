@@ -107,6 +107,7 @@ outputsandbox = { "g03.stdout", "g03.stderr" };
 inputsandbox = { "g03.inp", "g03.sh" };
 shallowretrycount = 3;
 requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 720 );
+myproxyserver = "myproxy.grid.cyf-kr.edu.pl";
 EOF_JDL
 
 # create and submit new job from JDL...
@@ -126,8 +127,20 @@ do
 done
 echo Job ${JOB_ID} finished, retrieving output... >> LGI_output
 
+# check if another job is generating a proxy...
+while [ -f /tmp/gLiteProxyLocked_${USER} ]
+ do
+   sleep 10
+ done
+
+# set lock...
+touch /tmp/gLiteProxyLocked_${USER}
+
 # retrieve the output now...
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
+
+# remove lock...
+rm -rf /tmp/gLiteProxyLocked_${USER}
 
 # send back the output to LGI server...
 ${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPO_URL} ./output-files/* > /dev/null

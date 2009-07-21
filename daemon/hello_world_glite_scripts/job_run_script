@@ -60,8 +60,20 @@ do
     export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
 done
 
+# check if another job is generating a proxy...
+while [ -f /tmp/gLiteProxyLocked_${USER} ]
+ do
+   sleep 10
+ done
+
+# set lock...
+touch /tmp/gLiteProxyLocked_${USER}
+
 # retrieve the output now...
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
+
+# remove lock...
+rm -rf /tmp/gLiteProxyLocked_${USER}
 
 # send back the output to LGI server...
 cp ./output-files/LGI_output ./LGI_output &> /dev/null
