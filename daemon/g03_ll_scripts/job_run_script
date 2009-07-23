@@ -7,7 +7,7 @@ setenv LGI_DIR /home/${USER}/LGI
 setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
 setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; grep -E '^([0-9]{1,2})$' cpus_file`
 if ( ${CPUS} == "" ) then
-   setenv CPUS 1
+   setenv CPUS 8
 endif
 setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o walltime_file walltime; grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$' walltime_file`
 if ( ${WALLTIME} == "" ) then
@@ -44,7 +44,7 @@ if ( ${REPOSITORY_URL} != "" ) then
  cat > ./ll_submit_script << END_OF_LL_SUBMIT_SCRIPT
 #@ shell = /usr/bin/csh
 #@ job_name = g03_ll
-#@ job_type = serial
+#@ job_type = parallel
 #@ node_usage = shared
 #@ node = 1
 #@ tasks_per_node = ${CPUS}
