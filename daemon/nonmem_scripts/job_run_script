@@ -1,0 +1,27 @@
+#!/bin/sh
+export LGI_DIR="${HOME}/LGI"
+
+echo $$ > running
+
+# get input...
+cp LGI_input input.nonmem; dos2unix input.nonmem
+
+# make compile tree..
+mkdir -p NONMEM_6.2.0/UNIX
+
+# get tar...
+cp ${LGI_DIR}/daemon/NONMEM/NONMEMVI.tar NONMEM_6.2.0/UNIX
+
+# get SETUP...
+cp ${LGI_DIR}/daemon/NONMEM/SETUP .
+
+# compile locally...
+./SETUP ./ ./ `which f77` -O `which ar` IEEE
+
+# run the bugger...
+./run/nmfe6 input.nonmem output.nonmem
+
+cp output.nonmem LGI_output
+
+touch finished
+rm running
