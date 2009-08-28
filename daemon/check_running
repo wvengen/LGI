@@ -1,5 +1,5 @@
 #!/bin/bash
-export LGI_ROOT=${HOME}/temp/LGI/daemon
+export LGI_ROOT=${HOME}/LGI/daemon
 
 if [ -f ${LGI_ROOT}/LGI.pid ]
 then
@@ -17,13 +17,13 @@ then
        mv ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.log_${DATE}
     fi
     ${LGI_ROOT}/bin/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
-    ps -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
+    ps -u ${USER} -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
  fi
 
 else
 
  echo No LGI.pid found, starting the daemon...
  ${LGI_ROOT}/bin/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
- ps -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
+ ps -u ${USER} -C LGI_daemon -o pid= | tail -n1 > ${LGI_ROOT}/LGI.pid
 
 fi
