@@ -33,6 +33,9 @@ else
  echo Input copied... > LGI_output
 fi
 
+# convert to unix text...
+dos2unix g03.inp > /dev/null
+
 # register at myproxy myproxy.grid.cyf-kr.edu.pl...
 echo ${CERT_PASSWD} | myproxy-init -s myproxy.grid.cyf-kr.edu.pl -d -n -S > /dev/null
 
@@ -95,7 +98,7 @@ stderror = "g03.stderr";
 outputsandbox = { "g03.stdout", "g03.stderr" };
 inputsandbox = { "g03.inp", "g03.sh" };
 shallowretrycount = 3;
-requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 720 );
+requirements = ( regexp( "cyf-kr.edu.pl", other.glueceuniqueid ) && other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 720 );
 myproxyserver = "myproxy.grid.cyf-kr.edu.pl";
 EOF_JDL
 

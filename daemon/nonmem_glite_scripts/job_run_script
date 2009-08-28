@@ -16,8 +16,8 @@ echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &>
 cat > nonmem.submitted.sh << EOF_SCRIPT
 mkdir -p NONMEM_6.2.0/UNIX
 cp NONMEMVI.tar NONMEM_6.2.0/UNIX
-./SETUP ./ ./ `which f77` -O `which ar` IEEE
-./run/nmfe6 input.nonmem output.nonmem
+sh ./SETUP ./ ./ `which f77` -O `which ar` IEEE
+sh ./run/nmfe6 input.nonmem output.nonmem
 EOF_SCRIPT
 
 # create JDL for this job script...
