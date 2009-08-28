@@ -36,13 +36,13 @@ EOF_JDL
 
 # create and submit new job from JDL...
 glite-wms-job-submit -a -o ${HOME}/my-glite-jobs hello.submitted.jdl | grep https | tail -1 &> ./running
-export JOB_ID=`cat ./running`
 
 # wait until job is finished, sleep a bit...
 export JOB_STATE=""
 while [ "${JOB_STATE}" == "" ]
 do
-    sleep 60
+    sleep 300
+    export JOB_ID=`cat ./running`
     export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
 done
 
