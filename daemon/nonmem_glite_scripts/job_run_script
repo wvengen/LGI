@@ -80,7 +80,7 @@ myproxyserver = "px.grid.sara.nl";
 EOF_JDL
 
 # convert input...
-cp LGI_input input.nonmem; dos2unix input.nonmem
+cp LGI_input input.nonmem; dos2unix input.nonmem > /dev/null
 
 # get other input files...
 cp ${LGI_DIR}/daemon/NONMEM/NONMEMVI.tar .

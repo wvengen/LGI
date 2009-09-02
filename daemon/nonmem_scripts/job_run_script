@@ -34,7 +34,7 @@ fi
 
 
 # get input...
-cp LGI_input input.nonmem; dos2unix input.nonmem
+cp LGI_input input.nonmem; dos2unix input.nonmem > /dev/null
 
 # make compile tree..
 mkdir -p NONMEM_6.2.0/UNIX
