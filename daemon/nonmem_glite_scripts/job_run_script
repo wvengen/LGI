@@ -102,7 +102,7 @@ done
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
 
 # send back files to repository...
-export FILE_LIST=`ls output-files`
+export FILE_LIST=`ls output-files/*`
 if [ "${FILE_LIST}" != "" ]
 then
       export DATE=`date`
@@ -111,9 +111,6 @@ then
 else
       echo "NONMEM-glite no locally created files found." >> LGI_output
 fi
-
-# send back the output to LGI server...
-cp ./output-files/output.nonmem ./LGI_output &> /dev/null
 
 # and we are finished...
 touch ./finished
