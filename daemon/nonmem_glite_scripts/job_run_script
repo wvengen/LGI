@@ -6,6 +6,35 @@ export VOMS="ncf"
 export X509_USER_PROXY=./x509_proxy_cert
 export LGI_DIR="${HOME}/LGI"
 
+# start retrieving the repository...
+export REPOSITORY_URL=`${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
+export CWD=`pwd`
+
+if [ ${REPOSITORY_URL} != "" ]
+then
+ ${LGI_DIR}/daemon/bin/LGI_filetransfer -x list ${REPOSITORY_URL} > repository_content
+
+ export NROFFILES=`${LGI_DIR}/daemon/bin/xml -i repository_content -o repository_nr_of_files number_of_files; cat repository_nr_of_files`
+ export FILE_LIST=""
+
+ for NR in `seq 1 ${NROFFILES}`
+ do
+    export FILE_ATTR="number=\"${NR}\""
+    export FILE_DATA=`${LGI_DIR}/daemon/bin/xml -i repository_content -o repository_file file ${FILE_ATTR}; cat repository_file`
+    export FILE_NAME=`${LGI_DIR}/daemon/bin/xml -i repository_file -o repository_file_name file_name; cat repository_file_name`
+    export FILE_LIST="${FILE_LIST} ${FILE_NAME}"
+ done
+fi
+
+if [ "${FILE_LIST}" != "" ]
+then
+   export DATE=`date`
+   echo "NONMEM-glite started retrieving repository ${REPOSITORY_URL} to ${CWD} at ${DATE}." >> LGI_output
+   ${LGI_DIR}/daemon/bin/LGI_filetransfer -j ${CWD} download ${REPOSITORY_URL} ${FILE_LIST} > /dev/null
+else
+   echo "No files in repository." >> LGI_output
+fi
+
 # register at myproxy px.grid.sara.nl...
 echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
 
@@ -16,13 +45,24 @@ echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &>
 cat > nonmem.submitted.sh << EOF_SCRIPT
 mkdir -p ./temp/NONMEM_6.2.0/UNIX
 mv NONMEMVI.tar ./temp/NONMEM_6.2.0/UNIX
-mv SETUP ./temp
+mv SETUP ${FILE_LIST} ./temp
 cd ./temp
 chmod +x ./SETUP
 ./SETUP ./ ./ `which f77` -O `which ar` IEEE
 chmod +x ./run/nmfe6
 ./run/nmfe6 ../input.nonmem ../output.nonmem
 EOF_SCRIPT
+
+# create file list for inputsandbox...
+export FILE_LIST_2='"nonmem.submitted.sh", "input.nonmem", "NONMEMVI.tar", "SETUP"'
+if [ "${FILE_LIST}" != "" ]
+then
+
+ for FILE in ${FILE_LIST}
+ do
+   export FILE_LIST_2="${FILE_LIST_2}, \"${FILE}\""
+ done
+fi
 
 # create JDL for this job script...
 cat > nonmem.submitted.jdl << EOF_JDL
@@ -33,7 +73,7 @@ arguments = "nonmem.submitted.sh";
 stdoutput = "stdout";
 stderror = "stderr";
 outputsandbox = { "output.nonmem", "stdout", "stderr" };
-inputsandbox = { "nonmem.submitted.sh", "input.nonmem", "NONMEMVI.tar", "SETUP" };
+inputsandbox = { ${FILE_LIST_2} };
 shallowretrycount = 3;
 requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 30 );
 myproxyserver = "px.grid.sara.nl";
@@ -60,6 +100,17 @@ done
 
 # retrieve the output now...
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
+
+# send back files to repository...
+export FILE_LIST=`ls output-files`
+if [ "${FILE_LIST}" != "" ]
+then
+      export DATE=`date`
+      echo "NONMEM-glite started sending back the output from ${CWD} to repository ${REPOSITORY_URL} at ${DATE}." >> LGI_output
+      ${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPOSITORY_URL} ${FILE_LIST} > /dev/null
+else
+      echo "NONMEM-glite no locally created files found." >> LGI_output
+fi
 
 # send back the output to LGI server...
 cp ./output-files/output.nonmem ./LGI_output &> /dev/null

@@ -1,7 +1,37 @@
 #!/bin/sh
 export LGI_DIR="${HOME}/LGI"
+export REPOSITORY_URL=`${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
+export CWD=`pwd`
 
 echo $$ > running
+
+
+if [ ${REPOSITORY_URL} != "" ] 
+then
+ ${LGI_DIR}/daemon/bin/LGI_filetransfer -x list ${REPOSITORY_URL} > repository_content
+
+ export NROFFILES=`${LGI_DIR}/daemon/bin/xml -i repository_content -o repository_nr_of_files number_of_files; cat repository_nr_of_files`
+ export FILE_LIST=""
+
+ for NR in `seq 1 ${NROFFILES}`
+ do
+    export FILE_ATTR="number=\"${NR}\""
+    export FILE_DATA=`${LGI_DIR}/daemon/bin/xml -i repository_content -o repository_file file ${FILE_ATTR}; cat repository_file`
+    export FILE_NAME=`${LGI_DIR}/daemon/bin/xml -i repository_file -o repository_file_name file_name; cat repository_file_name`
+    export FILE_LIST="${FILE_LIST} ${FILE_NAME}"
+ done 
+fi
+
+
+if [ "${FILE_LIST}" != "" ] 
+then
+   export DATE=`date`
+   echo "NONMEM started retrieving repository ${REPOSITORY_URL} to ${CWD} at ${DATE}." >> LGI_output
+   ${LGI_DIR}/daemon/bin/LGI_filetransfer -j ${CWD} download ${REPOSITORY_URL} ${FILE_LIST} > /dev/null
+else
+   echo "No files in repository." >> LGI_output
+fi
+
 
 # get input...
 cp LGI_input input.nonmem; dos2unix input.nonmem
@@ -21,7 +51,17 @@ cp ${LGI_DIR}/daemon/NONMEM/SETUP .
 # run the bugger...
 ./run/nmfe6 input.nonmem output.nonmem
 
-cp output.nonmem LGI_output
+#cp output.nonmem LGI_output
+export FILE_LIST=`ls output.nonmem`
+if [ "${FILE_LIST}" != "" ] 
+then
+      export DATE=`date`
+      echo "NONMEM started sending back the output from ${CWD} to repository ${REPOSITORY_URL} at ${DATE}." >> LGI_output
+      ${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPOSITORY_URL} ${FILE_LIST} > /dev/null
+else
+      echo "NONMEM no locally created files found." >> LGI_output
+fi
+
 
 touch finished
 rm running
