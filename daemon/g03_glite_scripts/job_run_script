@@ -103,7 +103,13 @@ myproxyserver = "myproxy.grid.cyf-kr.edu.pl";
 EOF_JDL
 
 # create and submit new job from JDL...
-glite-wms-job-submit -a -o ${HOME}/my-glite-jobs g03.jdl | grep https | tail -1 &> ./running
+export RUNNING=""
+while [ "${RUNNING} == "" ]
+do
+ glite-wms-job-submit -a -o ${HOME}/my-glite-jobs g03.jdl | grep https | tail -1 &> ./running
+ export RUNNING=`cat ./running | grep -E '^https'`
+done
+
 export JOB_ID=`cat ./running`
 echo Job ${JOB_ID} submitted to glite... >> LGI_output
 

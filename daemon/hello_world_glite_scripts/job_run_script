@@ -35,7 +35,12 @@ myproxyserver = "px.grid.sara.nl";
 EOF_JDL
 
 # create and submit new job from JDL...
-glite-wms-job-submit -a -o ${HOME}/my-glite-jobs hello.submitted.jdl | grep https | tail -1 &> ./running
+export RUNNING=""
+while [ "${RUNNING} == "" ]
+do
+ glite-wms-job-submit -a -o ${HOME}/my-glite-jobs hello.submitted.jdl | grep https | tail -1 &> ./running
+ export RUNNING=`cat ./running | grep -E '^https'`
+done
 
 # wait until job is finished, sleep a bit...
 export JOB_STATE=""
