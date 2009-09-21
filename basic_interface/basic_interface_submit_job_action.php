@@ -261,35 +261,6 @@ $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=LAST_INSERT_ID()"
 $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
 
-Start_Table();
-Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</font></center>" );
-Row2( "<b>Project:</b>", htmlentities( $Project ) );
-Row2( "<b>This project server:</b>", Get_Server_URL() );
-Row2( "<b>Project master server:</b>", "<a href='".Get_Master_Server_URL()."/basic_interface/index.php?project=$Project&groups=$Groups&sid=$SID'>".Get_Master_Server_URL()."</a>" );
-Row2( "<b>User:</b>", htmlentities( $User ) );
-Row2( "<b>Groups:</b>", htmlentities( $Groups ) );
-Row1( "<center><font color='green' size='4'><b>Submitted job details</b></font></center>" );
-Row2( "<b>Job ID:</b>", $JobSpecs -> job_id );
-Row2( "<b>Application:</b>", htmlentities( $JobSpecs -> application ) );
-Row2( "<b>State:</b>", htmlentities( $JobSpecs -> state ) );
-Row2( "<b>State time stamp:</b>", gmdate( "j M Y G:i", $JobSpecs -> state_time_stamp )." UTC" );
-Row2( "<b>Owners:</b>", htmlentities( $JobSpecs -> owners ) );
-Row2( "<b>Read access:</b>", htmlentities( $JobSpecs -> read_access ) );
-Row2( "<b>Write access:</b>", htmlentities( $JobSpecs -> write_access ) );
-Row2( "<b>Target resources:</b>", htmlentities( $JobSpecs -> target_resources ) );
-Row2( "<b>Job specifics:</b>", nl2br( htmlentities( $JobSpecs -> job_specifics ) ) );
-if( $RepositoryWWWURL != "" ) Row2( "<b>Repository:</b>", "<a href='".$RepositoryWWWURL."'> $RepositoryWWWURL </a>" );
-Row2( "<b>Input:</b>", nl2br( htmlentities( $JobSpecs -> input ) ) );
-End_Table();
-
-echo "<br><a href='basic_interface_delete_job.php?project=$Project&groups=$Groups&job_id=".$JobSpecs -> job_id."&sid=$SID'>Abort or Delete this job</a>\n";
-echo "<br><a href='basic_interface_list.php?project=$Project&groups=$Groups&project_server=1&sid=$SID'>Show project server list</a>\n";
-echo "<br><a href='basic_interface_list.php?project=$Project&groups=$Groups&project_server=0&sid=$SID'>Show project resource list</a>\n";
-echo "<br><a href='basic_interface_submit_job_form.php?project=$Project&groups=$Groups&sid=$SID'>Submit a job</a>\n";
-echo "<br><a href='basic_interface_job_state.php?project=$Project&groups=$Groups&sid=$SID'>Show job list</a>\n";
-echo "<br><a href='index.php?project=$Project&groups=$Groups&sid=$SID'>Go to main menu</a>\n";
-
-Page_Tail();
-
+// and redirect browser with a simple java script to the job_state page so that the POST url is not in browser history...
+echo '<script type="text/javascript">window.location.replace("basic_interface_job_state.php?project='.$Project.'&groups='.$Groups.'&sid='.$SID.'&job_id='.$JobSpecs->job_id.'");</script>'
 ?>
-
