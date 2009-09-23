@@ -65,7 +65,7 @@ EOF_JDL
 
 # create and submit new job from JDL...
 export RUNNING=""
-while [ "${RUNNING} == "" ]
+while [ "${RUNNING}" == "" ]
 do
  glite-wms-job-submit -a -o ${HOME}/my-glite-jobs classical.submitted.jdl | grep https | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`
