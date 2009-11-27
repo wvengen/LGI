@@ -141,7 +141,7 @@ sub reply
  $remuser = $ENV{'REMOTE_USER'} || "-";
  $remhost = $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} || "-";
     
- $logline = "$remhost $remuser $filename status $status ($message)";
+ $logline = "$remhost $remuser status $status ($message)";
  &log($logline);
  exit(0);
 }

@@ -586,7 +586,7 @@ int Daemon::RequestWorkCycle( void )
 
            // there are no limits and job was successfully accepted...
            AddJobToDaemonLists( TempJob );
-           NORMAL_LOG( "Daemon::RequestWorkCycle; Job with directory " << TempJob.GetJobDirectory() << " accepted" );
+           NORMAL_LOG( "Daemon::RequestWorkCycle; Job " << TempJob.GetJobId() << " accepted for " << TempJob.GetOwners() << " from " << TempJob.GetThisProjectServer() << " into " << TempJob.GetJobDirectory() );
            FoundJob = JobsObtained = 1;
 
           }
