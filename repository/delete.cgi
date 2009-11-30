@@ -109,8 +109,7 @@ sub reply
  $remuser = $ENV{'REMOTE_USER'} || "-";
  $remhost = $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} || "-";
     
- $logline = "$remhost $remuser status $status";
- $logline .= " ($message)" if ($status == 500);
+ $logline = "$remhost $remuser status $status ($message)";
  &log($logline);
  exit(0);
 }
