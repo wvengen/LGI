@@ -532,7 +532,7 @@ int Daemon::RequestWorkCycle( void )
 
        if( !Parse_XML( JobResponse, "error" ).empty() )
        { 
-        CRITICAL_LOG( "Daemon::RequestWorkCycle; Unable to request work at server " << (*ServerPointer) << " for project " << TheProject.Project_Name() << "for application " << TheApplication.Application_Name()<< ": " << Parse_XML( Parse_XML( JobResponse, "error" ), "message" ) ); 
+        CRITICAL_LOG( "Daemon::RequestWorkCycle; Unable to request work at server " << (*ServerPointer) << " for project " << TheProject.Project_Name() << " for application " << TheApplication.Application_Name()<< ": " << Parse_XML( Parse_XML( JobResponse, "error" ), "message" ) ); 
         break;
        };
 
