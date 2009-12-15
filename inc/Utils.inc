@@ -90,7 +90,7 @@ function MakeRegularExpressionForCommaSeparatedField( $Field, $Separator = ',' )
 {
  if( !isset( $Separator ) || ( $Separator == "" ) ) $Separator = ',';
  
- return( "^ *".$Field." *$|".$Separator." *".$Field." *$|^ *".$Field." *".$Separator." *|".$Separator." *".$Field." *".$Separator." *" );
+ return( "^ *".$Field."$|".$Separator." *".$Field."$|^ *".$Field.$Separator." *|".$Separator." *".$Field.$Separator." *" );
 }
 
 // --------------------------------------------------- 
