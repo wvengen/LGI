@@ -22,4 +22,4 @@ touch \${PBS_O_WORKDIR}/finished
 
 END_OF_PBS_SCRIPT
 
-qsub pbs_script > ./running
+qsub pbs_script | cut -d "." -f 1 > ./running

@@ -87,4 +87,4 @@ cd \${PBS_O_WORKDIR}
 rm -rf /scratch/\${USER}/\${PBS_JOBID}
 END_OF_PBS_SCRIPT
 
-qsub pbs_script > ./running
+qsub pbs_script | cut -d "." -f 1 > ./running
