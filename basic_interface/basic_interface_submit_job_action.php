@@ -66,6 +66,7 @@ else
   $Application = $_POST[ "application" ];
 if( $Application == "" ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 18 ] );
 if( strlen( $Application ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 46 ] );
+$Application = NormalizeString( $Application );
 
 // check if target_resources was given...
 $TargetResources = "";
@@ -199,12 +200,12 @@ else
 
 // now determine the write_access and read_access fields based on the possibly posted data and the user+groups data...
 if( $ReadAccess != "" )
- $ReadAccess = $User.", ".$ReadAccess;     // check perhaps if read_access is part of owners=user+groups allowed to submit?
+ $ReadAccess = $User.", ".NormalizeCommaSeparatedField( $ReadAccess, "," );     // check perhaps if read_access is part of owners=user+groups allowed to submit?
 else
  $ReadAccess = $User;
 
 if( $WriteAccess != "" )
- $WriteAccess = $User.", ".$WriteAccess;  // check perhaps if write_access is part of owners=user+groups allowed to submit?
+ $WriteAccess = $User.", "..NormalizeCommaSeparatedField( $WriteAccess, "," );  // check perhaps if write_access is part of owners=user+groups allowed to submit?
 else
  $WriteAccess = $User;
 

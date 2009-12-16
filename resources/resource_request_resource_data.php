@@ -35,7 +35,7 @@ else
 {
  if( strlen( $_POST[ "resource_name" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 63, $ErrorMsgs[ 63 ] ) );
- $ResourceName = mysql_escape_string( $_POST[ "resource_name" ] );
+ $ResourceName = mysql_escape_string( NormalizeString( $_POST[ "resource_name" ] ) );
 }
 
 // query for the job specs...

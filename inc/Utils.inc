@@ -47,6 +47,24 @@ function binhex( $bin )
 
 // --------------------------------------------------- 
 
+function NormalizeString( $String )
+{
+ $Start = 0;
+ $End = strlen( $String );
+
+ if( $End <= 0 ) return( "" );
+
+ while( ( $String[ $Start ] == " " ) && ( $Start < $End ) ) $Start++;
+ if( $Start >= $End ) return( "" );
+
+ while( ( $String[ $End - 1 ] == " " ) && ( $End > $Start ) ) $End--;
+ if( $End <= $Start ) return( "" );
+
+ return( substr( $String, $Start, $End - $Start ) );
+}
+
+// --------------------------------------------------- 
+
 function CommaSeparatedField2Array( $Field, $Separator = ',' )
 {
  if( !isset( $Separator ) || ( $Separator == "" ) ) $Separator = ',';
@@ -66,12 +84,10 @@ function CommaSeparatedField2Array( $Field, $Separator = ',' )
    $Array[ $Array[ 0 ] ] = '';
   } 
 
- // now remove possible leading spaces from all the elements in the array...
+ // now remove possible leading and trailing spaces from all the elements in the array...
  for( $i = 1; $i <= $Array[ 0 ]; $i++ )
  {
-  if( strlen( $Array[ $i ] ) != 0 )           
-   while( $Array[ $i ][ 0 ] == ' ' )
-    $Array[ $i ] = substr( $Array[ $i ], 1 );
+  $Array[ $i ] = NormalizeString( $Array[ $i ] );
 
   if( strlen( $Array[ $i ] ) == 0 )               // also remove empty entries from the array...
   {
@@ -90,7 +106,7 @@ function MakeRegularExpressionForCommaSeparatedField( $Field, $Separator = ',' )
 {
  if( !isset( $Separator ) || ( $Separator == "" ) ) $Separator = ',';
  
- return( "^ *".$Field."$|".$Separator." *".$Field."$|^ *".$Field.$Separator." *|".$Separator." *".$Field.$Separator." *" );
+ return( "^ *".$Field." *$|".$Separator." *".$Field." *$|^ *".$Field." *".$Separator." *|".$Separator." *".$Field." *".$Separator." *" );
 }
 
 // --------------------------------------------------- 
@@ -115,6 +131,7 @@ function FoundInCommaSeparatedField( $Field, $Value, $Separator = ',' )
  if( !isset( $Separator ) || ( $Separator == "" ) ) $Separator = ',';
 
  $Array = CommaSeparatedField2Array( $Field, $Separator );
+ $Value = NormalizeString( $Value );
 
  for( $i = 1; $i <= $Array[ 0 ]; $i++ )
   if( ( $Array[ $i ] == "any" ) || ( $Array[ $i ] == $Value ) )
@@ -230,24 +247,6 @@ function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
   }
 
  return( $Empty );
-}
-
-// --------------------------------------------------- 
-
-function NormalizeString( $String )
-{
- $Start = 0;
- $End = strlen( $String );
-
- if( $End <= 0 ) return( "" );
-
- while( ( $String[ $Start ] == " " ) && ( $Start < $End ) ) $Start++;  
- if( $Start >= $End ) return( "" );
-
- while( ( $String[ $End - 1 ] == " " ) && ( $End > $Start ) ) $End--; 
- if( $End <= $Start ) return( "" );
-
- return( substr( $String, $Start, $End - $Start ) );
 }
 
 // --------------------------------------------------- 

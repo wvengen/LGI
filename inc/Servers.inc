@@ -45,6 +45,7 @@ function Server_Verify( &$Project )
   if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
    return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ] ) );
  }
+ $Project = NormalizeString( $Project );
 
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );

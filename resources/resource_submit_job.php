@@ -40,7 +40,7 @@ else
 {
  if( strlen( $_POST[ "state" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 45, $ErrorMsgs[ 45 ] ) );
- $JobState = $_POST[ "state" ];
+ $JobState = NormalizeString( $_POST[ "state" ] );
 }
 
 if( !isset( $_POST[ "application" ] ) || ( $_POST[ "application" ] == "" ) )
@@ -49,7 +49,7 @@ else
 {
  if( strlen( $_POST[ "application" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ] ) );
- $JobApplication = $_POST[ "application" ];
+ $JobApplication = NormalizeString( $_POST[ "application" ] );
 }
 
 if( !isset( $_POST[ "owners" ] ) || ( $_POST[ "owners" ] == "" ) )
@@ -213,7 +213,7 @@ if( isset( $_POST[ "read_access" ] ) && ( $_POST[ "read_access" ] != "" ) )
 {
  if( strlen( $_POST[ "read_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 51, $ErrorMsgs[ 51 ] ) );
- $ReadAccess = $JobOwners.", ".$_POST[ "read_access" ];
+ $ReadAccess = $JobOwners.", ".NormalizeCommaSeparatedField( $_POST[ "read_access" ], "," );
 }
 else
  $ReadAccess = $JobOwners;
@@ -222,7 +222,7 @@ if( isset( $_POST[ "write_access" ] ) && ( $_POST[ "write_access" ] != "" ) )
 {
  if( strlen( $_POST[ "write_access" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 52, $ErrorMsgs[ 52 ] ) );
- $WriteAccess = $JobOwners.", ".$_POST[ "write_access" ];
+ $WriteAccess = $JobOwners.", ".NormalizeCommaSeparatedField( $_POST[ "write_access" ], "," );
 }
 else
  $WriteAccess = $JobOwners;

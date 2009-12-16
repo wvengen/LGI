@@ -27,7 +27,7 @@ require_once( '../inc/Utils.inc' );
 
 // -------------------------------------------------------------------- 
 
-function Interface_Verify( &$Project, $User, &$Groups, $ExitOnError = true )
+function Interface_Verify( &$Project, &$User, &$Groups, $ExitOnError = true )
 {
  global $ErrorMsgs;
  global $Config;
@@ -56,6 +56,11 @@ function Interface_Verify( &$Project, $User, &$Groups, $ExitOnError = true )
   if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
    return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ], $ExitOnError ) );
  }
+
+ // normalize some strings and fields... 
+ $User = NormalizeString( $User );
+ $Project = NormalizeString( $Project );
+ $Groups = NormalizeCommaSeparatedField( $Groups, "," );
 
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
@@ -312,9 +317,9 @@ function Interface_Is_Target_Resource_Known( $Resource, $Application = "" )
  $ReturnValue = 0;
 
  if( $Application === "" )
-  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name='".$Resource."'" );
+  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name LIKE ".$Resource."'" );
  else
-  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name='".$Resource."' AND resource_capabilities LIKE '%<".$Application.">%</".$Application.">%'" );
+  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name LIKE '".$Resource."' AND resource_capabilities LIKE '%<".$Application.">%</".$Application.">%'" );
 
  if( mysql_num_rows( $queryresult ) >= 1 )
   $ReturnValue = 1;

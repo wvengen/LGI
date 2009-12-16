@@ -57,7 +57,7 @@ if( !$DetailMode )
  {
   if( strlen( $_POST[ "state" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
    return( LGI_Error_Response( 45, $ErrorMsgs[ 45 ] ) );
-  $JobState = $_POST[ "state" ];
+  $JobState = NormalizeString( $_POST[ "state" ] );
  }
  else
   $JobState = "any";
@@ -69,7 +69,7 @@ if( !$DetailMode )
  {
   if( strlen( $_POST[ "application" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
    return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ] ) );
-  $JobApplication = $_POST[ "application" ];
+  $JobApplication = NormalizeString( $_POST[ "application" ] );
  }
  else
   $JobApplication = "any";

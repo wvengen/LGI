@@ -124,7 +124,7 @@ else
  else
   if( isset( $_POST[ "state" ] ) )
    $State = $_POST[ "state" ];
- $State = mysql_escape_string( $State );
+ $State = mysql_escape_string( NormalizeString( $State ) );
 
  // check if application is set in request... otherwise default to any...
  $Application = "any";
@@ -133,7 +133,7 @@ else
  else
   if( isset( $_POST[ "application" ] ) )
    $Application = $_POST[ "application" ];
- $Application = mysql_escape_string( $Application );
+ $Application = mysql_escape_string( NormalizeString( $Application ) );
 
  // check if application is set in request... otherwise default to 0...
  $Start = "0";

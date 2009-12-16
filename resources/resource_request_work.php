@@ -39,7 +39,7 @@ else
 {
  if( strlen( $_POST[ "application" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ] ) );
- $Application = $_POST[ "application" ];
+ $Application = NormalizeString( $_POST[ "application" ] );
 }
 
 // check if non-compulsory posts were set...

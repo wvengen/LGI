@@ -131,6 +131,7 @@ function Resource_Verify( &$Project, $SessionID = "", $Capabilities = "" )
   if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
    return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ] ) );
  }
+ $Project = NormalizeString( $Project );
 
  // check if capabilites were given...
  if( isset( $Capabilities ) && ( $Capabilities !== "" ) )
@@ -406,9 +407,9 @@ function Resource_Is_Target_Resource_Known( $Resource, $Application = "" )
  $Resource = mysql_escape_string( $Resource );
 
  if( $Application === "" )
-  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name='".$Resource."'" );
+  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name LIKE '".$Resource."'" );
  else
-  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name='".$Resource."' AND resource_capabilities LIKE '%<".$Application.">%</".$Application.">%'" );
+  $queryresult = mysql_query( "SELECT resource_id FROM active_resources WHERE resource_name LIKE '".$Resource."' AND resource_capabilities LIKE '%<".$Application.">%</".$Application.">%'" );
 
  if( mysql_num_rows( $queryresult ) >= 1 )
   $ReturnValue = 1; 
