@@ -205,7 +205,7 @@ else
  $ReadAccess = $User;
 
 if( $WriteAccess != "" )
- $WriteAccess = $User.", "..NormalizeCommaSeparatedField( $WriteAccess, "," );  // check perhaps if write_access is part of owners=user+groups allowed to submit?
+ $WriteAccess = $User.", ".NormalizeCommaSeparatedField( $WriteAccess, "," );  // check perhaps if write_access is part of owners=user+groups allowed to submit?
 else
  $WriteAccess = $User;
 
