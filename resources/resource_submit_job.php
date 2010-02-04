@@ -227,6 +227,10 @@ if( isset( $_POST[ "write_access" ] ) && ( $_POST[ "write_access" ] != "" ) )
 else
  $WriteAccess = $JobOwners;
 
+// add admins groups to read and write access lists...
+if( isset( $Config[ "LGI_ADMIN_GROUP_FOR_WRITE" ] ) && ( $Config[ "LGI_ADMIN_GROUP_FOR_WRITE" ] != "" ) ) $WriteAccess = $Config[ "LGI_ADMIN_GROUP_FOR_WRITE" ].", ".$WriteAccess
+if( isset( $Config[ "LGI_ADMIN_GROUP_FOR_READ" ] ) && ( $Config[ "LGI_ADMIN_GROUP_FOR_READ" ] != "" ) ) $ReadAccess = $Config[ "LGI_ADMIN_GROUP_FOR_READ" ].", ".$ReadAccess
+
 $ReadAccess = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $ReadAccess, "," ) );
 $WriteAccess = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $WriteAccess, "," ) );
 $InsertQuery .= ", read_access='".$ReadAccess."', write_access='".$WriteAccess."'";

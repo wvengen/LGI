@@ -159,6 +159,10 @@ if( isset( $_POST[ "write_access" ] ) && ( $_POST[ "write_access" ] != "" ) )
 else
  $JobWriteAccess = $JobUser;
 
+// add admins groups to read and write access lists...
+if( isset( $Config[ "LGI_ADMIN_GROUP_FOR_WRITE" ] ) && ( $Config[ "LGI_ADMIN_GROUP_FOR_WRITE" ] != "" ) ) $JobWriteAccess = $Config[ "LGI_ADMIN_GROUP_FOR_WRITE" ].", ".$JobWriteAccess
+if( isset( $Config[ "LGI_ADMIN_GROUP_FOR_READ" ] ) && ( $Config[ "LGI_ADMIN_GROUP_FOR_READ" ] != "" ) ) $JobReadAccess = $Config[ "LGI_ADMIN_GROUP_FOR_READ" ].", ".$JobReadAccess
+
 // create the job respository directory...
 CreateRepository( $RepositoryDir, $RepositoryURL, $RepositoryIDFile, $JobWriteAccess );
 $RepositoryWWWURL = RepositoryURL2WWW( $RepositoryURL.":".$RepositoryDir );
