@@ -17,7 +17,7 @@ MYSQL_DB=""
 # ----------------------------------------------------
 
 function print_usage {
- echo "ManageDB {list|add|del} {users|groups|resources} {allowed|denied} [DB [HST [PSWD [USR]]]]"
+ echo "ManageDB {list|add|del} {users|groups|resources} {allowed|denied} [DB [HST [USR [PWD]]]]"
 }
 
 # ----------------------------------------------------
@@ -31,9 +31,9 @@ function run_mysql {
 function run_update {
  ESCAPEDQUERY=`echo -e "${1}" | sed "s/'/\\\\\'/g"`
  UPDATEQUERY="INSERT INTO updates SET servers='${2}', update_query='${ESCAPEDQUERY}'"
- php -f ./cron_job.php
+ php -f ./cron_job.php > /dev/null
  run_mysql "${1}"
- run_mysql "${UPDATEQUERY}"
+ [ $? ] || run_mysql "${UPDATEQUERY}"
 }
 
 # ----------------------------------------------------
@@ -388,16 +388,16 @@ then
  MYSQL_HOST=${5}
 fi
 
-# see if other passwd was requested...
+# see if other user was requested...
 if [ "${6}" != "" ]
 then
- MYSQL_PASSWD=${6}
+ MYSQL_USER=${6}
 fi
 
-# see if other user was requested...
+# see if other passwd was requested...
 if [ "${7}" != "" ]
 then
- MYSQL_USER=${7}
+ MYSQL_PASSWD=${7}
 fi
 
 # check if value has been specified...
