@@ -477,6 +477,15 @@ Please read in the docs subdirectory the full details on the structure
 of the database, what the fields mean and what values you can assign to 
 them with MySQL queries like demonstrated.
 
+FOOTNOTE:
+
+As of version LGI 1.20 a new data base management tool has been added. In
+the tools subdirectory a script ManageDB can be used to manage an LGI database,
+including taking care of updates and all, more easily. Please check the
+script itself for default values for parameters and usage. Use of the tool
+is especially trivial and self-explaining. The older tool UpdateDB is still
+included though.
+
 
 
 

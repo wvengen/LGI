@@ -1,0 +1,435 @@
+#!/bin/bash
+#
+# Copyright (C) 2010 M.F. Somers, Theoretical Chemistry Group, Leiden University
+#
+# This is free software; you can redistribute it and/or modify it under the terms of
+# the GNU General Public License as published by the Free Software Foundation.
+#
+# http://www.gnu.org/licenses/gpl.txt 
+#
+
+# some default settings...
+MYSQL_HOST="localhost"
+MYSQL_USER="LGI"
+MYSQL_PASSWD=""
+MYSQL_DB=""
+
+# ----------------------------------------------------
+
+function print_usage {
+ echo "ManageDB {list|add|del} {users|groups|resources} {allowed|denied} [DB [HST [PSWD [USR]]]]"
+}
+
+# ----------------------------------------------------
+
+function run_mysql {
+ echo -e "${1}" | mysql --user="${MYSQL_USER}" --password="${MYSQL_PASSWD}" ${MYSQL_DB}
+}
+
+# ----------------------------------------------------
+
+function run_update {
+ ESCAPEDQUERY=`echo -e "${1}" | sed "s/'/\\\\\'/g"`
+ UPDATEQUERY="INSERT INTO updates SET servers='${2}', update_query='${ESCAPEDQUERY}'"
+ php -f ./cron_job.php
+ run_mysql "${1}"
+ run_mysql "${UPDATEQUERY}"
+}
+
+# ----------------------------------------------------
+
+function done_nothing {
+ echo "Nothing was done !"
+}
+
+# ----------------------------------------------------
+
+function list_groups_allowed {
+ run_mysql "SELECT group_name,application,job_limit FROM groups_allowed"
+}
+
+# ----------------------------------------------------
+
+function list_users_allowed {
+ run_mysql "SELECT user_name,application,job_limit FROM users_allowed"
+}
+
+# ----------------------------------------------------
+
+function list_resources_allowed {
+ run_mysql "SELECT resource_name,url,last_call_time,project_server,resource_capabilities FROM active_resources"
+}
+
+# ----------------------------------------------------
+
+function list_resources_denied {
+ echo "No resources are denied !"
+}
+
+# ----------------------------------------------------
+
+function list_users_denied {
+ run_mysql "SELECT user_name,application FROM users_denied"
+}
+
+# ----------------------------------------------------
+
+function list_groups_denied {
+ run_mysql "SELECT group_name,application FROM groups_denied"
+}
+
+# ----------------------------------------------------
+
+function add_users_allowed {
+ read -p "Enter user name: " USR
+ read -p "Enter application: " APP
+ read -p "Enter job limit: " LIM
+ read -p "Enter servers to update: " SRV	
+
+ if [ "${USR}" != "" -a "${APP}" != "" -a "${LIM}" != "" -a "${SRV}" != "" ]
+ then
+   run_update "INSERT INTO users_allowed SET user_name='${USR}',application='${APP}',job_limit=${LIM}" "${SRV}"
+ else
+   done_nothing
+ fi
+}
+
+# ----------------------------------------------------
+
+function add_groups_allowed {
+ read -p "Enter group name: " GRP
+ read -p "Enter application: " APP
+ read -p "Enter job limit: " LIM
+ read -p "Enter servers to update: " SRV
+
+ if [ "${GRP}" != "" -a "${APP}" != "" -a "${LIM}" != "" -a "${SRV}" != "" ]
+ then
+   run_update "INSERT INTO groups_allowed SET group_name='${GRP}',application='${APP}',job_limit=${LIM}" "${SRV}"
+ else
+   done_nothing
+ fi
+}
+
+# ----------------------------------------------------
+
+function add_resources_allowed {
+ read -p "Enter resource name: " NME
+ read -p "Enter resource url: " URL
+ read -p "Enter certificate file: " CRTF
+ read -p "Enter project server flag: " FLG
+ read -p "Enter servers to update: " SRV
+
+ if [ -f ${CRTF} ]
+ then
+   CRT=`cat ${CRTF}`
+ else
+   CRT=""
+ fi 
+
+ if [ "${NME}" != "" -a "${URL}" != "" -a "${CRT}" != "" -a "${FLG}" != "" -a "${SRV}" != "" ]
+ then
+   run_update "INSERT INTO active_resources SET resource_name='${NME}',url='${URL}',client_certificate='${CRT}\n',project_server=${FLG}" "${SRV}"
+ else
+   done_nothing
+ fi
+}
+
+# ----------------------------------------------------
+
+function add_users_denied {
+ read -p "Enter user name: " USR
+ read -p "Enter application: " APP
+ read -p "Enter servers to update: " SRV
+
+ if [ "${USR}" != "" -a "${APP}" != "" -a "${SRV}" != "" ]
+ then
+   run_update "INSERT INTO users_denied SET user_name='${USR}',application='${APP}'" "${SRV}"
+ else
+   done_nothing
+ fi
+}
+
+# ----------------------------------------------------
+
+function add_groups_denied {
+ read -p "Enter group name: " GRP
+ read -p "Enter application: " APP
+ read -p "Enter servers to update: " SRV
+
+ if [ "${GRP}" != "" -a "${APP}" != "" -a "${SRV}" != "" ]
+ then
+   run_update "INSERT INTO groups_denied SET group_name='${GRP}',application='${APP}'" "${SRV}"
+ else
+   done_nothing
+ fi
+}
+
+# ----------------------------------------------------
+
+function add_resources_denied {
+ echo "No resources can be denied !"
+}
+
+# ----------------------------------------------------
+
+function del_users_allowed {
+ read -p "Enter user name: " USR
+ read -p "Enter application: " APP
+ read -p "Enter servers to update: " SRV
+
+ if [ "${SRV}" != "" ]
+ then 
+
+   if [ "${USR}" != "" ]
+   then
+
+     if [ "${APP}" != "" ]
+     then
+       run_update "DELETE FROM users_allowed WHERE user_name='${USR}' AND application='${APP}'" "${SRV}" 
+     else
+       run_update "DELETE FROM users_allowed WHERE user_name='${USR}'" "${SRV}" 
+     fi
+
+   else
+
+     if [ "${APP}" != "" ]
+     then
+       run_update "DELETE FROM users_allowed WHERE application='${APP}'" "${SRV}"
+     else
+       done_nothing
+     fi
+
+   fi
+
+ else
+   done_nothing
+ fi
+}
+
+# ----------------------------------------------------
+
+function del_groups_allowed {
+ read -p "Enter group name: " GRP
+ read -p "Enter application: " APP
+ read -p "Enter servers to update: " SRV
+
+ if [ "${SRV}" != "" ]
+ then
+
+   if [ "${GRP}" != "" ]
+   then
+
+     if [ "${APP}" != "" ]
+     then
+       run_update "DELETE FROM groups_allowed WHERE group_name='${GRP}' AND application='${APP}'" "${SRV}"
+     else
+       run_update "DELETE FROM groups_allowed WHERE group_name='${GRP}'" "${SRV}"
+     fi
+
+   else
+
+     if [ "${APP}" != "" ]
+     then
+       run_update "DELETE FROM groups_allowed WHERE application='${APP}'" "${SRV}"
+     else
+       done_nothing
+     fi
+
+   fi
+
+ else
+   done_nothing
+ fi
+}
+
+# ----------------------------------------------------
+
+function del_resources_allowed {
+ read -p "Enter resource name: " NME
+ read -p "Enter servers to update: " SRV
+
+ if [ "${SRV}" != "" -a "${NME}" != "" ]
+ then
+   run_update "DELETE FROM active_resources WHERE resource_name='${NME}'" "${SRV}"
+ else
+   done_nothing
+ fi
+}
+
+# ----------------------------------------------------
+
+function del_users_denied {
+ read -p "Enter user name: " USR
+ read -p "Enter application: " APP
+ read -p "Enter servers to update: " SRV
+
+ if [ "${SRV}" != "" ]
+ then
+
+    if [ "${USR}" != "" ]
+    then
+
+      if [ "${APP}" != "" ]
+      then
+        run_update "DELETE FROM users_denied WHERE user_name='${USR}' AND application='${APP}'" "${SRV}"
+      else
+        run_update "DELETE FROM users_denied WHERE user_name='${USR}'" "${SRV}"
+      fi
+
+    else
+
+      if [ "${APP}" != "" ]
+      then
+        run_update "DELETE FROM users_denied WHERE application='${APP}'" "${SRV}"
+      else
+        done_nothing
+      fi
+
+    fi
+
+ else
+   done_nothing
+ fi 
+}
+
+# ----------------------------------------------------
+
+function del_groups_denied {
+ read -p "Enter group name: " GRP
+ read -p "Enter application: " APP
+ read -p "Enter servers to update: " SRV
+
+ if [ "${SRV}" != "" ]
+ then
+
+    if [ "${GRP}" != "" ]
+    then
+
+      if [ "${APP}" != "" ]
+      then
+        run_update "DELETE FROM groups_denied WHERE group_name='${GRP}' AND application='${APP}'" "${SRV}"
+      else
+        run_update "DELETE FROM groups_denied WHERE group_name='${GRP}'" "${SRV}"
+      fi
+
+    else
+
+      if [ "${APP}" != "" ]
+      then
+        run_update "DELETE FROM groups_denied WHERE application='${APP}'" "${SRV}"
+      else
+        done_nothing
+      fi
+
+    fi
+
+ else
+   done_nothing
+ fi
+}
+
+# ----------------------------------------------------
+
+function del_resources_denied {
+ echo "No resources can be denied !"
+}
+
+# ----------------------------------------------------
+
+# determine option #1...
+OPT=$( tr '[:upper:]' '[:lower:]' <<<"${1}" )
+case "${OPT}" in
+
+  list)  OPTION1="list";;
+
+  add)   OPTION1="add";;
+
+  del)   OPTION1="del";;
+
+  *) print_usage
+     exit;;
+esac
+
+# determine option #2...
+OPT=$( tr '[:upper:]' '[:lower:]' <<<"${2}" )
+case "${OPT}" in
+
+  users)     OPTION2="users";;
+
+  groups)    OPTION2="groups";;
+
+  resources) OPTION2="resources";;
+
+  *) print_usage
+     exit;;
+esac
+
+# determine option #3...
+OPT=$( tr '[:upper:]' '[:lower:]' <<<"${3}" )
+case "${OPT}" in
+
+  allowed)   OPTION3="allowed";;
+
+  denied)    OPTION3="denied";;
+
+  *) print_usage
+     exit;;
+esac
+
+# see if other DB was requested...
+if [ "${4}" != "" ]
+then
+ MYSQL_DB=${4}
+fi
+
+# see if other host was requested...
+if [ "${5}" != "" ]
+then
+ MYSQL_HOST=${5}
+fi
+
+# see if other passwd was requested...
+if [ "${6}" != "" ]
+then
+ MYSQL_PASSWD=${6}
+fi
+
+# see if other user was requested...
+if [ "${7}" != "" ]
+then
+ MYSQL_USER=${7}
+fi
+
+# check if value has been specified...
+if [ "${MYSQL_DB}" == "" ]
+then
+  read -p "Enter the data base to manage: " MYSQL_DB
+fi
+
+# check if value has been specified...
+if [ "${MYSQL_HOST}" == "" ]
+then
+  read -p "Enter the host of data base to manage: " MYSQL_HOST
+fi
+
+# check if value has been specified...
+if [ "${MYSQL_USER}" == "" ]
+then
+  read -p "Enter the user name to use to manage database: " MYSQL_USER
+fi
+
+# check if value has been specified...
+if [ "${MYSQL_PASSWD}" == "" ]
+then
+  read -s -p "Enter the password to use to manage database: " MYSQL_PASSWD
+  echo
+fi
+
+# finally doublecheck it all... and run requested command...
+if [ "${MYSQL_DB}" != "" -a "${MYSQL_HOST}" != "" -a "${MYSQL_USER}" != "" -a "${MYSQL_PASSWD}" != "" ]
+then
+  eval ${OPTION1}_${OPTION2}_${OPTION3}
+else
+  done_nothing
+fi
+
