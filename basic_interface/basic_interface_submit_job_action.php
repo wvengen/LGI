@@ -149,6 +149,7 @@ if( !$FoundResourceFlag )
 $TargetResources = substr( $NewTargetResourceList, 2 );
 
 // check if any of the posted combinations of user+groups or just the user is allowed to submit a job...
+$OldGroups = $Groups;
 $GroupsArray = CommaSeparatedField2Array( $Groups, "," );
 $NewGroupsList = "";
 $FoundPossibleGroup = 0;
@@ -267,5 +268,5 @@ $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
 
 // and redirect browser with a simple java script to the job_state page so that the POST url is not in browser history...
-echo '<script type="text/javascript">window.location.replace("basic_interface_job_state.php?project='.$Project.'&groups='.$Groups.'&sid='.$SID.'&job_id='.$JobSpecs->job_id.'");</script>'
+echo '<script type="text/javascript">window.location.replace("basic_interface_job_state.php?project='.$Project.'&groups='.$OldGroups.'&sid='.$SID.'&job_id='.$JobSpecs->job_id.'");</script>'
 ?>
