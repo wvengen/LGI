@@ -33,7 +33,7 @@ function run_update {
  UPDATEQUERY="INSERT INTO updates SET servers='${2}', update_query='${ESCAPEDQUERY}'"
  php -f ./cron_job.php &> /dev/null
  run_mysql "${1}"
- [ $? ] || run_mysql "${UPDATEQUERY}"
+ [ $? == 0 ] && run_mysql "${UPDATEQUERY}"
 }
 
 # ----------------------------------------------------
