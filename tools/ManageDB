@@ -31,7 +31,7 @@ function run_mysql {
 function run_update {
  ESCAPEDQUERY=`echo -e "${1}" | sed "s/'/\\\\\'/g"`
  UPDATEQUERY="INSERT INTO updates SET servers='${2}', update_query='${ESCAPEDQUERY}'"
- php -f ./cron_job.php > /dev/null
+ php -f ./cron_job.php > /dev/null 2&>1
  run_mysql "${1}"
  [ $? ] || run_mysql "${UPDATEQUERY}"
 }
