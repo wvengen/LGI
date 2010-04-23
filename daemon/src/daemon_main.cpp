@@ -65,6 +65,8 @@ void PrintHelp( char *ExeName )
  cout << endl << ExeName << " [options] configfile" << endl << endl;
  cout << "options:" << endl << endl;
  cout << "-h           this help." << endl;
+ cout << "-ft time     specify fast schedule cycle time in seconds. default is 120." << endl;
+ cout << "-fs time     specify slow schedule cycle time in seconds. default is 600." << endl;
  cout << "-d           daemonize and run in background." << endl;
  cout << "-q           log only critical messages." << endl;
  cout << "-n           log normal messages. this is the default." << endl;
@@ -80,6 +82,8 @@ int main( int argc, char *argv[] )
  int    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING;
  int    ConfigFileSet = 0;
  int    Daemonize = 0;
+ int    FastCycleTime = 120;
+ int    SlowCycleTime = 600;
  string LogFile( "/dev/stdout" );
  string ConfigFile( "LGI.cfg" );
 
@@ -106,6 +110,22 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-l" ) ) {
    if( argv[ ++i ] )
     LogFile = string( argv[ i ] );
+   else
+   {
+    PrintHelp( argv[ 0 ] );
+    return( 1 );
+   }
+  } else if( !strcmp( argv[ i ], "-ft" ) ) {
+   if( argv[ ++i ] )
+    FastCycleTime = atoi( argv[ i ] );
+   else
+   {
+    PrintHelp( argv[ 0 ] );
+    return( 1 );
+   }
+  } else if( !strcmp( argv[ i ], "-st" ) ) {
+   if( argv[ ++i ] )
+    SlowCycleTime = atoi( argv[ i ] );
    else
    {
     PrintHelp( argv[ 0 ] );
@@ -143,7 +163,7 @@ int main( int argc, char *argv[] )
 
  InitializeLogger( LogLevel, LogFile.c_str() );
  
- TheDaemon = new Daemon( ConfigFile );
+ TheDaemon = new Daemon( ConfigFile, SlowCycleTime, FastCycleTime );
 
  if( TheDaemon != NULL )
  {

@@ -53,7 +53,7 @@ class Daemon : public DaemonConfig
       {
        public:
 
-               Daemon( string ConfigFile );
+               Daemon( string ConfigFile, int SlowCycleTime = 600, int FastCycleTime = 120 );
 
                int RunSchedular( void );
                int IsSchedularReady( void );
@@ -75,7 +75,9 @@ class Daemon : public DaemonConfig
        map<string,int>              Accounting;
        int                          JobsFinished,
                                     JobsObtained,
-                                    ReadyForScheduling;
+                                    ReadyForScheduling,
+                                    TheFastCycleTime, 
+                                    TheSlowCycleTime;
       };
 
 // -----------------------------------------------------------------------------

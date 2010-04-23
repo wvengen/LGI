@@ -21,7 +21,7 @@
 
 // -----------------------------------------------------------------------------
 
-Daemon::Daemon( string ConfigFile ) : DaemonConfig( ConfigFile )
+Daemon::Daemon( string ConfigFile, int SlowCycleTime, int FastCycleTime ) : DaemonConfig( ConfigFile )
 {
  ReadyForScheduling = 0; Jobs.clear(); Accounting.clear();
 
@@ -29,6 +29,12 @@ Daemon::Daemon( string ConfigFile ) : DaemonConfig( ConfigFile )
 
  if( !ScanDirectoryForJobs( RunDirectory() ) ) { CRITICAL_LOG( "Daemon::Daemon; Error during scan of run directory " << RunDirectory() ); return; }
 
+ if( FastCycleTime >= SlowCycleTime ) { CRITICAL_LOG( "Daemon::Daemon; FastCycleTime >= SlowCycleTime" ); return; }
+
+ if( FastCycleTime < 1 ) { CRITICAL_LOG( "Daemon::Daemon; FastCycleTime < 1" ); return; }
+
+ TheFastCycleTime = FastCycleTime;
+ TheSlowCycleTime = SlowCycleTime;
  ReadyForScheduling = 1;
 }
 
@@ -766,35 +772,35 @@ int Daemon::RunSchedular( void )
 
  time_t LastRequestTime = 0;
  time_t LastUpdateTime = 0;
- time_t RequestDelay = 600;
+ time_t RequestDelay = TheSlowCycleTime;
 
  do
  {
 
-  if( time( NULL ) - LastRequestTime >= RequestDelay )        // check for work every 10 min...
+  if( time( NULL ) - LastRequestTime >= RequestDelay )        // check for work every slow cycle time seconds...
   {
-   if( RequestWorkCycle() )                    // if we got some work, wait for 2 min. now and ask for more... 
-    RequestDelay = 120;
+   if( RequestWorkCycle() )                    // if we got some work, wait for fast cycle time now and ask for more... 
+    RequestDelay = TheFastCycleTime;
    else
-    RequestDelay = 600;
+    RequestDelay = TheSlowCycleTime;
    LastRequestTime = time( NULL );
   }
   else
    JobsObtained = 0;
 
-  if( ( time( NULL ) - LastUpdateTime >= 120 ) || ( JobsObtained ) )      // check our jobs every 2 min...
+  if( ( time( NULL ) - LastUpdateTime >= TheFastCycleTime ) || ( JobsObtained ) )      // check our jobs every fast cycle time...
   {
    if( !Jobs.empty() )
    {
     CycleThroughJobs(); 
 
     if( JobsFinished )                            // if we have jobs finished, we can request new work now... 
-     RequestDelay = 120;
+     RequestDelay = TheFastCycleTime;
    }
    LastUpdateTime = time( NULL );
   }
 
-  sleep( 10 );                // sleep for 10 seconds each time...
+  sleep( 1 );                // sleep for a second each time...
 
  } while( ReadyForScheduling );
 
