@@ -66,7 +66,7 @@ void PrintHelp( char *ExeName )
  cout << "options:" << endl << endl;
  cout << "-h           this help." << endl;
  cout << "-ft time     specify fast schedule cycle time in seconds. default is 120." << endl;
- cout << "-fs time     specify slow schedule cycle time in seconds. default is 600." << endl;
+ cout << "-st time     specify slow schedule cycle time in seconds. default is 600." << endl;
  cout << "-d           daemonize and run in background." << endl;
  cout << "-q           log only critical messages." << endl;
  cout << "-n           log normal messages. this is the default." << endl;
