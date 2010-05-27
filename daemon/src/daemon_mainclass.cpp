@@ -96,6 +96,7 @@ int Daemon::ScanDirectoryForJobs( string Directory )
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_CA_CERTIFICATE_FILE ) ) FileMask |= LGI_JOBDAEMON_CA_CERTIFICATE_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE ) ) FileMask |= LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE ) ) FileMask |= LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE_BIT_VALUE;
+   if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE ) ) FileMask |= LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE_BIT_VALUE;
 
    // if we have all the needed files...
    if( FileMask == LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER )
@@ -238,6 +239,7 @@ int Daemon::CycleThroughJobs( void )
      {                                                                                 // the job doesn't exist in the DB anymore...
       CRITICAL_LOG( "Daemon::CycleThroughJobs; Removed and cleaned up stale job with directory " << TempJob.GetJobDirectory() );
       RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
+      TempJob.KillJobRunScriptProcess();
       TempJob.CleanUpJobDirectory();
      }
      continue;
@@ -300,6 +302,7 @@ int Daemon::CycleThroughJobs( void )
     if( TempJob.RunJobCheckRunningScript() == 0 )                 // we are currently running this job...
     {
      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " was found running" );
+
      if( TempJob.GetState() == "aborting" )                       // do we need to abort the job...
      {
       VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Aborting job with directory " << TempJob.GetJobDirectory() );
@@ -323,9 +326,21 @@ int Daemon::CycleThroughJobs( void )
       TempJob.SetSessionID( "" );
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       NORMAL_LOG( "Daemon::CycleThroughJobs; Aborted job with directory " << TempJob.GetJobDirectory() );
+      TempJob.KillJobRunScriptProcess();
       TempJob.CleanUpJobDirectory();
       JobsFinished = 1;
      }
+     else                     // if not aborting this job...
+     {
+      if( TempJob.GetState() != "running" )        // if our local scripts said the job runs and the state in DB said not so, drop the job...
+      {                                          
+       CRITICAL_LOG( "Daemon::CycleThroughJobs; Removed and cleaned up stale job with directory " << TempJob.GetJobDirectory() );
+       RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
+       TempJob.KillJobRunScriptProcess();
+       TempJob.CleanUpJobDirectory();
+      }
+     }
+
     }
     else
     {
@@ -352,6 +367,7 @@ int Daemon::CycleThroughJobs( void )
       TempJob.SetSessionID( "" );
       RemoveJobFromDaemonLists( TempJob );                        // remove job from lists and cleanup directory..
       NORMAL_LOG( "Daemon::CycleThroughJobs; Finished job with directory " << TempJob.GetJobDirectory() );
+      TempJob.KillJobRunScriptProcess();
       TempJob.CleanUpJobDirectory();
       JobsFinished = 1;
      }

@@ -32,6 +32,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <signal.h>
 
 #include "logger.h"
 #include "xml.h"
@@ -78,6 +79,7 @@ using namespace std;
 #define LGI_JOBDAEMON_CA_CERTIFICATE_FILE          "LGI_ca_certificate_file"
 #define LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE         "LGI_max_output_size"
 #define LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE         "LGI_job_sandbox_uid"
+#define LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE      "LGI_job_run_script_pid"
 
 // check values, a bit per file...
 
@@ -107,8 +109,9 @@ using namespace std;
 #define LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE_BIT_VALUE        8388608
 #define LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE_BIT_VALUE        16777216
 #define LGI_JOBDAEMON_WRITE_ACCESS_FILE_BIT_VALUE           33554432 
+#define LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE_BIT_VALUE     67108864
 
-#define LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER               67108863
+#define LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER               134217727
 
 // -----------------------------------------------------------------------------
 
@@ -121,6 +124,7 @@ class DaemonJob
               DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber );
 
               void CleanUpJobDirectory( void );             // remove job directory
+              void KillJobRunScriptProcess( void );
 
               string GetJobDirectory( void );               // retrieve data from job directory
               string GetProject( void );
@@ -142,7 +146,6 @@ class DaemonJob
               string GetKeyFile( void );
               string GetCertificateFile( void );
               string GetCACertificateFile( void );
-              string GetJobSandboxUID( void );
 
               string GetSessionID( void );
               void   SetSessionID( string ID );
@@ -171,6 +174,8 @@ class DaemonJob
               
               int  GetMaxOutputSize( void );
               int  GetErrorNumber( void );
+              int  GetJobSandboxUID( void );
+              int  GetJobRunScriptPid( void );
 
        protected:
 
