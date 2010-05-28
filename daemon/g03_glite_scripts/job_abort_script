@@ -17,9 +17,16 @@ then
    exit 1
   fi
  else
-  touch aborted
-  glite-wms-job-cancel --noint $ID &> /dev/null
-  exit 1
+  if [ "$ID" != "" ]
+  then
+   touch aborted
+   glite-wms-job-cancel --noint $ID &> /dev/null
+   exit 1
+  else
+   PID=`cat LGI_job_run_script_pid`
+   kill -9 $PID
+   exit 0
+  fi
  fi
 else
  exit 1
