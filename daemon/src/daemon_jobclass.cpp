@@ -118,6 +118,7 @@ DaemonJob::DaemonJob( string TheJobDirectory )
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE << " seems corrupt in " << TheJobDirectory ); return; }
  if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE << " seems corrupt in " << TheJobDirectory ); return; }
+ if( !ReadStringFromHashedFile( TheJobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE, Data ) ) { CRITICAL_LOG( "DaemonJob::DaemonJob; File " << LGI_JOBDAEMON_DAEMON_REFERENCE_FILE << " seems corrupt in " << TheJobDirectory ); return; }
 
  // all files are there and are okay... accept the job directory...
 
@@ -186,7 +187,7 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  else
   DEBUG_LOG( "DaemonJob::DaemonJob; Deamon not running as root, no sandboxing possible" );
 
- // create job slot directory...
+ // create job slot directory... Use this hash later on as a daemon reference cookie... 
  BinHex( Hash( TheXML ), TheHash );
  JobDirectory = JobDirectory + "/JOB_" + TheHash;
  if( mkdir( JobDirectory.c_str(), S_IRWXU ) )
@@ -378,6 +379,13 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  dummy = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
  dummy = chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
+ // and finally write the daemon reference hash file...
+ WriteStringToHashedFile( TheHash, JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE );
+ dummy = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE ).c_str(), S_IRUSR );
+ dummy = chown( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE ).c_str(), UID, UID );
+ dummy = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ dummy = chown( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+
  NORMAL_LOG( "DaemonJob::DaemonJob; Job with JobDirectory=" << JobDirectory << " has been setup" );
 }
 
@@ -386,6 +394,15 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
 string DaemonJob::GetJobDirectory( void )
 { 
  VERBOSE_DEBUG_LOG_RETURN( JobDirectory, "DaemonJob::GetJobDirectory; Returned " << JobDirectory );
+}
+
+// -----------------------------------------------------------------------------
+
+string DaemonJob::GetDaemonReferenceHash( void )
+{
+ if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetDaemonReferenceHash; JobDirectory empty" );
+ string Data; ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE, Data );
+ VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonJob::GetDaemonReferenceHash; Returned " << Data );
 }
 
 // -----------------------------------------------------------------------------
@@ -736,7 +753,7 @@ int DaemonJob::SetState( string State )
 
 // -----------------------------------------------------------------------------
 
-int DaemonJob:: SetJobSpecifics( string Specs )
+int DaemonJob::SetJobSpecifics( string Specs )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SetJobSpecifics; JobDirectory empty" );
  int Value = UpdateJob( "", "", "", "", Specs ); 
@@ -1047,7 +1064,7 @@ int DaemonJob::RunJobRunScript( void )
 
  waitpid( first_pid, &status, 0 );      // and here we wait on the first forked child that we quited above...
 
- NORMAL_LOG_RETURN( 0, "DamonJob::RunJobRunScript; Script started on background for job with directory " << JobDirectory );
+ NORMAL_LOG_RETURN( 0, "DamonJob::RunJobRunScript; Script started on background with pid " << GetJobRunScriptPid() << " for job with directory " << JobDirectory );
 }
 
 // -----------------------------------------------------------------------------

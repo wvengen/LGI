@@ -97,6 +97,7 @@ int Daemon::ScanDirectoryForJobs( string Directory )
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE ) ) FileMask |= LGI_JOBDAEMON_MAX_OUTPUT_SIZE_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE ) ) FileMask |= LGI_JOBDAEMON_JOB_SANDBOX_UID_FILE_BIT_VALUE;
    if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE ) ) FileMask |= LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE_BIT_VALUE;
+   if( !strcmp( Entry -> d_name, LGI_JOBDAEMON_DAEMON_REFERENCE_FILE ) ) FileMask |= LGI_JOBDAEMON_DAEMON_REFERENCE_FILE_BIT_VALUE;
 
    // if we have all the needed files...
    if( FileMask == LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER )
@@ -237,7 +238,7 @@ int Daemon::CycleThroughJobs( void )
     {
      if( ( TempJob.GetErrorNumber() == 24 ) || ( TempJob.GetErrorNumber() == 15 ) )    // check if we weren't allowed to get job state or
      {                                                                                 // the job doesn't exist in the DB anymore...
-      CRITICAL_LOG( "Daemon::CycleThroughJobs; Removed and cleaned up stale job with directory " << TempJob.GetJobDirectory() );
+      CRITICAL_LOG( "Daemon::CycleThroughJobs; Removing and cleaning up stale job with directory " << TempJob.GetJobDirectory() );
       RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
       TempJob.KillJobRunScriptProcess();
       TempJob.CleanUpJobDirectory();
@@ -299,6 +300,15 @@ int Daemon::CycleThroughJobs( void )
  
     TempJob = (*(JobPointer++));                                  // get copy and point to next for iterator...
 
+    // now check and see if the daemon reference in the job specs match the on in the job slot...
+    if( TempJob.GetDaemonReferenceHash() != NormalizeString( Parse_XML( TempJob.GetJobSpecifics(), "daemon_reference" ) ) )
+    {
+     CRITICAL_LOG( "Daemon::CycleThroughJobs; Removing and cleaning up stale job with directory " << TempJob.GetJobDirectory() );
+     RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
+     TempJob.KillJobRunScriptProcess();
+     TempJob.CleanUpJobDirectory();
+    }
+
     if( TempJob.RunJobCheckRunningScript() == 0 )                 // we are currently running this job...
     {
      VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " was found running" );
@@ -334,7 +344,7 @@ int Daemon::CycleThroughJobs( void )
      {
       if( TempJob.GetState() != "running" )        // if our local scripts said the job runs and the state in DB said not so, drop the job...
       {                                          
-       CRITICAL_LOG( "Daemon::CycleThroughJobs; Removed and cleaned up stale job with directory " << TempJob.GetJobDirectory() );
+       CRITICAL_LOG( "Daemon::CycleThroughJobs; Removing and cleaning up stale job with directory " << TempJob.GetJobDirectory() );
        RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
        TempJob.KillJobRunScriptProcess();
        TempJob.CleanUpJobDirectory();
@@ -601,9 +611,10 @@ int Daemon::RequestWorkCycle( void )
          {
           VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No job limits were encountered for job " << Job_Id );
 
-          // set job into running state on server and through this we now also get input...
+          // set job into running state on server and through this we now also get input... also set daemon reference into job specs...
           TempJob.SetSessionID( SessionID );
-          if( TempJob.UpdateJob( "running", NormalizeString( Parse_XML( JobResponse, "resource" ) ), "", "", "" ) )
+          if( TempJob.UpdateJob( "running", NormalizeString( Parse_XML( JobResponse, "resource" ) ), "", "", 
+              "<daemon_reference> " + TempJob.GetDaemonReferenceHash() + " </daemon_reference> " + TempJob.GetJobSpecifics() ) )
           {
 
            // there are no limits and job was successfully accepted...
