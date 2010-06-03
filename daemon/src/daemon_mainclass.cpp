@@ -307,6 +307,7 @@ int Daemon::CycleThroughJobs( void )
      RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
      TempJob.KillJobRunScriptProcess();
      TempJob.CleanUpJobDirectory();
+     continue;
     }
 
     if( TempJob.RunJobCheckRunningScript() == 0 )                 // we are currently running this job...
