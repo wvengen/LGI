@@ -238,13 +238,8 @@ int Daemon::CycleThroughJobs( void )
     {
      if( ( TempJob.GetErrorNumber() == 24 ) || ( TempJob.GetErrorNumber() == 15 ) )    // check if we weren't allowed to get job state or
      {                                                                                 // the job doesn't exist in the DB anymore...
-      CRITICAL_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " seems stale, trying to abort" );
+      CRITICAL_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " seems stale, invalidating daemon reference hash" );
       TempJob.InvalidateDaemonReferenceHash();
-      if( TempJob.RunJobAbortScript() & TempJob.RunJobCheckFinishedScript() ) continue;     // check if aborted or finished...
-      CRITICAL_LOG( "Daemon::CycleThroughJobs; Removing and cleaning up stale job with directory " << TempJob.GetJobDirectory() );
-      RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
-      TempJob.KillJobRunScriptProcess();
-      TempJob.CleanUpJobDirectory();
      }
      continue;
     }
@@ -303,13 +298,18 @@ int Daemon::CycleThroughJobs( void )
  
     TempJob = (*(JobPointer++));                                  // get copy and point to next for iterator...
 
-    // now check and see if the daemon reference in the job specs match the on in the job slot...
+    // now check and see if the daemon reference in the job specs match the one in the job slot...
     if( TempJob.GetDaemonReferenceHash() != NormalizeString( Parse_XML( TempJob.GetJobSpecifics(), "daemon_reference" ) ) )
     {
-     CRITICAL_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " seems stale, trying to abort" );
+     CRITICAL_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " seems stale, invalidating daemon reference hash and trying to abort" );
      TempJob.InvalidateDaemonReferenceHash();
-     if( TempJob.RunJobAbortScript() & TempJob.RunJobCheckFinishedScript() ) continue;     // check if aborted or finished...
-     CRITICAL_LOG( "Daemon::CycleThroughJobs; Removing and cleaning up stale job with directory " << TempJob.GetJobDirectory() );
+     if( TempJob.RunJobCheckFinishedScript() == 0 )                               // if finished run epilogue...
+     {
+      if( TempJob.RunJobEpilogueScript() ) continue;
+     }
+     else
+      if( TempJob.RunJobAbortScript() ) continue;                                // or try to abort...
+     NORMAL_LOG( "Daemon::CycleThroughJobs; Removing and cleaning up stale job with directory " << TempJob.GetJobDirectory() );
      RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
      TempJob.KillJobRunScriptProcess();
      TempJob.CleanUpJobDirectory();
@@ -349,12 +349,10 @@ int Daemon::CycleThroughJobs( void )
      }
      else                     // if not aborting this job...
      {
-      if( TempJob.GetState() != "running" )        // if our local scripts said the job runs and the state in DB said not so, drop the job...
+      if( TempJob.GetState() != "running" )        // if our local script said the job runs and the state in DB said not so, drop the job...
       {                                          
-       CRITICAL_LOG( "Daemon::CycleThroughJobs; Removing and cleaning up stale job with directory " << TempJob.GetJobDirectory() );
-       RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
-       TempJob.KillJobRunScriptProcess();
-       TempJob.CleanUpJobDirectory();
+       CRITICAL_LOG( "Daemon::CycleThroughJobs; Job with directory " << TempJob.GetJobDirectory() << " seems stale, invalidating daemon reference hash" );
+       TempJob.InvalidateDaemonReferenceHash();
       }
      }
 
