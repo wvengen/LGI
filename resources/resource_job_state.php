@@ -38,7 +38,8 @@ else
  $JobId = $_POST[ "job_id" ];
 }
 
-// query for the job specs...
+// query for the job specs... and update pulse...
+$JobQuery = mysql_query( "UPDATE job_queue SET daemon_pulse=UNIX_TIMESTAMP() WHERE job_id=".$JobId );
 $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobId );
 if( $JobQuery ) 
  $NrRows =  mysql_num_rows( $JobQuery );

@@ -254,7 +254,7 @@ $Application = mysql_escape_string( $Application );
 $TargetResources = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $TargetResources, "," ) );
 
 // start building the insert query based on all possible posted fields...
-$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$Application."', owners='".$Owners."', write_access='".$WriteAccess."', read_access='".$ReadAccess."', target_resources='".$TargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP(), job_specifics='".mysql_escape_string( $JobSpecifics." <repository> $RepositoryURL:$RepositoryDir </repository> <repository_url> $RepositoryWWWURL </repository_url>" )."'";
+$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$Application."', owners='".$Owners."', write_access='".$WriteAccess."', read_access='".$ReadAccess."', target_resources='".$TargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP(), priority=UNIX_TIMESTAMP(), job_specifics='".mysql_escape_string( $JobSpecifics." <repository> $RepositoryURL:$RepositoryDir </repository> <repository_url> $RepositoryWWWURL </repository_url>" )."'";
 
 if( $Input != "" )
  $InsertQuery .= ", input='".mysql_escape_string( $Input )."'";

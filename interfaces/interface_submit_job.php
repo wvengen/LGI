@@ -203,7 +203,7 @@ $JobApplication = mysql_escape_string( $JobApplication );
 $JobTargetResources = mysql_escape_string( RemoveDoubleEntriesFromCommaSeparatedField( $JobTargetResources, "," ) );
 
 // start building the insert query based on all possible posted fields...
-$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$JobApplication."', owners='".$JobOwners."', read_access='".$JobReadAccess."', write_access='".$JobWriteAccess."', target_resources='".$JobTargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP()";
+$InsertQuery = "INSERT INTO job_queue SET state='queued', application='".$JobApplication."', owners='".$JobOwners."', read_access='".$JobReadAccess."', write_access='".$JobWriteAccess."', target_resources='".$JobTargetResources."', lock_state=0, state_time_stamp=UNIX_TIMESTAMP(), priority=UNIX_TIMESTAMP()";
 
 if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
 {
