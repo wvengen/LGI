@@ -38,7 +38,7 @@ EOF_JDL
 export RUNNING=""
 while [ "${RUNNING}" == "" ]
 do
- glite-wms-job-submit -a -o ${HOME}/my-glite-jobs hello.submitted.jdl | grep https | tail -1 &> ./running
+ glite-wms-job-submit -a -o ${HOME}/my-glite-jobs hello.submitted.jdl | grep https | grep 9000 | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`
 done
 
