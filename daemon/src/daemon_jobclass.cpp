@@ -407,6 +407,22 @@ string DaemonJob::GetDaemonReferenceHash( void )
 
 // -----------------------------------------------------------------------------
 
+void DaemonJob::InvalidateDaemonReferenceHash( void )
+{
+ if( JobDirectory.empty() ) { CRITICAL_LOG( "DaemonJob::InvalidateDaemonReferenceHash; JobDirectory empty" ); return; }
+ CRITICAL_LOG( "DaemonJob::InvalidateDaemonReferenceHash; Invalidating job in directory " << JobDirectory );
+ int UID = GetJobSandboxUID();
+ int dummy = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE ).c_str(), S_IWUSR );
+ dummy = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
+ WriteStringToHashedFile( "! INVALID !", JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE );
+ dummy = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE ).c_str(), S_IRUSR );
+ dummy = chown( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE ).c_str(), UID, UID );
+ dummy = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
+ dummy = chown( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
+}
+
+// -----------------------------------------------------------------------------
+
 string DaemonJob::GetProject( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetProject; JobDirectory empty" );
