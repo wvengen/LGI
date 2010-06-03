@@ -986,7 +986,7 @@ int DaemonJob::RunJobCheckLimitsScript( void )
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_CHECK_LIMITS_SCRIPT );
 
- NORMAL_LOG_RETURN( Value, "DamonJob::RunJobCheckLimitsScript; Returned " << Value << " for job with directory " << JobDirectory );
+ NORMAL_LOG_RETURN( Value, "DaemonJob::RunJobCheckLimitsScript; Returned " << Value << " for job with directory " << JobDirectory );
 }
 
 // -----------------------------------------------------------------------------
@@ -998,7 +998,7 @@ int DaemonJob::RunJobCheckRunningScript( void )
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_CHECK_RUNNING_SCRIPT );
 
- NORMAL_LOG_RETURN( Value, "DamonJob::RunJobCheckRunningScript; Returned " << Value << " for job with directory " << JobDirectory );
+ NORMAL_LOG_RETURN( Value, "DaemonJob::RunJobCheckRunningScript; Returned " << Value << " for job with directory " << JobDirectory );
 }
 
 // -----------------------------------------------------------------------------
@@ -1010,7 +1010,7 @@ int DaemonJob::RunJobCheckFinishedScript( void )
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_CHECK_FINISHED_SCRIPT );
 
- NORMAL_LOG_RETURN( Value, "DamonJob::RunJobCheckFinishedScript; Returned " << Value << " for job with directory " << JobDirectory );
+ NORMAL_LOG_RETURN( Value, "DaemonJob::RunJobCheckFinishedScript; Returned " << Value << " for job with directory " << JobDirectory );
 }
 
 // -----------------------------------------------------------------------------
@@ -1022,7 +1022,7 @@ int DaemonJob::RunJobPrologueScript( void )
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_PROLOGUE_SCRIPT );
 
- NORMAL_LOG_RETURN( Value, "DamonJob::RunJobPrologueScript; Returned " << Value << " for job with directory " << JobDirectory );
+ NORMAL_LOG_RETURN( Value, "DaemonJob::RunJobPrologueScript; Returned " << Value << " for job with directory " << JobDirectory );
 }
 
 // -----------------------------------------------------------------------------
@@ -1034,7 +1034,7 @@ int DaemonJob::RunJobEpilogueScript( void )
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_EPILOGUE_SCRIPT );
 
- NORMAL_LOG_RETURN( Value, "DamonJob::RunJobEpilogueScript; Returned " << Value << " for job with directory " << JobDirectory );
+ NORMAL_LOG_RETURN( Value, "DaemonJob::RunJobEpilogueScript; Returned " << Value << " for job with directory " << JobDirectory );
 }
 
 // -----------------------------------------------------------------------------
@@ -1080,7 +1080,7 @@ int DaemonJob::RunJobRunScript( void )
 
  waitpid( first_pid, &status, 0 );      // and here we wait on the first forked child that we quited above...
 
- NORMAL_LOG_RETURN( 0, "DamonJob::RunJobRunScript; Script started on background with pid " << GetJobRunScriptPid() << " for job with directory " << JobDirectory );
+ NORMAL_LOG_RETURN( 0, "DaemonJob::RunJobRunScript; Script started on background with pid " << GetJobRunScriptPid() << " for job with directory " << JobDirectory );
 }
 
 // -----------------------------------------------------------------------------
@@ -1113,7 +1113,7 @@ int DaemonJob::RunJobAbortScript( void )
  string Data; if( !ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_ABORT_SCRIPT, Data ) ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobAbortScript; Script seems corrupt, refusing to run it" );
 
  int Value = RunAScript( LGI_JOBDAEMON_JOB_ABORT_SCRIPT );
- NORMAL_LOG_RETURN( Value, "DamonJob::RunJobAbortScript; Returned " << Value << " for job with directory " << JobDirectory );
+ NORMAL_LOG_RETURN( Value, "DaemonJob::RunJobAbortScript; Returned " << Value << " for job with directory " << JobDirectory );
 }
 
 // -----------------------------------------------------------------------------
