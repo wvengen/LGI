@@ -41,7 +41,7 @@ void TheSignalHandler( int S )
 {
  if( TheDaemon != NULL ) 
  {
-  CRITICAL_LOG( "TheSignalHandler; Received signal, stoping with scheduling gracefully" );
+  CRITICAL_LOG( "TheSignalHandler; Received signal, stopping with scheduling gracefully" );
   TheDaemon -> StopScheduling();
  }
 }

@@ -308,7 +308,8 @@ int Daemon::CycleThroughJobs( void )
       if( TempJob.RunJobEpilogueScript() ) continue;
      }
      else
-      if( TempJob.RunJobAbortScript() ) continue;                                // or try to abort...
+      if( TempJob.RunJobCheckRunningScript() == 0 ) 
+       if( TempJob.RunJobAbortScript() ) continue;                                // or try to abort...
      NORMAL_LOG( "Daemon::CycleThroughJobs; Removing and cleaning up stale job with directory " << TempJob.GetJobDirectory() );
      RemoveJobFromDaemonLists( TempJob );                   // remove job from lists and cleanup directory..
      TempJob.KillJobRunScriptProcess();
