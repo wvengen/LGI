@@ -51,6 +51,8 @@ while( true ) {
 
  $Event = WaitForEvent( $Projects );       // wait until an event is due in any of the projects...
 
+ // echo "$Event \n";
+ 
  switch( $Event ) {
 
  case "schedule_cycle":                           // default schedule cylce for jobs...
