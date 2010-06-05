@@ -19,13 +19,7 @@
 // http://www.gnu.org/licenses/gpl.txt
 
 require_once( '../inc/Config.inc' );
-require_once( '../inc/Ssl.inc' );
-require_once( '../inc/Errors.inc' );
-require_once( '../inc/Response.inc' );
-require_once( '../inc/Repository.inc' );
 require_once( '../inc/MySQL.inc' );
-require_once( '../inc/Utils.inc' );
-require_once( '../inc/Servers.inc' );
 
 // -------------------------------------------------------------------- 
 
@@ -61,7 +55,7 @@ function WaitForEvent( $Projects = ""  )
       }
      }
 
-     echo "."; sleep( 1 );
+     sleep( 1 );
  }
 
 }

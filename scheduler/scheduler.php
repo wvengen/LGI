@@ -19,6 +19,7 @@
 // http://www.gnu.org/licenses/gpl.txt
 
 require_once( '../inc/Config.inc' );
+require_once( '../inc/MySQL.inc' );
 require_once( '../inc/Servers.inc' );
 require_once( '../inc/Repository.inc' );
 require_once( '../inc/Scheduler.inc' );
