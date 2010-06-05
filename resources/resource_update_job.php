@@ -113,6 +113,9 @@ $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobId );
 $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
 
+// schedule default scheduler event...
+ScheduleEvent();
+
 // build response for this job...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
 $Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";

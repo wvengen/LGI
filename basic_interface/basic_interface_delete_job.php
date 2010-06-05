@@ -111,6 +111,9 @@ else
  $JobStateTimeStamp = $JobSpecs->state_time_stamp;
 }
 
+// schedule default scheduler event...
+ScheduleEvent();
+
 Start_Table();
 Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
 Row2( "<b>Project:</b>", htmlentities( $Project ) ); 

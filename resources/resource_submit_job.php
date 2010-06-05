@@ -249,6 +249,9 @@ $queryresult = mysql_query( "INSERT INTO running_locks SET job_id=".$JobSpecs->j
 // get repository content...
 $RepoContent = GetRepositoryContent( NormalizeString( Parse_XML( $JobSpecs->job_specifics, "repository", $Attributes ) ) );
 
+// schedule default scheduler event...
+ScheduleEvent();
+
 // and build response for this job submition...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
 $Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";

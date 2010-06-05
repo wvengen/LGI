@@ -25,6 +25,7 @@ require_once( '../inc/Response.inc' );
 require_once( '../inc/Repository.inc' );
 require_once( '../inc/MySQL.inc' );
 require_once( '../inc/Utils.inc' );
+require_once( '../inc/Scheduler.inc' );
 
 // -------------------------------------------------------------------- 
 

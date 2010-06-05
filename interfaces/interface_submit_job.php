@@ -241,6 +241,9 @@ mysql_free_result( $JobQuery );
 // get repository content...
 $RepoContent = GetRepositoryContent( NormalizeString( Parse_XML( $JobSpecs->job_specifics, "repository", $Attributes ) ) );
 
+// schedule default scheduler event...
+ScheduleEvent();
+
 // and build response for this job submition...
 $Response =  " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";

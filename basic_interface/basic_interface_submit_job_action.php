@@ -267,6 +267,9 @@ $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=LAST_INSERT_ID()"
 $JobSpecs = mysql_fetch_object( $JobQuery );
 mysql_free_result( $JobQuery );
 
+// schedule default scheduler event...
+ScheduleEvent();
+
 // and redirect browser with a simple java script to the job_state page so that the POST url is not in browser history...
 echo '<script type="text/javascript">window.location.replace("basic_interface_job_state.php?project='.$Project.'&groups='.$OldGroups.'&sid='.$SID.'&job_id='.$JobSpecs->job_id.'");</script>'
 ?>

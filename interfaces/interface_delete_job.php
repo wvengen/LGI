@@ -72,6 +72,9 @@ else
  $JobStateTimeStamp = $JobSpecs->state_time_stamp;
 }
 
+// schedule default scheduler event...
+ScheduleEvent();
+
 // build response header...
 $Response =  " <project> ".Get_Selected_MySQL_DataBase()." </project>";
 $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
