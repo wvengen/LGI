@@ -1,9 +1,3 @@
--- MySQL dump 9.11
---
--- Host: localhost    Database: LGI
--- ------------------------------------------------------
--- Server version	4.0.21
-
 --
 -- Table structure for table `active_resources`
 --
@@ -21,11 +15,6 @@ CREATE TABLE active_resources (
 ) TYPE=MyISAM;
 
 --
--- Dumping data for table `active_resources`
---
-
-
---
 -- Table structure for table `groups_allowed`
 --
 
@@ -33,13 +22,9 @@ DROP TABLE IF EXISTS groups_allowed;
 CREATE TABLE groups_allowed (
   group_name tinytext NOT NULL,
   application tinytext NOT NULL,
-  job_limit int(11) NOT NULL default '0',
+  job_limit int(10) NOT NULL default '0',
   PRIMARY KEY  (group_name(128),application(128))
 ) TYPE=MyISAM;
-
---
--- Dumping data for table `groups_allowed`
---
 
 --
 -- Table structure for table `groups_denied`
@@ -51,10 +36,6 @@ CREATE TABLE groups_denied (
   application tinytext NOT NULL,
   PRIMARY KEY  (group_name(128),application(128))
 ) TYPE=MyISAM;
-
---
--- Dumping data for table `groups_denied`
---
 
 --
 -- Table structure for table `job_queue`
@@ -81,10 +62,6 @@ CREATE TABLE job_queue (
 ) TYPE=MyISAM;
 
 --
--- Dumping data for table `job_queue`
---
-
---
 -- Table structure for table `running_sessions`
 --
 
@@ -97,8 +74,15 @@ CREATE TABLE running_sessions (
 ) TYPE=MyISAM;
 
 --
--- Dumping data for table `running_sessions`
+-- Table structure for table `event_queue`
 --
+
+DROP TABLE IF EXISTS event_queue;
+CREATE TABLE event_queue (
+  event tinytext NOT NULL,
+  event_time_stamp int(10) unsigned NOT NULL default '0',
+  PRIMARY KEY  (event(128),event_time_stamp)
+) TYPE=MyISAM;
 
 --
 -- Table structure for table `running_locks`
@@ -117,10 +101,6 @@ CREATE TABLE running_locks (
 ) TYPE=MyISAM;
 
 --
--- Dumping data for table `running_locks`
---
-
---
 -- Table structure for table `updates`
 --
 
@@ -133,10 +113,6 @@ CREATE TABLE updates (
 ) TYPE=MyISAM;
 
 --
--- Dumping data for table `updates`
---
-
---
 -- Table structure for table `users_allowed`
 --
 
@@ -144,7 +120,7 @@ DROP TABLE IF EXISTS users_allowed;
 CREATE TABLE users_allowed (
   user_name tinytext NOT NULL,
   application tinytext NOT NULL,
-  job_limit int(11) NOT NULL default '0',
+  job_limit int(10) NOT NULL default '0',
   PRIMARY KEY  (user_name(128),application(128))
 ) TYPE=MyISAM;
 
@@ -164,9 +140,5 @@ CREATE TABLE users_denied (
   application tinytext NOT NULL,
   PRIMARY KEY  (user_name(128),application(128))
 ) TYPE=MyISAM;
-
---
--- Dumping data for table `users_denied`
---
 
 
