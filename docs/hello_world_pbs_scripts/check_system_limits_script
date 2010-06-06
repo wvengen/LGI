@@ -1,8 +1,2 @@
 #!/bin/sh
-queued_in_small=`qstat -q small | awk '/small/ { print $7 }'`
-if (( $queued_in_small < 1 ))
-then
- exit 0
-else
- exit 1
-fi
+exit 0

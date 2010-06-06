@@ -31,7 +31,9 @@ function run_mysql {
 function run_update {
  ESCAPEDQUERY=`echo -e "${1}" | sed "s/'/\\\\\'/g"`
  UPDATEQUERY="INSERT INTO updates SET servers='${2}', update_query='${ESCAPEDQUERY}'"
- php -f ./cron_job.php &> /dev/null
+ php -q -a << EOFS &> /dev/null
+<?php require_once( '../inc/Servers.inc' ); Select_MySQL_DataBase( "${MYSQL_DB}" ); Server_Check_And_Perform_Updates(); ?>
+EOFS
  run_mysql "${1}"
  [ $? == 0 ] && run_mysql "${UPDATEQUERY}"
 }
@@ -126,9 +128,15 @@ function add_resources_allowed {
    CRT=""
  fi 
 
- if [ "${NME}" != "" -a "${URL}" != "" -a "${CRT}" != "" -a "${FLG}" != "" -a "${SRV}" != "" ]
+ if [ "${NME}" != "" -a "${URL}" != "" -a "${CRT}" != "" -a "${FLG}" != "" ]
  then
-   run_update "INSERT INTO active_resources SET resource_name='${NME}',url='${URL}',client_certificate='${CRT}\n',project_server=${FLG}" "${SRV}"
+   if [ "${SRV}" != "" ]
+   then
+     run_update "INSERT INTO active_resources SET resource_name='${NME}',url='${URL}',client_certificate='${CRT}\n',project_server=${FLG}" "${SRV}"
+   else
+     run_mysql "INSERT INTO active_resources SET resource_name='${NME}',url='${URL}',client_certificate='${CRT}\n',project_server=${FLG}"
+     echo "Warning: this change to DB has not been recorded as an update in the DB!"
+   fi
  else
    done_nothing
  fi

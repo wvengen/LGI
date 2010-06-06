@@ -51,7 +51,7 @@ following steps:
 
 - Start the daemon by invoking the daemon like:
 
-  ~/LGI/daemon/src/LGI_daemon -l ~/LGI/daemon/LGI.log ~/LGI/daemon/LGI.cfg
+  ~/LGI/daemon/src/LGI_daemon -d -l ~/LGI/daemon/LGI.log ~/LGI/daemon/LGI.cfg
 
  You can now inspect the log file '~/LGI/daemon/LGI.log' and see if everything
  was setup correctly.
@@ -170,7 +170,7 @@ and be your own X.509 CA.
   AccessFileName .htaccess
 
   <Directory "/var/www/html/LGI">
-         AllowOverride All
+         AllowOverride None
   </Directory>
 
   <Directory "/var/www/html/LGI/repository/JOB_*">
@@ -221,6 +221,10 @@ and be your own X.509 CA.
          Deny from all
   </Directory>
 
+  <Directory "/var/www/html/LGI/scheduler">
+         Deny from all
+  </Directory>
+
   <Directory "/var/www/html/LGI/certificates">
          Deny from all
   </Directory>
@@ -241,8 +245,8 @@ and be your own X.509 CA.
   </Directory>
 
   Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates', 
-  '/var/www/html/LGI/inc', '/var/www/html/LGI/tools' and '/var/www/html/LGI/daemon'
-  directories with the content:
+  '/var/www/html/LGI/inc', '/var/www/html/LGI/tools', '/var/www/html/LGI/daemon'
+  and '/var/www/html/LGI/scheduler' directories with the content:
 
   Deny from all
 
@@ -281,8 +285,8 @@ and be your own X.509 CA.
   '/var/www/html/LGI/repository', '/var/www/html/LGI/inc', 
   '/var/www/html/LGI/interfaces', '/var/www/html/LGI/servers'
   '/var/www/html/LGI/resources', '/var/www/html/LGI/daemon', 
-  '/var/www/html/LGI/tools' and '/var/www/html/LGI/certificates' 
-  with the content:
+  '/var/www/html/LGI/tools', '/var/www/html/LGI/certificates' 
+  and '/var/www/html/LGI/scheduler' with the content:
 
   <html>
     ! No browsing allowed !
@@ -314,16 +318,22 @@ and be your own X.509 CA.
 
   mysql -u examplemysqluser -p exampleprojectname < /var/www/html/LGI/LGI.db
 
-- Insert your project server entry into the database:
+- Insert your project server entry into the database by using the database
+  management tool:
 
-  export CERTIFICATE=`cat /var/www/html/LGI/certificates/exampleCA.crt`
+  /var/www/html/LGI/tools/ManageDB add resources allowed exampleprojectname
+     localhost examplemysqluser examplemysqluserpasswd
 
-  echo -e "INSERT INTO active_resources SET resource_name=
-       'apache@exampleserver.somewhere.org',project_server=1,
-       url='https://exampleserver.somewhere.org/LGI',
-       client_certificate='$CERTIFICATE\n'" | mysql -u
-       examplemysqluser -p exampleprojectname
+    Enter resource name: apache@exampleserver.somewhere.org
+    Enter resource url: https://exampleserver.somewhere.org/LGI
+    Enter certificate file: /var/www/html/LGI/certificates/exampleCA.crt
+    Enter project server flag: 1
+    Enter servers to update: 
+    Warning: this change to DB has not been recorded as an update in the DB!
 
+  Just make sure you do not specify any servers to be updated otherwise this 
+  change to the database will also be recorded as an update for the project.
+ 
 - Make sure you edit the project web server configuration file 
   '/var/www/html/LGI/inc/Config.inc':
 
@@ -342,24 +352,20 @@ and be your own X.509 CA.
   $Config[ "REPOSITORY_SERVER_NAME" ] = $Config[ "SERVER_NAME" ];
   $Config[ "REPOSITORY_URL" ]  = $Config[ "SERVER_URL" ]."/repository";   
 
-- The last thing to do is to edit a crontab entry for the apache user
+- Edit the /var/www/html/LGI/scheduler/scheduler.php file if more than one 
+  project is configured. Just uncomment the required array_push lines to
+  add your projects to the list:
 
-  crontab -u apache -e
+     array_push( $Projects, "secondprojectname" );  
+     array_push( $Projects, "thirdprojectname" );  
 
-  Add the following lines:
- 
-  MAILTO=""
-  HOME=/var/www
-  */10 * * * *  /usr/bin/php -f /var/www/html/LGI/tools/cron_job.php
+  Once this is done; you can run the scheduler on the background like:
+
+    nohup /var/www/html/LGI/scheduler/scheduler.php & 
 
 You could also choose to use a different user account to setup your LGI
 project web-server. Just be sure that the user apache is part of the group the
 new user is part of too so that apache can serve the content. 
-
-If you happen to run several projects on the same server, please adapt
-the above cron_job.php file to correctly maintain all of them. This is 
-done by simply adding the project name to the array of projects as is
-demonstrated in cron_job.php.
 
 
 
@@ -385,44 +391,47 @@ slave database:
   wget https://exampleserver.somewhere.org/exampleserver.crt 
        -O /var/www/html/LGI/certificates/exampleserver.crt
 
-  export CERTIFICATE=`cat /var/www/html/LGI/certificates/exampleserver.crt`
+  /var/www/html/LGI/tools/ManageDB add resources allowed exampleprojectname
+     localhost exampleslavemysqluser exampleslavemysqluserpasswd
+  
+    Enter resource name: apache@exampleserver.somewhere.org
+    Enter resource url: https://exampleserver.somewhere.org/LGI
+    Enter certificate file: /var/www/html/LGI/certificates/exampleserver.crt
+    Enter project server flag: 1
+    Enter servers to update:
+    Warning: this change to DB has not been recorded as an update in the DB!
 
-  echo -e "INSERT INTO active_resources SET resource_name=
-       'apache@exampleserver.somewhere.org',project_server=1,
-       url='https://exampleserver.somewhere.org/LGI',
-       client_certificate='$CERTIFICATE\n'" | mysql -u
-       exampleslavemysqluser -p exampleprojectname
+Again be sure not to specify any servers to be updated so this change to the
+database is not recorded as an update.
 
-and insert the slave server details into the master server database:
+Now insert the slave server details into the master server database:
 
   (on the masterserver)
 
   wget https://exampleslaveserver.somewhere.org/exampleslaveserver.crt 
        -O /var/www/html/LGI/certificates/exampleslaveserver.crt
 
-  export SLAVECERTIFICATE=`cat /var/www/html/LGI/certificates/exampleslaveserver.crt`
+  /var/www/html/LGI/tools/ManageDB add resources allowed exampleprojectname
+     localhost examplemysqluser examplemysqluserpasswd
 
-  export SLAVEINSERTQUERY="INSERT INTO active_resources SET resource_name=
-       'apache@exampleslaveserver.somewhere.org',project_server=2,
-       url='https://exampleslaveserver.somewhere.org/LGI',
-       client_certificate='$SLAVECERTIFICATE\n'"
+    Enter resource name: apache@exampleslaveserver.somewhere.org
+    Enter resource url: https://exampleslaveserver.somewhere.org/LGI
+    Enter certificate file: /var/www/html/LGI/certificates/exampleslaveserver.crt
+    Enter project server flag: 2
+    Enter servers to update: any
 
-  export ESCAPEDSLAVEINSERTQUERY=`echo -e "$SLAVEINSERTQUERY" | sed "s/'/\\\\\'/g"`
+Make sure you use the correct server flag value '2' and set the servers to be
+updated to 'any'. This will make sure that all other slaveservers will also
+pick up the change and updates from the database.
 
-  export UPDATEQUERY="INSERT INTO updates SET servers='any',
-         update_query='$ESCAPEDSLAVEINSERTQUERY'"
+Continue with configuring the slaveservers config file and scheduler as
+described in part II. 
 
-  echo "$SLAVEINSERTQUERY" | mysql -u examplemysqluser -p exampleprojectname
-
-  echo "$UPDATEQUERY" | mysql -u examplemysqluser -p exampleprojectname
-  
-At this point the two servers are linked together and the crontab entries
-of both will ensure that any updates pending in the 'updates' table of
-the master server database are transfered to the slave server. 
-
-Users can now use both the slave and the master server independantly to submit
-jobs. The resource daemon will automatically request work from all servers of 
-the project.
+When done, the two servers are linked together and the schedulers ensure that 
+any updates pending in the 'updates' table of the master server database are
+transfered to the slave server. Users can now use both the slave and the master 
+server independantly to submit jobs. The resource daemon will automatically 
+request work from all servers of the project.
 
 
 
@@ -433,59 +442,65 @@ By default on each project server, the basic interface is active and
 any user is allowed to have only two jobs in the database. If you want
 certain users or groups of users to be able to submit more, you can add
 that user or group with a new limit for a certain application. One
-should do that like:
+should do that with the ManageDB tool:
 
-  php -f tools/cron_job.php
+  /var/www/html/LGI/tools/ManageDB add users allowed exampleprojectname
+     localhost examplemysqluser examplemysqluserpasswd
 
-  export QUERY="INSERT INTO users_allowed SET user_name='user', 
-         application='hello_world', job_limit=10"
+   Enter user name: theusername
+   Enter application: hello_world
+   Enter job limit: 10
+   Enter servers to update: any
 
-  echo "$QUERY" | mysql -u examplemysqluser -p exampleprojectname
+The ManageDB tool can be used to perform most project management tasks. If
+you want, you can also configure it with default settings (see script itself)
+to avoid long command with usernames and passwords:
 
-  export ESCAPEDQUERY=`echo "$QUERY" | sed "s/'/\\\\\'/g"`
+  # some default settings...
+  MYSQL_HOST="localhost"
+  MYSQL_USER="examplemysqluser"
+  MYSQL_PASSWD="examplemysqluserpasswd"
+  MYSQL_DB="exampleprojectname"
 
-  export UPDATEQUERY="INSERT INTO updates SET 
-         servers='apache@exampleserver.somewhere.org',
-         update_query='$ESCAPEDQUERY'"
+To find out what can all be managed; just run the tool without any parameters:
 
-  echo "$UPDATEQUERY" | mysql -u examplemysqluser -p exampleprojectname
+  /var/www/html/LGI/tools/ManageDB
 
-By also inserting an update query into the server database for this,
-slave servers will automatically synchronize and also apply them if
-needed. It also allows the easy addition of more slave servers as was
-shown in part III. To make this easier, one can use the UpdateDB script
-located in the tools subdirectory:
+  ManageDB {list|add|del} {users|groups|resources} {allowed|denied} [DB [HST
+    [USR [PWD]]]]
 
-  tools/UpdateDB "INSERT INTO users_allowed SET user_name='user',
-                 application='hello_world', job_limit=10" 
-                 "apache@exampleserver.somewhere.org" -u examplemysqluser 
-                 -p exampleprojectname
+Also read the LGI documentation in the docs directory to understand what
+limits can be set and what meaning they have. In general a limit value of 0
+means there is no limit; a positive limit value means a maximum total number
+of jobs limit and a negative limit is a maximum number of queued or running
+jobs in the database. None the less please read the documentation to
+understand which tables have precedence over what.
 
-To insert a new resource into the database use the following commands:
+A new resource is also easily added now:
 
-   export CERTIFICATE=`cat newresource.crt`
+  /var/www/html/LGI/tools/ManageDB add resources allowed
 
-   tools/UpdateDB "INSERT INTO active_resources SET resource_name=
-              'user@newresource.somewere.org',project_server=0, url=
-              'user@newresource.somewere.org', client_certificate=
-              '$CERTIFICATE\n'" "any" -u examplemysqluser -p exampleprojectname
+  Enter resource name: user@resource
+  Enter resource url: user@resource
+  Enter certificate file: resource.crt
+  Enter project server flag: 0
+  Enter servers to update: any
 
-Beware, if you have password protected the account for user examplemysqluser
-in MySQL, you need to type in your password twice with this UpdateDB script.
+Here a new group is added on the slaveserver only:
 
-Please read in the docs subdirectory the full details on the structure
-of the database, what the fields mean and what values you can assign to 
-them with MySQL queries like demonstrated.
+  /var/www/html/LGI/tools/ManageDB add groups allowed
 
-FOOTNOTE:
+  Enter group name: newgroup
+  Enter application: any
+  Enter job limit: -10
+  Enter servers to update: apache@exampleslaveserver.somewhere.org
 
-As of version LGI 1.20 a new data base management tool has been added. In
-the tools subdirectory a script ManageDB can be used to manage an LGI database,
-including taking care of updates and all, more easily. Please check the
-script itself for default values for parameters and usage. Use of the tool
-is especially trivial and self-explaining. The older tool UpdateDB is still
-included though.
+Or a user is denied on the master server only:
 
+  /var/www/html/LGI/tools/ManageDB add users denied
 
+  Enter user name: baduser
+  Enter application: any
+  Enter servers to update: apache@exampleserver.somewhere.org
 
 

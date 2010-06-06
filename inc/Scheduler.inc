@@ -50,9 +50,12 @@ function WaitForEvent( $Projects = ""  )
       if( mysql_num_rows( $Result ) >= 1 )
       {
        $Event = mysql_fetch_object( $Result );
-       $Result= mysql_query( "DELETE FROM event_queue WHERE event LIKE '".$Event->event."' AND event_time_stamp<=UNIX_TIMESTAMP()" );
+       mysql_free_result( $Result );
+       mysql_query( "DELETE FROM event_queue WHERE event LIKE '".$Event->event."' AND event_time_stamp<=UNIX_TIMESTAMP()" );
        if( mysql_affected_rows() >= 1 ) return( $Event->event );
       }
+      else
+       mysql_free_result( $Result );
      }
 
      sleep( 1 );
