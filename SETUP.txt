@@ -164,7 +164,8 @@ and be your own X.509 CA.
 
   Also make sure the AccessFileName has been set correctly in the Apache main
   configuration so that the LGI document tree can be protected by .htaccess
-  files and make sure the important directories are carefully protected:
+  files (if desired) and make sure the important directories are carefully 
+  protected:
 
   DocumentRoot "/var/www/html"
   AccessFileName .htaccess
@@ -332,7 +333,8 @@ and be your own X.509 CA.
     Warning: this change to DB has not been recorded as an update in the DB!
 
   Just make sure you do not specify any servers to be updated otherwise this 
-  change to the database will also be recorded as an update for the project.
+  change to the database will also be recorded as an update for the rest of
+  the project.
  
 - Make sure you edit the project web server configuration file 
   '/var/www/html/LGI/inc/Config.inc':
@@ -359,13 +361,18 @@ and be your own X.509 CA.
      array_push( $Projects, "secondprojectname" );  
      array_push( $Projects, "thirdprojectname" );  
 
-  Once this is done; you can run the scheduler on the background like:
+  Each project has an independant database on the web server, by creating a
+  second database, as described above, a second project has been setup.
+
+  Once this is done; you can start the scheduler on the background like:
 
     nohup /var/www/html/LGI/scheduler/scheduler.php & 
 
+  Your project servers has been setup now and can be used!
+
 You could also choose to use a different user account to setup your LGI
-project web-server. Just be sure that the user apache is part of the group the
-new user is part of too so that apache can serve the content. 
+project web-server. Just be sure that the user apache is part of the group 
+the new user is part of too so that apache can serve the content. 
 
 
 
@@ -383,7 +390,7 @@ However, at the point where you insert the server entry into the fresh database
 in part II, use that command now to insert the MASTER server data into the 
 slave database:
 
-  (on the slaveserver)
+  (on the slave server)
 
   wget https://exampleserver.somewhere.org/exampleCA.crt 
        -O /var/www/html/LGI/certificates/exampleCA.crt
@@ -402,11 +409,10 @@ slave database:
     Warning: this change to DB has not been recorded as an update in the DB!
 
 Again be sure not to specify any servers to be updated so this change to the
-database is not recorded as an update.
+database is not recorded as an update. Now insert the slave server details 
+into the master server database:
 
-Now insert the slave server details into the master server database:
-
-  (on the masterserver)
+  (on the master server)
 
   wget https://exampleslaveserver.somewhere.org/exampleslaveserver.crt 
        -O /var/www/html/LGI/certificates/exampleslaveserver.crt
@@ -421,17 +427,16 @@ Now insert the slave server details into the master server database:
     Enter servers to update: any
 
 Make sure you use the correct server flag value '2' and set the servers to be
-updated to 'any'. This will make sure that all other slaveservers will also
-pick up the change and updates from the database.
-
-Continue with configuring the slaveservers config file and scheduler as
-described in part II. 
-
-When done, the two servers are linked together and the schedulers ensure that 
-any updates pending in the 'updates' table of the master server database are
-transfered to the slave server. Users can now use both the slave and the master 
-server independantly to submit jobs. The resource daemon will automatically 
-request work from all servers of the project.
+updated to 'any'. This will make sure that all other slave servers will also
+pick up the change and updates from the database. It will also make sure that
+your slave server currently being setup will load it's certificate into it's
+database through an update automatically. Just continue with configuring the
+slave servers config file and scheduler as described in part II. When done, the 
+two servers are linked together and the schedulers ensure that any updates 
+pending in the 'updates' table of the master server database are transfered 
+to the slave server. Users can now use both the slave and the master server 
+independantly to submit jobs. The resource daemon will automatically request 
+work from all servers of the project.
 
 
 
@@ -486,7 +491,7 @@ A new resource is also easily added now:
   Enter project server flag: 0
   Enter servers to update: any
 
-Here a new group is added on the slaveserver only:
+Here a new group is added on the slave server only:
 
   /var/www/html/LGI/tools/ManageDB add groups allowed
 
