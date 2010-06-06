@@ -1,0 +1,19 @@
+Sun June 6th -- Version 1.25
+----------------------------
+
+- Added this ChangeLog.txt file.
+- Added new scheduler into project server code. A new table
+  event_queue has been added in the database.
+- The resource daemon has been modified to add a resource hash 
+  into the job_specifics tag when a job is accepeted. It is used
+  by the daemon to check if a job has been taken over by another
+  daemon on the same or different resource and should ignore the
+  job but finish or abort gracefully on the resource if possible. 
+- Added a deamon_pulse into the job_queue to detect daemons not
+  running as they should (i.e. on a grid). Jobs can now be requeued.
+- Added new priority field into the job_queue table. This allows
+  a future version of the scheduler to supply QOS by assigning
+  a different priority to jobs. Currently the priority is set equal
+  to the time stamp of submit.
+
+
