@@ -5,7 +5,7 @@ Sun June 6th -- Version 1.25
 - Added new scheduler into project server code. A new table
   event_queue has been added in the database.
 - The resource daemon has been modified to add a resource hash 
-  into the job_specifics tag when a job is accepeted. It is used
+  into the job_specifics tag when a job is accepted. It is used
   by the daemon to check if a job has been taken over by another
   daemon on the same or different resource and should ignore the
   job but finish or abort gracefully on the resource if possible. 
