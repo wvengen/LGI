@@ -17,3 +17,9 @@ Sun June 6th -- Version 1.25
   to the time stamp of submit.
 
 
+Sat June 26 -- version 1.26
+---------------------------
+
+- Added python client class into python dir.
+- Moved daemon/src into root, adjusted makefile and so on.
+
