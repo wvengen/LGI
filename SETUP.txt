@@ -29,14 +29,14 @@ following steps:
 - Make sure that libcurl is installed. Visit http://curl.haxx.se/libcurl/ if
   you do not have this yet.
 
-- Go to the '~/LGI/daemon/src' directory and invoke make. If you have a
-  different compiler installed than GNU's g++, or you have libcurl installed
-  in a different location, adjust the first few lines of the file Makefile to
+- Go to the '~/LGI/src' directory and invoke make. If you have a different 
+  compiler installed than GNU's g++, or you have libcurl installed in a 
+  different location, adjust the first few lines of the file Makefile to
   your needs.
 
 - If you want, you can also invoke make with the 'make install' command. If
-  you do that the directory '~/LGI/daemon/bin' will be created and you can
-  include that in your PATH for convencience.
+  you do that the directory '~/LGI/bin' will be created and you can include 
+  that in your PATH for convencience.
 
 - Edit the '~/LGI/daemon/LGI.cfg' example configuration file. It has been
   setup to run the hello_world application by just simple forking scripts.
@@ -51,7 +51,7 @@ following steps:
 
 - Start the daemon by invoking the daemon like:
 
-  ~/LGI/daemon/src/LGI_daemon -d -l ~/LGI/daemon/LGI.log ~/LGI/daemon/LGI.cfg
+  ~/LGI/daemon/bin/LGI_daemon -d -l ~/LGI/daemon/LGI.log ~/LGI/daemon/LGI.cfg
 
  You can now inspect the log file '~/LGI/daemon/LGI.log' and see if everything
  was setup correctly.
@@ -222,6 +222,13 @@ and be your own X.509 CA.
          Deny from all
   </Directory>
 
+  <Directory "/var/www/html/LGI/src">
+         Deny from all
+  </Directory>
+  <Directory "/var/www/html/LGI/bin">
+         Deny from all
+  </Directory>
+
   <Directory "/var/www/html/LGI/scheduler">
          Deny from all
   </Directory>
@@ -246,8 +253,9 @@ and be your own X.509 CA.
   </Directory>
 
   Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates', 
-  '/var/www/html/LGI/inc', '/var/www/html/LGI/tools', '/var/www/html/LGI/daemon'
-  and '/var/www/html/LGI/scheduler' directories with the content:
+  '/var/www/html/LGI/inc', '/var/www/html/LGI/tools', '/var/www/html/LGI/daemon',
+  '/var/www/html/LGI/scheduler', '/var/www/html/LGI/src' and  '/var/www/html/LGI/bin'
+  directories with the content:
 
   Deny from all
 
@@ -286,7 +294,8 @@ and be your own X.509 CA.
   '/var/www/html/LGI/repository', '/var/www/html/LGI/inc', 
   '/var/www/html/LGI/interfaces', '/var/www/html/LGI/servers'
   '/var/www/html/LGI/resources', '/var/www/html/LGI/daemon', 
-  '/var/www/html/LGI/tools', '/var/www/html/LGI/certificates' 
+  '/var/www/html/LGI/tools', '/var/www/html/LGI/certificates',
+  '/var/www/html/LGI/src', '/var/www/html/LGI/bin'
   and '/var/www/html/LGI/scheduler' with the content:
 
   <html>

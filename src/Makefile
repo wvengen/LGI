@@ -99,4 +99,5 @@ uninstall :
 
 # install...
 install : all
-	mkdir -p ../bin; cp LGI_daemon xml binhex hexbin hash csv LGI_filetransfer LGI_qstat LGI_qsub LGI_qdel ../bin
+	mkdir -p ../bin; cp .htaccess index.html LGI_daemon xml binhex hexbin hash csv LGI_filetransfer LGI_qstat LGI_qsub LGI_qdel ../bin
+	ln -s ../bin ../daemon/bin 
