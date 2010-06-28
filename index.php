@@ -26,41 +26,76 @@ $LGI_PROJECT = $Config[ "MYSQL_DEFAULT_DATABASE" ];
 <br>
 <h3><a name="Main_introduction"></a>Main introduction to LGI<br>
 </h3>
-The Leiden Grid Infrastucture (LGI) is an easy to use grid middleware
-designed specifically for application oriented research groups.<br>
+The Leiden Grid Infrastucture (LGI) is an easy-to-use scalable grid
+middleware designed specifically for application oriented research
+groups.<br>
 <br>
-LGI is
-based on a Linux-Apache-MySQL-PHP (LAMP) stack on the so-called
-project-server,
-together with x509 client- and server-certificates. The project-server
-Remote Procedure Calls (RPC) Application Programming Interface (API)
-routines have been implemented in PHP.<br>
+LGI is based on a Linux-Apache-MySQL-PHP (LAMP) stack on the so-called
+project-server, together with x509 client- and server-certificates. The
+project-server Remote Procedure Calls (RPC) Application Programming 
+Interface (API) routines have been implemented in PHP.<br>
 <br>
 Users submit jobs to an LGI project-server only for specifically
-installed applications using either the general web-interface or the
-command-line-interface. The web-interface is automatically included and
-active on
-the project-server and the command-line-interface is easily compiled on
-any POSIX system using a C++ compiler with the Standard Template
-Library (STL) and libcurl. A link to the basic web-interface for this
-project-server can be found <a href="#Basic_interface">below</a>.
+installed applications using either the general web-interface, the
+command-line-interface or perhaps by using the python class interface 
+from within a python script. The web-interface is automatically included
+and active on the project-server and the command-line-interface is easily 
+compiled on any POSIX system using a C++ compiler with the Standard
+Template Library (STL) and libcurl. A link to the basic web-interface for
+this project-server can be found <a href="#Basic_interface">below</a>.
 Other project and application specific interfaces can make use of the
 RPC-APIs LGI has to offer (see the documentation <a
  href="#Documentation">below</a>).<br>
 <br>
 Resources within the LGI poll an LGI project-server and request work
-for applications that have been installed on a resource by
-configuring and running a resource-daemon. The
-resource-daemon runs as a normal user on the resource and can run
-behind a firewall and or a Network Adress Translating (NAT) router. The
-resource-daemon can handle
-any local back-end (like Torque/PBS or LoadLeveler) through local
-scripts specified in a resource-daemon xml configuration file (see
-documentation <a href="#Documentation">below</a> for examples).<br>
+for applications that have been installed on a resource by configuring
+and running a resource-daemon. The resource-daemon runs as a normal user
+on the resource and can run behind a firewall and or a Network Adress
+Translating (NAT) router. If the resource-daemon runs as root, each 
+individual job will be sandboxed automatically and run as a non-root
+user. The resource-daemon can handle any local back-end (like Torque/PBS
+or LoadLeveler) through local scripts specified in the resource-daemon xml
+configuration file (see documentation <a href="#Documentation">below</a>
+for examples). The resource-daemon has been made especially resilient to
+crashes and caches all information into files on disk. Also, jobs being
+resubmitted to other resources by the project-server, perhaps because of
+a lost heart-beat, are taken care of gracefully by the resource-daemon.
+The daemon can thus be successfully used in a non-stable (grid)
+environment.
+<br>
 <br>
 Both the user &lt;-&gt; project-server and the resource &lt;-&gt;
 project-server communication is encrypted and authenticated through the
 x509 standard. <br>
+<br>
+Currently the project-server schedules jobs to resources on a 
+first-come-first-serve and in first-in-first-out job priority order. If
+projects want to use other types of scheduling or a quality of service,
+they can be implemented on the project-server side where a special 
+event-queue is implemented and a hook in the scheduler loop is available.
+Several of these project-server based schedulers can run concurently on
+the same project-server if required. It is also possible to have several
+slave project-servers connected to your master project-server. 
+Resource-daemons transparently take care of that (see the documentation
+<a href="#Documentation">below</a>, a resource-daemon requests work from
+other project-servers if no work was found on the configured 
+project-server).<br>
+<br>
+User management and resource management on the project-servers (master and
+slaves) is made easy by using a specialized ManageDB script (see the 
+documentation <a href="#Documentation">below</a>). Slave servers regularly
+synchronize to the master project-server and updates are propagated to all
+project-servers automatically.  Several limits can be enforced per 
+application, group or user. If required, several project-servers can use a
+single MySQL database located perhaps on yet another host or each 
+project-server can make use of a separate MySQL project database perhaps 
+on separate hosts. It is also possible to setup several web-servers, using
+DNS round-robin load balancing, as a single master project-server using a
+single MySQL host (with only one project database) and perhaps with
+separate job repository storage hosts (local to each host, or through a
+global filesystem available accross the web-servers being balanced over).
+With all these possibilities, LGI offers a user-friendly and very scalable
+infrastructure for application oriented research groups.<br>
 <br>
 The LGI software has been licenced under the <a href="LICENSE.txt">GNU
 General Public License
@@ -109,6 +144,10 @@ command-line-interface on Linux:<br>
  src="docs/screen_shots/command%20line%20interface%20LGI_filetransfer%20list%20and%20download.png"
  style="border: 0px solid ; width: 200px; height: 200px;"></a><br>
 <br>
+An example python script using the LGI python client class interface can
+be downloaded <a href=#Documentation>below</a>.
+<br>
+<br>
 <a href="#Leiden_Grid_Infrastructure">[top]</a><br>
 <br>
 <br>
@@ -130,6 +169,11 @@ An example resource-daemon configuration file can be found <a
 <br>
 Example resource-daemon back-end scripts for Torque/PBS can be found <a
  href="docs/hello_world_pbs_scripts/">here</a> (ascci/text).<br>
+<br>
+An example of using the python LGI_Client class interface script can
+be found <a href="docs/ExampleInterface.py">here</a>.<br>
+<br>
+The latest ChangeLog.txt can be found <a href="ChangeLog.txt">here</a>.<br>
 <br>
 The report written for NCF-NWO on the LGI deployment project (see
 support <a href="#Support">below</a>) can be found <a
@@ -188,7 +232,9 @@ Template Library?<br style="font-weight: bold;">
 <span style="font-weight: bold;">A:</span> C++ and the STL, together
 with libcurl, are well supported on any system. The standard C++ code
 is therefore very portable and installation only requires a single
-'make' command to be issued.<br>
+'make' command to be issued. You can however also use the LGI_Client 
+python class interface to interface to an LGI project-server from your
+python scripts.<br>
 <span style="font-weight: bold;"></span><br>
 <a href="#Leiden_Grid_Infrastructure">[top]</a><br>
 <br>
@@ -205,9 +251,9 @@ The LGI middleware source code and documentation can be downloaded from
 <h3><a name="Basic_interface"></a>Basic interfaces of project "<?php echo $LGI_PROJECT ?>"<br>
 </h3>
 The basic web-interface of this LGI project-server can be reached
-through <a href="<?php echo "$LGI_URL/basic_interface/index.php" ?>">this</a> link. You can
-only use the basic web-interface if you have a valid personal x509
-certificate signed by the LGI Certificate Authority of this project
+through <a href="<?php echo "$LGI_URL/basic_interface/index.php" ?>">this</a>
+link. You can only use the basic web-interface if you have a valid personal
+x509 certificate signed by the LGI Certificate Authority of this project
 "<?php echo $LGI_PROJECT ?>". <br>
 <br>
 To use the basic command-line-interface, you need to <a href="#Dowload">download</a>
@@ -216,6 +262,10 @@ you have installed libcurl too (get it from <a
  href="http://curl.haxx.se/libcurl/">http://curl.haxx.se/libcurl/</a>).
 Check out the documentation <a href="#Documentation">above</a> on how
 to configure the tools and to see some examples on how to use them.<br>
+<br>
+Using the python LGI_Client class is easy. Just look at the example 
+<a href="#Documentation">above</a>. The LGI_Client class uses the
+same default configuration files as the command-line-interface.<br>
 <br>
 <a href="#Leiden_Grid_Infrastructure">[top]</a><br>
 <br>
