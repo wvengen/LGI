@@ -171,7 +171,7 @@ and be your own X.509 CA.
   AccessFileName .htaccess
 
   <Directory "/var/www/html/LGI">
-         AllowOverride None
+         AllowOverride All
   </Directory>
 
   <Directory "/var/www/html/LGI/repository/JOB_*">
@@ -225,7 +225,12 @@ and be your own X.509 CA.
   <Directory "/var/www/html/LGI/src">
          Deny from all
   </Directory>
+
   <Directory "/var/www/html/LGI/bin">
+         Deny from all
+  </Directory>
+  
+  <Directory "/var/www/html/LGI/python">
          Deny from all
   </Directory>
 
@@ -254,8 +259,8 @@ and be your own X.509 CA.
 
   Make sure you have an .htaccess file in the '/var/www/html/LGI/certificates', 
   '/var/www/html/LGI/inc', '/var/www/html/LGI/tools', '/var/www/html/LGI/daemon',
-  '/var/www/html/LGI/scheduler', '/var/www/html/LGI/src' and  '/var/www/html/LGI/bin'
-  directories with the content:
+  '/var/www/html/LGI/scheduler', '/var/www/html/LGI/src', '/var/www/html/LGI/bin'
+  and '/var/www/html/LGI/python' directories with the content:
 
   Deny from all
 
@@ -295,8 +300,9 @@ and be your own X.509 CA.
   '/var/www/html/LGI/interfaces', '/var/www/html/LGI/servers'
   '/var/www/html/LGI/resources', '/var/www/html/LGI/daemon', 
   '/var/www/html/LGI/tools', '/var/www/html/LGI/certificates',
-  '/var/www/html/LGI/src', '/var/www/html/LGI/bin'
-  and '/var/www/html/LGI/scheduler' with the content:
+  '/var/www/html/LGI/src', '/var/www/html/LGI/bin', 
+  '/var/www/html/LGI/python' and '/var/www/html/LGI/scheduler'
+  with the content:
 
   <html>
     ! No browsing allowed !
