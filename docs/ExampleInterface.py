@@ -39,7 +39,7 @@ print
 
 # now play with the repository for a bit
 print FileClient.ListRepository();
-FileClient.DownLoadFiles( [ "test.py" ], "/tmp" );
+FileClient.DownLoadFiles( [ "resolv.conf" ], "/tmp" );
 FileClient.UpLoadFiles( [ "/etc/hosts", "/etc/fstab" ] );
 print
 print FileClient.ListRepository();

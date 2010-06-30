@@ -11,8 +11,10 @@ CREATE TABLE active_resources (
   project_server int(10) unsigned NOT NULL default '0',
   url tinytext NOT NULL,
   resource_capabilities text NOT NULL default '',
-  PRIMARY KEY  (resource_id), UNIQUE (resource_name(128))
-) TYPE=MyISAM;
+  PRIMARY KEY  (resource_id), 
+  UNIQUE KEY (resource_name(128)),
+  KEY (project_server)
+) TYPE=InnoDB;
 
 --
 -- Table structure for table `groups_allowed`
@@ -58,8 +60,9 @@ CREATE TABLE job_queue (
   priority int(10) unsigned NOT NULL default '0',
   daemon_pulse int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (job_id),
-  KEY `job_queue_index` USING BTREE (`application`(128),`state`(128))
-) TYPE=MyISAM;
+  KEY (application(128)),
+  KEY (application(128),state(128))
+) TYPE=InnoDB;
 
 --
 -- Table structure for table `running_sessions`
@@ -70,8 +73,9 @@ CREATE TABLE running_sessions (
   session_id int(10) unsigned NOT NULL auto_increment,
   resource_id int(10) unsigned NOT NULL default '0',
   session_time_stamp int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (session_id)
-) TYPE=MyISAM;
+  PRIMARY KEY  (session_id),
+  KEY (session_id,resource_id)
+) TYPE=InnoDB;
 
 --
 -- Table structure for table `event_queue`
@@ -81,8 +85,9 @@ DROP TABLE IF EXISTS event_queue;
 CREATE TABLE event_queue (
   event tinytext NOT NULL,
   event_time_stamp int(10) unsigned NOT NULL default '0',
-  PRIMARY KEY  (event(128),event_time_stamp)
-) TYPE=MyISAM;
+  PRIMARY KEY  (event(128),event_time_stamp),
+  KEY (event_time_stamp)
+) TYPE=InnoDB;
 
 --
 -- Table structure for table `running_locks`
@@ -96,9 +101,11 @@ CREATE TABLE running_locks (
   lock_time int(10) unsigned NOT NULL default '0',
   session_id int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (lock_id),
-  KEY `lock_index_1` (`session_id`),
-  KEY `lock_index_2` (`job_id`)
-) TYPE=MyISAM;
+  KEY (session_id),
+  KEY (job_id),
+  KEY (session_id,resource_id),
+  KEY (job_id,session_id,resource_id)
+) TYPE=InnoDB;
 
 --
 -- Table structure for table `updates`
