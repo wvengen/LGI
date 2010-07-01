@@ -95,9 +95,9 @@ clean :
 
 # uninstall...
 uninstall :
-	rm -rf ../bin
+	rm -rf ../bin; rm -rf ../daemon/bin
 
 # install...
 install : all
 	mkdir -p ../bin; cp .htaccess index.html LGI_daemon xml binhex hexbin hash csv LGI_filetransfer LGI_qstat LGI_qsub LGI_qdel ../bin
-	ln -s ../bin ../daemon/bin 
+	rm -rf ../daemon/bin; ln -s ../bin ../daemon/bin 
