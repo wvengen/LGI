@@ -213,10 +213,11 @@ numbers for which other grid middleware software was designed. It
 appeared that a simple to use, easy to deploy and administrate
 middleware could be built in-house to circumvent the above issues. In
 short; most grid middlewares are designed for <a
- href="http://www.cs.wisc.edu/condor/htc.html">high throughput computing</a>
+ href="http://en.wikipedia.org/wiki/High-throughput_computing">high throughput computing</a>
 rather than <a
  href="http://en.wikipedia.org/wiki/High-performance_computing">high
-performance computing</a> and ease of use.<br>
+performance computing</a> and ease of use. LGI can however offer both
+types of computing, with ease of use and ease of management.<br>
 <br>
 <span style="font-weight: bold;">Q:</span> Why was LGI developed on a
 Linux-Apache-MySQL-PHP stack?<br>
@@ -228,14 +229,25 @@ any type of hardware.<br>
 <br>
 <span style="font-weight: bold;">Q:</span> Why were the resource-daemon
 and the command-line-interface tools written in C++ using the Standard
-Template Library?<br style="font-weight: bold;">
+Template Library?<br>
 <span style="font-weight: bold;">A:</span> C++ and the STL, together
 with libcurl, are well supported on any system. The standard C++ code
 is therefore very portable and installation only requires a single
 'make' command to be issued. You can however also use the LGI_Client 
 python class interface to interface to an LGI project-server from your
 python scripts.<br>
-<span style="font-weight: bold;"></span><br>
+<br>
+<span style="font-weight: bold;">Q:</span> Is LGI a scalable 
+infrastructure?<br> <span style="font-weight: bold;">A:</span> Yes, LGI
+is very scalable on all ends. Several resource-daemons can run 
+concurrently on the same resource and several project slave servers 
+can be added into the project, each using a separate MySQL back-end. 
+With the user management options within LGI, also users can be 
+load-balanced over the project servers. There are, however, several
+other scaling options available. For more details on those, please 
+check out the documentation <a href=#Documentation>above</a>.<br>
+<br>
+<span style="font-weight: bold;"></span>
 <a href="#Leiden_Grid_Infrastructure">[top]</a><br>
 <br>
 <br>
