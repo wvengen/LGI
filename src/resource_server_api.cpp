@@ -60,7 +60,8 @@ CURL *Resource_Server_API::SetupcURLForPost( string &PostURL )
   curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
   curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
   curl_easy_setopt( MycURLHandle, CURLOPT_NOSIGNAL, 1 );
-  //  curl_easy_setopt( MycURLHandle, CURLOPT_VERBOSE, 1 );
+  curl_easy_setopt( MycURLHandle, CURLOPT_VERBOSE, 0 );
+  curl_easy_setopt( MycURLHandle, CURLOPT_NOPROGRESS, 1 );
   curl_easy_setopt( MycURLHandle, CURLOPT_ERRORBUFFER, CURLErrorBuffer );
   DEBUG_LOG_RETURN( MycURLHandle, "Resource_Server_API::SetupcURLForPost; Obtained cURL handle for PostURL=" << PostURL );
  }
