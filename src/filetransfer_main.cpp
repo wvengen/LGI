@@ -116,6 +116,8 @@ int ListRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
+  curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, &Response );
   curl_easy_setopt( cURLHandle, CURLOPT_WRITEFUNCTION, WriteToStringCallBack );
   CURLcode cURLResult = curl_easy_perform( cURLHandle );
@@ -191,6 +193,8 @@ int DownLoadFilesFromRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
+  curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
 
   for( int i = 0; i < FileList.size(); ++i )
    if( !FileList[ i ].empty() )
@@ -250,6 +254,8 @@ int UpLoadFilesToRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
+  curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_UPLOAD, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, &Response );
   curl_easy_setopt( cURLHandle, CURLOPT_WRITEFUNCTION, WriteToStringCallBack );
@@ -322,6 +328,8 @@ int DeleteFilesFromRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
+  curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_CUSTOMREQUEST, "DELETE" );
   curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, &Response );
   curl_easy_setopt( cURLHandle, CURLOPT_WRITEFUNCTION, WriteToStringCallBack );
