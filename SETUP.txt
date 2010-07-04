@@ -150,6 +150,8 @@ and be your own X.509 CA.
   for https and check that the following options have been set correctly into
   the https virtual host configuration:
 
+  SSLSessionCache shmcb:/var/cache/mod_ssl/scache(512000)
+  SSLSessionCacheTimeout 5
   SSLCertificateFile /var/www/html/LGI/certificates/exampleserver.crt
   SSLCertificateKeyFile /var/www/html/LGI/certificates/exampleserver.key
   SSLCertificateChainFile /var/www/html/LGI/certificates/exampleCA.crt
@@ -164,12 +166,18 @@ and be your own X.509 CA.
 
   Also make sure the AccessFileName has been set correctly in the Apache main
   configuration so that the LGI document tree can be protected by .htaccess
-  files (if desired) and make sure the important directories are carefully 
-  protected:
+  files (if desired), make sure the important directories are carefully 
+  protected and for performance reasons, make sure KeepAlive is turned on, 
+  KeepAliveTimeOut is set low and MaxKeepAliveRequests set high in the
+  main server configuration of Apache:
 
   DocumentRoot "/var/www/html"
   AccessFileName .htaccess
 
+  KeepAlive On
+  KeepAliveTimeout 1
+  MaxKeepAliveRequests 100
+  
   <Directory "/var/www/html/LGI">
          AllowOverride All
   </Directory>
