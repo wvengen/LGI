@@ -36,6 +36,8 @@
 #include <dirent.h>
 #include <time.h>
 
+#include <curl/curl.h>
+
 #include "logger.h"
 #include "xml.h"
 #include "csv.h"
@@ -54,6 +56,7 @@ class Daemon : public DaemonConfig
        public:
 
                Daemon( string ConfigFile, int SlowCycleTime = 600, int FastCycleTime = 120 );
+               ~Daemon( void );
 
                int RunSchedular( void );
                int IsSchedularReady( void );
@@ -78,6 +81,7 @@ class Daemon : public DaemonConfig
                                     ReadyForScheduling,
                                     TheFastCycleTime, 
                                     TheSlowCycleTime;
+       CURL                        *MycURLHandle;
       };
 
 // -----------------------------------------------------------------------------

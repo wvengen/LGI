@@ -22,36 +22,50 @@
 
 // ------------------------------------------------------------------------------
 
-Interface_Server_API::Interface_Server_API( string KeyFile, string CertificateFile, string CAFile )
+Interface_Server_API::Interface_Server_API( string KeyFile, string CertificateFile, string CAFile, CURL *cURLHandle )
 {
  DEBUG_LOG( "Interface_Server_API::Interface_Server_API; KeyFile=" << KeyFile << ", CertificateFile=" << CertificateFile << ", CAFile=" << CAFile );
 
  PrivateKeyFile = KeyFile;
  PublicCertificateFile = CertificateFile;
  CAChainFile = CAFile;
+ MycURLHandle = cURLHandle;
+ CreatedMycURLHandle = 0;
+}
+
+// ------------------------------------------------------------------------------
+
+Interface_Server_API::~Interface_Server_API( void )
+{
+ if( CreatedMycURLHandle && MycURLHandle != NULL ) curl_easy_cleanup( MycURLHandle );
 }
 
 // ------------------------------------------------------------------------------
 
 CURL *Interface_Server_API::SetupcURLForPost( string &PostURL )
 {
- CURL *cURLHandle = curl_easy_init(); 
-
- if( cURLHandle != NULL )
+ if( MycURLHandle == NULL )
  {
-  curl_easy_setopt( cURLHandle, CURLOPT_URL, PostURL.c_str() );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSLCERT, PublicCertificateFile.c_str() );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, PrivateKeyFile.c_str() );
-  curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CAChainFile.c_str() );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
-  //  curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_ERRORBUFFER, CURLErrorBuffer );
-  DEBUG_LOG_RETURN( cURLHandle, "Interface_Server_API::SetupcURLForPost; Obtained cURL handle for PostURL=" << PostURL );
+  MycURLHandle = curl_easy_init();
+  CreatedMycURLHandle = 1;
  }
 
- CRITICAL_LOG_RETURN( cURLHandle, "Interface_Server_API::SetupcURLForPost; Failed to obtain a cURL handle for PostURL=" << PostURL );
+ if( MycURLHandle != NULL )
+ {
+  curl_easy_reset( MycURLHandle );
+  curl_easy_setopt( MycURLHandle, CURLOPT_URL, PostURL.c_str() );
+  curl_easy_setopt( MycURLHandle, CURLOPT_SSLCERT, PublicCertificateFile.c_str() );
+  curl_easy_setopt( MycURLHandle, CURLOPT_SSLKEY, PrivateKeyFile.c_str() );
+  curl_easy_setopt( MycURLHandle, CURLOPT_CAINFO, CAChainFile.c_str() );
+  curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
+  curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( MycURLHandle, CURLOPT_NOSIGNAL, 1 );
+  //  curl_easy_setopt( MycURLHandle, CURLOPT_VERBOSE, 1 );
+  curl_easy_setopt( MycURLHandle, CURLOPT_ERRORBUFFER, CURLErrorBuffer );
+  DEBUG_LOG_RETURN( MycURLHandle, "Interface_Server_API::SetupcURLForPost; Obtained cURL handle for PostURL=" << PostURL );
+ }
+
+ CRITICAL_LOG_RETURN( MycURLHandle, "Interface_Server_API::SetupcURLForPost; Failed to obtain a cURL handle for PostURL=" << PostURL );
 }
 
 // ------------------------------------------------------------------------------
@@ -69,7 +83,6 @@ size_t Interface_Server_API::WriteToStringCallBack( void *ptr, size_t size, size
 
 CURLcode Interface_Server_API::PerformcURLPost( string &Response, CURL *cURLHandle, curl_httppost *PostList )
 {
-
  if( cURLHandle != NULL )
  {
   Response.reserve( 8192 );    
@@ -81,7 +94,6 @@ CURLcode Interface_Server_API::PerformcURLPost( string &Response, CURL *cURLHand
 
   CURLcode cURLResult = curl_easy_perform( cURLHandle );
 
-  curl_easy_cleanup( cURLHandle );
   if( PostList != NULL ) curl_formfree( PostList );
 
   if( cURLResult != CURLE_OK )

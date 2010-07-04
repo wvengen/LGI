@@ -36,6 +36,15 @@ Daemon::Daemon( string ConfigFile, int SlowCycleTime, int FastCycleTime ) : Daem
  TheFastCycleTime = FastCycleTime;
  TheSlowCycleTime = SlowCycleTime;
  ReadyForScheduling = 1;
+ MycURLHandle = curl_easy_init();
+ if( MycURLHandle == NULL ) CRITICAL_LOG( "Daemon::Daemon; Could not create cURL handle for all connections" );
+}
+
+// -----------------------------------------------------------------------------
+
+Daemon::~Daemon( void )
+{
+ if( MycURLHandle != NULL ) curl_easy_cleanup( MycURLHandle );
 }
 
 // -----------------------------------------------------------------------------
@@ -106,7 +115,7 @@ int Daemon::ScanDirectoryForJobs( string Directory )
 
     FileMask = ( LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER << 1 ) + 1;      // make sure we won't include it again...
 
-    DaemonJob TheScannedJob( Directory );
+    DaemonJob TheScannedJob( Directory, MycURLHandle );                 // also make sure we use our curl handle...
 
     if( TheScannedJob.GetJobDirectory().empty() )
      CRITICAL_LOG( "Daemon::ScanDirectoryForJobs; Job with directory " << Directory << " seems corrupt, it will be ignored" )
@@ -229,7 +238,7 @@ int Daemon::CycleThroughJobs( void )
    {
     DaemonJob TempJob;
     TempJob = (*(JobPointer++));                 // get copy and point to next for iterator...
- 
+
     VERBOSE_DEBUG_LOG( "Daemon::CycleThroughJobs; Get time stamp for job with directory " << TempJob.GetJobDirectory() );
 
     string TimeStamp = TempJob.GetStateTimeStampFromServer();          // get state time stamp on server of job...
@@ -283,7 +292,7 @@ int Daemon::CycleThroughJobs( void )
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with job scripts cycle" );
  
- Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File() );
+ Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File(), MycURLHandle );
  string ServerURL, Project, Response;
 
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; ++Server )
@@ -440,7 +449,7 @@ int Daemon::RequestWorkCycle( void )
 
  if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) NORMAL_LOG_RETURN( JobsObtained, "Daemon::RequestWorkCycle; Total job limit reached, not requesting any work" );
 
- Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File() );
+ Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File(), MycURLHandle );
 
  for( int nP = 1; nP <= Number_Of_Projects() && ReadyForScheduling; ++nP )     // cycle through all projects...
  {
@@ -610,7 +619,7 @@ int Daemon::RequestWorkCycle( void )
          VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No owners were denied service for job " << Job_Id );
 
          // create temporary job directory with the jobs response data...
-         DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, nA );
+         DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, nA, MycURLHandle );
 
          // see if job has limits from job limits script somehow... if so, delete temp job directory...
          if( TempJob.RunJobCheckLimitsScript() == 0 )

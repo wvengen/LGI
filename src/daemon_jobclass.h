@@ -34,6 +34,8 @@
 #include <dirent.h>
 #include <signal.h>
 
+#include <curl/curl.h>
+
 #include "logger.h"
 #include "xml.h"
 #include "csv.h"
@@ -122,8 +124,8 @@ class DaemonJob
        public:
 
               DaemonJob();
-              DaemonJob( string TheJobDirectory );
-              DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber );
+              DaemonJob( string TheJobDirectory, CURL *cURLHandle = NULL );
+              DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber, CURL *cURLHandle = NULL );
 
               void CleanUpJobDirectory( void );             // remove job directory
               void KillJobRunScriptProcess( void );
@@ -187,6 +189,7 @@ class DaemonJob
 
               int ErrorNumber;
               string JobDirectory, SessionID;
+              CURL *MycURLHandle;
       };
 
 // -----------------------------------------------------------------------------

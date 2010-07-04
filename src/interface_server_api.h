@@ -40,7 +40,8 @@ class Interface_Server_API
       {
        public:
 
-              Interface_Server_API( string KeyFile, string CertificateFile, string CAFile );
+              Interface_Server_API( string KeyFile, string CertificateFile, string CAFile, CURL *cURLHandle = NULL );
+              ~Interface_Server_API( void );
 
               int Interface_Project_Server_List( string &Response, string ServerURL, string Project, string User, string Groups );
               int Interface_Project_Resource_List( string &Response, string ServerURL, string Project, string User, string Groups );
@@ -58,6 +59,8 @@ class Interface_Server_API
        string PublicCertificateFile;
        string CAChainFile;
        char   CURLErrorBuffer[ CURL_ERROR_SIZE ];
+       CURL   *MycURLHandle;
+       int    CreatedMycURLHandle;
       }; 
   
 // ------------------------------------------------------------------------------

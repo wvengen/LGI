@@ -40,7 +40,8 @@ class Resource_Server_API
       {
        public:
 
-              Resource_Server_API( string KeyFile, string CertificateFile, string CAFile );
+              Resource_Server_API( string KeyFile, string CertificateFile, string CAFile, CURL *cURLHandle = NULL );
+              ~Resource_Server_API( void );
 
               int Resource_SignUp_Resource( string &Response, string ServerURL, string Project, string Capabilities = "" );
               int Resource_SignOff_Resource( string &Response, string ServerURL, string Project, string SessionID );
@@ -63,6 +64,8 @@ class Resource_Server_API
        string PublicCertificateFile;
        string CAChainFile;
        char   CURLErrorBuffer[ CURL_ERROR_SIZE ];
+       CURL   *MycURLHandle;
+       int    CreatedMycURLHandle;
       }; 
   
 // ------------------------------------------------------------------------------
