@@ -64,7 +64,6 @@ class LGI_Client:
 	def Connect( self ):
 		if( not self._Connection ): 
 			self._Connection = self.__HTTPSConnection( self._Host, PrivateKey = self._PrivateKey, Certificate = self._Certificate, CA_Chain = self._CA_Chain );
-			self._Connection.connect();
 
 	# request the jobs state
 	def GetJobState( self, JobId ):
@@ -142,6 +141,7 @@ class LGI_Client:
 	# if the class was setup with a repository URL, use this method to download some files
 	def DownLoadFiles( self, Files, Where = None ):
 		if( not self._Connection ): self.Connect();
+		self._Connection.connect();
 		for FileName in Files:
 			BaseFileName = FileName[ FileName.rfind( '/' ) + 1 : len( FileName ) ];
 			self._Connection.request( "GET", self._URL + "/" + BaseFileName );
@@ -160,6 +160,7 @@ class LGI_Client:
 	# if the class was setup with a repository URL, use this method to upload some files
 	def UpLoadFiles( self, Files ):
 		if( not self._Connection ): self.Connect();
+		self._Connection.connect();
 		for FileName in Files:
 			BaseFileName = FileName[ FileName.rfind( '/' ) + 1 : len( FileName ) ];
 			File = open( FileName, "r" );
@@ -177,6 +178,7 @@ class LGI_Client:
 	# if the class was setup with a repository URL, use this method to delete some files
 	def DeleteFiles( self, Files ):
 		if( not self._Connection ): self.Connect();
+		self._Connection.connect();
 		for FileName in Files:
 			BaseFileName = FileName[ FileName.rfind( '/' ) + 1 : len( FileName ) ];
 			self._Connection.request( "DELETE", self._URL + "/" + BaseFileName );
@@ -201,6 +203,7 @@ class LGI_Client:
 	
 	def __PostToServer( self, API, Variables = {}, Files = {}, Path = None ):
 		if( not self._Connection ): self.Connect();
+		self._Connection.connect();
 
                 Boundary = "@$_Th1s_1s_th3_b0und@ry_@$";
                 List = [];
