@@ -148,10 +148,11 @@ and be your own X.509 CA.
 
 - Make sure Apache is setup correctly to use client and server certificates
   for https and check that the following options have been set correctly into
-  the https virtual host configuration:
+  the https (virtual host) configuration:
 
   SSLSessionCache shmcb:/var/cache/mod_ssl/scache(512000)
   SSLSessionCacheTimeout 5
+	
   SSLCertificateFile /var/www/html/LGI/certificates/exampleserver.crt
   SSLCertificateKeyFile /var/www/html/LGI/certificates/exampleserver.key
   SSLCertificateChainFile /var/www/html/LGI/certificates/exampleCA.crt
@@ -169,14 +170,22 @@ and be your own X.509 CA.
   files (if desired), make sure the important directories are carefully 
   protected and for performance reasons, make sure KeepAlive is turned on, 
   KeepAliveTimeOut is set low and MaxKeepAliveRequests set high in the
-  main server configuration of Apache:
+  main server configuration of Apache. Also make sure the Timeout is not to
+  high and no DNS queries are perfomed for each request:
 
   DocumentRoot "/var/www/html"
   AccessFileName .htaccess
 
+  HostnameLookups off
+  Timeout 15
   KeepAlive On
   KeepAliveTimeout 1
   MaxKeepAliveRequests 100
+
+  <Directory />
+         Options FollowSymLinks
+         AllowOverride None
+  </Directory>
   
   <Directory "/var/www/html/LGI">
          AllowOverride All
@@ -316,6 +325,18 @@ and be your own X.509 CA.
     ! No browsing allowed !
   </html>
 
+  For high performance, make sure you scale the Apache MPM settings to your 
+  needs taking the amount of RAM your server has into account:
+
+     http://httpd.apache.org/docs/2.2/mod/prefork.html
+     http://www.ibm.com/developerworks/linux/library/l-tune-lamp-2.html
+
+  It is also advised to set the net.ipv4.tcp_fin_timeout to 15s or less with
+  the sysctl command. Make this setting permanent by adding it into the file
+  /etc/sysctl.conf. This setting will make sure that keep-alive connections,
+  when closed by Apache, do not linger to long until the client finaly closes
+  the socket.
+  
   Finally check your Apache configuration with the 'apachectl configtest' command.
 
   !!!!! WORD OF CAUTION !!!!!
@@ -324,7 +345,7 @@ and be your own X.509 CA.
   environment. Please be very carefull when diverting from the above
   suggested configuration. Web application security is a complicated matter
   and a lot of care has been taken to ensure a secure default configuration
-  that will work out-of-the box.
+  that will work out-of-the box mostly tuned for performance.
 
   !!!!! WORD OF CAUTION !!!!!
 
