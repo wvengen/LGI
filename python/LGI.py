@@ -155,6 +155,7 @@ class LGI_Client:
 				File.write( Data );
 				Data = Response.read( 4096 );
 			File.close();
+			Response.close();
 
 	# if the class was setup with a repository URL, use this method to upload some files
 	def UpLoadFiles( self, Files ):
@@ -170,6 +171,7 @@ class LGI_Client:
 				Data = File.read( 4096 );
 			File.close();
 			Response = self._Connection.getresponse();
+			Response.close();
 	
 	# if the class was setup with a repository URL, use this method to delete some files
 	def DeleteFiles( self, Files ):
@@ -178,6 +180,7 @@ class LGI_Client:
 			BaseFileName = FileName[ FileName.rfind( '/' ) + 1 : len( FileName ) ];
 			self._Connection.request( "DELETE", self._URL + "/" + BaseFileName );
 			Response = self._Connection.getresponse();
+			Response.close();
 
 	# close the connection
 	def Close( self ):
@@ -226,7 +229,9 @@ class LGI_Client:
 			self._Connection.request( "POST", self._Path + API, Body, Headers );
 	
 		Response = self._Connection.getresponse();
-		return( self.__NodesToDict( xml.dom.minidom.parseString( Response.read() ) ) );
+		Data = Response.read();
+		Response.close();
+		return( self.__NodesToDict( xml.dom.minidom.parseString( Data ) ) );
 
 	class __NotATextNode:
 		pass;
