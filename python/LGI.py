@@ -233,7 +233,7 @@ class LGI_Client:
 		Response = self._Connection.getresponse();
 		Data = Response.read();
 		Response.close();
-		return( self.__NodesToDict( xml.dom.minidom.parseString( Response.read() ) ) );
+		return( self.__NodesToDict( xml.dom.minidom.parseString( Data ) ) );
 
 	class __NotATextNode:
 		pass;
