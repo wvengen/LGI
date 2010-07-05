@@ -131,7 +131,7 @@ sub reply
  local($remuser, $remhost, $logline) = ();
 
  # Create header...
- print "Status: $status\n";
+ print "Status: $status $message\n";
  print "Content-Type: text/html\n\n";
 
  # Response...
