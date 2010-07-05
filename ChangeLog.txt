@@ -23,3 +23,13 @@ Sat June 26 -- version 1.26
 - Added python client class into python dir.
 - Moved daemon/src into root, adjusted makefile and so on.
 
+
+Mon July 5 -- version 1.27
+--------------------------
+
+- Adapted daemon and tools to use persistent connections by
+  reusing the cURL handle.
+- Configured Apache for performance using keep-alive options.
+- Updated documentation.
+
+
