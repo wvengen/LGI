@@ -247,50 +247,45 @@ function Resource_Lock_Job( $ResourceData, $JobId )
 
  // check for lock data from running_locks table...
  $queryresult = mysql_query( "SELECT lock_id FROM running_locks WHERE job_id=".$JobId );
-
- if( mysql_num_rows( $queryresult ) > 0 )     // we couldn't lock it, it was already locked by someone...
+ if( mysql_num_rows( $queryresult ) > 0 )                       // we couldn't lock it, it was already locked by someone...
  {
   mysql_free_result( $queryresult );  
   return( 1 );
  }
-
  mysql_free_result( $queryresult );
-
- // check for job in job_queue table...
- $queryresult = mysql_query( "SELECT lock_state,target_resources FROM job_queue WHERE job_id=".$JobId );
- 
- if( mysql_num_rows( $queryresult ) < 1 )
- {
-  mysql_free_result( $queryresult );
-  return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ] ) );
- }
 
  // check if this resource is allowed to lock the job...
+ $queryresult = mysql_query( "SELECT lock_state,target_resources FROM job_queue WHERE job_id=".$JobId );  
+ if( mysql_num_rows( $queryresult ) < 1 )                      // the job was not found in the db anymore...
+ {
+  mysql_free_result( $queryresult );
+  return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ] ) );    
+ }
  $JobData = mysql_fetch_object( $queryresult );
-
  mysql_free_result( $queryresult );
-
  if( !FoundInCommaSeparatedField( $JobData->target_resources, $ResourceData->resource_name, "," ) )
   return( LGI_Error_Response( 21, $ErrorMsgs[ 21 ] ) );
+ if( $JobData->lock_state > 0 )                                // it was already locked by another process running concurrently...
+  return( 1 );
   
  // now try and get a lock on the job in job_queue...
- $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state+1 WHERE job_id=".$JobId );
-
- $queryresult = mysql_query( "SELECT lock_state FROM job_queue WHERE job_id=".$JobId );
- $CurrentLockState = mysql_fetch_object( $queryresult );
- mysql_free_result( $queryresult );
+ mysql_query( "LOCK TABLES job_queue WRITE" );                                                              // lock table...
+ mysql_query( "UPDATE job_queue SET lock_state=lock_state+1 WHERE job_id=".$JobId );                        // update the row...
+ $queryresult = mysql_query( "SELECT lock_state FROM job_queue WHERE job_id=".$JobId );                     // get row...
+ mysql_query( "UNLOCK TABLES" );                                                                            // unlock table...
+ $CurrentLockState = mysql_fetch_object( $queryresult );                                                    // get current state...
+ mysql_free_result( $queryresult );                                                                         // free result...
 
  // check if we obtained the lock...
  if( $CurrentLockState->lock_state == 1 ) 
- {
-  // yup we got the lock, insert into running_locks table...
-  $queryresult = mysql_query( "INSERT INTO running_locks SET job_id=".$JobId.",resource_id=".$ResourceData->resource_id.",lock_time=UNIX_TIMESTAMP(),session_id=".$ResourceData->SessionID );
+ { 
+  mysql_query( "INSERT INTO running_locks SET job_id=".$JobId.",resource_id=".$ResourceData->resource_id.",lock_time=UNIX_TIMESTAMP(),session_id=".$ResourceData->SessionID );
   return( 0 );
  }
  else
  {
   // we couln't get the lock cause another thread beat us to it or we just encountered a race-condition...
-  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobId );
+  mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobId );                        // restore state...
   return( 1 );
  }
  
