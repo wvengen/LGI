@@ -208,7 +208,7 @@ int DownLoadFilesFromRepository( void )
      continue;
     }
 
-    string URL = RepositoryURL + "/" + FileList[ i ];
+    string URL = RepositoryURL + "/" + basename( FileList[ i ].c_str() );
 
     curl_easy_setopt( cURLHandle, CURLOPT_URL, URL.c_str() );
     curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, TheFile );

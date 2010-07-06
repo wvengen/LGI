@@ -31,5 +31,7 @@ Mon July 5 -- version 1.27
   reusing the cURL handle.
 - Configured Apache for performance using keep-alive options.
 - Updated documentation.
+- Made sure that the python interface class also handles the
+  persistent / keep-alive connections correctly.
 
 

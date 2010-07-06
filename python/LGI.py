@@ -141,15 +141,20 @@ class LGI_Client:
 	# if the class was setup with a repository URL, use this method to download some files
 	def DownLoadFiles( self, Files, Where = None ):
 		if( not self._Connection ): self.Connect();
-		self._Connection.connect();
 		for FileName in Files:
 			BaseFileName = FileName[ FileName.rfind( '/' ) + 1 : len( FileName ) ];
-			self._Connection.request( "GET", self._URL + "/" + BaseFileName );
 			if( Where ):
 				File = open( Where + "/" + BaseFileName, "w" );
 			else:
 				File = open( FileName, "w" );
-			Response = self._Connection.getresponse();
+			try:
+				self._Connection.request( "GET", self._URL + "/" + BaseFileName );
+				Response = self._Connection.getresponse();
+			except:
+				self._Connection.close();
+				self._Connection.connect();	
+				self._Connection.request( "GET", self._URL + "/" + BaseFileName );
+				Response = self._Connection.getresponse();
 			Data = Response.read( 4096 );
 			while( Data ):
 				File.write( Data );
@@ -160,29 +165,46 @@ class LGI_Client:
 	# if the class was setup with a repository URL, use this method to upload some files
 	def UpLoadFiles( self, Files ):
 		if( not self._Connection ): self.Connect();
-		self._Connection.connect();
 		for FileName in Files:
 			BaseFileName = FileName[ FileName.rfind( '/' ) + 1 : len( FileName ) ];
 			File = open( FileName, "r" );
 			Headers = { "Content-Length": str( os.fstat( File.fileno() ).st_size ) };
-			self._Connection.request( "PUT", self._URL + "/" + BaseFileName, None, Headers );
-			Data = File.read( 4096 );
-			while( Data ):
-				self._Connection.send( Data );
+			try:
+				self._Connection.request( "PUT", self._URL + "/" + BaseFileName, None, Headers );
 				Data = File.read( 4096 );
-			File.close();
-			Response = self._Connection.getresponse();
+				while( Data ):
+					self._Connection.send( Data );
+					Data = File.read( 4096 );
+				Response = self._Connection.getresponse();
+			except:
+				self._Connection.close();
+				self._Connection.connect();
+				File.seek( 0 );
+
+				self._Connection.request( "PUT", self._URL + "/" + BaseFileName, None, Headers );
+				Data = File.read( 4096 );
+				while( Data ):
+					self._Connection.send( Data );
+					Data = File.read( 4096 );
+				Response = self._Connection.getresponse();
+
 			Response.read();
 			Response.close();
+			File.close();
 	
 	# if the class was setup with a repository URL, use this method to delete some files
 	def DeleteFiles( self, Files ):
 		if( not self._Connection ): self.Connect();
-		self._Connection.connect();
 		for FileName in Files:
 			BaseFileName = FileName[ FileName.rfind( '/' ) + 1 : len( FileName ) ];
-			self._Connection.request( "DELETE", self._URL + "/" + BaseFileName );
-			Response = self._Connection.getresponse();
+			try:
+				self._Connection.request( "DELETE", self._URL + "/" + BaseFileName );
+				Response = self._Connection.getresponse();
+			except:
+				self._Connection.close();
+				self._Connection.connect();
+				self._Connection.request( "DELETE", self._URL + "/" + BaseFileName );
+				Response = self._Connection.getresponse();
 			Response.read();
 			Response.close();
 
@@ -203,7 +225,6 @@ class LGI_Client:
 	
 	def __PostToServer( self, API, Variables = {}, Files = {}, Path = None ):
 		if( not self._Connection ): self.Connect();
-		self._Connection.connect();
 
                 Boundary = "@$_Th1s_1s_th3_b0und@ry_@$";
                 List = [];
@@ -228,12 +249,25 @@ class LGI_Client:
 		Body = "\r\n".join( List );
 		Headers = { "Content-type": "multipart/form-data; boundary=%s" % Boundary, "Accept": "text/plain" };
 
-		if( Path ):
-			self._Connection.request( "POST", Path, Body, Headers );
-		else:
-			self._Connection.request( "POST", self._Path + API, Body, Headers );
-	
-		Response = self._Connection.getresponse();
+		try:
+			if( Path ):
+				self._Connection.request( "POST", Path, Body, Headers );
+			else:
+				self._Connection.request( "POST", self._Path + API, Body, Headers );
+
+			Response = self._Connection.getresponse();
+
+		except:
+			self._Connection.close();
+			self._Connection.connect();
+			
+			if( Path ):
+				self._Connection.request( "POST", Path, Body, Headers );
+			else:
+				self._Connection.request( "POST", self._Path + API, Body, Headers );
+
+			Response = self._Connection.getresponse();
+
 		Data = Response.read();
 		Response.close();
 		return( self.__NodesToDict( xml.dom.minidom.parseString( Data ) ) );
