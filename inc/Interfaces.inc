@@ -358,6 +358,8 @@ function Interface_Set_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
 
  while( $Count < $Config[ "LGI_SPIN_LOCK_ATTEMPTS" ] )
  {
+  mysql_query( "LOCK TABLES job_queue WRITE" );                            // lock table...
+
   $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state+1 WHERE job_id=".$JobID );
 
   // if the update couldn't be done, the job wasn't there...
@@ -368,6 +370,8 @@ function Interface_Set_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
   $queryresult = mysql_query( "SELECT lock_state FROM job_queue WHERE job_id=".$JobID );
   $LockState = mysql_fetch_object( $queryresult );
   mysql_free_result( $queryresult );
+
+  mysql_query( "UNLOCK TABLES" );                                          // unlock table...
 
   // we did set it...
   if( $LockState->lock_state == 1 )
