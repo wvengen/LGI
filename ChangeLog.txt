@@ -33,5 +33,7 @@ Mon July 5 -- version 1.27
 - Updated documentation.
 - Made sure that the python interface class also handles the
   persistent / keep-alive connections correctly.
+- Made sure aborting jobs without a pulse are also nicely taken
+  care of.
 
 
