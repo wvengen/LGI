@@ -24,7 +24,7 @@ Sat June 26 -- version 1.26
 - Moved daemon/src into root, adjusted makefile and so on.
 
 
-Mon July 5 -- version 1.27
+Mon July 7 -- version 1.27
 --------------------------
 
 - Adapted daemon and tools to use persistent connections by
@@ -35,5 +35,7 @@ Mon July 5 -- version 1.27
   persistent / keep-alive connections correctly.
 - Made sure aborting jobs without a pulse are also nicely taken
   care of.
+- Studied LGI under load and updated statistics in the 
+  documentation.
 
 
