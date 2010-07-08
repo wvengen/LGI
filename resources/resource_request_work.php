@@ -97,14 +97,14 @@ if( $NrOfPossibleJobs >= 1 )
  {
   $JobId = mysql_fetch_object( $TheWorkQuery );        
 
-  if( !Resource_Lock_Job( $ResourceData, $JobId->job_id, False ) ) 
+  if( !Resource_Lock_Job( $ResourceData, $JobId->job_id, False ) )   // we will do the extra checks so avoid some queries...
   {
    // we were able to get the lock... include this job into the response...
-   $JobQuery = mysql_query( "SELECT job_id,target_resources,owners,read_access,write_access,state_time_stamp,job_specifics,state FROM job_queue WHERE job_id=".$JobId->job_id );
+   $JobQuery = mysql_query( "SELECT job_id,target_resources,owners,read_access,write_access,state_time_stamp,job_specifics,state,lock_state FROM job_queue WHERE job_id=".$JobId->job_id );
    $JobSpecs = mysql_fetch_object( $JobQuery );
 
-   // double check if state is still 'queued' as another thread could have taken it in the mean time...
-   if( $JobSpecs->state == "queued" && FoundInCommaSeparatedField( $JobSpecs->target_resources, $ResourceData->resource_name, "," ) )
+   // double check if state is still 'queued' and locked as another thread could have taken it in the mean time...
+   if( ( $JobSpecs->lock_state == 1 ) && ( $JobSpecs->state == "queued" ) && FoundInCommaSeparatedField( $JobSpecs->target_resources, $ResourceData->resource_name, "," ) )
    {
     // build job record for this job...
     $ActualNrOfJobs += 1; 
