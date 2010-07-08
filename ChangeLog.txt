@@ -40,4 +40,5 @@ Thu July 8 -- version 1.27
 - Made sure that MySQL connections are nicely closed on exits.
 - Found a small race-condition in the resource request work API,
   it has been fixed and the resource locking has been optimized.
+- Made sure cURL is setup and cleaned up nicely.
 

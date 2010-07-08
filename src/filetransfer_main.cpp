@@ -538,13 +538,12 @@ int main( int argc, char *argv[] )
  // Now check issued command...
  switch( Command )
  {
-  case CMD_LIST:     return( ListRepository() );
-  case CMD_DOWNLOAD: return( DownLoadFilesFromRepository() );
-  case CMD_UPLOAD:   return( UpLoadFilesToRepository() );
-  case CMD_DELETE:   return( DeleteFilesFromRepository() );
+  case CMD_LIST:     Flag = ListRepository(); break;
+  case CMD_DOWNLOAD: Flag = DownLoadFilesFromRepository(); break;
+  case CMD_UPLOAD:   Flag = UpLoadFilesToRepository(); break;
+  case CMD_DELETE:   Flag = DeleteFilesFromRepository(); break;
  }
 
  curl_global_cleanup();
-
- return( 1 );
+ return( Flag );
 }
