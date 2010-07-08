@@ -559,7 +559,7 @@ int Daemon::RequestWorkCycle( void )
       DEBUG_LOG( "Daemon::RequestWorkCycle; Requesting work for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() << " at server " << (*ServerPointer) << " with session id " << SessionID );
 
       int NrOfJobs = 0;
-      int Limit = TheApplication.Job_Limit() << 2;
+      int Limit = MIN( MAX( ( TheApplication.Job_Limit() << 2 ), 32 ), 256 );
       int Offset = 0;
       int FoundJob = 0;
       char OffsetStr[ 64 ];
