@@ -19,6 +19,7 @@
 
 #include <signal.h>
 #include <sys/wait.h>
+
 #include <curl/curl.h>
 
 #include <string>
@@ -532,6 +533,8 @@ int main( int argc, char *argv[] )
   return( 1 );
  }
 
+ curl_global_init( CURL_GLOBAL_ALL );
+
  // Now check issued command...
  switch( Command )
  {
@@ -540,6 +543,8 @@ int main( int argc, char *argv[] )
   case CMD_UPLOAD:   return( UpLoadFilesToRepository() );
   case CMD_DELETE:   return( DeleteFilesFromRepository() );
  }
+
+ curl_global_cleanup();
 
  return( 1 );
 }

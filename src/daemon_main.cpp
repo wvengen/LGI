@@ -21,6 +21,8 @@
 #include <sys/wait.h>
 #include <cstring>
 
+#include <curl/curl.h>
+
 #include "logger.h"
 #include "resource_server_api.h"
 #include "xml.h"
@@ -162,6 +164,8 @@ int main( int argc, char *argv[] )
  signal( SIGTERM, TheSignalHandler );
 
  InitializeLogger( LogLevel, LogFile.c_str() );
+
+ curl_global_init( CURL_GLOBAL_ALL );
  
  TheDaemon = new Daemon( ConfigFile, SlowCycleTime, FastCycleTime );
 
@@ -191,6 +195,8 @@ int main( int argc, char *argv[] )
   else
    CRITICAL_LOG_RETURN( 1, "Main; Daemon stopped" );
  }
+
+ curl_global_cleanup();
  
  return( 0 );
 }

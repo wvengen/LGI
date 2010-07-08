@@ -20,6 +20,8 @@
 #include <signal.h>
 #include <sys/wait.h>
 
+#include <curl/curl.h>
+
 #include <iostream>
 #include <iomanip>
 #include <cstring>
@@ -227,6 +229,8 @@ int main( int argc, char *argv[] )
   return( 1 );
  }
 
+ curl_global_init( CURL_GLOBAL_ALL );
+
  // now start qstating the server...
  Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );
 
@@ -238,24 +242,26 @@ int main( int argc, char *argv[] )
    if( ( Flag = ServerAPI.Interface_Project_Server_List( Response, ServerURL, Project, User, Groups ) ) != CURLE_OK )
    {
     cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+    curl_global_cleanup();
     return( 1 );
    }
 
    Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
-   if( Response.empty() ) return( 1 );
+   if( Response.empty() ) { curl_global_cleanup(); return( 1 ); }
 
    if( OutputInXML )
    {
     cout << Response << endl;                // just dump the XML if requested...
 
-    if( !Parse_XML( Response, "error" ).empty() ) return( 1 );
+    if( !Parse_XML( Response, "error" ).empty() ) { curl_global_cleanup(); return( 1 ); }
    }
    else
    {
     if( !Parse_XML( Response, "error" ).empty() ) 
     {
      cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+     curl_global_cleanup();
      return( 1 );
     }
 
@@ -279,24 +285,26 @@ int main( int argc, char *argv[] )
    if( ( Flag = ServerAPI.Interface_Project_Resource_List( Response, ServerURL, Project, User, Groups ) ) != CURLE_OK )
    {
     cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+    curl_global_cleanup();
     return( 1 );
    }
 
    Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
-   if( Response.empty() ) return( 1 );
+   if( Response.empty() ) { curl_global_cleanup(); return( 1 ); }
 
    if( OutputInXML )
    {
     cout << Response << endl;                // just dump the XML if requested...
 
-    if( !Parse_XML( Response, "error" ).empty() ) return( 1 );
+    if( !Parse_XML( Response, "error" ).empty() ) { curl_global_cleanup(); return( 1 ); }
    }
    else
    {
     if( !Parse_XML( Response, "error" ).empty() )
     {
      cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+     curl_global_cleanup();
      return( 1 );
     }
 
@@ -327,6 +335,7 @@ int main( int argc, char *argv[] )
    }
   }
 
+  curl_global_cleanup();
   return( 0 );
  }
 
@@ -359,12 +368,13 @@ int main( int argc, char *argv[] )
    if( ( Flag = ServerAPI.Interface_Job_State( Response, ServerURL, Project, User, Groups, Job_Id, State, Application, OffsetStr, LimitStr ) ) != CURLE_OK )
    {
     cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+    curl_global_cleanup();
     return( 1 );
    }
 
    Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
-   if( Response.empty() ) return( 1 );
+   if( Response.empty() ) { curl_global_cleanup(); return( 1 ); }
 
    if( !Parse_XML( Response, "error" ).empty() )
    {
@@ -372,6 +382,7 @@ int main( int argc, char *argv[] )
      cout << Response << endl;
     else
      cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+    curl_global_cleanup();
     return( 1 );
    }
 
@@ -443,24 +454,26 @@ int main( int argc, char *argv[] )
   if( ( Flag = ServerAPI.Interface_Job_State( Response, ServerURL, Project, User, Groups, Job_Id, "", "", "", "" ) ) != CURLE_OK )
   {
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+   curl_global_cleanup();
    return( 1 );
   }
   
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 
-  if( Response.empty() ) return( 1 );
+  if( Response.empty() ) { curl_global_cleanup(); return( 1 ); }
 
   if( OutputInXML )
   {
    cout << Response << endl;
 
-   if( !Parse_XML( Response, "error" ).empty() ) return( 1 );
+   if( !Parse_XML( Response, "error" ).empty() ) { curl_global_cleanup(); return( 1 ); }
   }
   else
   {
    if( !Parse_XML( Response, "error" ).empty() ) 
    {
     cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
+    curl_global_cleanup();
     return( 1 );
    }
 
@@ -518,5 +531,6 @@ int main( int argc, char *argv[] )
   }
  }
 
+ curl_global_cleanup();
  return( 0 );
 }

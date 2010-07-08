@@ -23,6 +23,8 @@
 #include <cstdlib>
 #include <vector>
 
+#include <curl/curl.h>
+
 #include "logger.h"
 #include "interface_server_api.h"
 #include "xml.h"
@@ -199,6 +201,8 @@ int main( int argc, char *argv[] )
   return( 1 );
  }
 
+ curl_global_init( CURL_GLOBAL_ALL );
+
  // now start contacting the server...
  Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );
 
@@ -210,6 +214,7 @@ int main( int argc, char *argv[] )
   if( ( Flag = ServerAPI.Interface_Delete_Job( Response, ServerURL, Project, User, Groups, Job_Ids[ j ] ) ) != CURLE_OK )
   {
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
+   curl_global_cleanup();
    return( 1 );
   }
 
@@ -244,5 +249,7 @@ int main( int argc, char *argv[] )
  }
 
  cout << endl;
+
+ curl_global_cleanup();
  return( 0 );
 }
