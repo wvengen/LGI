@@ -97,21 +97,25 @@ if( $NrOfPossibleJobs >= 1 )
  {
   $JobId = mysql_fetch_object( $TheWorkQuery );        
 
-  if( !Resource_Lock_Job( $ResourceData, $JobId->job_id ) )    
+  if( !Resource_Lock_Job( $ResourceData, $JobId->job_id, False ) ) 
   {
    // we were able to get the lock... include this job into the response...
-   $JobQuery = mysql_query( "SELECT job_id,target_resources,owners,read_access,write_access,state_time_stamp,job_specifics FROM job_queue WHERE job_id=".$JobId->job_id );
+   $JobQuery = mysql_query( "SELECT job_id,target_resources,owners,read_access,write_access,state_time_stamp,job_specifics,state FROM job_queue WHERE job_id=".$JobId->job_id );
    $JobSpecs = mysql_fetch_object( $JobQuery );
 
-   // build job record for this job...
-   $ActualNrOfJobs += 1; 
-   $ResponseJobs .= " <job number='".$ActualNrOfJobs."'> <job_id> ".$JobSpecs->job_id." </job_id>"; 
-   $ResponseJobs .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>"; 
-   $ResponseJobs .= " <owners> ".$JobSpecs->owners." </owners>"; 
-   $ResponseJobs .= " <read_access> ".$JobSpecs->read_access." </read_access>"; 
-   $ResponseJobs .= " <write_access> ".$JobSpecs->write_access." </write_access>"; 
-   $ResponseJobs .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>"; 
-   $ResponseJobs .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>"; 
+   // double check if state is still 'queued' as another thread could have taken it in the mean time...
+   if( $JobSpecs->state == "queued" && FoundInCommaSeparatedField( $JobSpecs->target_resources, $ResourceData->resource_name, "," ) )
+   {
+    // build job record for this job...
+    $ActualNrOfJobs += 1; 
+    $ResponseJobs .= " <job number='".$ActualNrOfJobs."'> <job_id> ".$JobSpecs->job_id." </job_id>"; 
+    $ResponseJobs .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>"; 
+    $ResponseJobs .= " <owners> ".$JobSpecs->owners." </owners>"; 
+    $ResponseJobs .= " <read_access> ".$JobSpecs->read_access." </read_access>"; 
+    $ResponseJobs .= " <write_access> ".$JobSpecs->write_access." </write_access>"; 
+    $ResponseJobs .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>"; 
+    $ResponseJobs .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>"; 
+   }
 
    mysql_free_result( $JobQuery );
   } 

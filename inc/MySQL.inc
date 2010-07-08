@@ -65,6 +65,21 @@ function Setup_MySQL_Connection( $ExitOnError = true )
 
 // -------------------------------------------------------------------- 
 
+function Close_MySQL_Connection( )
+{
+ global $MySQLSetup_Flag;
+
+ if( $MySQLSetup_Flag )
+ {
+  mysql_close();
+  $MySQLSetup_Flag = 0;
+ }
+
+ return( $MySQLSetup_Flag );
+}
+
+// -------------------------------------------------------------------- 
+
 function Select_MySQL_DataBase( $DataBase, $ExitOnError = true )
 {
  global $ErrorMsgs;

@@ -20,6 +20,7 @@
 
 require_once( '../inc/Config.inc' );
 require_once( '../inc/Errors.inc' );
+require_once( '../inc/MySQL.inc' );
 
 // -------------------------------------------------------------------- 
 
@@ -32,7 +33,10 @@ function LGI_Response( $DataTags, $Exit = true, $ExtraInfoTags = "" )
  $Response = "<LGI> ".$ExtraInfoTags." <response> ".$DataTags." </response> </LGI>";
 
  if( $Exit )
+ {
+  Close_MySQL_Connection();
   exit( $Response ); 
+ }
  else
   return( $Response );
 }

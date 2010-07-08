@@ -363,6 +363,9 @@ and be your own X.509 CA.
 
   mysql -u examplemysqluser -p exampleprojectname < /var/www/html/LGI/LGI.db
 
+  For high performance reasons you might want to set the max_connections
+  variable to a higher value for MySQL.
+
 - Insert your project server entry into the database by using the database
   management tool:
 

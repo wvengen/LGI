@@ -24,7 +24,7 @@ Sat June 26 -- version 1.26
 - Moved daemon/src into root, adjusted makefile and so on.
 
 
-Wed July 7 -- version 1.27
+Thu July 8 -- version 1.27
 --------------------------
 
 - Adapted daemon and tools to use persistent connections by
@@ -37,5 +37,7 @@ Wed July 7 -- version 1.27
   care of.
 - Studied LGI under load and updated statistics in the 
   documentation.
-
+- Made sure that MySQL connections are nicely closed on exits.
+- Found a small race-condition in the resource request work API,
+  it has been fixed and the resource locking has been optimized.
 
