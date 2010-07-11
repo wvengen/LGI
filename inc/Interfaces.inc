@@ -335,14 +335,10 @@ function Interface_Clear_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
 {
  global $ErrorMsgs;
 
- $queryresult = mysql_query( "SELECT lock_state FROM job_queue WHERE job_id=".$JobID." AND lock_state>=1" );
- if( mysql_num_rows( $queryresult ) <= 0 )
- {
-  mysql_free_result( $queryresult );
+ if( mysql_query( "DELETE FROM running_locks WHERE resource_id=-1 AND session_id=0 AND job_id=".$JobID ) )
+  mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobID );
+ else
   return( LGI_Error_Response( 36, $ErrorMsgs[ 36 ], $ExitOnError ) );
- }
-
- $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobID );
 
  return( 0 );
 }
@@ -358,30 +354,15 @@ function Interface_Set_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
 
  while( $Count < $Config[ "LGI_SPIN_LOCK_ATTEMPTS" ] )
  {
-  mysql_query( "LOCK TABLES job_queue WRITE" );                            // lock table...
-
-  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state+1 WHERE job_id=".$JobID );
-
   // if the update couldn't be done, the job wasn't there...
-  if( !$queryresult )
+  if( !mysql_query( "UPDATE job_queue SET lock_state=lock_state+1 WHERE job_id=".$JobID ) )
    return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], $ExitOnError ) );
 
-  // check the value, which is now 1 or bigger...
-  $queryresult = mysql_query( "SELECT lock_state FROM job_queue WHERE job_id=".$JobID );
-  $LockState = mysql_fetch_object( $queryresult );
-  mysql_free_result( $queryresult );
-
-  mysql_query( "UNLOCK TABLES" );                                          // unlock table...
-
-  // we did set it...
-  if( $LockState->lock_state == 1 )
+  if( mysql_query( "INSERT INTO running_locks SET resource_id=-1,session_id=0,lock_time=UNIX_TIMESTAMP(),job_id=".$JobID ) )
    return( 0 );
 
   // we didn't set it... decrease value again and try again later...
-  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobID );
-
-  // if the update couldn't be done, the job wasn't there...
-  if( !$queryresult )
+  if( !mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobID ) )
    return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], $ExitOnError ) );
 
   $Count++;

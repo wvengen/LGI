@@ -53,20 +53,19 @@ if( !Interface_Is_User_Allowed_To_Modify_Job( $JobSpecs, $JobUser, $JobGroups ) 
 // if the job can be actually removed...
 if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( $JobSpecs->state == 'aborted' ) )
 {
- Interface_Set_Spin_Lock_On_Job( $JobId );
-
+ Interface_Set_Spin_Lock_On_Job( $JobId );   // lock job or send back error response...
  $RepositoryURL = NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) );
  if( $RepositoryURL != "" ) DeleteRepository( $RepositoryURL );
-
- $queryresult = mysql_query( "DELETE FROM job_queue WHERE job_id=".$JobId );
+ mysql_query( "DELETE FROM job_queue WHERE job_id=".$JobId );
+ Interface_Clear_Spin_Lock_On_Job( $JobId );   // unlock job again...
  $JobState = "deleted";
  $JobStateTimeStamp = time();
 }
 else
 {
- Interface_Set_Spin_Lock_On_Job( $JobId );
+ Interface_Set_Spin_Lock_On_Job( $JobId );     // lock job or return error...
  $queryresult = mysql_query( "UPDATE job_queue SET state='aborting',state_time_stamp=UNIX_TIMESTAMP() WHERE job_id=".$JobId );
- Interface_Clear_Spin_Lock_On_Job( $JobId );
+ Interface_Clear_Spin_Lock_On_Job( $JobId );   // unlock job again...
  $JobSpecs = Interface_Wait_For_Cleared_Spin_Lock_On_Job( $JobId );
  $JobState = $JobSpecs->state;
  $JobStateTimeStamp = $JobSpecs->state_time_stamp;

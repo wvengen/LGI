@@ -24,8 +24,8 @@ Sat June 26 -- version 1.26
 - Moved daemon/src into root, adjusted makefile and so on.
 
 
-Thu July 8 -- version 1.27
---------------------------
+Sun July 11 -- version 1.27
+---------------------------
 
 - Adapted daemon and tools to use persistent connections by
   reusing the cURL handle.
@@ -41,4 +41,7 @@ Thu July 8 -- version 1.27
 - Found a small race-condition in the resource request work API,
   it has been fixed and the resource locking has been optimized.
 - Made sure cURL is setup and cleaned up nicely.
+- Removed another small race-condition for resources and removed
+  table locks from algorithm in interface job locks. 
+
 

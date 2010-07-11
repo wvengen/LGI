@@ -87,13 +87,11 @@ if( ( $JobSpecs->state == 'queued' ) || ( $JobSpecs->state == 'finished' ) || ( 
 {
  $ErrorCode = Interface_Set_Spin_Lock_On_Job( $Job_ID, false );
  if( $ErrorCode != 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
-
- // remove the repository...
  $RepositoryURL = NormalizeString( Parse_XML( $JobSpecs -> job_specifics, "repository", $Attributes ) );
  if( $RepositoryURL != "" ) DeleteRepository( $RepositoryURL );
-
- // now delete from db...
  $queryresult = mysql_query( "DELETE FROM job_queue WHERE job_id=".$Job_ID );
+ $ErrorCode = Interface_Clear_Spin_Lock_On_Job( $Job_ID, false );
+ if( $ErrorCode != 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
  $JobState = "deleted";
  $JobStateTimeStamp = time();
 }

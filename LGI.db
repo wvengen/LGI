@@ -97,7 +97,7 @@ DROP TABLE IF EXISTS running_locks;
 CREATE TABLE running_locks (
   lock_id int(10) unsigned NOT NULL auto_increment,
   job_id int(10) unsigned NOT NULL default '0',
-  resource_id int(10) unsigned NOT NULL default '0',
+  resource_id int(10) NOT NULL default '0',
   lock_time int(10) unsigned NOT NULL default '0',
   session_id int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (lock_id),
