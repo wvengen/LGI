@@ -364,7 +364,12 @@ and be your own X.509 CA.
   mysql -u examplemysqluser -p exampleprojectname < /var/www/html/LGI/LGI.db
 
   For high performance reasons you might want to set the max_connections
-  variable to a higher value for MySQL.
+  variable to a higher value for MySQL. You should also set the global
+  table_cache value to twice the max_connections value. Values of 128 and
+  256 are a good starting point. With these settings, with the Apache config
+  suggested above, 128 concurrent resource daemons pose no problem and a
+  pool of ~10k resources should not be a problem using the default daemon 
+  settings (-ft 120 -st 600). 
 
 - Insert your project server entry into the database by using the database
   management tool:
