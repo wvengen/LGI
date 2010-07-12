@@ -48,4 +48,3 @@ Mon July 12 -- version 1.27
 - Optimized locking for resources a bit more.
 - Removed small race-condition in daemon_pulse field.
 
-

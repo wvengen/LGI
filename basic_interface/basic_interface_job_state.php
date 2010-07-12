@@ -145,7 +145,7 @@ else
  if( !ctype_digit( $Start ) ) Exit_With_Text( "ERROR: Start not a number" );
 
  // check if application is set in request... otherwise default to a nice number...
- $Limit = $Config[ "DEFAULT_JOB_STATUS_LIMIT" ];
+ $Limit = (string)( $Config[ "DEFAULT_JOB_STATUS_LIMIT" ] );
  if( isset( $_GET[ "limit" ] ) )
   $Limit = $_GET[ "limit" ];
  else
