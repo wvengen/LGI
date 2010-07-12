@@ -308,7 +308,7 @@ function Resource_UnLock_Job( $ResourceData, $JobId, $CheckTheResource = True  )
  }
 
  // remove the lock from the running_locks table...
- $queryresult = mysql_query( "DELETE FROM running_locks WHERE job_id=".$JobId." AND resource_id=".$ResourceData -> resource_id." AND session_id=".$TheLockData -> session_id );
+ $queryresult = mysql_query( "DELETE FROM running_locks WHERE job_id=".$JobId." AND resource_id=".$ResourceData -> resource_id." AND session_id=".$ResourceData -> SessionID );
 
  // and unlock the job in the job_queue table...
  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobId );

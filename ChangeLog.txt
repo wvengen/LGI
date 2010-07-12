@@ -24,7 +24,7 @@ Sat June 26 -- version 1.26
 - Moved daemon/src into root, adjusted makefile and so on.
 
 
-Sun July 11 -- version 1.27
+Mon July 12 -- version 1.27
 ---------------------------
 
 - Adapted daemon and tools to use persistent connections by
@@ -43,5 +43,8 @@ Sun July 11 -- version 1.27
 - Made sure cURL is setup and cleaned up nicely.
 - Removed another small race-condition for resources and removed
   table locks from algorithm in interface job locks. 
+- Using ctype_digit for checks and check limit values for 
+  queries.
+
 
 
