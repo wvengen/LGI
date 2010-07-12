@@ -38,7 +38,7 @@ function Resource_Verify_Session( &$ResourceData )
   return( 0 );
 
  // check if variable was set correctly...
- if( !isset( $ResourceData -> SessionID ) || ( $ResourceData -> SessionID == "" ) || !is_numeric( $ResourceData -> SessionID ) )
+ if( !isset( $ResourceData -> SessionID ) || ( $ResourceData -> SessionID == "" ) || !ctype_digit( $ResourceData -> SessionID ) )
   return( LGI_Error_Response( 8, $ErrorMsgs[ 8 ] ) );
 
  if( strlen( $ResourceData -> SessionID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
@@ -188,7 +188,7 @@ function Resource_Verify( &$Project, $SessionID = "", $Capabilities = "" )
   $queryresult = mysql_query( "UPDATE active_resources SET last_call_time=UNIX_TIMESTAMP() WHERE resource_name='".$CommonName."'" );
 
  // pass through the SessionID into the resource data structure...
- if( isset( $SessionID ) && is_numeric( $SessionID ) ) 
+ if( isset( $SessionID ) && ctype_digit( $SessionID ) ) 
  {
   if( strlen( $SessionID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
    return( LGI_Error_Response( 62, $ErrorMsgs[ 62 ] ) );
@@ -308,7 +308,7 @@ function Resource_UnLock_Job( $ResourceData, $JobId, $CheckTheResource = True  )
  }
 
  // remove the lock from the running_locks table...
- $queryresult = mysql_query( "DELETE FROM running_locks WHERE job_id=".$JobId );
+ $queryresult = mysql_query( "DELETE FROM running_locks WHERE job_id=".$JobId." AND resource_id=".$ResourceData -> resource_id." AND session_id=".$TheLockData -> session_id );
 
  // and unlock the job in the job_queue table...
  $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobId );

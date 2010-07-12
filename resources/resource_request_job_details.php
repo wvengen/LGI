@@ -34,7 +34,7 @@ if( Resource_Verify_Session( $ResourceData ) )
  return( LGI_Error_Response( 16, $ErrorMsgs[ 16 ] ) );
 
 // check if compulsory post variable was set...
-if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || ! is_numeric( $_POST[ "job_id" ] ) )
+if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || ! ctype_digit( $_POST[ "job_id" ] ) )
  return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ] ) );
 else
 {

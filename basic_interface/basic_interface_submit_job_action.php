@@ -116,7 +116,7 @@ if( strlen( $Input ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "E
 
 // check posted number of uploaded files...
 $NrOfUploadedFiles = -1;
-if( isset( $_POST[ "number_of_uploaded_files" ] ) && is_numeric( $_POST[ "number_of_uploaded_files" ] ) )
+if( isset( $_POST[ "number_of_uploaded_files" ] ) && ctype_digit( $_POST[ "number_of_uploaded_files" ] ) )
  $NrOfUploadedFiles = $_POST[ "number_of_uploaded_files" ];
 if( $NrOfUploadedFiles < 0 ) Exit_With_Text( "ERROR: Hidden field number_of_uploaded_files not correctly posted." );
 

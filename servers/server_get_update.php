@@ -29,7 +29,7 @@ session_destroy();
 $ServerData = Server_Verify( $_POST[ "project" ] );
 
 // check if compulsory post variable was set...
-if( !isset( $_POST[ "version" ] ) || ( $_POST[ "version" ] == "" ) || !is_numeric( $_POST[ "version" ] ) )
+if( !isset( $_POST[ "version" ] ) || ( $_POST[ "version" ] == "" ) || !ctype_digit( $_POST[ "version" ] ) )
  return( LGI_Error_Response( 40, $ErrorMsgs[ 40 ] ) );
 else
 {

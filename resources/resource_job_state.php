@@ -29,7 +29,7 @@ session_destroy();
 $ResourceData = Resource_Verify( $_POST[ "project" ] );
 
 // check if compulsory post variable was set...
-if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || !is_numeric( $_POST[ "job_id" ] ) )
+if( !isset( $_POST[ "job_id" ] ) || ( $_POST[ "job_id" ] == "" ) || !ctype_digit( $_POST[ "job_id" ] ) )
  return( LGI_Error_Response( 19, $ErrorMsgs[ 19 ] ) );
 else
 {

@@ -43,7 +43,7 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
  $UpdateQuery = $_POST[ "update" ];
 
  // check if posted fields are correct and allowed...
- if( !is_numeric( $UpdateVersion ) || ( $TargetServers == "" ) || ( $UpdateQuery == "" ) )
+ if( !ctype_digit( $UpdateVersion ) || ( $TargetServers == "" ) || ( $UpdateQuery == "" ) )
   return( LGI_Error_Response( 41, $ErrorMsgs[ 41 ] ) );
  
  // build response header...

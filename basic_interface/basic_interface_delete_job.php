@@ -68,7 +68,7 @@ else
   $Job_ID = $_POST[ "job_id" ];
 if( !isset( $Job_ID ) ) Exit_With_Text( "ERROR: Job_id was not posted" );
 if( strlen( $Job_ID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 47 ] );
-if( !is_numeric( $Job_ID ) ) Exit_With_Text( "ERROR: Job_id is not a number" );
+if( !ctype_digit( $Job_ID ) ) Exit_With_Text( "ERROR: Job_id is not a number" );
 
 // now verify the user using the basic browser interface... also make MySQL connection...
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );

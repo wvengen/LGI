@@ -34,7 +34,7 @@ $JobGroups = NormalizeCommaSeparatedField( $_POST[ "groups" ], "," );
 $JobUser = $_POST[ "user" ];
 
 // check if job_id was posted...
-if( isset( $_POST[ "job_id" ] ) && ( $_POST[ "job_id" ] != "" ) && is_numeric( $_POST[ "job_id" ] ) )
+if( isset( $_POST[ "job_id" ] ) && ( $_POST[ "job_id" ] != "" ) && ctype_digit( $_POST[ "job_id" ] ) )
 {
  if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
   return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ] ) );

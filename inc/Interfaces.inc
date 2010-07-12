@@ -335,6 +335,7 @@ function Interface_Clear_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
 {
  global $ErrorMsgs;
 
+ // for this to work, the resource_id field is signed in the running_locks table...
  if( mysql_query( "DELETE FROM running_locks WHERE resource_id=-1 AND session_id=0 AND job_id=".$JobID ) )
   mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobID );
  else
@@ -358,6 +359,7 @@ function Interface_Set_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
   if( !mysql_query( "UPDATE job_queue SET lock_state=lock_state+1 WHERE job_id=".$JobID ) )
    return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], $ExitOnError ) );
 
+  // for this to work, the resource_id field is signed in the running_locks table...
   if( mysql_query( "INSERT INTO running_locks SET resource_id=-1,session_id=0,lock_time=UNIX_TIMESTAMP(),job_id=".$JobID ) )
    return( 0 );
 

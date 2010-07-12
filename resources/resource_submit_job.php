@@ -72,7 +72,7 @@ else
 
 // check posted number of uploaded files...
 $NrOfUploadedFiles = -1;
-if( isset( $_POST[ "number_of_uploaded_files" ] ) && is_numeric( $_POST[ "number_of_uploaded_files" ] ) )
+if( isset( $_POST[ "number_of_uploaded_files" ] ) && ctype_digit( $_POST[ "number_of_uploaded_files" ] ) )
  $NrOfUploadedFiles = $_POST[ "number_of_uploaded_files" ];
 
 // check if this resource has any jobs locked...

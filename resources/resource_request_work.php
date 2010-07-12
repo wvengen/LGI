@@ -43,7 +43,7 @@ else
 }
 
 // check if non-compulsory posts were set...
-if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && is_numeric( $_POST[ "start" ] ) )
+if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && ctype_digit( $_POST[ "start" ] ) )
 {
  if( strlen( $_POST[ "start" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
   return( LGI_Error_Response( 48, $ErrorMsgs[ 48 ] ) );
@@ -52,14 +52,15 @@ if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && is_numeric( $_P
 else 
  $JobIdStart = 0;
 
-if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" ) && is_numeric( $_POST[ "limit" ] ) )
+if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" ) && ctype_digit( $_POST[ "limit" ] ) )
 {
  if( strlen( $_POST[ "limit" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
   return( LGI_Error_Response( 49, $ErrorMsgs[ 49 ] ) );
  $JobIdLimit = $_POST[ "limit" ];
 }
 else
- $JobIdLimit = mysql_escape_string( $Config[ "DEFAULT_WORK_REQUEST_LIMIT" ] );
+ $JobIdLimit = $Config[ "DEFAULT_WORK_REQUEST_LIMIT" ];
+if( (int)( $JobIdLimit ) > $Config[ "MAX_WORK_REQUEST_LIMIT" ] ) $JobIdLimit = $Config[ "MAX_WORK_REQUEST_LIMIT" ];
 
 // check if this resource has any jobs locked...
 if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )

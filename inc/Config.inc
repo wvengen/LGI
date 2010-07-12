@@ -54,7 +54,10 @@ $Config[ "LGI_INACTIVITY_VALUE" ]        = 1800;                   // default ti
 $Config[ "LGI_ADMIN_GROUP_FOR_READ" ]    = "admin";                // default group for admins for reading / writing
 $Config[ "LGI_ADMIN_GROUP_FOR_WRITE" ]   = "admin";                
 
-$Config[ "DEFAULT_WORK_REQUEST_LIMIT" ]  = 10;                     // the default request limit for resources
-$Config[ "DEFAULT_JOB_STATUS_LIMIT" ]    = 20;                     // the default request limit for interfaces
+$Config[ "DEFAULT_WORK_REQUEST_LIMIT" ]  = 32;                     // the default request limit for resources
+$Config[ "DEFAULT_JOB_STATUS_LIMIT" ]    = 128;                    // the default request limit for interfaces
+
+$Config[ "MAX_WORK_REQUEST_LIMIT" ]  = 256;                        // the max request limit for resources
+$Config[ "MAX_JOB_STATUS_LIMIT" ]    = 4096;                       // the max request limit for interfaces
 
 ?>

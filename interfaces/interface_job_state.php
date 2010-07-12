@@ -34,7 +34,7 @@ $JobGroups = NormalizeCommaSeparatedField( $_POST[ "groups" ], "," );
 $JobUser = $_POST[ "user" ];
 
 // check if job_id was posted...
-if( isset( $_POST[ "job_id" ] ) && ( $_POST[ "job_id" ] != "" ) && is_numeric( $_POST[ "job_id" ] ) )
+if( isset( $_POST[ "job_id" ] ) && ( $_POST[ "job_id" ] != "" ) && ctype_digit( $_POST[ "job_id" ] ) )
 {
  if( strlen( $_POST[ "job_id" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
   return( LGI_Error_Response( 47, $ErrorMsgs[ 47 ] ) );
@@ -77,7 +77,7 @@ if( !$DetailMode )
  $Response .= " <application> ".$JobApplication." </application>";
 
  // see if start field was posted...
- if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && is_numeric( $_POST[ "start" ] ) ) 
+ if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && ctype_digit( $_POST[ "start" ] ) ) 
  {
   if( strlen( $_POST[ "start" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
    return( LGI_Error_Response( 48, $ErrorMsgs[ 48 ] ) );
@@ -87,7 +87,7 @@ if( !$DetailMode )
   $JobStart = 0;
 
  // see if limit field was posted...
- if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" )  && is_numeric( $_POST[ "limit" ] ) )
+ if( isset( $_POST[ "limit" ] ) && ( $_POST[ "limit" ] != "" )  && ctype_digit( $_POST[ "limit" ] ) )
  {
   if( strlen( $_POST[ "limit" ] ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] )
    return( LGI_Error_Response( 49, $ErrorMsgs[ 49 ] ) );
@@ -95,6 +95,7 @@ if( !$DetailMode )
  }
  else
   $JobLimit = $Config[ "DEFAULT_JOB_STATUS_LIMIT" ];
+ if( (int)( $JobLimit ) > $Config[ "MAX_JOB_STATUS_LIMIT" ] ) $JobLimit = $Config[ "MAX_JOB_STATUS_LIMIT" ];
 
  $Response .= " <start> ".$JobStart." </start>";
  $Response .= " <limit> ".$JobLimit." </limit>";

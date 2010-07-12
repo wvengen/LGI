@@ -67,7 +67,7 @@ else
  if( isset( $_POST[ "project_server" ] ) )
   $ProjectServer = $_POST[ "project_server" ];
 if( strlen( $ProjectServer ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] ) Exit_With_Text( "ERROR: Project_server field posted too big" );
-if( !is_numeric( $ProjectServer ) ) Exit_With_Text( "ERROR: Project_server is not a number" );
+if( !ctype_digit( $ProjectServer ) ) Exit_With_Text( "ERROR: Project_server is not a number" );
 
 // now verfiy the user using the basic browser interface... also make MySQL connection...
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );

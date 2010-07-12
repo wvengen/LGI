@@ -74,7 +74,7 @@ if( $ErrorCode !== 0 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $ErrorCode ] );
 if( isset( $Job_ID ) )               // we requested details on a job...
 {
  if( strlen( $Job_ID ) >= $Config[ "MAX_POST_SIZE_FOR_INTEGER" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 47 ] );
- if( !is_numeric( $Job_ID ) ) Exit_With_Text( "ERROR: Job_id not a number" );
+ if( !ctype_digit( $Job_ID ) ) Exit_With_Text( "ERROR: Job_id not a number" );
 
  $JobSpecs = Interface_Wait_For_Cleared_Spin_Lock_On_Job( $Job_ID, false );
  if( $JobSpecs === 15 ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ $JobSpecs ] );
@@ -142,16 +142,17 @@ else
  else
   if( isset( $_POST[ "start" ] ) )
    $Start = $_POST[ "start" ];
- if( !is_numeric( $Start ) ) Exit_With_Text( "ERROR: Start not a number" );
+ if( !ctype_digit( $Start ) ) Exit_With_Text( "ERROR: Start not a number" );
 
  // check if application is set in request... otherwise default to a nice number...
- $Limit = "64";
+ $Limit = $Config[ "DEFAULT_JOB_STATUS_LIMIT" ];
  if( isset( $_GET[ "limit" ] ) )
   $Limit = $_GET[ "limit" ];
  else
   if( isset( $_POST[ "limit" ] ) )
    $Limit = $_POST[ "limit" ];
- if( !is_numeric( $Limit ) ) Exit_With_Text( "ERROR: Limit not a number" );
+ if( !ctype_digit( $Limit ) ) Exit_With_Text( "ERROR: Limit not a number" );
+ if( (int)( $Limit ) > $Config[ "MAX_JOB_STATUS_LIMIT" ] ) $Limit = $Config[ "MAX_JOB_STATUS_LIMIT" ];
 
  Start_Table();
  Row1( "<center><font color='green' size='4'><b>Leiden Grid Infrastructure basic interface at ".gmdate( "j M Y G:i", time() )." UTC</b></font></center>" );
