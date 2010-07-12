@@ -47,7 +47,7 @@ if( !Resource_Has_Job_Locked( $ResourceData, $JobId ) )
  return( LGI_Error_Response( 14, $ErrorMsgs[ 14 ] ) ); 
 
 // start building the update query based on the posted fields...
-$UpdateQuery = "UPDATE job_queue SET job_id=".$JobId.", state_time_stamp=UNIX_TIMESTAMP()";
+$UpdateQuery = "UPDATE job_queue SET job_id=".$JobId.", state_time_stamp=UNIX_TIMESTAMP(), daemon_pulse=UNIX_TIMESTAMP()";
 
 if( isset( $_POST[ "state" ] ) && ( $_POST[ "state" ] != "" ) )
 {
