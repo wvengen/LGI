@@ -38,8 +38,7 @@ else
  $JobId = $_POST[ "job_id" ];
 }
 
-// query for the job specs... and update pulse...
-$JobQuery = mysql_query( "UPDATE job_queue SET daemon_pulse=UNIX_TIMESTAMP() WHERE job_id=".$JobId );
+// query for the job specs... 
 $JobQuery = mysql_query( "SELECT * FROM job_queue WHERE job_id=".$JobId );
 if( $JobQuery ) 
  $NrRows =  mysql_num_rows( $JobQuery );
@@ -58,6 +57,9 @@ mysql_free_result( $JobQuery );
 // check if this resource is allowed to get the state of this job...
 if( !FoundInCommaSeparatedField( $JobSpecs->target_resources, $ResourceData->resource_name, "," ) )
  return( LGI_Error_Response( 24, $ErrorMsgs[ 24 ] ) );
+
+// now update the pulse...
+$JobQuery = mysql_query( "UPDATE job_queue SET daemon_pulse=UNIX_TIMESTAMP() WHERE job_id=".$JobId );
 
 // build response for this job...
 $Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
