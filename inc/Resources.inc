@@ -242,12 +242,12 @@ function Resource_Lock_Job( $ResourceData, $JobId, $CheckTheResource = True )
 {
  global $ErrorMsgs;
 
- if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 11, $ErrorMsgs[ 11 ] ) );
-
  // check if this resource is allowed to lock the job by default...
  if( $CheckTheResource )
  {
+  if( Resource_Verify_Session( $ResourceData ) )
+   return( LGI_Error_Response( 11, $ErrorMsgs[ 11 ] ) );
+
   $queryresult = mysql_query( "SELECT lock_state,target_resources FROM job_queue WHERE job_id=".$JobId );  
 
   if( mysql_num_rows( $queryresult ) < 1 )                      // the job was not found in the db anymore...
@@ -281,15 +281,15 @@ function Resource_Lock_Job( $ResourceData, $JobId, $CheckTheResource = True )
 
 // -------------------------------------------------------------------- 
 
-function Resource_UnLock_Job( $ResourceData, $JobId, $CheckTheResource = True  )
+function Resource_UnLock_Job( $ResourceData, $JobId, $CheckTheResource = True )
 {
  global $ErrorMsgs;
 
- if( Resource_Verify_Session( $ResourceData ) )
-  return( LGI_Error_Response( 10, $ErrorMsgs[ 10 ] ) );
-
  if( $CheckTheResource )
  {
+  if( Resource_Verify_Session( $ResourceData ) )
+   return( LGI_Error_Response( 10, $ErrorMsgs[ 10 ] ) );
+
   // get lock data from running_locks table...
   $queryresult = mysql_query( "SELECT lock_id,job_id,resource_id,session_id FROM running_locks WHERE job_id=".$JobId );
 

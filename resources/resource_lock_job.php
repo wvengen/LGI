@@ -42,8 +42,8 @@ else
  $JobId = $_POST[ "job_id" ];
 }
 
-// now try to lock the job... return an error response if we failed somehow...
-if( Resource_Lock_Job( $ResourceData, $JobId ) )
+// now try to lock the job... return an error response if we failed somehow... we do need to check everything now...
+if( Resource_Lock_Job( $ResourceData, $JobId, True ) )
  return( LGI_Error_Response( 22, $ErrorMsgs[ 22 ] ) ); 
 
 // query for the lock specs...

@@ -45,6 +45,6 @@ Mon July 12 -- version 1.27
   table locks from algorithm in interface job locks. 
 - Using ctype_digit for checks and check limit values for 
   queries.
-
+- Optimized locking for resources a bit more.
 
 
