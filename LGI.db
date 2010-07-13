@@ -62,13 +62,10 @@ CREATE TABLE job_queue (
   PRIMARY KEY  (job_id),
   KEY (priority),
   KEY (state_time_stamp),
-  KEY (state(128)),
-  KEY (application(128)),
   KEY (application(128),priority),
   KEY (application(128),state_time_stamp),
   KEY (state(128),priority),
   KEY (state(128),state_time_stamp),
-  KEY (application(128),state(128)),
   KEY (application(128),state(128),priority),
   KEY (application(128),state(128),state_time_stamp)
 ) TYPE=InnoDB;

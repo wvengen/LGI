@@ -51,4 +51,6 @@ Tue July 13 -- version 1.27
   for updated stats in LGI.pdf.
 - Added some extra indices to job_queue to avoid MySQL sorting 
   a bit more. The number of slow_queries dropped significantly.
+- Removed duplicate indices.
+
 
