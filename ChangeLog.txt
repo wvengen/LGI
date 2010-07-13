@@ -49,4 +49,6 @@ Tue July 13 -- version 1.27
 - Removed small race-condition in daemon_pulse field.
 - Tweaked MySQL setup for better performance, ran tests again
   for updated stats in LGI.pdf.
+- Added some extra indices to job_queue to avoid MySQL sorting 
+  a bit more. The number of slow_queries dropped significantly.
 
