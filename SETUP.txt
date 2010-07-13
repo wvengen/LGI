@@ -371,7 +371,7 @@ and be your own X.509 CA.
     query_cache_size = 128M
     key_buffer_size = 128M
     sort_buffer_size = 128M
-    query_cache_type = on
+    query_cache_type = 1
     thread_cache_size = 64
     innodb_log_buffer_size = 16M
     innodb_flush_method = O_DIRECT
