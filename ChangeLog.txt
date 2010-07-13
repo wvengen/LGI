@@ -24,7 +24,7 @@ Sat June 26 -- version 1.26
 - Moved daemon/src into root, adjusted makefile and so on.
 
 
-Mon July 12 -- version 1.27
+Tue July 13 -- version 1.27
 ---------------------------
 
 - Adapted daemon and tools to use persistent connections by
@@ -47,4 +47,6 @@ Mon July 12 -- version 1.27
   queries.
 - Optimized locking for resources a bit more.
 - Removed small race-condition in daemon_pulse field.
+- Tweaked MySQL setup for better performance, ran tests again
+  for updated stats in LGI.pdf.
 
