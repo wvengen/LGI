@@ -24,7 +24,7 @@ Sat June 26 -- version 1.26
 - Moved daemon/src into root, adjusted makefile and so on.
 
 
-Tue July 13 -- version 1.27
+Wed July 14 -- version 1.27
 ---------------------------
 
 - Adapted daemon and tools to use persistent connections by
@@ -52,5 +52,11 @@ Tue July 13 -- version 1.27
 - Added some extra indices to job_queue to avoid MySQL sorting 
   a bit more. The number of slow_queries dropped significantly.
 - Removed duplicate indices.
+- Use explicitly specified index for work requests and job
+  lists so no 'ORDER BY' is needed to sort. Updated stats and
+  documentation. Big improvements gained.
+- Removed some php error messages for repocitories.
+
+
 
 

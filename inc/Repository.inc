@@ -69,9 +69,12 @@ function CreateRepositoryResourceFile( $Resources = "" )
   exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"echo $Resources > $RepositoryResourceFile\"" );
  else
  {
-  $File = fopen( $RepositoryResourceFile, "w" );
-  fwrite( $File, $Resources );
-  fclose( $File );
+  @$File = fopen( $RepositoryResourceFile, "w" );
+  if( $File )
+  {
+   fwrite( $File, $Resources );
+   fclose( $File );
+  }
  }
 
 }
@@ -127,10 +130,13 @@ function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile,
   if( !is_dir( $RepositoryDir ) )
   {
    $OldMask = umask( 0 );
-   mkdir( $RepositoryDir, 0770 );
-   $File = fopen( "$RepositoryDir/.LGI_repository_write_access", "w" );
-   fwrite( $File, $WriteAccess );
-   fclose( $File );
+   @mkdir( $RepositoryDir, 0770 );
+   $File = @fopen( "$RepositoryDir/.LGI_repository_write_access", "w" );
+   if( $File )
+   {
+    fwrite( $File, $WriteAccess );
+    fclose( $File );
+   }
    umask( $OldMask );
   }
  }

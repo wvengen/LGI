@@ -380,7 +380,7 @@ and be your own X.509 CA.
     innodb_log_archive = 0
     innodb_buffer_pool_size = 2048M
     innodb_additional_mem_pool_size = 8M
-    innodb_file_io_threads = 64
+    innodb_file_io_threads = 32
     innodb_lock_wait_timeout = 50
     innodb_thread_concurrency = 32
 

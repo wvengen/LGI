@@ -418,37 +418,42 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
  $State = mysql_escape_string( $State );
  $Application = mysql_escape_string( $Application );
 
- $Query = "SELECT job_id,state,application,state_time_stamp,target_resources,owners,read_access,write_access,job_specifics FROM job_queue WHERE ( ";
+ $Query1 = "SELECT job_id,state,application,state_time_stamp,target_resources,owners,read_access,write_access,job_specifics FROM job_queue ";
+ $Query2 = "WHERE ( ";
+ $IndexNr = 0;
 
  $Owner = mysql_escape_string( $OwnerArray[ 1 ] );
  $RegExpUser = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
- $Query .= " ( read_access REGEXP '".$RegExpUser."' )";
+ $Query2 .= " ( read_access REGEXP '".$RegExpUser."' )";
  for( $o = 2; $o <= $OwnerArray[ 0 ]; $o++ )
  {
   $Owner = mysql_escape_string( $OwnerArray[ $o ] );
   $RegExpUser = MakeRegularExpressionForCommaSeparatedField( $Owner, "," );
-  $Query .= " OR ( read_access REGEXP '".$RegExpUser."' )";
+  $Query2 .= " OR ( read_access REGEXP '".$RegExpUser."' )";
  }
 
  if( isset( $State ) && ( $State != "" ) && ( $State != "any" ) )
  {
   if( $State[ 0 ] == "!" )
-   $Query .= " ) AND ( state!='".substr($State,1)."'";
+   $Query2 .= " ) AND ( state!='".substr($State,1)."'";
   else
-   $Query .= " ) AND ( state='".$State."'";
+   $Query2 .= " ) AND ( state='".$State."'";
+  $IndexNr = $IndexNr + 2;
  }
 
  if( isset( $Application ) && ( $Application != "" ) && ( $Application != "any" ) )
  {
   if( $Application[ 0 ] == "!" )
-   $Query .= " ) AND ( application!='".substr($Application,1)."'";
+   $Query2 .= " ) AND ( application!='".substr($Application,1)."'";
   else
-   $Query .= " ) AND ( application='".$Application."'";
+   $Query2 .= " ) AND ( application='".$Application."'";
+  $IndexNr = $IndexNr + 1;
  }
 
- $Query .= " ) ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start;
+ $Query2 .= " ) LIMIT ".$Limit." OFFSET ".$Start;
+ $Query1 .= "USE INDEX(interface_index_$IndexNr) ";
 
- return( $Query );
+ return( $Query1.$Query2 );
 }
 
 // -------------------------------------------------------------------- 

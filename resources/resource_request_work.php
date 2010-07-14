@@ -80,7 +80,7 @@ $RegExpResource = mysql_escape_string( MakeRegularExpressionForCommaSeparatedFie
 $RegExpAny = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( "any", "," ) );
 $Application = mysql_escape_string( $Application );
 
-$TheWorkQuery = mysql_query( "SELECT job_id FROM job_queue WHERE application='".$Application."' AND state='queued' AND lock_state=0 AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' ) ORDER BY priority LIMIT ".$JobIdLimit." OFFSET ".$JobIdStart );
+$TheWorkQuery = mysql_query( "SELECT job_id FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND lock_state=0 AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' ) LIMIT ".$JobIdLimit." OFFSET ".$JobIdStart );
 
 if( $TheWorkQuery )
  $NrOfPossibleJobs = mysql_num_rows( $TheWorkQuery );

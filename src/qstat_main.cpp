@@ -345,7 +345,7 @@ int main( int argc, char *argv[] )
  {
   int TotalNrOfJobs = 0;
   int NrOfJobs = 0;
-  int Limit = 256;
+  int Limit = 1024;
   int Offset = 0;
   char OffsetStr[ 64 ];
   char LimitStr[ 64 ];
