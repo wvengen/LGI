@@ -431,9 +431,16 @@ and be your own X.509 CA.
   Each project has an independant database on the web server, by creating a
   second database, as described above, a second project has been setup.
 
-  Once this is done; you can start the scheduler on the background like:
+  Edit the /var/www/html/LGI/scheduler/check_running script to use the correct
+  LGI_ROOT directory to run the scheduler. Now you can start the scheduler on 
+  the background like:
 
-    nohup /var/www/html/LGI/scheduler/scheduler.php & 
+    /var/www/html/LGI/scheduler/check_running 
+
+  You can also add a crontab entry to automatically check if the scheduler is
+  running once per hour:
+
+    1 * * * * /var/www/html/LGI/scheduler/check_running
 
   Your project servers has been setup now and can be used!
 
