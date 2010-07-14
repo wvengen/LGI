@@ -55,8 +55,8 @@ Wed July 14 -- version 1.27
 - Use explicitly specified index for work requests and job
   lists so no 'ORDER BY' is needed to sort. Updated stats and
   documentation. Big improvements gained.
-- Removed some php error messages for repocitories.
-
+- Removed some php error messages for repositories.
+- Added a check_running script for the LGI scheduler.
 
 
 

@@ -1,0 +1,24 @@
+#!/bin/bash
+export LGI_ROOT=${HOME}/LGI/scheduler
+
+if [ -f ${LGI_ROOT}/scheduler.pid ]
+then
+
+ PID=`tail -n1 ${LGI_ROOT}/scheduler.pid`
+ SPID=`ps -p ${PID} -o pid=`
+
+ if [ "${SPID}" == "" ]
+ then
+    DATE=`date`
+    echo "At ${DATE} the LGI scheduler daemon was not running anymore, restarting..."
+    ${LGI_ROOT}/scheduler.php &
+    ps -C scheduler.php -o pid=,user | grep ${USER} | awk '{ print $1 }' > ${LGI_ROOT}/scheduler.pid
+ fi
+
+else
+
+ echo No scheduler.pid found, starting the scheduler daemon...
+ ${LGI_ROOT}/scheduler.php &
+ ps -C scheduler.php -o pid=,user | grep ${USER} | awk '{ print $1 }' > ${LGI_ROOT}/scheduler.pid
+
+fi
