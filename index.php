@@ -175,10 +175,6 @@ be found <a href="docs/ExampleInterface.py">here</a>.<br>
 <br>
 The latest ChangeLog.txt can be found <a href="ChangeLog.txt">here</a>.<br>
 <br>
-The report written for NCF-NWO on the LGI deployment project (see
-support <a href="#Support">below</a>) can be found <a
- href="docs/LGI_report.pdf">here</a> (pdf).<br>
-<br>
 All these documents are also part of the LGI middleware distribution
 you can dowload <a href="#Dowload">below</a>.<br>
 <br>
@@ -288,13 +284,12 @@ The development of LGI has been supported by the <a
 of the <a href="http://www.chem.leidenuniv.nl/">Leiden Institute of
 Chemistry</a> of the <a href="http://leidenuniv.nl">Leiden University</a>.
 The deployment of LGI for the Theoretical Chemistry Group on their <a
- href="http://theorchem.leidenuniv.nl/en/facilities">local clusters</a>
+ href="http://theorchem.leidenuniv.nl/facilities">local clusters</a>
 and the <a href="http://www.sara.nl">national (dutch) super computers</a>
 has been supported by <a
  href="http://www.nwo.nl/nwohome.nsf/pages/ACPP_4X6R5C_Eng">NWO-NCF</a>
 through grant nr. <a
- href="http://www.nwo.nl/projecten.nsf/pages/2300152441">NRG-2008.02</a>
-(see documentation <a href="#Documentation">above</a>).<br>
+ href="http://www.nwo.nl/projecten.nsf/pages/2300152441">NRG-2008.02</a>.<br>
 <br>
 <a href="#Leiden_Grid_Infrastructure">[top]</a><br>
 <br>
