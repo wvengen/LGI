@@ -660,7 +660,7 @@ int Daemon::RequestWorkCycle( void )
        }
 
        Offset += Limit;
-      } while( ( NrOfJobs > ( Limit >> 1 ) ) && ( !FoundJob ) && ReadyForScheduling );
+      } while( ( NrOfJobs > ( Limit >> 1 ) ) && ( !FoundJob ) && ReadyForScheduling && ( Offset < ( Limit << 4 ) ) );
 
      }
      else

@@ -59,8 +59,10 @@ Wed July 14 -- version 1.27
 - Added a check_running script for the LGI scheduler.
 
 
-Fri July 16 -- version 1.28
----------------------------
+Wed August 11 -- version 1.28
+-----------------------------
 
 - Removed some old documentation and added new.
+- Allow for project server scheduler unlimited run time.
+- Limited the number of work request a resource can do.
 

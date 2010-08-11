@@ -75,19 +75,24 @@ $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_mas
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 $Response .= " <application> ".$Application." </application>";
 
-// start the work query...
-$RegExpResource = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( $ResourceData->resource_name, "," ) );
-$RegExpAny = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( "any", "," ) );
-$Application = mysql_escape_string( $Application );
-
-$TheWorkQuery = mysql_query( "SELECT job_id FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND lock_state=0 AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' ) LIMIT ".$JobIdLimit." OFFSET ".$JobIdStart );
-
-if( $TheWorkQuery )
- $NrOfPossibleJobs = mysql_num_rows( $TheWorkQuery );
-else
+if( (int)( $JobIdStart ) >= 16 * (int)( $JobIdLimit ) )      // make sure we have not too many requests from a resource...
  $NrOfPossibleJobs = 0;
+else
+{
+ // start the work query...
+ $RegExpResource = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( $ResourceData->resource_name, "," ) );
+ $RegExpAny = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( "any", "," ) );
+ $Application = mysql_escape_string( $Application );
 
-// now if there is work...
+ $TheWorkQuery = mysql_query( "SELECT job_id FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND lock_state=0 AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' ) LIMIT ".$JobIdLimit." OFFSET ".$JobIdStart );
+
+ if( $TheWorkQuery )
+  $NrOfPossibleJobs = mysql_num_rows( $TheWorkQuery );
+ else
+  $NrOfPossibleJobs = 0;
+}
+
+// now if there was work...
 if( $NrOfPossibleJobs >= 1 )  
 {
  $ActualNrOfJobs = 0;
