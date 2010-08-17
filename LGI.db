@@ -108,7 +108,7 @@ CREATE TABLE running_locks (
   session_id int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (lock_id),
   KEY (session_id),
-  KEY (job_id),
+  UNIQUE KEY (job_id),
   KEY (session_id,resource_id),
   KEY (job_id,session_id,resource_id)
 ) TYPE=InnoDB;
