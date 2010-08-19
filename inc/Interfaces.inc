@@ -450,8 +450,17 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
   $IndexNr = $IndexNr + 1;
  }
 
- $Query2 .= " ) LIMIT ".$Limit." OFFSET ".$Start;
- $Query1 .= "USE INDEX(interface_index_$IndexNr) ";
+ // now introduce a dirty hack to make sure MySQL does use the index and sort on state_time_stamp...
+ $Query1 .= "FORCE INDEX(interface_index_$IndexNr) ";
+ if( $IndexNr ) 
+ {
+  $Query2 .= " ) LIMIT ".$Limit." OFFSET ".$Start; 
+ }
+ else
+ {
+  // apparently when the table is small, it sometimes ignores the index in this specific case...
+  $Query2 .= " ) ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start; 
+ }
 
  return( $Query1.$Query2 );
 }

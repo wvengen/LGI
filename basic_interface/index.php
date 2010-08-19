@@ -56,8 +56,9 @@ else
 if( strlen( $Project ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 58 ] );
 $Project = mysql_escape_string( $Project );
 
-// set the session id...
-$SID = $_SESSION[ "sid" ] = md5( $User.$Groups.$Project.uniqid( rand(), TRUE ) );
+// set the session id if it wasn't set already...
+if( !isset( $_SESSION[ "sid" ] )) $_SESSION[ "sid" ] = md5( $User.$Groups.$Project.uniqid( rand(), TRUE ) );
+$SID = $_SESSION[ "sid" ];
 
 // now verfiy the user using the basic browser interface... also make MySQL connection...
 $ErrorCode = Interface_Verify( $Project, $User, $Groups, false );
