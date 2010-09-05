@@ -1,0 +1,53 @@
+#!/bin/bash
+
+# some settings...
+export CERT_PASSWD="m@rks0m3rs007"
+export VOMS="ncf"
+export X509_USER_PROXY=./x509_proxy_cert
+
+# register at myproxy px.grid.sara.nl...
+echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
+
+# create new proxy cert for 196 hours...
+echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &> /dev/null
+
+# create JDL for this job script...
+cat > bash.submitted.jdl << EOF_JDL
+type = "Job";
+jobtype = "Normal";
+executable = "/bin/bash";
+arguments = "LGI_input";
+stdoutput = "LGI_output";
+stderror = "stderr";
+outputsandbox = { "LGI_output", "stderr" };
+inputsandbox = { "LGI_input" };
+shallowretrycount = 3;
+requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 30 );
+myproxyserver = "px.grid.sara.nl";
+EOF_JDL
+
+# create and submit new job from JDL...
+export RUNNING=""
+while [ "${RUNNING}" == "" ]
+do
+ glite-wms-job-submit -a -o ${HOME}/my-glite-jobs bash.submitted.jdl | grep https | grep 9000 | tail -1 &> ./running
+ export RUNNING=`cat ./running | grep -E '^https'`
+done
+
+# wait until job is finished, sleep a bit...
+export JOB_STATE=""
+while [ "${JOB_STATE}" == "" ]
+do
+    sleep 300
+    export JOB_ID=`cat ./running`
+    export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+done
+
+# retrieve the output now...
+glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
+
+# send back the output to LGI server...
+cp ./output-files/*/LGI_output ./LGI_output &> /dev/null
+
+# and we are finished...
+touch ./finished
