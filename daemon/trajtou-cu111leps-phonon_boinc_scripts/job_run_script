@@ -1,0 +1,85 @@
+#!/usr/bin/php -q
+<?php
+
+$LGI_HOME_DIR = "/home/boinc/LGI";
+
+include_once "$LGI_HOME_DIR/inc/Utils.inc";
+
+$LGI_DIR = getcwd();
+
+$JobSpecs = file_get_contents( "$LGI_DIR/LGI_job_specifics" );
+$RepoURL = Parse_XML( $JobSpecs, "repository_url", $Attrs );
+
+if( $RepoURL != "" )
+{
+ $RepoContent = shell_exec( "$LGI_HOME_DIR/daemon/bin/LGI_filetransfer list -x $RepoURL" );
+ $NrOfFiles = intval( Parse_XML( $RepoContent, "number_of_files", $Attrs ) );
+ $FileList = "";
+ $Pos = 0;
+
+ for( $f = 0; $f < $NrOfFiles; $f++ )
+ {
+  $FileData = Parse_XML_Extended( $RepoContent, "file", $Attr, $Pos );
+  $FileName = Parse_XML( $FileData, "file_name", $Attrs );
+  $FileList = "$FileList $FileName";
+ }
+
+ mkdir( "repository" );
+ chdir( "repository" );
+ shell_exec( "$LGI_HOME_DIR/daemon/bin/LGI_filetransfer download -j $LGI_DIR $RepoURL $FileList" );
+ chdir( $LGI_DIR );
+}
+
+$InputFile = "$LGI_DIR/repository/cu111leps_phonon.inp";
+if( !file_exists( $InputFile ) ) $InputFile = "$LGI_DIR/LGI_input";
+
+chdir( "/home/boinc/Classical/html/user" );
+
+include_once( "../inc/db.inc" );
+include_once( "../inc/util.inc" );
+
+db_init();
+
+$config = get_config();
+
+$bin_dir = parse_config( $config, "<bin_dir>" );
+$download_dir = parse_config( $config, "<download_dir>" );
+$upload_dir = parse_config( $config, "<upload_dir>" );
+$template_dir = parse_config( $config, "<template_dir>" );
+$config_dir = parse_config( $config, "<project_dir>" );
+$createworkprogram = parse_config( $config, "<create_work_program>" );
+
+$extendedjobname = "LGI_trajtou-phonon_queue_job_".random_string();
+$extendedjobname = escapeshellcmd( $extendedjobname );
+
+$wu_template = $template_dir."/LGI_queue_trajtou-phonon_work_unit_template";
+$result_template = $template_dir."/LGI_queue_trajtou-phonon_result_unit_template";
+
+$temporaryinputfile = $extendedjobname;
+
+$command_to_submit = $bin_dir."/".$createworkprogram;
+$command_to_submit .= " -config_dir ".$config_dir;
+$command_to_submit .= " -appname trajtou-cu111leps-phonon -wu_name ".$extendedjobname;
+$command_to_submit .= " -wu_template ".$wu_template." -result_template ".$result_template;
+$command_to_submit .= " -priority 5 -batch 1 ";
+$command_to_submit .= $temporaryinputfile;
+$command_to_submit = escapeshellcmd( $command_to_submit );
+$command_to_submit = "cd ".$config_dir."; ".$command_to_submit." &> /dev/null";
+
+$temporaryinputfile = $download_dir."/".$temporaryinputfile;
+
+copy( $InputFile, $temporaryinputfile );
+
+system( $command_to_submit );
+
+unlink( $temporaryinputfile );
+
+chdir( $LGI_DIR );
+
+$workunit = mysql_fetch_object( mysql_query( "SELECT * FROM workunit WHERE name='".$extendedjobname."'" ) );
+
+$file = fopen( "running", "w" );
+fwrite( $file, $workunit -> id );
+fclose( $file );
+
+?>
