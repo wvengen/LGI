@@ -47,7 +47,7 @@ done
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
 
 # send back the output to LGI server...
-cp ./output-files/*/LGI_output ./LGI_output &> /dev/null
+cp ./output-files/LGI_output ./LGI_output &> /dev/null
 
 # and we are finished...
 touch ./finished
