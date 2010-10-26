@@ -1,5 +1,6 @@
 #!/bin/bash
 export LGI_ROOT=${HOME}/LGI/daemon
+export OLD_ROOT=`pwd`
 
 if [ -f ${LGI_ROOT}/LGI.pid ]
 then
@@ -16,14 +17,14 @@ then
        DATE=`date +%s`
        mv ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.log_${DATE}
     fi
-    ${LGI_ROOT}/bin/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
+    cd ${LGI_ROOT}; ${LGI_ROOT}/bin/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg; cd ${OLD_ROOT}
     ps -C LGI_daemon -o pid=,user | grep ${USER} | awk '{ print $1 }' > ${LGI_ROOT}/LGI.pid
  fi
 
 else
 
  echo No LGI.pid found, starting the daemon...
- ${LGI_ROOT}/bin/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg
+ cd ${LGI_ROOT}; ${LGI_ROOT}/bin/LGI_daemon -d -l ${LGI_ROOT}/LGI.log ${LGI_ROOT}/LGI.cfg; cd ${OLD_ROOT}
  ps -C LGI_daemon -o pid=,user | grep ${USER} | awk '{ print $1 }' > ${LGI_ROOT}/LGI.pid
 
 fi

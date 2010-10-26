@@ -1,5 +1,6 @@
 #!/bin/bash
 export LGI_ROOT=${HOME}/LGI/scheduler
+export OLD_ROOT=`pwd`
 
 if [ -f ${LGI_ROOT}/scheduler.pid ]
 then
@@ -11,14 +12,18 @@ then
  then
     DATE=`date`
     echo "At ${DATE} the LGI scheduler daemon was not running anymore, restarting..."
+    cd ${LGI_ROOT}
     ${LGI_ROOT}/scheduler.php &
+    cd ${OLD_ROOT}
     ps -C scheduler.php -o pid=,user | grep ${USER} | awk '{ print $1 }' > ${LGI_ROOT}/scheduler.pid
  fi
 
 else
 
  echo No scheduler.pid found, starting the scheduler daemon...
+ cd ${LGI_ROOT}
  ${LGI_ROOT}/scheduler.php &
+ cd ${OLD_ROOT}
  ps -C scheduler.php -o pid=,user | grep ${USER} | awk '{ print $1 }' > ${LGI_ROOT}/scheduler.pid
 
 fi

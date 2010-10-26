@@ -4,13 +4,14 @@
 //  |                        Ssl.inc                         |
 // []--------------------------------------------------------[]
 //  |                                                        |
-//  | AUTHOR:     M.F.Somers                                 |
-//  | VERSION:    1.00, August 2007.                         |
+//  | AUTHOR:     M.F.Somers, W. van Engen                   |
+//  | VERSION:    1.01, September 2010.                      |
 //  | USE:        Handy ssl related subroutines...           |
 //  |                                                        |
 // []--------------------------------------------------------[]
 //
 //
+// Copyright (C) 2010 Stichting FOM
 // Copyright (C) 2007 M.F. Somers, Theoretical Chemistry Group, Leiden University
 //
 // This is free software; you can redistribute it and/or modify it under the terms of
@@ -24,17 +25,22 @@ require_once( '../inc/Response.inc' );
 
 // -------------------------------------------------------------------- 
 
+function _SSL_Get_Server_Variable( $Var ) {
+ if ( !empty( $GLOBALS[ 'HTTP_SERVER_VARS' ] ) )
+   $Ret = $GLOBALS[ 'HTTP_SERVER_VARS' ][ $Var ];
+ else
+   $Ret = $_SERVER[ $Var ];
+ return( $Ret ? $Ret : '' );
+}
+
+// -------------------------------------------------------------------- 
+
 function SSL_Verify_Client( $ExitOnError = true )
 {
- global $Config;
  global $ErrorMsgs;
 
  // See if a valid CA-signed client certificate was used to connect
-
- if( !isset( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_VERIFY" ] ) )
-  return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], $ExitOnError ) );
-
- if( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_VERIFY" ] != "SUCCESS" )
+ if( _SSL_Get_Server_Variable( "SSL_CLIENT_VERIFY" ) != "SUCCESS" )
   return( LGI_Error_Response( 2, $ErrorMsgs[ 2 ], $ExitOnError ) );
 
  return( 0 );
@@ -44,30 +50,21 @@ function SSL_Verify_Client( $ExitOnError = true )
 
 function SSL_Get_Common_Name( )
 {
- if( isset(  $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_S_DN_CN" ] ) )
-  return( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_S_DN_CN" ] );
- else
-  return( "" );
+ return( _SSL_Get_Server_Variable( "SSL_CLIENT_S_DN_CN" ) );
 }
 
 // -------------------------------------------------------------------- 
 
 function SSL_Get_Full_Client_Certificate( )
 {
- if( isset( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_CERT" ] ) )
-  return( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_CLIENT_CERT" ] );
- else
-  return( "" );
+ return( _SSL_Get_Server_Variable( "SSL_CLIENT_CERT" ) );
 }
 
 // -------------------------------------------------------------------- 
 
 function SSL_Get_Full_Server_Certificate( )
 {
- if( isset( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_SERVER_CERT" ] ) )
-  return( $GLOBALS[ "HTTP_SERVER_VARS" ][ "SSL_SERVER_CERT" ] );
- else
-  return( "" );
+ return( _SSL_Get_Server_Variable( "SSL_SERVER_CERT" ) );
 }
 
 // --------------------------------------------------------------------

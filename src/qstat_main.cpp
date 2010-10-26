@@ -39,6 +39,16 @@ string KeyFile, CertificateFile, CACertificateFile, ServerURL, Response,
        Project, State, Application, User, Groups, Job_Id, ConfigDir, BinData;
 int OutputInXML = 0;
 int ListServers = 0;
+int LogLevel = 0;
+
+// ----------------------------------------------------------------------
+
+int IsNumber( char *String )
+{
+ for( int i = 0; String[ i ]; ++i )
+  if( !isdigit( String[ i ] ) ) return( 0 );
+ return( 1 );
+}
 
 // ----------------------------------------------------------------------
 
@@ -62,6 +72,8 @@ void PrintHelp( char *ExeName )
  cout << "-a application             specify application to query about. default is any." << endl;
  cout << "-s state                   specify job state to query about. default is any." << endl;
  cout << "-x                         output in XML format." << endl;
+ cout << "-v                         log to stderr." << endl;
+ cout << "-vv                        log even more to stderr." << endl;
  cout << "-l                         report project server list." << endl;
  cout << "-L                         report project resource list." << endl;
  cout << "-c directory               specify configuration directory to read. default is ~/.LGI. use the options below to overrule those settings." << endl; 
@@ -78,9 +90,6 @@ void PrintHelp( char *ExeName )
 
 int main( int argc, char *argv[] )
 {
- // turn logging facilities off...
- InitializeLogger( 0 );
-
  // setup default values from default configuration directory...
  ConfigDir = string( getenv( "HOME" ) ) + "/.LGI";
 
@@ -100,11 +109,15 @@ int main( int argc, char *argv[] )
     PrintHelp( argv[ 0 ] );
     return( 0 );
   } else if( !strcmp( argv[ i ], "-x" ) ) {
-     OutputInXML = 1;
+    OutputInXML = 1;
   } else if( !strcmp( argv[ i ], "-l" ) ) {
-     ListServers |= 1;
+    ListServers |= 1;
   } else if( !strcmp( argv[ i ], "-L" ) ) {
-     ListServers |= 2;
+    ListServers |= 2;
+  } else if( !strcmp( argv[ i ], "-v" ) ) {
+    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING | DEBUG_LOGGING;
+  } else if( !strcmp( argv[ i ], "-vv" ) ) {
+    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING | DEBUG_LOGGING | VERBOSE_DEBUG_LOGGING;
   } else if( !strcmp( argv[ i ], "-c" ) ) {
     if( argv[ ++i ] )
     {
@@ -196,9 +209,7 @@ int main( int argc, char *argv[] )
      return( 1 );
     }
   } else {
-    int Dummy;
-
-    if( sscanf( argv[ i ], "%d", &Dummy ) == 1 )
+    if( IsNumber( argv[ i ] ) )
      Job_Id = string( argv[ i ] );
     else
     {
@@ -228,6 +239,9 @@ int main( int argc, char *argv[] )
   PrintHelp( argv[ 0 ] );
   return( 1 );
  }
+
+ // setup logging as requested...
+ InitializeLogger( LogLevel, "/dev/stderr" );
 
  curl_global_init( CURL_GLOBAL_ALL );
 

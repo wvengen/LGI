@@ -396,12 +396,11 @@ and be your own X.509 CA.
     Enter resource url: https://exampleserver.somewhere.org/LGI
     Enter certificate file: /var/www/html/LGI/certificates/exampleCA.crt
     Enter project server flag: 1
-    Enter servers to update: 
-    Warning: this change to DB has not been recorded as an update in the DB!
+    Enter servers to update: any
 
-  Just make sure you do not specify any servers to be updated otherwise this 
-  change to the database will also be recorded as an update for the rest of
-  the project.
+  Just make sure you set the servers to be updated to 'any'. This will 
+  make sure that this insert is recorded as update nr 1 and when adding
+  slave servers later on, everything will be automatically synchronized.
  
 - Make sure you edit the project web server configuration file 
   '/var/www/html/LGI/inc/Config.inc':
@@ -479,12 +478,14 @@ slave database:
     Enter resource url: https://exampleserver.somewhere.org/LGI
     Enter certificate file: /var/www/html/LGI/certificates/exampleserver.crt
     Enter project server flag: 1
-    Enter servers to update:
-    Warning: this change to DB has not been recorded as an update in the DB!
+    Enter servers to update: any
 
-Again be sure not to specify any servers to be updated so this change to the
-database is not recorded as an update. Now insert the slave server details 
-into the master server database:
+Again be sure to set the servers to be updated to 'any'. This will make sure
+that the first update of this slave and of the master server are synchronized.
+All other updates from the master server (including the addition of this
+slave below) will be automatically picked up by this slave.
+
+Now insert the slave server details into the master server database:
 
   (on the master server)
 

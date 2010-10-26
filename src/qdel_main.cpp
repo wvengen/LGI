@@ -39,6 +39,15 @@ vector<string> Job_Ids;
 
 // ----------------------------------------------------------------------
 
+int IsNumber( char *String )
+{
+ for( int i = 0; String[ i ]; ++i )
+  if( !isdigit( String[ i ] ) ) return( 0 );
+ return( 1 );
+}
+
+// ----------------------------------------------------------------------
+
 string ReadLineFromFile( string FileName )
 {
  fstream File( FileName.c_str(), fstream::in );
@@ -172,9 +181,7 @@ int main( int argc, char *argv[] )
      return( 1 );
     }
   } else {
-    int Dummy;
-
-    if( sscanf( argv[ i ], "%d", &Dummy ) == 1 )
+    if( IsNumber( argv[ i ] ) )
      Job_Ids.push_back( string( argv[ i ] ) );
     else
     {

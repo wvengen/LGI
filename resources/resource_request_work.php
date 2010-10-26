@@ -75,7 +75,22 @@ $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_mas
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 $Response .= " <application> ".$Application." </application>";
 
-if( (int)( $JobIdStart ) >= 16 * (int)( $JobIdLimit ) )      // make sure we have not too many requests from a resource...
+if( (int)( $JobIdLimit ) <= 0 )     // see if we want a job-count only for pilotjob scheduling purposes...
+{
+ $RegExpResource = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( $ResourceData->resource_name, "," ) );
+ $RegExpAny = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( "any", "," ) );
+ $Application = mysql_escape_string( $Application );
+
+ $TheWorkQuery = mysql_query( "SELECT COUNT(job_id) AS count FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."'" );
+ $TheData = mysql_fetch_object( $TheWorkQuery );
+ mysql_free_result( $TheWorkQuery );
+
+ $NrOfPossibleJobs = $TheData -> count;
+ $Response .= " <number_of_jobs> $NrOfPossibleJobs </number_of_jobs>"; 
+ return( LGI_Response( $Response ) );
+}
+
+if( (int)( $JobIdStart ) >= 16 * (int)( $JobIdLimit ) )      // otherwise, make sure we have not too many requests from a resource...
  $NrOfPossibleJobs = 0;
 else
 {

@@ -39,6 +39,15 @@ Daemon *TheDaemon = NULL;
 
 // ----------------------------------------------------------------------
 
+int IsNumber( char *String )
+{
+ for( int i = 0; String[ i ]; ++i )
+  if( !isdigit( String[ i ] ) ) return( 0 );
+ return( 1 );
+}
+
+// ----------------------------------------------------------------------
+
 void TheSignalHandler( int S )
 {
  if( TheDaemon != NULL ) 
@@ -118,17 +127,19 @@ int main( int argc, char *argv[] )
     return( 1 );
    }
   } else if( !strcmp( argv[ i ], "-ft" ) ) {
+   FastCycleTime = 0;
    if( argv[ ++i ] )
-    FastCycleTime = atoi( argv[ i ] );
-   else
+    FastCycleTime = ( IsNumber( argv[ i ] ) ? atoi( argv[ i ] ) : 0 );
+   if( !FastCycleTime )
    {
     PrintHelp( argv[ 0 ] );
     return( 1 );
    }
   } else if( !strcmp( argv[ i ], "-st" ) ) {
+   SlowCycleTime = 0;
    if( argv[ ++i ] )
-    SlowCycleTime = atoi( argv[ i ] );
-   else
+    SlowCycleTime = ( IsNumber( argv[ i ] ) ? atoi( argv[ i ] ) : 0 );
+   if( !SlowCycleTime )
    {
     PrintHelp( argv[ 0 ] );
     return( 1 );

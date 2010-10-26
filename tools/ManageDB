@@ -14,6 +14,9 @@ MYSQL_USER="LGI"
 MYSQL_PASSWD=""
 MYSQL_DB=""
 
+LGI_ROOT=${HOME}/LGI/scheduler
+OLD_ROOT=`pwd`
+
 # ----------------------------------------------------
 
 function print_usage {
@@ -31,9 +34,11 @@ function run_mysql {
 function run_update {
  ESCAPEDQUERY=`echo -e "${1}" | sed "s/'/\\\\\'/g"`
  UPDATEQUERY="INSERT INTO updates SET servers='${2}', update_query='${ESCAPEDQUERY}'"
+ cd ${LGI_ROOT}
  php -q -a << EOFS &> /dev/null
 <?php require_once( '../inc/Servers.inc' ); Select_MySQL_DataBase( "${MYSQL_DB}" ); Server_Check_And_Perform_Updates(); ?>
 EOFS
+ cd ${OLD_ROOT}
  run_mysql "${1}"
  [ $? == 0 ] && run_mysql "${UPDATEQUERY}"
 }

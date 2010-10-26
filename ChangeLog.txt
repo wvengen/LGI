@@ -74,3 +74,17 @@ Thu August 19 -- version 1.28
   XSS attacks) is not reset each time index.php is hit.
 
 
+Tue October 26 -- version 1.29
+------------------------------
+
+- Patched Ssl.inc to work with newer PHP 5.x (patch of Willem v.
+  Engen).
+- Added 'cd' trick to some tool scripts so they can be run from 
+  any other directory.
+- Added extra logging to stderr option for qstat tool.
+- Made sure that for CLI tools arguments are numeric if needed.
+- Added job count feature to request work for resources for future
+  pilot job frameworks.
+
+
+

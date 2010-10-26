@@ -29,6 +29,15 @@
 
 // ----------------------------------------------------------------------
 
+int IsNumber( char *String )
+{
+ for( int i = 0; String[ i ]; ++i )
+  if( !isdigit( String[ i ] ) ) return( 0 );
+ return( 1 );
+}
+
+// ----------------------------------------------------------------------
+
 string ReadStringFromFile( fstream &File )
 {
  char TempBuffer[ 1024 ];
@@ -113,9 +122,10 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-n" ) ) {
     PrintNumberOption = 1;
   } else if( !strcmp( argv[ i ], "-e" ) ) {
+    PrintItemOption = 0;
     if( argv[ ++i ] )
-     PrintItemOption = atoi( argv[ i ] );
-    else
+     PrintItemOption = ( IsNumber( argv[ i ] ) ? atoi( argv[ i ] ) : 0 );
+    if( !PrintItemOption )
     {
      PrintHelp( argv[ 0 ] );
      return( 1 );
@@ -128,9 +138,10 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-nle" ) ) {
     PrintNumberOption = 1;
     PrintListOption = 1;
+    PrintItemOption = 0;
     if( argv[ ++i ] )
-     PrintItemOption = atoi( argv[ i ] );
-    else
+     PrintItemOption = ( IsNumber( argv[ i ] ) ? atoi( argv[ i ] ) : 0 );
+    if( !PrintItemOption )
     {
      PrintHelp( argv[ 0 ] );
      return( 1 );
