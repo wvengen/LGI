@@ -74,8 +74,8 @@ Thu August 19 -- version 1.28
   XSS attacks) is not reset each time index.php is hit.
 
 
-Tue October 26 -- version 1.29
-------------------------------
+Fri November 19 -- version 1.29
+-------------------------------
 
 - Patched Ssl.inc to work with newer PHP 5.x (patch of Willem v.
   Engen).
@@ -85,6 +85,8 @@ Tue October 26 -- version 1.29
 - Made sure that for CLI tools arguments are numeric if needed.
 - Added job count feature to request work for resources for future
   pilot job frameworks.
+- Removed small update bug for master-slave servers.
+- Added slave server capabilities report into daemon.
 
 
 
