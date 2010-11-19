@@ -159,9 +159,9 @@ function Server_Check_And_Perform_Updates( )
     mysql_free_result( $mysqlresult );
    }
    else 
-    $CurrentVersionNumber = -1;
+    $CurrentVersionNumber = 0;
     
-   if( !isset( $CurrentVersionNumber ) ) $CurrentVersionNumber = -1;
+   if( !isset( $CurrentVersionNumber ) ) $CurrentVersionNumber = 0;
 
    // post our version number and get a possible update...
    $PostResponse = SSL_Post_To_URL( $CurrentUpdateServer->url."/servers/server_get_update.php", "project=".Get_Selected_MySQL_DataBase()."&version=".strval( $CurrentVersionNumber ) );
