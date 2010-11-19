@@ -680,7 +680,7 @@ int Daemon::RequestWorkCycle( void )
    {
     DEBUG_LOG( "Daemon::RequestWorkCycle; Signing up to project " << TheProject.Project_Name() << " at server " << (*ServerPointer) );
 
-    if( ServerAPI.Resource_SignUp_Resource( Response, (*ServerPointer), TheProject.Project_Name() ) != CURLE_OK )
+    if( ServerAPI.Resource_SignUp_Resource( Response, (*ServerPointer), TheProject.Project_Name(), Capabilities ) != CURLE_OK )
     {
      Response.clear();
      SessionID.clear();
