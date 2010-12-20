@@ -40,6 +40,7 @@ string KeyFile, CertificateFile, CACertificateFile, ServerURL, Response,
 int OutputInXML = 0;
 int ListServers = 0;
 int LogLevel = 0;
+int Count = 0;
 
 // ----------------------------------------------------------------------
 
@@ -72,6 +73,7 @@ void PrintHelp( char *ExeName )
  cout << "-a application             specify application to query about. default is any." << endl;
  cout << "-s state                   specify job state to query about. default is any." << endl;
  cout << "-x                         output in XML format." << endl;
+ cout << "-cnt                       only count number of jobs." << endl;
  cout << "-v                         log to stderr." << endl;
  cout << "-vv                        log even more to stderr." << endl;
  cout << "-l                         report project server list." << endl;
@@ -110,6 +112,8 @@ int main( int argc, char *argv[] )
     return( 0 );
   } else if( !strcmp( argv[ i ], "-x" ) ) {
     OutputInXML = 1;
+  } else if( !strcmp( argv[ i ], "-cnt" ) ) {
+    Count = 1;
   } else if( !strcmp( argv[ i ], "-l" ) ) {
     ListServers |= 1;
   } else if( !strcmp( argv[ i ], "-L" ) ) {
@@ -233,6 +237,8 @@ int main( int argc, char *argv[] )
  if( !State.empty() && ListServers ) Flag = 1;
  if( !Job_Id.empty() && !Application.empty() ) Flag = 1;
  if( !Job_Id.empty() && !State.empty() ) Flag = 1;
+ if( Count && !Job_Id.empty() ) Flag = 1;
+ if( Count && ListServers ) Flag = 1;
 
  if( Flag )
  {
@@ -359,12 +365,12 @@ int main( int argc, char *argv[] )
  {
   int TotalNrOfJobs = 0;
   int NrOfJobs = 0;
-  int Limit = 1024;
+  int Limit = ( Count ? 0 : 1024 );
   int Offset = 0;
   char OffsetStr[ 64 ];
   char LimitStr[ 64 ];
 
-  if( !OutputInXML )                       // output header of list...
+  if( !OutputInXML && !Count )         // output header of list...
   {
    cout << endl << "-----------------------------------------------------------------------------------------------------------------------------------" << endl;
    cout << " " << setw( 4 ) << "#" << " | " << setw( 6 ) << "job_id" << " | ";
@@ -402,7 +408,7 @@ int main( int argc, char *argv[] )
 
    NrOfJobs = atoi( NormalizeString( Parse_XML( Response, "number_of_jobs" ) ).c_str() );
 
-   if( NrOfJobs )
+   if( !Count && NrOfJobs )
    {
     string Attribute, Job;
     int StartPos = 0;
@@ -443,13 +449,20 @@ int main( int argc, char *argv[] )
      cout << "<groups> " << NormalizeString( Parse_XML( Response, "groups" ) ) << " </groups> ";
      cout << "<state> " << NormalizeString( Parse_XML( Response, "state" ) ) << " </state> ";
      cout << "<application> " << NormalizeString( Parse_XML( Response, "application" ) ) << " </application> ";
-     cout << "<number_of_jobs> " << TotalNrOfJobs << " </number_of_jobs> " << endl;
-
+     if( Count )
+      cout << "<number_of_jobs> " << NrOfJobs << " </number_of_jobs> " << endl;
+     else
+      cout << "<number_of_jobs> " << TotalNrOfJobs << " </number_of_jobs> " << endl;
     }
     else
     {
-     cout << "-----------------------------------------------------------------------------------------------------------------------------------" << endl << endl;
-     cout << "Number of jobs listed : " << TotalNrOfJobs << endl;
+     if( Count )
+      cout << endl << "Number of jobs found  : " << NrOfJobs << endl;
+     else
+     {
+      cout << "-----------------------------------------------------------------------------------------------------------------------------------" << endl << endl;
+      cout << "Number of jobs listed : " << TotalNrOfJobs << endl;
+     }
      cout << "This project          : " << NormalizeString( Parse_XML( Response, "project" ) ) << endl;
      cout << "This project server   : " << NormalizeString( Parse_XML( Response, "this_project_server" ) ) << endl;
      cout << "Project master server : " << NormalizeString( Parse_XML( Response, "project_master_server" ) ) << endl << endl;
@@ -458,7 +471,7 @@ int main( int argc, char *argv[] )
 
    TotalNrOfJobs += NrOfJobs;
    Offset += Limit;
-  } while( NrOfJobs );
+  } while( NrOfJobs && !Count );
 
  }
  else                    // when details were requested...
