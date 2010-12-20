@@ -418,7 +418,11 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
  $State = mysql_escape_string( $State );
  $Application = mysql_escape_string( $Application );
 
- $Query1 = "SELECT job_id,state,application,state_time_stamp,target_resources,owners,read_access,write_access,job_specifics FROM job_queue ";
+ if( (int)( $Limit ) <= 0 ) 
+  $Query1 = "SELECT COUNT(job_id) AS N FROM job_queue ";
+ else
+  $Query1 = "SELECT job_id,state,application,state_time_stamp,target_resources,owners,read_access,write_access,job_specifics FROM job_queue ";
+
  $Query2 = "WHERE ( ";
  $IndexNr = 0;
 
@@ -452,14 +456,18 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
 
  // now introduce a dirty hack to make sure MySQL does use the index and sort on state_time_stamp...
  $Query1 .= "FORCE INDEX(interface_index_$IndexNr) ";
- if( $IndexNr ) 
+
+ if( (int)( $Limit ) >= 1 )    // order and limit if we want the list and not the count...
  {
-  $Query2 .= " ) LIMIT ".$Limit." OFFSET ".$Start; 
- }
- else
- {
-  // apparently when the table is small, it sometimes ignores the index in this specific case...
-  $Query2 .= " ) ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start; 
+  if( $IndexNr ) 
+  {
+   $Query2 .= " ) LIMIT ".$Limit." OFFSET ".$Start; 
+  }
+  else
+  {
+   // apparently when the table is small, it sometimes ignores the index in this specific case...
+   $Query2 .= " ) ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start; 
+  }
  }
 
  return( $Query1.$Query2 );
