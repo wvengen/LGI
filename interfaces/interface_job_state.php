@@ -105,7 +105,6 @@ if( !$DetailMode )
 
  $NrOfJobsReported = 0;
  $JobResponses = "";
- $JobIdArray[ 0 ] = 0;
 
  // do the specific query for this owner array...
  $queryresult = mysql_query( Interface_Make_Query_For_Work_For_Owners( $PossibleJobOwnersArray, $JobState, $JobApplication, $JobStart, $JobLimit ) );
@@ -121,13 +120,6 @@ if( !$DetailMode )
   for( $job = 0; ( $job < $NrOfResults ) && ( $NrOfJobsReported < $JobLimit ); $job++ )
   {
    $JobData = mysql_fetch_object( $queryresult );
-
-   // check if we have already reported this job...
-   if( Interface_Found_Id_In_List( $JobIdArray, $JobData->job_id ) ) continue;
-
-   // add this found job into our report list...
-   $JobIdArray[ 0 ]++;
-   $JobIdArray[ $JobIdArray[ 0 ] ] = $JobData->job_id;
 
    // and build it's response...
    $NrOfJobsReported++;

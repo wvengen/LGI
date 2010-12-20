@@ -94,5 +94,5 @@ Mon December 20 2010 -- version 1.30
 
 - Patched repository content listing code. It had a security hole 
   found by Willem v. Engen.
-
+- Removed some dead code in interface job state api.
 
