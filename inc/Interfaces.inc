@@ -469,6 +469,8 @@ function Interface_Make_Query_For_Work_For_Owners( $OwnerArray, $State, $Applica
    $Query2 .= " ) ORDER BY state_time_stamp LIMIT ".$Limit." OFFSET ".$Start; 
   }
  }
+ else
+  $Query2 .= " )";
 
  return( $Query1.$Query2 );
 }
