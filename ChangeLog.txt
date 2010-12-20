@@ -1,5 +1,5 @@
-Sun June 6th -- Version 1.25
-----------------------------
+Sun June 6th 2010 -- Version 1.25
+---------------------------------
 
 - Added this ChangeLog.txt file.
 - Added new scheduler into project server code. A new table
@@ -17,15 +17,15 @@ Sun June 6th -- Version 1.25
   to the time stamp of submit.
 
 
-Sat June 26 -- version 1.26
----------------------------
+Sat June 26 2010 -- version 1.26
+--------------------------------
 
 - Added python client class into python dir.
 - Moved daemon/src into root, adjusted makefile and so on.
 
 
-Wed July 14 -- version 1.27
----------------------------
+Wed July 14 2010 -- version 1.27
+--------------------------------
 
 - Adapted daemon and tools to use persistent connections by
   reusing the cURL handle.
@@ -59,8 +59,8 @@ Wed July 14 -- version 1.27
 - Added a check_running script for the LGI scheduler.
 
 
-Thu August 19 -- version 1.28
------------------------------
+Thu August 19 2010 -- version 1.28
+----------------------------------
 
 - Removed some old documentation and added new.
 - Allow for project server scheduler unlimited run time.
@@ -74,8 +74,8 @@ Thu August 19 -- version 1.28
   XSS attacks) is not reset each time index.php is hit.
 
 
-Fri November 19 -- version 1.29
--------------------------------
+Fri November 19 2010 -- version 1.29
+------------------------------------
 
 - Patched Ssl.inc to work with newer PHP 5.x (patch of Willem v.
   Engen).
@@ -88,5 +88,11 @@ Fri November 19 -- version 1.29
 - Removed small update bug for master-slave servers.
 - Added slave server capabilities report into daemon.
 
+
+Mon December 20 2010 -- version 1.30
+------------------------------------
+
+- Patched repository content listing code. It had a security hole 
+  found by Willem v. Engen.
 
 
