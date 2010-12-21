@@ -81,11 +81,11 @@ if( (int)( $JobIdLimit ) <= 0 )     // see if we want a job-count only for pilot
  $RegExpAny = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( "any", "," ) );
  $Application = mysql_escape_string( $Application );
 
- $TheWorkQuery = mysql_query( "SELECT COUNT(job_id) AS count FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."'" );
+ $TheWorkQuery = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' )" );
  $TheData = mysql_fetch_object( $TheWorkQuery );
  mysql_free_result( $TheWorkQuery );
 
- $NrOfPossibleJobs = $TheData -> count;
+ $NrOfPossibleJobs = $TheData -> N;
  $Response .= " <number_of_jobs> $NrOfPossibleJobs </number_of_jobs>"; 
  return( LGI_Response( $Response ) );
 }
