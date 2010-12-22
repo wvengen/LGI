@@ -133,15 +133,9 @@ function add_resources_allowed {
    CRT=""
  fi 
 
- if [ "${NME}" != "" -a "${URL}" != "" -a "${CRT}" != "" -a "${FLG}" != "" ]
+ if [ "${NME}" != "" -a "${URL}" != "" -a "${CRT}" != "" -a "${FLG}" != "" -a "${SRV}" != "" ]
  then
-   if [ "${SRV}" != "" ]
-   then
-     run_update "INSERT INTO active_resources SET resource_name='${NME}',url='${URL}',client_certificate='${CRT}\n',project_server=${FLG}" "${SRV}"
-   else
-     run_mysql "INSERT INTO active_resources SET resource_name='${NME}',url='${URL}',client_certificate='${CRT}\n',project_server=${FLG}"
-     echo "Warning: this change to DB has not been recorded as an update in the DB!"
-   fi
+   run_update "INSERT INTO active_resources SET resource_name='${NME}',url='${URL}',client_certificate='${CRT}\n',project_server=${FLG}" "${SRV}"
  else
    done_nothing
  fi
