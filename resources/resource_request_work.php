@@ -100,12 +100,12 @@ if( $JobOwnersList != "" )
    $OwnerDenied = substr( $JobOwnersArray[ $i ], 1 );
    if( $OwnerDenied == "" ) continue;
    $Expression = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( $OwnerDenied, "," ) );
-   $OwnersDeniedRegExp .= " AND NOT owners REGEXP '".$Expression."'";
+   $OwnersDeniedRegExp .= " AND NOT ( owners REGEXP '".$Expression."' )";
   }
   else                  
   {
    $Expression = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( $JobOwnersArray[ $i ], "," ) );
-   $OwnersAllowedRegExp .= " OR owners REGEXP '".$Expression."'";
+   $OwnersAllowedRegExp .= " OR ( owners REGEXP '".$Expression."' )";
   }
  }
  if( $FoundAny ) $OwnersAllowedRegExp = "";
