@@ -45,7 +45,7 @@ class Resource_Server_API
 
               int Resource_SignUp_Resource( string &Response, string ServerURL, string Project, string Capabilities = "" );
               int Resource_SignOff_Resource( string &Response, string ServerURL, string Project, string SessionID );
-              int Resource_Request_Work( string &Response, string ServerURL, string Project, string SessionID, string Application, string Start = "", string Limit = "" );
+              int Resource_Request_Work( string &Response, string ServerURL, string Project, string SessionID, string Application, string Start = "", string Limit = "", string Owners = "" );
               int Resource_Request_Job_Details( string &Response, string ServerURL, string Project, string SessionID, string Job_Id );
               int Resource_Lock_Job( string &Response, string ServerURL, string Project, string SessionID, string Job_Id );
               int Resource_UnLock_Job( string &Response, string ServerURL, string Project, string SessionID, string Job_Id );

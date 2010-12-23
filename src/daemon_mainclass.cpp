@@ -564,14 +564,20 @@ int Daemon::RequestWorkCycle( void )
       int FoundJob = 0;
       char OffsetStr[ 64 ];
       char LimitStr[ 64 ];
+      string OwnersList = "";
 
       do
       {
        sprintf( OffsetStr, "%d", Offset );
        sprintf( LimitStr, "%d", Limit );
 
+       // start by collecting possible owners or denied owners for jobs...
+       // ...
+       // ...
+       // ...
+
        VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Performing work request with Offset=" << OffsetStr << " at server " << (*ServerPointer) );
-       if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, TheApplication.Application_Name(), OffsetStr, LimitStr ) != CURLE_OK ) break;
+       if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, TheApplication.Application_Name(), OffsetStr, LimitStr, OwnersList ) != CURLE_OK ) break;
 
        string JobResponse = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 

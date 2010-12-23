@@ -167,9 +167,9 @@ int Resource_Server_API::Resource_SignOff_Resource( string &Response, string Ser
 
 // ------------------------------------------------------------------------------
 
-int Resource_Server_API::Resource_Request_Work( string &Response, string ServerURL, string Project, string SessionID, string Application, string Start, string Limit )
+int Resource_Server_API::Resource_Request_Work( string &Response, string ServerURL, string Project, string SessionID, string Application, string Start, string Limit, string Owners )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_Request_Work; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Application=" << Application << ", Start=" << Start << ", Limit=" << Limit );
+ DEBUG_LOG( "Resource_Server_API::Resource_Request_Work; ServerURL=" << ServerURL << ", Project=" << Project << ", SessionID=" << SessionID << ", Application=" << Application << ", Start=" << Start << ", Limit=" << Limit << ", Owners=" << Owners );
 
  string PostURL = ServerURL + "/resources/resource_request_work.php";
  CURL *cURLHandle = SetupcURLForPost( PostURL );
@@ -184,6 +184,7 @@ int Resource_Server_API::Resource_Request_Work( string &Response, string ServerU
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "application", CURLFORM_PTRCONTENTS, Application.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "start", CURLFORM_PTRCONTENTS, Start.c_str(), CURLFORM_END );
   curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "limit", CURLFORM_PTRCONTENTS, Limit.c_str(), CURLFORM_END );
+  curl_formadd( &PostList, &LastItem, CURLFORM_PTRNAME, "owners", CURLFORM_PTRCONTENTS, Owners.c_str(), CURLFORM_END );
 
   CURLcode cURLResult = PerformcURLPost( Response, cURLHandle, PostList );
 
