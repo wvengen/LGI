@@ -89,10 +89,14 @@ Fri November 19 2010 -- version 1.29
 - Added slave server capabilities report into daemon.
 
 
-Mon December 20 2010 -- version 1.30
+Thu December 23 2010 -- version 1.30
 ------------------------------------
 
 - Patched repository content listing code. It had a security hole 
   found by Willem v. Engen.
-- Removed some dead code in interface job state api.
+- Removed some dead code in interface job state API.
 - Added support for retreiving job count in interface API.
+- Added support for specifying owners allowed or denied for 
+  resources in resource request work API.
+- Removed bug generating php error messages in Utils.inc.
+

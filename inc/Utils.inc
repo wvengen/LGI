@@ -54,10 +54,10 @@ function NormalizeString( $String )
 
  if( $End <= 0 ) return( "" );
 
- while( ( $String[ $Start ] == " " ) && ( $Start < $End ) ) $Start++;
+ while( ( $Start < $End ) && ( $String[ $Start ] == " " ) ) $Start++;
  if( $Start >= $End ) return( "" );
 
- while( ( $String[ $End - 1 ] == " " ) && ( $End > $Start ) ) $End--;
+ while( ( $End > $Start ) && ( $String[ $End - 1 ] == " " ) ) $End--;
  if( $End <= $Start ) return( "" );
 
  return( substr( $String, $Start, $End - $Start ) );

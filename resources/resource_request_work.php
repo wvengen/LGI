@@ -62,12 +62,21 @@ else
  $JobIdLimit = $Config[ "DEFAULT_WORK_REQUEST_LIMIT" ];
 if( (int)( $JobIdLimit ) > $Config[ "MAX_WORK_REQUEST_LIMIT" ] ) $JobIdLimit = $Config[ "MAX_WORK_REQUEST_LIMIT" ];
 
+if( isset( $_POST[ "owners" ] ) && ( $_POST[ "owners" ] != "" ) )
+{
+ if( strlen( $_POST[ "owners" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
+  return( LGI_Error_Response( 71, $ErrorMsgs[ 71 ] ) );
+ $JobOwnersList = $_POST[ "owners" ];
+}
+else
+ $JobOwnersList = "";
+
 // check if this resource has any jobs locked...
 if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )
  return( LGI_Error_Response( 17, $ErrorMsgs[ 17 ] ) ); 
 
 // header of the response...
-$Response = "<start> ".$JobIdStart." </start> <limit> ".$JobIdLimit." </limit>";
+$Response = "<start> ".$JobIdStart." </start> <limit> ".$JobIdLimit." </limit> <owners> ".$JobOwnersList." </owners>";
 $Response .= " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
 $Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
 $Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
@@ -75,13 +84,41 @@ $Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_mas
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 $Response .= " <application> ".$Application." </application>";
 
+// create regexps for owners being allowed and being denied by resource...
+$OwnersAllowedRegExp = "";
+$OwnersDeniedRegExp = "";
+if( $JobOwnersList != "" )
+{
+ $JobOwnersArray = CommaSeparatedField2Array( $JobOwnersList );
+ $FoundAny = false;
+ for( $i = 1; $i <= $JobOwnersArray[ 0 ]; $i++ )
+ {
+  if( $JobOwnersArray[ $i ] == "" ) continue;
+  if( $JobOwnersArray[ $i] == 'any' ) $FoundAny = true;
+  if( $JobOwnersArray[ $i ][ 0 ] == '!' )    
+  {
+   $OwnerDenied = substr( $JobOwnersArray[ $i ], 1 );
+   if( $OwnerDenied == "" ) continue;
+   $Expression = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( $OwnerDenied, "," ) );
+   $OwnersDeniedRegExp .= " AND NOT owners REGEXP '".$Expression."'";
+  }
+  else                  
+  {
+   $Expression = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( $JobOwnersArray[ $i ], "," ) );
+   $OwnersAllowedRegExp .= " OR owners REGEXP '".$Expression."'";
+  }
+ }
+ if( $FoundAny ) $OwnersAllowedRegExp = "";
+ if( $OwnersAllowedRegExp != "" ) $OwnersAllowedRegExp = "AND ( ".substr( $OwnersAllowedRegExp, 4 )." ) ";
+}
+
 if( (int)( $JobIdLimit ) <= 0 )     // see if we want a job-count only for pilotjob scheduling purposes...
 {
  $RegExpResource = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( $ResourceData->resource_name, "," ) );
  $RegExpAny = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( "any", "," ) );
  $Application = mysql_escape_string( $Application );
 
- $TheWorkQuery = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' )" );
+ $TheWorkQuery = mysql_query( "SELECT COUNT(job_id) AS N FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' ) ".$OwnersAllowedRegExp.$OwnersDeniedRegExp );
  $TheData = mysql_fetch_object( $TheWorkQuery );
  mysql_free_result( $TheWorkQuery );
 
@@ -99,7 +136,7 @@ else
  $RegExpAny = mysql_escape_string( MakeRegularExpressionForCommaSeparatedField( "any", "," ) );
  $Application = mysql_escape_string( $Application );
 
- $TheWorkQuery = mysql_query( "SELECT job_id FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND lock_state=0 AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' ) LIMIT ".$JobIdLimit." OFFSET ".$JobIdStart );
+ $TheWorkQuery = mysql_query( "SELECT job_id FROM job_queue USE INDEX (resource_index) WHERE application='".$Application."' AND state='queued' AND lock_state=0 AND ( target_resources REGEXP '".$RegExpResource."' OR target_resources REGEXP '".$RegExpAny."' ) ".$OwnersAllowedRegExp.$OwnersDeniedRegExp." LIMIT ".$JobIdLimit." OFFSET ".$JobIdStart );
 
  if( $TheWorkQuery )
   $NrOfPossibleJobs = mysql_num_rows( $TheWorkQuery );
