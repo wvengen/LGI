@@ -31,6 +31,7 @@ using namespace std;
 string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop );
 string Parse_XML( string XML, string Tag, string &Attributes );
 string Parse_XML( string XML, string Tag );
+void   Parse_XML_ListAllTags( string XML, vector<string> &List );
 
 // -----------------------------------------------------------------------------
 

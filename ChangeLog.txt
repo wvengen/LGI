@@ -98,6 +98,8 @@ Thu December 23 2010 -- version 1.30
 - Added support for retreiving job count in interface API.
 - Added support for specifying owners allowed or denied for 
   resources in resource request work API.
-- Removed bug generating php error messages in Utils.inc.
+- Removed small bug generating php error messages in Utils.inc.
+- Added support for reporting allowed and denied owners in daemon
+  when requesting work.
 
 

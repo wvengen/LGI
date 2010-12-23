@@ -21,6 +21,48 @@
 
 // -----------------------------------------------------------------------------
 
+void Parse_XML_ListAllTags( string XML, vector<string> &List )
+{
+ int XMLLength = XML.length();
+ int Index, BeginTagStart, BeginTagEnd,
+     EndTagStart, EndTagEnd, FoundTagLength;
+ string FoundTag;
+
+ if( XMLLength <= 0 ) return;
+
+ for( Index = 0; Index < XMLLength; ++Index )           
+  if( XML[ Index ] == '<' )                             
+  {
+   BeginTagEnd = BeginTagStart = Index + 1;              // BeginTagStart marks the start of the tag 
+
+   while( ( BeginTagEnd < XMLLength ) && ( XML[ BeginTagEnd ] != '>' ) ) ++BeginTagEnd;  // BeginTagEnd marks the '>'
+
+   if( BeginTagEnd >= XMLLength ) return;            
+
+   FoundTag = XML.substr( BeginTagStart, BeginTagEnd - BeginTagStart );    
+   FoundTagLength = BeginTagEnd - BeginTagStart;
+
+   EndTagStart = XML.find( "</" + FoundTag + ">", BeginTagEnd + 1 );       // EndTagStart marks start of the end tag
+
+   if( EndTagStart == string::npos ) return;
+
+   EndTagStart += 2;
+
+   if( EndTagStart >= XMLLength ) return;
+
+   EndTagEnd = EndTagStart + FoundTagLength;             // EndTagEnd marks the '>' of the end tag
+   
+   if( EndTagEnd >= XMLLength ) return; 
+
+   List.push_back( FoundTag );          // add found tag to list
+
+   Index = EndTagEnd;
+  }
+
+}
+
+// -----------------------------------------------------------------------------
+
 string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop )
 {
  int XMLLength = XML.length();
@@ -107,3 +149,4 @@ string Parse_XML( string XML, string Tag )
 }
 
 // -----------------------------------------------------------------------------
+

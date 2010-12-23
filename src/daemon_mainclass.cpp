@@ -159,6 +159,8 @@ int Daemon::AddJobToDaemonLists( DaemonJob Job )
   Accounting[ Owners[ i ] ]++;
   Accounting[ Owners[ i ] + ", " + Project ]++;
   Accounting[ Owners[ i ] + ", " + Project + ", " + Application ]++;
+
+  ListOfActiveOwners.insert( Owners[ i ] );   // add this owner into set...
  }
 
  Accounting[ "; TOTALS;" ]++;
@@ -206,6 +208,8 @@ int Daemon::RemoveJobFromDaemonLists( DaemonJob Job )
   Accounting[ Owners[ i ] ]--;
   Accounting[ Owners[ i ] + ", " + Project ]--;
   Accounting[ Owners[ i ] + ", " + Project + ", " + Application ]--;
+
+  if( Accounting[ Owners[ i ] ] <= 0 ) ListOfActiveOwners.erase( Owners[ i ] );
  }
 
  Accounting[ "; TOTALS;" ]--;
@@ -564,7 +568,9 @@ int Daemon::RequestWorkCycle( void )
       int FoundJob = 0;
       char OffsetStr[ 64 ];
       char LimitStr[ 64 ];
-      string OwnersList = "";
+      string OwnersStr = "";
+      vector<string> LimitsList;
+      set<string> OwnersAllowedList, OwnersDeniedList;
 
       do
       {
@@ -572,12 +578,44 @@ int Daemon::RequestWorkCycle( void )
        sprintf( LimitStr, "%d", Limit );
 
        // start by collecting possible owners or denied owners for jobs...
-       // ...
-       // ...
-       // ...
+
+       LimitsList.clear(); OwnersDeniedList.clear(); OwnersAllowedList.clear();     // clear all lists...
+
+       Parse_XML_ListAllTags( Owner_Allow(), LimitsList );                       // get all listed owners from limits...
+       Parse_XML_ListAllTags( TheProject.Owner_Allow(), LimitsList );
+       Parse_XML_ListAllTags( TheApplication.Owner_Allow(), LimitsList );
+
+       for( set<string>::iterator i = ListOfActiveOwners.begin(); i != ListOfActiveOwners.end(); ++i )   // add all known owners so far...
+        LimitsList.push_back( (*i) );
+
+       for( int i = 0; i < LimitsList.size(); ++i )      // check if any of these owners has hit a limit or is denied...
+        if( ( IsOwnerDenied( LimitsList[ i ], TheProject, TheApplication ) ) || ( IsOwnerRunningToMuch( LimitsList[ i ], TheProject, TheApplication ) & 3 ) )
+         OwnersDeniedList.insert( LimitsList[ i ] );  
+        else
+        {
+         if( IsOwnerRunningToMuch( LimitsList[ i ], TheProject, TheApplication ) & 12 )
+          OwnersAllowedList.insert( LimitsList[ i ] );  
+        }
+
+       if( OwnersAllowedList.find( "any" ) != OwnersAllowedList.end() )  
+        OwnersAllowedList.clear();
+
+       LimitsList.clear(); 
+       LimitsList = CommaSeparatedValues2Array( Owner_Deny() + ", " + TheProject.Owner_Deny() + ", " + TheApplication.Owner_Deny() );
+       for( int i = 0; i < LimitsList.size(); ++i ) OwnersDeniedList.insert( LimitsList[ i ] );
+
+       for( set<string>::iterator i = OwnersAllowedList.begin(); i != OwnersAllowedList.end(); ++i )
+        OwnersStr += ", " + (*i);
+
+       for( set<string>::iterator i = OwnersDeniedList.begin(); i != OwnersDeniedList.end(); ++i )
+        OwnersStr += ", !" + (*i);
+
+       if( !OwnersStr.empty() ) OwnersStr[ 0 ] = ' ';
+
+       DEBUG_LOG( "Daemon::RequestWorkCycle; requesting work for owner list " << OwnersStr );
 
        VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Performing work request with Offset=" << OffsetStr << " at server " << (*ServerPointer) );
-       if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, TheApplication.Application_Name(), OffsetStr, LimitStr, OwnersList ) != CURLE_OK ) break;
+       if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, TheApplication.Application_Name(), OffsetStr, LimitStr, OwnersStr ) != CURLE_OK ) break;
 
        string JobResponse = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
 

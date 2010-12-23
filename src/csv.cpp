@@ -29,10 +29,10 @@ string NormalizeString( string S )
 
  Empty.clear();
  
- while( isspace( S[ Start ] ) && ( Start < End ) ) Start++;   // ignore spaces in front of the string
+ while( ( Start < End ) && isspace( S[ Start ] ) ) Start++;   // ignore spaces in front of the string
  if( Start >= End ) return( Empty );
 
- while( isspace( S[ End - 1 ] ) && ( End > Start ) ) End--;   // and ignore spaces at the end of the string
+ while( ( End > Start ) && isspace( S[ End - 1 ] ) ) End--;   // and ignore spaces at the end of the string
  if( End <= Start ) return( Empty );
 
  return( S.substr( Start, End - Start ) );

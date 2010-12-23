@@ -28,6 +28,7 @@
 #include <cstdio>
 #include <list>
 #include <map>
+#include <set>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -76,6 +77,7 @@ class Daemon : public DaemonConfig
 
        map<string,list<DaemonJob> > Jobs;
        map<string,int>              Accounting;
+       set<string>                  ListOfActiveOwners;
        int                          JobsFinished,
                                     JobsObtained,
                                     ReadyForScheduling,
