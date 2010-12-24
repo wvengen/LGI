@@ -112,7 +112,7 @@ string DaemonConfig::Owner_Allow( void )
 {
  string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "owner_allow" ) );
  if( Data.empty() )
-  DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Allow; No data in owner_allow tag found" )
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Allow; No data in owner_allow tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Allow; Returned " << Data );
 }
@@ -123,7 +123,7 @@ string DaemonConfig::Owner_Deny( void )
 {
  string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "owner_deny" ) );
  if( Data.empty() )
-  DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Deny; No data in owner_deny tag found" )
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Deny; No data in owner_deny tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Owner_Deny; Returned " << Data );
 }
@@ -265,7 +265,7 @@ string DaemonConfigProject::Owner_Allow( void )
 {
  string Data = NormalizeString( Parse_XML( ProjectCache, "owner_allow" ) );
  if( Data.empty() )
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Allow; No data in owner_allow tag found" )
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Allow; No data in owner_allow tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Allow; Returned " << Data );
 }
@@ -276,7 +276,7 @@ string DaemonConfigProject::Owner_Deny( void )
 {
  string Data = NormalizeString( Parse_XML( ProjectCache, "owner_deny" ) );
  if( Data.empty() )
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Deny; No data in owner_deny tag found" )
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Deny; No data in owner_deny tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProject::Owner_Deny; Returned " << Data );
 }
@@ -418,7 +418,7 @@ string DaemonConfigProjectApplication::Owner_Allow( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "owner_allow" ) );
  if( Data.empty() )
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; No data in owner_allow tag found" )
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; No data in owner_allow tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Allow; Returned " << Data );
 }
@@ -429,7 +429,7 @@ string DaemonConfigProjectApplication::Owner_Deny( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "owner_deny" ) );
  if( Data.empty() )
-  DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; No data in owner_deny tag found" )
+  VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; No data in owner_deny tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Owner_Deny; Returned " << Data );
 }
@@ -451,7 +451,7 @@ int DaemonConfigProjectApplication::Job_Sandbox_UID( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "job_sandbox_uid" ) );
  if( Data.empty() )
-  DEBUG_LOG_RETURN( 0, "DaemonConfigProjectApplication::Job_Sandbox_UID; No valid job_sandbox_uid tag found" )
+  VERBOSE_DEBUG_LOG_RETURN( 0, "DaemonConfigProjectApplication::Job_Sandbox_UID; No valid job_sandbox_uid tag found" )
  else
   VERBOSE_DEBUG_LOG_RETURN( atoi( Data.c_str() ), "DaemonConfigProjectApplication::Job_Sandbox_UID; Returned " << Data );
 }

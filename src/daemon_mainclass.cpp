@@ -578,41 +578,36 @@ int Daemon::RequestWorkCycle( void )
        sprintf( LimitStr, "%d", Limit );
 
        // start by collecting possible owners or denied owners for jobs...
-
        LimitsList.clear(); OwnersDeniedList.clear(); OwnersAllowedList.clear();     // clear all lists...
 
        Parse_XML_ListAllTags( Owner_Allow(), LimitsList );                       // get all listed owners from limits...
        Parse_XML_ListAllTags( TheProject.Owner_Allow(), LimitsList );
        Parse_XML_ListAllTags( TheApplication.Owner_Allow(), LimitsList );
 
-       for( set<string>::iterator i = ListOfActiveOwners.begin(); i != ListOfActiveOwners.end(); ++i )   // add all known owners so far...
-        LimitsList.push_back( (*i) );
-
        for( int i = 0; i < LimitsList.size(); ++i )      // check if any of these owners has hit a limit or is denied...
-        if( ( IsOwnerDenied( LimitsList[ i ], TheProject, TheApplication ) ) || ( IsOwnerRunningToMuch( LimitsList[ i ], TheProject, TheApplication ) & 3 ) )
+        if( ( IsOwnerDenied( LimitsList[ i ], TheProject, TheApplication ) ) || ( IsOwnerRunningToMuch( LimitsList[ i ], TheProject, TheApplication ) & 7 ) )
          OwnersDeniedList.insert( LimitsList[ i ] );  
         else
-        {
-         if( IsOwnerRunningToMuch( LimitsList[ i ], TheProject, TheApplication ) & 12 )
-          OwnersAllowedList.insert( LimitsList[ i ] );  
-        }
+         OwnersAllowedList.insert( LimitsList[ i ] );  
 
-       if( OwnersAllowedList.find( "any" ) != OwnersAllowedList.end() )  
+       if( OwnersAllowedList.find( "any" ) != OwnersAllowedList.end() )   // just clear list if 'any' was also found and allowed...
         OwnersAllowedList.clear();
 
-       LimitsList.clear(); 
+       for( set<string>::iterator i = ListOfActiveOwners.begin(); i != ListOfActiveOwners.end(); ++i )   // check all known owners so far...
+        if( ( IsOwnerDenied( (*i), TheProject, TheApplication ) ) || ( IsOwnerRunningToMuch( (*i), TheProject, TheApplication ) & 7 ) )
+         OwnersDeniedList.insert( (*i) );
+
+       LimitsList.clear();                                     // and add all denied owners to the list...
        LimitsList = CommaSeparatedValues2Array( Owner_Deny() + ", " + TheProject.Owner_Deny() + ", " + TheApplication.Owner_Deny() );
        for( int i = 0; i < LimitsList.size(); ++i ) OwnersDeniedList.insert( LimitsList[ i ] );
 
-       for( set<string>::iterator i = OwnersAllowedList.begin(); i != OwnersAllowedList.end(); ++i )
+       for( set<string>::iterator i = OwnersAllowedList.begin(); i != OwnersAllowedList.end(); ++i )   // finally build string to post...
         OwnersStr += ", " + (*i);
-
        for( set<string>::iterator i = OwnersDeniedList.begin(); i != OwnersDeniedList.end(); ++i )
         OwnersStr += ", !" + (*i);
-
        if( !OwnersStr.empty() ) OwnersStr[ 0 ] = ' ';
 
-       DEBUG_LOG( "Daemon::RequestWorkCycle; requesting work for owner list " << OwnersStr );
+       if( !OwnersStr.empty() ) DEBUG_LOG( "Daemon::RequestWorkCycle; requesting work for owner list" << OwnersStr );   // log for testing and debugging...
 
        VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Performing work request with Offset=" << OffsetStr << " at server " << (*ServerPointer) );
        if( ServerAPI.Resource_Request_Work( Response, (*ServerPointer), TheProject.Project_Name(), SessionID, TheApplication.Application_Name(), OffsetStr, LimitStr, OwnersStr ) != CURLE_OK ) break;
