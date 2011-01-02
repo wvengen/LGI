@@ -71,10 +71,22 @@ function SSL_Get_Full_Server_Certificate( )
 
 function SSL_Post_To_URL( $URL, $POST )
 {
+ $MyCurlHandle = curl_init( $URL );
+
+ $Response = SSL_Post_To_URL_internal( $URL, $POST, $MyCurlHandle );
+
+ curl_close( $MyCurlHandle );
+
+ return( $Response );
+}
+
+// --------------------------------------------------------------------
+
+function SSL_Post_To_URL_internal( $URL, $POST, &$Handle )
+{
  global $Config;
 
- $Handle = curl_init( $URL );
-
+ curl_setopt( $Handle, CURLOPT_URL, $URL );
  curl_setopt( $Handle, CURLOPT_SSLCERT, $Config[ "SERVER_SSL_CERTIFICATE_FILE" ] );
  curl_setopt( $Handle, CURLOPT_SSLKEY, $Config[ "SERVER_SSL_KEY" ] );
  curl_setopt( $Handle, CURLOPT_CAINFO, $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ] );
@@ -83,11 +95,7 @@ function SSL_Post_To_URL( $URL, $POST )
  curl_setopt( $Handle, CURLOPT_POSTFIELDS, $POST );
  curl_setopt( $Handle, CURLOPT_RETURNTRANSFER, 1 );
 
- $Response = curl_exec( $Handle );
-
- curl_close( $Handle );
-
- return( $Response );
+ return( curl_exec( $Handle ) );
 }
 
 // --------------------------------------------------------------------

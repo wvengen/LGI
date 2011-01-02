@@ -36,6 +36,8 @@
 // ----------------------------------------------------------------------
 
 Daemon *TheDaemon = NULL;
+int    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING;
+string LogFile( "/dev/stdout" );
 
 // ----------------------------------------------------------------------
 
@@ -50,10 +52,19 @@ int IsNumber( char *String )
 
 void TheSignalHandler( int S )
 {
- if( TheDaemon != NULL ) 
+ if( S == SIGHUP )
  {
-  CRITICAL_LOG( "TheSignalHandler; Received signal, stopping with scheduling gracefully" );
-  TheDaemon -> StopScheduling();
+  InitializeLogger( LogLevel, LogFile.c_str() );
+  CRITICAL_LOG( "TheSignalHandler; Received HUP signal, restarting logger" );
+  return;
+ }
+ else
+ {
+  if( TheDaemon != NULL ) 
+  {
+   CRITICAL_LOG( "TheSignalHandler; Received signal, stopping with scheduling gracefully" );
+   TheDaemon -> StopScheduling();
+  }
  }
 }
 
@@ -90,12 +101,10 @@ void PrintHelp( char *ExeName )
 
 int main( int argc, char *argv[] )
 {
- int    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING;
  int    ConfigFileSet = 0;
  int    Daemonize = 0;
  int    FastCycleTime = 120;
  int    SlowCycleTime = 600;
- string LogFile( "/dev/stdout" );
  string ConfigFile( "LGI.cfg" );
 
  // check arguments here...
@@ -173,6 +182,7 @@ int main( int argc, char *argv[] )
  signal( SIGQUIT, TheSignalHandler );
  signal( SIGABRT, TheSignalHandler );
  signal( SIGTERM, TheSignalHandler );
+ signal( SIGHUP, TheSignalHandler );
 
  InitializeLogger( LogLevel, LogFile.c_str() );
 

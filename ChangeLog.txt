@@ -89,8 +89,8 @@ Fri November 19 2010 -- version 1.29
 - Added slave server capabilities report into daemon.
 
 
-Thu December 23 2010 -- version 1.30
-------------------------------------
+Sun January 1 2011 -- version 1.30
+----------------------------------
 
 - Patched repository content listing code. It had a security hole 
   found by Willem v. Engen.
@@ -101,5 +101,7 @@ Thu December 23 2010 -- version 1.30
 - Removed small bug generating php error messages in Utils.inc.
 - Added support for reporting allowed and denied owners in daemon
   when requesting work.
+- Added SIGHUP support in daemon for restarting logger.
+- Made sure server updates use keep alives and caching in posting.
 
 

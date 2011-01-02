@@ -139,10 +139,12 @@ function Server_Check_And_Perform_Updates( )
 {
  global $Config;
 
+ $MyCurlHandle = curl_init();
+
  // get all project servers we know of...
  $ServerListQuery = mysql_query( "SELECT url FROM active_resources WHERE project_server>=1" );
  $NrOfServers = mysql_num_rows( $ServerListQuery );
-
+  
  for( $i = 0; $i < $NrOfServers; $i++ )
  {
   $CurrentUpdateServer = mysql_fetch_object( $ServerListQuery );
@@ -164,7 +166,7 @@ function Server_Check_And_Perform_Updates( )
    if( !isset( $CurrentVersionNumber ) ) $CurrentVersionNumber = 0;
 
    // post our version number and get a possible update...
-   $PostResponse = SSL_Post_To_URL( $CurrentUpdateServer->url."/servers/server_get_update.php", "project=".Get_Selected_MySQL_DataBase()."&version=".strval( $CurrentVersionNumber ) );
+   $PostResponse = SSL_Post_To_URL_internal( $CurrentUpdateServer->url."/servers/server_get_update.php", "project=".Get_Selected_MySQL_DataBase()."&version=".strval( $CurrentVersionNumber ), $MyCurlHandle );
 
    $UpdateData = NormalizeString( Parse_XML( Parse_XML( Parse_XML( $PostResponse, "LGI", $Attributes ), "response", $Attributes ), "update", $Attributes ) );
 
@@ -194,6 +196,8 @@ function Server_Check_And_Perform_Updates( )
   } while( $UpdateFlag >= 1 );
   
  }
+
+ curl_close( $MyCurlHandle );
 
  return( 0 );
 }
