@@ -89,7 +89,7 @@ Fri November 19 2010 -- version 1.29
 - Added slave server capabilities report into daemon.
 
 
-Sun January 1 2011 -- version 1.30
+Fri January 7 2011 -- version 1.30
 ----------------------------------
 
 - Patched repository content listing code. It had a security hole 
@@ -103,5 +103,6 @@ Sun January 1 2011 -- version 1.30
   when requesting work.
 - Added SIGHUP support in daemon for restarting logger.
 - Made sure server updates use keep alives and caching in posting.
-
+- Added support for relative paths in daemon config file, thanks
+  to Willem v. Engen.
 

@@ -26,6 +26,8 @@
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
+#include <cerrno>
+#include <unistd.h>
 
 #include "logger.h"
 #include "xml.h"
@@ -130,6 +132,7 @@ class DaemonConfigProjectApplication
 
 string ReadStringFromFile( string FileName, int MaxSize = -1 );
 void   WriteStringToFile( string String, string FileName );
+string AbsolutePath( string FileName );
 
 // -----------------------------------------------------------------------------
 

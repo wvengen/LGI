@@ -67,10 +67,12 @@ int DaemonConfig::IsValidConfigured( void )
 string DaemonConfig::CA_Certificate_File( void )
 {
  string Data = NormalizeString( Parse_XML( ConfigurationXML, "ca_certificate_file" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::CA_Certificate_File; No data in ca_certificate_file tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::CA_Certificate_File; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -78,10 +80,12 @@ string DaemonConfig::CA_Certificate_File( void )
 string DaemonConfig::Resource_Certificate_File( void )
 {
  string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "resource_certificate_file" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_Certificate_File; No data in resource_certificate_file tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_Certificate_File; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -89,10 +93,12 @@ string DaemonConfig::Resource_Certificate_File( void )
 string DaemonConfig::Resource_Key_File( void )
 {
  string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "resource_key_file" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::Resource_Key_File; No data in resource_key_file tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::Resource_Key_File; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -102,8 +108,10 @@ string DaemonConfig::RunDirectory( void )
  string Data = NormalizeString( Parse_XML( Parse_XML( ConfigurationXML, "resource" ), "run_directory" ) );
  if( Data.empty() )
   CRITICAL_LOG_RETURN( Data, "DaemonConfig::RunDirectory; No data in run_directory tag found" )
- else
+ else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfig::RunDirectory; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -228,8 +236,8 @@ int DaemonConfigProject::IsValidConfigured( void )
  if( Project_Master_Server().empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Project_Master_Server() empty" );
  if( Owner_Allow().empty() ) DEBUG_LOG( "DaemonConfigProject::IsValidConfigured; Warning: Owner_Allow() empty" );
  if( Owner_Deny().empty() ) DEBUG_LOG( "DaemonConfigProject::IsValidConfigured; Warning: Owner_Deny() empty" );
- if( Number_Of_Applications() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Number_Of_Applications()returned 0 or less" );
- if( Job_Limit() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Job_Limit()returned 0 or less" );
+ if( Number_Of_Applications() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Number_Of_Applications() returned 0 or less" );
+ if( Job_Limit() <= 0 ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Job_Limit() returned 0 or less" );
 
  for( int a = 1; a <= Number_Of_Applications(); ++a )
   if( !Application( a ).IsValidConfigured() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Application not configured corrctly for application number " << a );
@@ -472,10 +480,12 @@ int DaemonConfigProjectApplication::Max_Output_Size( void )
 string DaemonConfigProjectApplication::Check_System_Limits_Script( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "check_system_limits_script" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Check_System_Limits_Script; No data in check_system_limits_script tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Check_System_Limits_Script; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -483,10 +493,12 @@ string DaemonConfigProjectApplication::Check_System_Limits_Script( void )
 string DaemonConfigProjectApplication::Job_Check_Limits_Script( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "job_check_limits_script" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Limits_Script; No data in job_check_limits_script tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Limits_Script; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -494,10 +506,12 @@ string DaemonConfigProjectApplication::Job_Check_Limits_Script( void )
 string DaemonConfigProjectApplication::Job_Check_Running_Script( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "job_check_running_script" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Running_Script; No data in job_check_running_script tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Running_Script; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -505,10 +519,12 @@ string DaemonConfigProjectApplication::Job_Check_Running_Script( void )
 string DaemonConfigProjectApplication::Job_Check_Finished_Script( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "job_check_finished_script" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Finished_Script; No data in job_check_finished_script tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Check_Finished_Script; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -516,10 +532,12 @@ string DaemonConfigProjectApplication::Job_Check_Finished_Script( void )
 string DaemonConfigProjectApplication::Job_Prologue_Script( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "job_prologue_script" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Prologue_Script; No data in job_prologue_script tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Prologue_Script; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -527,10 +545,12 @@ string DaemonConfigProjectApplication::Job_Prologue_Script( void )
 string DaemonConfigProjectApplication::Job_Run_Script( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "job_run_script" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Run_Script; No data in job_run_script tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Run_Script; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -538,10 +558,12 @@ string DaemonConfigProjectApplication::Job_Run_Script( void )
 string DaemonConfigProjectApplication::Job_Epilogue_Script( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "job_epilogue_script" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Epilogue_Script; No data in job_epilogue_script tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Epilogue_Script; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -549,10 +571,12 @@ string DaemonConfigProjectApplication::Job_Epilogue_Script( void )
 string DaemonConfigProjectApplication::Job_Abort_Script( void )
 {
  string Data = NormalizeString( Parse_XML( ApplicationCache, "job_abort_script" ) );
- if( Data.empty() )
+ if( Data.empty() ) {
   CRITICAL_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Abort_Script; No data in job_abort_script tag found" )
- else
+ } else {
+  Data = AbsolutePath( Data );
   VERBOSE_DEBUG_LOG_RETURN( Data, "DaemonConfigProjectApplication::Job_Abort_Script; Returned " << Data );
+ }
 }
 
 // -----------------------------------------------------------------------------
@@ -619,6 +643,23 @@ void WriteStringToFile( string String, string FileName )
  File << String;
 
  VERBOSE_DEBUG_LOG( "WriteStringToFile; Wrote file " << FileName << " with String=" << String );
+}
+
+// -----------------------------------------------------------------------------
+
+string AbsolutePath( string FileName )
+{
+ string Result;
+ 
+ if( FileName[ 0 ] == '/' ) return( FileName );
+
+ while( !getcwd( (char *)(Result.c_str()), Result.size() ) )
+ {
+  if( errno != ERANGE ) CRITICAL_LOG_RETURN( FileName, "AbsolutePath; could not obtain current directory: " << strerror( errno ) );
+  Result.resize( Result.size() * 2 );
+ }   
+
+ return( Result + "/" + FileName );
 }
 
 // -----------------------------------------------------------------------------
