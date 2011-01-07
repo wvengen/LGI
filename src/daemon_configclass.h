@@ -24,6 +24,7 @@
 #include <fstream>
 #include <string>
 #include <cctype>
+#include <cstring>
 #include <cstdio>
 #include <cstdlib>
 #include <cerrno>
