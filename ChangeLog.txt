@@ -105,4 +105,5 @@ Fri January 7 2011 -- version 1.30
 - Made sure server updates use keep alives and caching in posting.
 - Added support for relative paths in daemon config file, thanks
   to Willem v. Engen.
+- Added the .spec files in specs to build RPMs on RHEL systems.
 

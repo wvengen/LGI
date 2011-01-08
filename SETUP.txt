@@ -250,6 +250,10 @@ and be your own X.509 CA.
   <Directory "/var/www/html/LGI/python">
          Deny from all
   </Directory>
+ 
+  <Directory "/var/www/html/LGI/specs">
+         Deny from all
+  </Directory>
 
   <Directory "/var/www/html/LGI/scheduler">
          Deny from all
