@@ -293,7 +293,10 @@ do
 done
 chown -R LGI.LGI $RPM_INSTALL_PREFIX
 chmod g+w $RPM_INSTALL_PREFIX/repository
+chmod 750 $RPM_INSTALL_PREFIX/docs/screen_shots
+chmod 750 $RPM_INSTALL_PREFIX/docs/hello_world_pbs_scripts
 chmod 770 $RPM_INSTALL_PREFIX
+rm -rf $RPM_INSTALL_PREFIX/docs/ExampleInterface.pyc $RPM_INSTALL_PREFIX/docs/ExampleInterface.pyo
 HOSTNAME=`hostname -f`
 ESCAPED=`echo -e "$RPM_INSTALL_PREFIX" | sed "s/\//\\\\\\\\\//g"`
 sed "s/LGIpasswd/$LGIPASSWD/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
