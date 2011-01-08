@@ -196,6 +196,7 @@ ln -s %{prefix}/ssl_LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/ssl_LGI.conf
 %attr(750,root,root) %{prefix}/scheduler/scheduler.php
 %attr(750,root,root) %{prefix}/scheduler/LGI_scheduler
 %attr(640,root,root) %{prefix}/repository/*
+%attr(750,root,root) %{prefix}/repository/*.cgi
 %attr(640,root,root) %{prefix}/tools/*
 %attr(750,root,root) %{prefix}/tools/ManageDB
 %attr(640,root,root) %{prefix}/ChangeLog.txt
