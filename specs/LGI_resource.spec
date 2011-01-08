@@ -36,7 +36,7 @@ Vendor: Theoretical Chemistry Group Leiden University
 Packager: mark somers <m.somers@chem.leidenuniv.nl>
 BuildRoot: %{_buildroot}
 Prefix: %{prefix}
-Requires: /etc/redhat-release, /bin/sed, /sbin/chkconfig, /sbin/service, /bin/cat
+Requires: /etc/redhat-release, /bin/sed, /sbin/chkconfig, /sbin/service, /bin/cat, /usr/bin/killall
 
 %description
 This is the resource software for running as part of the Leiden Grid Infrastructure Grid. 
@@ -188,7 +188,7 @@ cat << EOF_LOGROTATE > $RPM_BUILD_ROOT/etc/logrotate.d/LGI
     rotate 6
     compress
     postrotate
-          /bin/killall -HUP LGI_daemon 2> /dev/null || true
+          /usr/bin/killall -HUP LGI_daemon 2> /dev/null || true
     endscript
 }
 EOF_LOGROTATE
