@@ -207,8 +207,10 @@ EOF_LOGROTATE
 /etc/logrotate.d/LGI
 
 %preun
-service LGI_daemon stop > /dev/null
-chkconfig LGI_daemon off > /dev/null
+if [ "$1" = "0" ]; then
+ service LGI_daemon stop &> /dev/null
+ chkconfig LGI_daemon off &> /dev/null
+fi
 
 %post
 HOSTNAME=`hostname -f`
@@ -219,7 +221,8 @@ sed "s/PATCHKEYHERE/$HOSTNAME.key/" -i /etc/LGI.cfg
 sed "s/PATCHCERTHERE/$HOSTNAME.crt/" -i /etc/LGI.cfg
 sed "s/PATCHTHISPATH/$ESCAPED/" -i /etc/profile.d/LGI.sh
 sed "s/PATCHTHISPATH/$ESCAPED/" -i /etc/profile.d/LGI.csh
-cat << END_OF_MESSAGE
+if [ "$1" = "1" ]; then
+ cat << END_OF_MESSAGE
 
 This machine ($HOSTNAME) has been configured as an LGI resource now.
 
@@ -231,3 +234,4 @@ Also make sure your LGI project server administrator has inserted the resource c
 database on the LGI project (master) server.
 
 END_OF_MESSAGE
+fi

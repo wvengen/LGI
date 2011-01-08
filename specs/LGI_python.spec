@@ -71,8 +71,10 @@ cp $RPM_BUILD_DIR/LGI*/LICENSE.txt $RPM_BUILD_ROOT/%{prefix}/docs
 %{prefix}
 
 %postun
-rm -rf /usr/lib/python*/LGI.*
-rm -rf /usr/lib64/python*/LGI.*
+if [ "$1" = "0" ]; then
+ rm -rf /usr/lib/python*/LGI.*
+ rm -rf /usr/lib64/python*/LGI.*
+fi
 
 %post
 rm -rf $RPM_INSTALL_PREFIX/docs/ExampleInterface.pyc

@@ -215,9 +215,6 @@ ln -s %{prefix}/ssl_LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/ssl_LGI.conf
 %attr(750,root,root) /etc/init.d/LGI_scheduler
 
 %preun
-apachectl stop 2> /dev/null
-service LGI_scheduler stop > /dev/null
-chkconfig LGI_scheduler off > /dev/null
 PASSWD=""
 mysql -u root --password="$PASSWD" -e 'SHOW DATABASES' mysql &> /dev/null
 if [ "$?" -ne "0" ]; then
@@ -234,26 +231,34 @@ mysql -u root --password="$PASSWD" -e 'SHOW DATABASES' mysql > /dev/null && echo
 
 %postun
 PASSWD=`cat /root/.tmppasswd`; rm -rf /root/.tmppasswd
-mysql -u root --password="$PASSWD" -e 'DROP DATABASE LGI' mysql
-mysql -u root --password="$PASSWD" -e 'DROP USER "LGI"@"localhost"' mysql
-userdel LGI > /dev/null
-groupdel LGI > /dev/null
-if [ -f /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI ]; then
- mv /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI /etc/httpd/conf.d/ssl.conf > /dev/null
- echo /etc/httpd/conf.d/ssl.conf has been restored from /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI
+if [ "$1" = "0" ]; then
+ apachectl stop &> /dev/null
+ service LGI_scheduler stop &> /dev/null
+ chkconfig LGI_scheduler off &> /dev/null
+ mysql -u root --password="$PASSWD" -e 'DROP DATABASE LGI' mysql &> /dev/null
+ mysql -u root --password="$PASSWD" -e 'DROP USER "LGI"@"localhost"' mysql &> /dev/null
+ rm -rf $RPM_INSTALL_PREFIX/repository/JOB_* 
+ userdel LGI &> /dev/null
+ groupdel LGI &> /dev/null
+ if [ -f /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI ]; then
+  mv /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI /etc/httpd/conf.d/ssl.conf &> /dev/null
+  echo /etc/httpd/conf.d/ssl.conf has been restored from /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI
+ fi
+ apachectl start &> /dev/null
 fi
-apachectl start > /dev/null
+
 
 %pre
 LGIPASSWD=`dd if=/dev/urandom count=128 2> /dev/null | tr -dc A-Za-z0-9 | head -c 12`
 if [ "$1" = "2" ]; then
  LGIPASSWD=`grep MYSQL_PASSWD $RPM_INSTALL_PREFIX/inc/Config.inc | cut -d'=' -f2 | sed "s/;\$//g" | sed "s/\"//g"`
+else
+ if [ -f /etc/httpd/conf.d/ssl.conf ]; then
+  mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI
+  echo /etc/httpd/conf.d/ssl.conf has been saved to /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI
+ fi
 fi
 echo $LGIPASSWD > /root/.tmplgipasswd
-if [ -f /etc/httpd/conf.d/ssl.conf ]; then
- mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI
- echo /etc/httpd/conf.d/ssl.conf has been saved to /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI
-fi
 PASSWD=""
 mysql -u root --password="$PASSWD" -e 'SHOW DATABASES' mysql &> /dev/null
 if [ "$?" -ne "0" ]; then
@@ -308,7 +313,8 @@ sed "s/PATCHHOSTNAME/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/ssl_LGI.conf
 rm -rf /etc/httpd/conf.d/ssl_LGI.conf; ln -s $RPM_INSTALL_PREFIX/ssl_LGI.conf /etc/httpd/conf.d/ssl_LGI.conf
 sed "s/\/var\/www\/html\/LGI/$ESCAPED/g" -i $RPM_INSTALL_PREFIX/LGI.conf
 rm -rf /etc/httpd/conf.d/LGI.conf; ln -s $RPM_INSTALL_PREFIX/LGI.conf /etc/httpd/conf.d/LGI.conf
-cat << END_OF_MESSAGE
+if [ "$1" = "1" ]; then
+ cat << END_OF_MESSAGE
 This machine ($HOSTNAME) has been configured as an LGI project server now.
 
 Please place the certificate in the file $RPM_INSTALL_PREFIX/certificates/LGI@$HOSTNAME.crt
@@ -328,3 +334,4 @@ Start the scheduler with 'service LGI_scheduler start'. To survive a reboot, use
 Please read $RPM_INSTALL_PREFIX/SETUP.txt to fine-tune your setup for extra performance.
 
 END_OF_MESSAGE
+fi
