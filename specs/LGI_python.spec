@@ -72,8 +72,8 @@ cp $RPM_BUILD_DIR/LGI*/LICENSE.txt $RPM_BUILD_ROOT/%{prefix}/docs
 
 %postun
 if [ "$1" = "0" ]; then
- rm -rf /usr/lib/python*/LGI.*
- rm -rf /usr/lib64/python*/LGI.*
+ rm -rf /usr/lib/python*/LGI.* &> /dev/null
+ rm -rf /usr/lib64/python*/LGI.* &> /dev/null
 fi
 
 %post
@@ -81,7 +81,7 @@ rm -rf $RPM_INSTALL_PREFIX/docs/ExampleInterface.pyc
 rm -rf $RPM_INSTALL_PREFIX/docs/ExampleInterface.pyo
 rm -rf /usr/lib/python*/LGI.*
 rm -rf /usr/lib64/python*/LGI.*
-for l in `ls -d /usr/lib/* /usr/lib64/* | grep '\/python'`
+for l in `ls -d /usr/lib/* /usr/lib64/* 2> /dev/null | grep '\/python'`
 do
  ln -s -T $RPM_INSTALL_PREFIX/python/LGI.py $l/LGI.py
  ln -s -T $RPM_INSTALL_PREFIX/python/LGI.pyc $l/LGI.pyc
