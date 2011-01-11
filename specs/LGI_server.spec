@@ -36,7 +36,7 @@ Vendor: Theoretical Chemistry Group Leiden University
 Packager: mark somers <m.somers@chem.leidenuniv.nl>
 BuildRoot: %{_buildroot}
 Prefix: %{prefix}
-Requires: /etc/redhat-release, /bin/sed, /sbin/chkconfig, /sbin/service, /bin/cat, httpd, mod_ssl, mysql, mysql-server, php, php-mysql, perl
+Requires: /etc/redhat-release, /bin/touch, /bin/sed, /sbin/chkconfig, /sbin/service, /bin/cat, httpd, mod_ssl, mysql, mysql-server, php, php-mysql, perl
 
 %description
 This is the server software for running a Leiden Grid Infrastructure Grid yourself. 
@@ -102,22 +102,22 @@ cat > $RPM_BUILD_ROOT/%{prefix}/scheduler/LGI_scheduler << END_OF_SCHED
 
 start() {
     echo -n $"Starting LGI scheduler: "
-    daemon "PATCHTHIS/scheduler/scheduler.php &"
+    daemon "PATCHTHIS/scheduler/scheduler.php &" && touch PATCHTHIS/scheduler/LGI_scheduler.lock
     echo
 }   
     
 stop() {
     echo -n $"Stopping LGI scheduler: "
-    killproc scheduler.php
+    killproc scheduler.php && rm -f PATCHTHIS/scheduler/LGI_scheduler.lock
     echo
 }
 
 case "\$1" in
     start)
-        start
+        [ ! -f PATCHTHIS/scheduler/LGI_scheduler.lock ] && start
         ;;
     stop)
-        stop
+        [ -f PATCHTHIS/scheduler/LGI_scheduler.lock ] && stop
         ;;
     restart)
         stop

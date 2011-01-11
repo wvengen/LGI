@@ -101,7 +101,7 @@ void PrintHelp( char *ExeName )
 
 int ListRepository( void )
 {
- string Response, File, FileData, URL = RepositoryServer + "/repository_content.php?repository=" + RepositoryDir;
+ string Response, File, FileData, URL = RepositoryServer + "/../repository_content.php?repository=" + RepositoryDir;
  int Pos, FileNr;
  time_t TimeStamp;
  char *TimeStampStr;

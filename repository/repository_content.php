@@ -24,13 +24,17 @@
   if( isset( $_GET[ "repository" ] ) )
    $Repository = $_GET[ "repository" ];
 
-  if( isset( $Repository ) && is_dir( "./".escapeshellcmd( $Repository ) ) && ( preg_match( "/^JOB_[a-zA-Z0-9]{32}$/", $Repository ) == 1 ) )
+  if( isset( $Repository ) && ( preg_match( "/^JOB_[a-zA-Z0-9]{32}$/", $Repository ) == 1 ) )
   {
-   $Find = "find ./".escapeshellcmd( $Repository )." -type f -printf '<file name=\"%P\"> <size> %s </size> <date> %T@ </date> </file> '";
-   $Content = shell_exec( $Find ); 
+   $RepositoryDir = substr( $Repository, -3 )."/".$Repository;
+   if( is_dir( "./".escapeshellcmd( $RepositoryDir ) ) )
+   {
+    $Find = "find ./".escapeshellcmd( $RepositoryDir )." -type f -printf '<file name=\"%P\"> <size> %s </size> <date> %T@ </date> </file> '";
+    $Content = shell_exec( $Find ); 
+   }
+   else
+    $Content = "";
   }
-  else
-   $Content = "";
 
   echo "<repository_content name=\"$Repository\"> $Content </repository_content>";
 ?>

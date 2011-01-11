@@ -136,7 +136,7 @@ class LGI_Client:
 	def ListRepository( self ):
 		Vars = {};
 		Vars[ 'repository' ] = self._Path[ self._Path.rfind( "/" ) + 1 : len( self._Path ) ];
-		return( self.__PostToServer( API = None, Path = self._Path[ 0 : self._Path.rfind( "/" ) + 1 ] + "repository_content.php", Variables = Vars ) );
+		return( self.__PostToServer( API = None, Path = self._Path[ 0 : self._Path.rfind( "/" ) + 1 ] + "../repository_content.php", Variables = Vars ) );
 
 	# if the class was setup with a repository URL, use this method to download some files
 	def DownLoadFiles( self, Files, Where = None ):

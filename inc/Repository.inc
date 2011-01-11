@@ -18,8 +18,8 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-require_once( '../inc/Config.inc' );
-require_once( '../inc/Utils.inc' );
+require_once( '/var/www/html/LGI/inc/Config.inc' );
+require_once( '/var/www/html/LGI/inc/Utils.inc' );
 
 // --------------------------------------------------- 
 
@@ -86,6 +86,7 @@ function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile,
  global $Config;
 
  $RepositoryName = "JOB_".md5( uniqid( rand(), TRUE ) );
+ $RepositoryName = substr( $RepositoryName, -3 )."/".$RepositoryName;
 
  if( ( $Config[ "REPOSITORY_SERVER_NAME" ] != "" ) && ( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" ) )
  {
@@ -124,13 +125,13 @@ function CreateRepository( &$RepositoryDir, &$RepositoryURL, &$RepositoryIDFile,
  }
 
  if( $RepositoryIDFile != "" )
-  exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir $RepositoryDir; chmod 770 $RepositoryDir; echo $WriteAccess > $RepositoryDir/.LGI_repository_write_access\"" ); 
+  exec( "$SSHCommand -i $RepositoryIDFile $RepositoryURL \"mkdir -p $RepositoryDir; chmod 770 $RepositoryDir; echo $WriteAccess > $RepositoryDir/.LGI_repository_write_access\"" ); 
  else
  {
   if( !is_dir( $RepositoryDir ) )
   {
    $OldMask = umask( 0 );
-   @mkdir( $RepositoryDir, 0770 );
+   @mkdir( $RepositoryDir, 0770, true );
    $File = @fopen( "$RepositoryDir/.LGI_repository_write_access", "w" );
    if( $File )
    {
@@ -180,6 +181,7 @@ function RepositoryURL2WWW( $RepositoryURL )
   if( $RepositoryArray[ 0 ] == 2 )
   {  
    $RepositoryURL = basename( $RepositoryArray[ 2 ] );
+   $RepositoryURL = substr( $RepositoryURL, -3 )."/".$RepositoryURL;
    if( $Config[ "REPOSITORY_URL" ] != "" ) $RepositoryURL = $Config[ "REPOSITORY_URL" ]."/".$RepositoryURL;
   }  
   else

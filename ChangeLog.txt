@@ -106,4 +106,8 @@ Fri January 7 2011 -- version 1.30
 - Added support for relative paths in daemon config file, thanks
   to Willem v. Engen.
 - Added the .spec files in specs to build RPMs on RHEL systems.
+- Added support for more than 32k jobs in repository by adding 
+  extra fan-out directory based on unique name. Limit is now 134M
+  jobs on ext3 filesystem.
+
 

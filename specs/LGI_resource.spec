@@ -36,7 +36,7 @@ Vendor: Theoretical Chemistry Group Leiden University
 Packager: mark somers <m.somers@chem.leidenuniv.nl>
 BuildRoot: %{_buildroot}
 Prefix: %{prefix}
-Requires: /etc/redhat-release, /bin/sed, /sbin/chkconfig, /sbin/service, /bin/cat, /usr/bin/killall
+Requires: /etc/redhat-release, /bin/sed, /sbin/chkconfig, /sbin/service, /bin/cat, /usr/bin/killall, /bin/touch
 
 %description
 This is the resource software for running as part of the Leiden Grid Infrastructure Grid. 
@@ -154,22 +154,22 @@ cat << EOF_INITD > $RPM_BUILD_ROOT/etc/init.d/LGI_daemon
 
 start() {
     echo -n $"Starting LGI daemon: "
-    daemon PATCHTHIS/sbin/LGI_daemon -d -l /var/log/LGI.log /etc/LGI.cfg 
+    daemon PATCHTHIS/sbin/LGI_daemon -d -l /var/log/LGI.log /etc/LGI.cfg && touch /var/spool/LGI/LGI_daemon.lock
     echo
 }
 
 stop() {
     echo -n $"Stopping LGI daemon: "
-    killproc LGI_daemon
+    killproc LGI_daemon && rm -rf /var/spool/LGI/LGI_daemon.lock
     echo
 }
 
 case "\$1" in
     start)
-	start
+	[ ! -f /var/spool/LGI/LGI_daemon.lock ] && start
 	;;
     stop)
-	stop
+	[ -f /var/spool/LGI/LGI_daemon.lock ] && stop
 	;;
     restart)
 	stop
