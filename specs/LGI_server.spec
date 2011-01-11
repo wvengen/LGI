@@ -237,7 +237,7 @@ if [ "$1" = "0" ]; then
  chkconfig LGI_scheduler off &> /dev/null
  mysql -u root --password="$PASSWD" -e 'DROP DATABASE LGI' mysql &> /dev/null
  mysql -u root --password="$PASSWD" -e 'DROP USER "LGI"@"localhost"' mysql &> /dev/null
- rm -rf $RPM_INSTALL_PREFIX/repository/JOB_* 
+ rm -rf $RPM_INSTALL_PREFIX/repository/???
  userdel LGI &> /dev/null
  groupdel LGI &> /dev/null
  if [ -f /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI ]; then
