@@ -18,8 +18,8 @@
 //
 // http://www.gnu.org/licenses/gpl.txt
 
-require_once( '/var/www/html/LGI/inc/Config.inc' );
-require_once( '/var/www/html/LGI/inc/Utils.inc' );
+require_once( '../inc/Config.inc' );
+require_once( '../inc/Utils.inc' );
 
 // --------------------------------------------------- 
 
