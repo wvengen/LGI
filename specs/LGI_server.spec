@@ -123,8 +123,11 @@ case "\$1" in
         stop
         start
         ;;
+    status)
+        status PATCHTHIS/scheduler/scheduler.php
+        ;;
     *)
-        echo $"Usage: \$0 {start|stop|restart}"
+        echo $"Usage: \$0 {start|stop|restart|status}"
         ;;
 esac
 END_OF_SCHED

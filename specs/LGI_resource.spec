@@ -175,8 +175,11 @@ case "\$1" in
 	stop
 	start
         ;;
+    status)
+        status PATCHTHIS/sbin/LGI_daemon
+        ;;
     *)
-	echo $"Usage: \$0 {start|stop|restart}"
+	echo $"Usage: \$0 {start|stop|restart|status}"
 	;;
 esac
 EOF_INITD
