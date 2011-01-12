@@ -108,7 +108,7 @@ start() {
     
 stop() {
     echo -n $"Stopping LGI scheduler: "
-    killproc scheduler.php && rm -f PATCHTHIS/scheduler/LGI_scheduler.lock
+    killproc --user LGI scheduler.php && rm -f PATCHTHIS/scheduler/LGI_scheduler.lock
     echo
 }
 
