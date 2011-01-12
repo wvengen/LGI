@@ -160,7 +160,7 @@ start() {
 
 stop() {
     echo -n $"Stopping LGI daemon: "
-    killproc LGI_daemon && rm -rf /var/spool/LGI/LGI_daemon.lock
+    killproc PATCHTHIS/sbin/LGI_daemon && rm -rf /var/spool/LGI/LGI_daemon.lock
     echo
 }
 
