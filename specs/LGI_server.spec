@@ -102,13 +102,13 @@ cat > $RPM_BUILD_ROOT/%{prefix}/scheduler/LGI_scheduler << END_OF_SCHED
 
 start() {
     echo -n $"Starting LGI scheduler: "
-    daemon "PATCHTHIS/scheduler/scheduler.php &" && touch PATCHTHIS/scheduler/LGI_scheduler.lock
+    daemon --user LGI "PATCHTHIS/scheduler/scheduler.php &" && touch PATCHTHIS/scheduler/LGI_scheduler.lock
     echo
 }   
     
 stop() {
     echo -n $"Stopping LGI scheduler: "
-    killproc --user LGI scheduler.php && rm -f PATCHTHIS/scheduler/LGI_scheduler.lock
+    killproc PATCHTHIS/scheduler/scheduler.php && rm -f PATCHTHIS/scheduler/LGI_scheduler.lock
     echo
 }
 
