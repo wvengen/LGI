@@ -4,8 +4,8 @@
 %define name LGI_resource
 %define version 1.30
 %define release 1.el5
-%define sources http://fwnc7003.leidenuniv.nl/LGI/LGI.tar.gz
-%define url http://fwnc7003.leidenuniv.nl/LGI
+%define sources http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
+%define url http://gliteui.wks.gorlaeus.net/LGI
 %define prefix /usr/local/LGI
 #
 # define RPM build area so that the following vars will be defined:
@@ -215,6 +215,11 @@ if [ "$1" = "0" ]; then
  chkconfig LGI_daemon off &> /dev/null
 fi
 
+%pre
+if [ "$1" = "2" ]; then
+ service LGI_daemon stop &> /dev/null
+fi
+
 %post
 HOSTNAME=`hostname -f`
 ESCAPED=`echo -e "$RPM_INSTALL_PREFIX" | sed "s/\//\\\\\\\\\//g"`
@@ -237,4 +242,8 @@ Also make sure your LGI project server administrator has inserted the resource c
 database on the LGI project (master) server.
 
 END_OF_MESSAGE
+else
+ cat << END_OF_MESSAGE_2
+LGI_daemon has been stopped as part of the upgrade!
+END_OF_MESSAGE_2
 fi

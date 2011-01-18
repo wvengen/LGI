@@ -88,4 +88,6 @@ class Daemon : public DaemonConfig
 
 // -----------------------------------------------------------------------------
 
+string EscapeSpacesInString( string Command );
+
 #endif

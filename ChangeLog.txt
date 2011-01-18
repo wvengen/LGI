@@ -89,7 +89,7 @@ Fri November 19 2010 -- version 1.29
 - Added slave server capabilities report into daemon.
 
 
-Wed January 12 2011 -- version 1.30
+Wed January 18 2011 -- version 1.30
 ----------------------------------
 
 - Patched repository content listing code. It had a security hole 
@@ -109,5 +109,11 @@ Wed January 12 2011 -- version 1.30
 - Added support for more than 32k jobs in repository by adding 
   extra fan-out directory based on unique name. Limit is now 134M
   jobs on ext3 filesystem.
+- Made sure .spec files create upgradable rpms and use correct source 
+  URL.
+- Removed small issues with relative paths in daemon config file.
+- Made sure paths for daemon can have spaces.
+
+
 
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-export LGI_ROOT=${HOME}/LGI/scheduler
+export LGI_ROOT=${HOME}/scheduler
 export OLD_ROOT=`pwd`
 
 if [ -f ${LGI_ROOT}/scheduler.pid ]

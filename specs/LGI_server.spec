@@ -4,8 +4,8 @@
 %define name LGI_server
 %define version 1.30
 %define release 1.el5
-%define sources http://fwnc7003.leidenuniv.nl/LGI/LGI.tar.gz
-%define url http://fwnc7003.leidenuniv.nl/LGI
+%define sources http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
+%define url http://gliteui.wks.gorlaeus.net/LGI
 %define prefix /var/www/html/LGI
 #
 # define RPM build area so that the following vars will be defined:
@@ -218,26 +218,31 @@ ln -s %{prefix}/ssl_LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/ssl_LGI.conf
 %attr(750,root,root) /etc/init.d/LGI_scheduler
 
 %preun
-PASSWD=""
-mysql -u root --password="$PASSWD" -e 'SHOW DATABASES' mysql &> /dev/null
-if [ "$?" -ne "0" ]; then
- echo
- read -s -p "Enter mysql root password to DROP the LGI database: " PASSWD < /dev/tty
- echo
- echo
-else
- echo 
- echo ! ! ! YOU REALY SHOULD SET A mysql ROOT PASSWORD. USE 'mysqladmin -u root password "yourmysqlrootpassword"' ! ! !
- echo
-fi
-mysql -u root --password="$PASSWD" -e 'SHOW DATABASES' mysql > /dev/null && echo $PASSWD > /root/.tmppasswd
-
-%postun
-PASSWD=`cat /root/.tmppasswd`; rm -rf /root/.tmppasswd
 if [ "$1" = "0" ]; then
  apachectl stop &> /dev/null
  service LGI_scheduler stop &> /dev/null
  chkconfig LGI_scheduler off &> /dev/null
+ cat << END_OF_MESSAGE
+apache has been stopped as part of the erase!
+END_OF_MESSAGE
+ PASSWD=""
+ mysql -u root --password="$PASSWD" -e 'SHOW DATABASES' mysql &> /dev/null
+ if [ "$?" -ne "0" ]; then
+  echo
+  read -s -p "Enter mysql root password to DROP the LGI database: " PASSWD < /dev/tty
+  echo
+  echo
+ else
+  echo 
+  echo ! ! ! YOU REALY SHOULD SET A mysql ROOT PASSWORD. USE 'mysqladmin -u root password "yourmysqlrootpassword"' ! ! !
+  echo
+ fi
+ mysql -u root --password="$PASSWD" -e 'SHOW DATABASES' mysql > /dev/null && echo $PASSWD > /root/.tmppasswd
+fi
+
+%postun
+if [ "$1" = "0" ]; then
+ PASSWD=`cat /root/.tmppasswd`; rm -rf /root/.tmppasswd
  mysql -u root --password="$PASSWD" -e 'DROP DATABASE LGI' mysql &> /dev/null
  mysql -u root --password="$PASSWD" -e 'DROP USER "LGI"@"localhost"' mysql &> /dev/null
  rm -rf $RPM_INSTALL_PREFIX/repository/???
@@ -247,14 +252,17 @@ if [ "$1" = "0" ]; then
   mv /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI /etc/httpd/conf.d/ssl.conf &> /dev/null
   echo /etc/httpd/conf.d/ssl.conf has been restored from /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI
  fi
- apachectl start &> /dev/null
 fi
-
 
 %pre
 LGIPASSWD=`dd if=/dev/urandom count=128 2> /dev/null | tr -dc A-Za-z0-9 | head -c 12`
 if [ "$1" = "2" ]; then
  LGIPASSWD=`grep MYSQL_PASSWD $RPM_INSTALL_PREFIX/inc/Config.inc | cut -d'=' -f2 | sed "s/;\$//g" | sed "s/\"//g"`
+ service LGI_scheduler stop &> /dev/null
+ apachectl stop &> /dev/null
+ cat << END_OF_MESSAGE_2
+LGI_scheduler and apache have been stopped as part of the upgrade!
+END_OF_MESSAGE_2
 else
  if [ -f /etc/httpd/conf.d/ssl.conf ]; then
   mv /etc/httpd/conf.d/ssl.conf /etc/httpd/conf.d/ssl.conf.SAVED_BY_LGI
@@ -286,9 +294,9 @@ if [ "$1" = "1" ]; then
  echo "GRANT ALL PRIVILEGES ON LGI.* to \"LGI\"@\"localhost\" IDENTIFIED BY \"$LGIPASSWD\"" | mysql -u root --password="$PASSWD" mysql
  mysql -u LGI --password="$LGIPASSWD" LGI < $RPM_INSTALL_PREFIX/LGI.db
 fi
-FILES1=`find $RPM_INSTALL_PREFIX -type f -name '*.inc'`
-FILES2=`find $RPM_INSTALL_PREFIX -type f -name '*.php'`
-FILES="$FILES1 $FILES2 $RPM_INSTALL_PREFIX/tools/ManageDB"
+FILES1=`find $RPM_INSTALL_PREFIX/inc -type f -name '*.inc'`
+FILES2=`find $RPM_INSTALL_PREFIX/basic_interface $RPM_INSTALL_PREFIX/resources $RPM_INSTALL_PREFIX/servers $RPM_INSTALL_PREFIX/interfaces -type f -name '*.php'`
+FILES="$FILES1 $FILES2 $RPM_INSTALL_PREFIX/tools/ManageDB $RPM_INSTALL_PREFIX/scheduler/scheduler.php"
 ESCAPED=`echo -e "$RPM_INSTALL_PREFIX" | sed "s/\//\\\\\\\\\//g"`
 for f in $FILES
 do
@@ -303,15 +311,14 @@ rm -rf $RPM_INSTALL_PREFIX/docs/ExampleInterface.pyc $RPM_INSTALL_PREFIX/docs/Ex
 HOSTNAME=`hostname -f`
 ESCAPED=`echo -e "$RPM_INSTALL_PREFIX" | sed "s/\//\\\\\\\\\//g"`
 sed "s/LGIpasswd/$LGIPASSWD/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
-sed "s/fwnc7003.leidenuniv.nl/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
-sed "s/fwnc7003.wks.gorlaeus.net/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
-sed "s/fwnc7003/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
+sed "s/gliteui.wks.gorlaeus.net/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
+sed "s/gliteui/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/Certificates\/LGI+CA.crt/LGI\/LGI+CA.crt/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/..\/certificates/$ESCAPED\/certificates/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
-sed "s/\/mnt\/sdb1\/LGI\/trunk\/repository/$ESCAPED\/repository/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
+sed "s/\/var\/www\/html\/LGI\/repository/$ESCAPED\/repository/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/MYSQL_PASSWD=\"\"/MYSQL_PASSWD=\"$LGIPASSWD\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB
 sed "s/MYSQL_DB=\"\"/MYSQL_DB=\"LGI\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB
-sed "s/LGI_ROOT=\${HOME}\/LGI\/scheduler/LGI_ROOT=\"$ESCAPED\/scheduler\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB
+sed "s/LGI_ROOT=\${HOME}\/scheduler/LGI_ROOT=\"$ESCAPED\/scheduler\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB
 sed "s/PATCHTHIS/$ESCAPED/g" -i $RPM_INSTALL_PREFIX/scheduler/LGI_scheduler
 rm -rf /etc/init.d/LGI_scheduler; ln -s $RPM_INSTALL_PREFIX/scheduler/LGI_scheduler /etc/init.d/LGI_scheduler
 sed "s/PATCHTHIS/$ESCAPED/g" -i $RPM_INSTALL_PREFIX/ssl_LGI.conf
@@ -320,7 +327,7 @@ rm -rf /etc/httpd/conf.d/ssl_LGI.conf; ln -s $RPM_INSTALL_PREFIX/ssl_LGI.conf /e
 sed "s/\/var\/www\/html\/LGI/$ESCAPED/g" -i $RPM_INSTALL_PREFIX/LGI.conf
 rm -rf /etc/httpd/conf.d/LGI.conf; ln -s $RPM_INSTALL_PREFIX/LGI.conf /etc/httpd/conf.d/LGI.conf
 if [ "$1" = "1" ]; then
- cat << END_OF_MESSAGE
+ cat << END_OF_MESSAGE_3
 This machine ($HOSTNAME) has been configured as an LGI project server now.
 
 Please place the certificate in the file $RPM_INSTALL_PREFIX/certificates/LGI@$HOSTNAME.crt
@@ -339,5 +346,5 @@ Start the scheduler with 'service LGI_scheduler start'. To survive a reboot, use
 
 Please read $RPM_INSTALL_PREFIX/SETUP.txt to fine-tune your setup for extra performance.
 
-END_OF_MESSAGE
+END_OF_MESSAGE_3
 fi

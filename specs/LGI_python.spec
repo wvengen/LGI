@@ -4,8 +4,8 @@
 %define name LGI_python
 %define version 1.30
 %define release 1.el5
-%define sources http://fwnc7003.leidenuniv.nl/LGI/LGI.tar.gz
-%define url http://fwnc7003.leidenuniv.nl/LGI
+%define sources http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
+%define url http://gliteui.wks.gorlaeus.net/LGI
 %define prefix /usr/local/LGI
 
 #

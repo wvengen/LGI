@@ -649,17 +649,18 @@ void WriteStringToFile( string String, string FileName )
 
 string AbsolutePath( string FileName )
 {
- string Result;
+ char TempBuffer[ 1024 ];
  
  if( FileName[ 0 ] == '/' ) return( FileName );
 
- while( !getcwd( (char *)(Result.c_str()), Result.size() ) )
- {
-  if( errno != ERANGE ) CRITICAL_LOG_RETURN( FileName, "AbsolutePath; could not obtain current directory: " << strerror( errno ) );
-  Result.resize( Result.size() * 2 );
- }   
+ if( !getcwd( TempBuffer, sizeof( TempBuffer ) ) )
+  CRITICAL_LOG_RETURN( FileName, "AbsolutePath; could not obtain current directory: " << strerror( errno ) );
+ 
+ string Result( TempBuffer ); 
 
- return( Result + "/" + FileName );
+ Result = Result + "/" + FileName;
+
+ VERBOSE_DEBUG_LOG_RETURN( Result, "AbsolutePath; returned " << Result );
 }
 
 // -----------------------------------------------------------------------------

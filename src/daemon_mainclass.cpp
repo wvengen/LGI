@@ -558,7 +558,7 @@ int Daemon::RequestWorkCycle( void )
      VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Checking system limits for application " << TheApplication.Application_Name() );
 
      // check if there is a system wide limit reached for this application...
-     if( system( TheApplication.Check_System_Limits_Script().c_str() ) == 0 ) 
+     if( system( EscapeSpacesInString( TheApplication.Check_System_Limits_Script() ).c_str() ) == 0 ) 
      {
       DEBUG_LOG( "Daemon::RequestWorkCycle; Requesting work for application " << TheApplication.Application_Name() << " of project " << TheProject.Project_Name() << " at server " << (*ServerPointer) << " with session id " << SessionID );
 
@@ -886,6 +886,21 @@ int Daemon::RunSchedular( void )
  } while( ReadyForScheduling );
 
  return( ReadyForScheduling );
+}
+
+// -----------------------------------------------------------------------------
+
+string EscapeSpacesInString( string Command )
+{
+ string Result( 256, '\0' );
+
+ for( int i = 0; i < Command.size(); ++i )
+ {
+  if( isspace( Command[ i ] ) ) Result += '\\';
+  Result += Command[ i ];
+ }
+
+ return( Result );
 }
 
 // -----------------------------------------------------------------------------

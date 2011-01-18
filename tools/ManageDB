@@ -14,7 +14,7 @@ MYSQL_USER="LGI"
 MYSQL_PASSWD=""
 MYSQL_DB=""
 
-LGI_ROOT=${HOME}/LGI/scheduler
+LGI_ROOT=${HOME}/scheduler
 OLD_ROOT=`pwd`
 
 # ----------------------------------------------------
