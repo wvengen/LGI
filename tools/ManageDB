@@ -12,7 +12,7 @@
 MYSQL_HOST="localhost"
 MYSQL_USER="LGI"
 MYSQL_PASSWD=""
-MYSQL_DB=""
+MYSQL_DB="LGI"
 
 LGI_ROOT=${HOME}/scheduler
 OLD_ROOT=`pwd`
