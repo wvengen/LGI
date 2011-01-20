@@ -113,7 +113,8 @@ Wed January 18 2011 -- version 1.30
   URL.
 - Removed small issues with relative paths in daemon config file.
 - Made sure paths for daemon can have spaces.
-
+- Updated default scripts a bit.
+- Removed small scheduling bug from daemon.
 
 
 

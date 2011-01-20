@@ -585,7 +585,7 @@ int Daemon::RequestWorkCycle( void )
        Parse_XML_ListAllTags( TheApplication.Owner_Allow(), LimitsList );
 
        for( int i = 0; i < LimitsList.size(); ++i )      // check if any of these owners has hit a limit or is denied...
-        if( ( IsOwnerDenied( LimitsList[ i ], TheProject, TheApplication ) ) || ( IsOwnerRunningToMuch( LimitsList[ i ], TheProject, TheApplication ) & 7 ) )
+        if( ( IsOwnerDenied( LimitsList[ i ], TheProject, TheApplication ) ) || ( IsOwnerRunningToMuch( LimitsList[ i ], TheProject, TheApplication ) & 3 ) )
          OwnersDeniedList.insert( LimitsList[ i ] );  
         else
          OwnersAllowedList.insert( LimitsList[ i ] );  
@@ -594,7 +594,7 @@ int Daemon::RequestWorkCycle( void )
         OwnersAllowedList.clear();
 
        for( set<string>::iterator i = ListOfActiveOwners.begin(); i != ListOfActiveOwners.end(); ++i )   // check all known owners so far...
-        if( ( IsOwnerDenied( (*i), TheProject, TheApplication ) ) || ( IsOwnerRunningToMuch( (*i), TheProject, TheApplication ) & 7 ) )
+        if( ( IsOwnerDenied( (*i), TheProject, TheApplication ) ) || ( IsOwnerRunningToMuch( (*i), TheProject, TheApplication ) & 3 ) )
          OwnersDeniedList.insert( (*i) );
 
        LimitsList.clear();                                     // and add all denied owners to the list...
