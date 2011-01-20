@@ -89,8 +89,8 @@ Fri November 19 2010 -- version 1.29
 - Added slave server capabilities report into daemon.
 
 
-Wed January 18 2011 -- version 1.30
-----------------------------------
+Thu January 20 2011 -- version 1.30
+-----------------------------------
 
 - Patched repository content listing code. It had a security hole 
   found by Willem v. Engen.
