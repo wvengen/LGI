@@ -6,13 +6,22 @@ setenv LGI_DIR /home/${USER}/LGI
 
 setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
 setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; grep -E '^([0-9]{1,2})$' cpus_file`
-if ( ${CPUS} == "" ) then
+
+setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics cpus | grep -E '^([0-9]{1,2})$'`
+if ( ${CPUS} <= 0 || ${CPUS} > 8 ) then
    setenv CPUS 8
 endif
-setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o walltime_file walltime; grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$' walltime_file`
-if ( ${WALLTIME} == "" ) then
+
+setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics walltime | grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$'`
+if ( `echo ${WALLTIME} | cut -d':' -f 1` <= 0 || `echo ${WALLTIME} | cut -d ':' -f 1` > 24 ) then
    setenv WALLTIME "24:00:00"
 endif
+
+setenv NODES `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics nodes | grep -E '^([0-9]{1,2})$'`
+if ( ${NODES} <= 0 || ${NODES} > 1 ) then
+   setenv NODES 1
+endif
+
 setenv CWD `pwd`
 
 if ( ${REPOSITORY_URL} != "" ) then
@@ -46,7 +55,7 @@ if ( ${REPOSITORY_URL} != "" ) then
 #@ shell = /usr/bin/csh
 #@ job_name = VASP_ll
 #@ job_type = parallel
-#@ node = 1
+#@ node = ${NODES}
 #@ tasks_per_node = ${CPUS}
 #@ node_usage = shared
 #@ notification = never

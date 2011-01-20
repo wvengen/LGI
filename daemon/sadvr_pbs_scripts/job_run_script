@@ -1,18 +1,25 @@
 #!/bin/csh
 
 setenv LGI_DIR /home/${USER}/LGI
+
 setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics cpus | grep -E '^([0-9]{1,2})$'`
-if ( ${CPUS} == "" ) then
+if ( ${CPUS} <= 0 || ${CPUS} > 1 ) then
    setenv CPUS 1
 endif
+
 setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics walltime | grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$'`
-if ( ${WALLTIME} == "" ) then
+if ( `echo ${WALLTIME} | cut -d':' -f 1` <= 0 || `echo ${WALLTIME} | cut -d ':' -f 1` > 12 ) then
    setenv WALLTIME "12:00:00"
+endif
+
+setenv NODES `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics nodes | grep -E '^([0-9]{1,2})$'`
+if ( ${NODES} <= 0 || ${NODES} > 1 ) then
+   setenv NODES 1
 endif
 
 cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -S /bin/csh
-#PBS -l nodes=01:ppn=${CPUS},walltime=${WALLTIME}
+#PBS -l nodes=${NODES}:ppn=${CPUS},walltime=${WALLTIME}
 #PBS -N SA-DVR_pbs
 #PBS -o LGI_output
 

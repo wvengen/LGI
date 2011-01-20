@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # some settings...
-export CERT_PASSWD="m@rks0m3rs007"
+export CERT_PASSWD=""
 export VOMS="gaussian"
 export LGI_DIR="${HOME}/LGI"
 export X509_USER_PROXY=./x509_proxy_cert
