@@ -59,6 +59,8 @@ if ( \${REPOSITORY_URL} != "" ) then
  endif
 
  dos2unix -n \${PBS_O_WORKDIR}/LGI_input g03.input
+ echo >> g03.input
+ echo >> g03.input
 
  setenv DATE \`date\`
  echo "G03_PBS started g03 on node \${NODE} at \${DATE}." 

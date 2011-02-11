@@ -58,7 +58,7 @@ CURL *Interface_Server_API::SetupcURLForPost( string &PostURL )
   curl_easy_setopt( MycURLHandle, CURLOPT_SSLKEY, PrivateKeyFile.c_str() );
   curl_easy_setopt( MycURLHandle, CURLOPT_CAINFO, CAChainFile.c_str() );
   curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
   curl_easy_setopt( MycURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( MycURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( MycURLHandle, CURLOPT_NOPROGRESS, 1 );

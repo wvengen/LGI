@@ -343,17 +343,15 @@ int main( int argc, char *argv[] )
   if( Flag != CURLE_OK )
   {
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
-   curl_global_cleanup();
    return( 1 );
   }
 
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-  if( Response.empty() ) { curl_global_cleanup(); return( 1 ); }
+  if( Response.empty() ) return( 1 );
   Flag = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
   if( Flag ) 
   {
    cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
-   curl_global_cleanup();
    return( 1 );
   }
 
@@ -366,7 +364,7 @@ int main( int argc, char *argv[] )
   else
   {
    Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-   if( Response.empty() ) { curl_global_cleanup(); return( 1 ); }
+   if( Response.empty() ) return( 1 );
    Flag = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
    if( Flag ) 
     cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
@@ -378,21 +376,18 @@ int main( int argc, char *argv[] )
   if( Flag != CURLE_OK )
   {
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
-   curl_global_cleanup();
    return( 1 );
   }
 
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-  if( Response.empty() ) { curl_global_cleanup(); return( 1 ); }
+  if( Response.empty() ) return( 1 );
   Flag = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
   if( Flag ) 
   {
    cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
-   curl_global_cleanup();
    return( 1 );
   }
 
-  curl_global_cleanup();
   return( 0 );           // all went well....
  }
  else    // when the submit is in user mode...
@@ -403,24 +398,21 @@ int main( int argc, char *argv[] )
   if( Flag != CURLE_OK )
   {
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
-   curl_global_cleanup();
    return( 1 );
   }
 
   Response = Parse_XML( Parse_XML( Response, "LGI" ), "response" );
-  if( Response.empty() ) { curl_global_cleanup(); return( 1 ); }
+  if( Response.empty() ) return( 1 );
   Flag = atoi( NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "number" ) ).c_str() );
   if( Flag )
   {
    cout << endl << "Error message returned by server " << ServerURL << " : " << NormalizeString( Parse_XML( Parse_XML( Response, "error" ), "message" ) ) << endl << endl;
-   curl_global_cleanup();
    return( 1 );
   }
 
   if( XMLOutput )
   {
    cout << Response << endl;
-   curl_global_cleanup();
    return( 0 );
   }
 
@@ -472,10 +464,8 @@ int main( int argc, char *argv[] )
 
   cout << endl;
 
-  curl_global_cleanup();
   return( 0 );
  }
 
- curl_global_cleanup();
  return( 1 );
 }

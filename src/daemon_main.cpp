@@ -203,7 +203,6 @@ int main( int argc, char *argv[] )
      while( TheDaemon -> RunSchedular() );
      delete TheDaemon;
      NORMAL_LOG( "Main; Daemon finished normally" );
-     curl_global_cleanup();
      _exit( 0 );
     }
    }
@@ -215,12 +214,8 @@ int main( int argc, char *argv[] )
    }
   }
   else
-  {
-   curl_global_cleanup();
    CRITICAL_LOG_RETURN( 1, "Main; Daemon stopped" );
-  }
  }
 
- curl_global_cleanup();
  return( 0 );
 }

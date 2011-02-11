@@ -221,7 +221,6 @@ int main( int argc, char *argv[] )
   if( ( Flag = ServerAPI.Interface_Delete_Job( Response, ServerURL, Project, User, Groups, Job_Ids[ j ] ) ) != CURLE_OK )
   {
    cout << endl << "Error posting to server " << ServerURL << ". The cURL return code was " << Flag << endl << endl;
-   curl_global_cleanup();
    return( 1 );
   }
 
@@ -257,6 +256,5 @@ int main( int argc, char *argv[] )
 
  cout << endl;
 
- curl_global_cleanup();
  return( 0 );
 }

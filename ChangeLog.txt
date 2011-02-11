@@ -89,7 +89,7 @@ Fri November 19 2010 -- version 1.29
 - Added slave server capabilities report into daemon.
 
 
-Thu January 20 2011 -- version 1.30
+Tue February 8 2011 -- version 1.30
 -----------------------------------
 
 - Patched repository content listing code. It had a security hole 
@@ -115,6 +115,7 @@ Thu January 20 2011 -- version 1.30
 - Made sure paths for daemon can have spaces.
 - Updated default scripts a bit.
 - Removed small scheduling bug from daemon.
+- Tested .specs and code against RHEL 6; removed two small curl issues.
 
 
 

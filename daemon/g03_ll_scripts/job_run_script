@@ -66,6 +66,8 @@ source \${MODULESHOME}/init/csh
 module load gaussian
 
 dos2unix -n \${LOADL_STEP_INITDIR}/LGI_input g03.input
+echo >> g03.input
+echo >> g03.input
 g03 > g03.output < g03.input
 END_OF_LL_SUBMIT_SCRIPT
 

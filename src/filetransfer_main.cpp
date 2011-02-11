@@ -544,6 +544,5 @@ int main( int argc, char *argv[] )
   case CMD_DELETE:   Flag = DeleteFilesFromRepository(); break;
  }
 
- curl_global_cleanup();
  return( Flag );
 }

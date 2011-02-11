@@ -35,6 +35,8 @@ fi
 
 # convert to unix text...
 dos2unix g03.inp > /dev/null
+echo >> g03.inp
+echo >> g03.inp
 
 # register at myproxy myproxy.grid.cyf-kr.edu.pl...
 echo ${CERT_PASSWD} | myproxy-init -s myproxy.grid.cyf-kr.edu.pl -d -n -S > /dev/null
