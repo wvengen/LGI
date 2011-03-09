@@ -1,0 +1,119 @@
+#!/bin/bash
+
+# some settings...
+export CERT_PASSWD=""
+export VOMS="ncf"
+export LGI_DIR="${HOME}/LGI"
+export X509_USER_PROXY=./x509_proxy_cert
+
+# get repository url and download input...
+export REPO_URL=`${LGI_DIR}/daemon/bin/xml repository_url < LGI_job_specifics`
+export REPO_CONTENT=`${LGI_DIR}/daemon/bin/LGI_filetransfer list -x ${REPO_URL}`
+export FILE_LIST=""
+export NR_FILES=`echo ${REPO_CONTENT} | ${LGI_DIR}/daemon/bin/xml number_of_files`
+
+for nr in `seq 1 ${NR_FILES}`
+do
+  export FILE_ATTR="number=\"${nr}\""
+  export FILE_DATA=`echo ${REPO_CONTENT} | ${LGI_DIR}/daemon/bin/xml file ${FILE_ATTR}`
+  export FILE_NAME=`echo ${FILE_DATA} | ${LGI_DIR}/daemon/bin/xml file_name`
+  export FILE_LIST="${FILE_LIST} ${FILE_NAME}"
+done
+
+if [ "${FILE_LIST}" != "" ]
+then
+ ${LGI_DIR}/daemon/bin/LGI_filetransfer download ${REPO_URL} ${FILE_LIST} > /dev/null
+fi
+
+# see if we got any .nw files for input...
+NWINPUT=`ls *.nw`
+if [ "${NWINPUT}" == "" ]
+then
+ dos2unix -n LGI_input input.nw &>/dev/null
+ export FILE_LIST="${FILE_LIST} input.nw"
+ export NWINPUT="input.nw"
+ echo Input copied... >> LGI_output
+else
+ NWINPUT=`echo ${NWINPUT} | cut -d ' ' -f 1`
+ echo "Downloaded input file ${NWINPUT}..." >> LGI_output
+fi
+
+# get all files needed for nwchem...
+cp ${LGI_DIR}/daemon/nwchem.tar.gz .
+
+# create actual job script here..
+cat > nwchem.submitted.sh << EOF_SCRIPT
+tar -zxf nwchem.tar.gz &>/dev/null
+mkdir RUNHERE; mv ${FILE_LIST} RUNHERE; cd RUNHERE &>/dev/null
+../etc/gen_default.nwchemrc; cp ../etc/default.nwchemrc \${HOME}/.nwchemrc &>/dev/null
+../bin/nwchem ${NWINPUT}
+tar -zcvf ../nwchem.output.tar.gz ${NWINPUT} * &>/dev/null
+cd .. &>/dev/null
+EOF_SCRIPT
+echo nwchem run script created... >> LGI_output
+
+# create file list for inputsandbox...
+export FILE_LIST_2='"nwchem.submitted.sh", "nwchem.tar.gz"'
+if [ "${FILE_LIST}" != "" ]
+then
+
+ for FILE in ${FILE_LIST}
+ do
+   export FILE_LIST_2="${FILE_LIST_2}, \"${FILE}\""
+ done
+fi
+
+# create JDL for this job script...
+cat > nwchem.submitted.jdl << EOF_JDL
+type = "Job";
+jobtype = "Normal";
+executable = "/bin/bash";
+arguments = "nwchem.submitted.sh";
+stdoutput = "stdout";
+stderror = "stderr";
+outputsandbox = { "stdout", "stderr", "nwchem.output.tar.gz" };
+inputsandbox = { ${FILE_LIST_2} };
+shallowretrycount = 3;
+requirements = ( other.glueceinfototalcpus >= 4 && other.gluecepolicymaxcputime > 720 );
+myproxyserver = "px.grid.sara.nl";
+EOF_JDL
+
+# register at myproxy px.grid.sara.nl...
+echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
+
+# create new proxy cert for 196 hours...
+echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &> /dev/null
+
+# create and submit new job from JDL...
+export RUNNING=""
+while [ "${RUNNING}" == "" ]
+do
+ glite-wms-job-submit -a -o ${HOME}/my-glite-jobs nwchem.submitted.jdl | grep https | grep 9000 | tail -1 &> ./running
+ export RUNNING=`cat ./running | grep -E '^https'`
+done
+
+export JOB_ID=`cat ./running`
+echo Job ${JOB_ID} submitted to glite... >> LGI_output
+
+# wait until job is finished, sleep a bit...
+export JOB_STATE=""
+while [ "${JOB_STATE}" == "" ]
+do
+    sleep 300
+    export JOB_ID=`cat ./running`
+    export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+done
+echo Job ${JOB_ID} finished, retrieving output... >> LGI_output
+
+# retrieve the output now...
+glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
+
+# extract the output...
+cd ./output-files/*; tar -zxf nwchem.output.tar.gz; rm nwchem.output.tar.gz; cd ../..
+
+# send back the output to LGI server...
+${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPO_URL} ./output-files/*/* > /dev/null
+echo Uploaded output to repository ${REPO_URL}... >> LGI_output
+
+# and we are finished...
+touch ./finished
