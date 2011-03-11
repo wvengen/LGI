@@ -89,8 +89,8 @@ Fri November 19 2010 -- version 1.29
 - Added slave server capabilities report into daemon.
 
 
-Tue February 8 2011 -- version 1.30
------------------------------------
+Fri March 11 2011 -- version 1.30
+---------------------------------
 
 - Patched repository content listing code. It had a security hole 
   found by Willem v. Engen.
@@ -116,6 +116,9 @@ Tue February 8 2011 -- version 1.30
 - Updated default scripts a bit.
 - Removed small scheduling bug from daemon.
 - Tested .specs and code against RHEL 6; removed two small curl issues.
+- Made sure that LGI python code can deal with limit=0 values.
+- Updated documentation.
+- Added configuration reload capabilities on SIGHUP into daemon.
 
 
 

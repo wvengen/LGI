@@ -55,7 +55,11 @@ void TheSignalHandler( int S )
  if( S == SIGHUP )
  {
   InitializeLogger( LogLevel, LogFile.c_str() );
-  CRITICAL_LOG( "TheSignalHandler; Received HUP signal, restarting logger" );
+  CRITICAL_LOG( "TheSignalHandler; Received HUP signal, restarting logger and reloading config" );
+  if( TheDaemon != NULL )
+  {
+   TheDaemon -> ReloadConfigFile();
+  }
   return;
  }
  else

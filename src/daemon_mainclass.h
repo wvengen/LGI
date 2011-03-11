@@ -56,12 +56,13 @@ class Daemon : public DaemonConfig
       {
        public:
 
-               Daemon( string ConfigFile, int SlowCycleTime = 600, int FastCycleTime = 120 );
+               Daemon( string TheConfigFile, int SlowCycleTime = 600, int FastCycleTime = 120 );
                ~Daemon( void );
 
                int RunSchedular( void );
                int IsSchedularReady( void );
                void StopScheduling( void );
+               void ReloadConfigFile( void );
 
        protected:
 
@@ -81,9 +82,11 @@ class Daemon : public DaemonConfig
        int                          JobsFinished,
                                     JobsObtained,
                                     ReadyForScheduling,
+                                    ReloadConfig,
                                     TheFastCycleTime, 
                                     TheSlowCycleTime;
        CURL                        *MycURLHandle;
+       string                       ConfigFile;
       };
 
 // -----------------------------------------------------------------------------

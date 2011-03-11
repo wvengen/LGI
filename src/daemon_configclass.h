@@ -61,6 +61,7 @@ class DaemonConfig
               string Owner_Deny( void );
               int    Number_Of_Projects( void );
               int    Job_Limit( void );
+              int    ReloadConfigFromFile( string ConfigFile );
 
               DaemonConfigProject Project( int Number );
 

@@ -21,9 +21,9 @@
 
 // -----------------------------------------------------------------------------
 
-Daemon::Daemon( string ConfigFile, int SlowCycleTime, int FastCycleTime ) : DaemonConfig( ConfigFile )
+Daemon::Daemon( string TheConfigFile, int SlowCycleTime, int FastCycleTime ) : DaemonConfig( TheConfigFile )
 {
- ReadyForScheduling = 0; Jobs.clear(); Accounting.clear();
+ ReloadConfig = ReadyForScheduling = 0; Jobs.clear(); Accounting.clear(); ConfigFile = TheConfigFile;
 
  if( !IsValidConfigured() ) { CRITICAL_LOG( "Daemon::Daemon; Configuration in file " << ConfigFile << " invalid" ); return; }
 
@@ -840,6 +840,14 @@ void Daemon::StopScheduling( void )
 
 // -----------------------------------------------------------------------------
 
+void Daemon::ReloadConfigFile( void )
+{
+ NORMAL_LOG( "Daemon::ReloadConfigFile; Received signal, triggering config file reload" );
+ ReloadConfig = 1;
+}
+
+// -----------------------------------------------------------------------------
+
 int Daemon::IsSchedularReady( void )
 {
  return( ReadyForScheduling );
@@ -849,7 +857,7 @@ int Daemon::IsSchedularReady( void )
 
 int Daemon::RunSchedular( void )
 {
- if( !ReadyForScheduling ) CRITICAL_LOG_RETURN( ReadyForScheduling, "Daemon::RunSchedular; Daemon was not ready for schedulig" );
+ if( !ReadyForScheduling ) CRITICAL_LOG_RETURN( ReadyForScheduling, "Daemon::RunSchedular; Daemon was not ready for scheduling" );
 
  time_t LastRequestTime = 0;
  time_t LastUpdateTime = 0;
@@ -857,6 +865,12 @@ int Daemon::RunSchedular( void )
 
  do
  {
+
+  if( ReloadConfig )         // check if config reload was triggered...
+  {
+   if( !ReloadConfigFromFile( ConfigFile ) ) CRITICAL_LOG_RETURN( ReloadConfig = ReadyForScheduling = 0, "Daemon::RunSchedular; Config file reload unsuccessfull" );
+   LastRequestTime = LastUpdateTime = ReloadConfig = 0;
+  }
 
   if( time( NULL ) - LastRequestTime >= RequestDelay )        // check for work every slow cycle time seconds...
   {

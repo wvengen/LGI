@@ -37,6 +37,20 @@ DaemonConfig::DaemonConfig( string ConfigFile )
 
 // -----------------------------------------------------------------------------
 
+int DaemonConfig::ReloadConfigFromFile( string ConfigFile )
+{
+ NORMAL_LOG( "DaemonConfig::ReloadConfigFromFile; Reloading config from file " << ConfigFile );
+
+ ConfigurationXML = NormalizeString( Parse_XML( ReadStringFromFile( ConfigFile ), "LGI" ) );
+
+ if( ConfigurationXML.empty() )
+  CRITICAL_LOG_RETURN( 0, "DaemonConfig::ReloadConfigFromFile; Reload of config file " << ConfigFile << " failed" )
+ else
+  DEBUG_LOG_RETURN( IsValidConfigured(), "DaemonConfig::ReloadConfigFromFile; The configuration reloaded: " << ConfigurationXML );
+}
+
+// -----------------------------------------------------------------------------
+
 int DaemonConfig::IsValidConfigured( void )
 {
  if( ConfigurationXML.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfig::IsValidConfigured; ConfigurationXML cache empty" );
@@ -242,7 +256,7 @@ int DaemonConfigProject::IsValidConfigured( void )
  for( int a = 1; a <= Number_Of_Applications(); ++a )
   if( !Application( a ).IsValidConfigured() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProject::IsValidConfigured; Application not configured corrctly for application number " << a );
 
- NORMAL_LOG_RETURN( 1, "DaemonConfigProject::IsValidConfigured; Configuration tested valid" );
+ NORMAL_LOG_RETURN( 1, "DaemonConfigProject::IsValidConfigured; Configuration tested for project " << Project_Name() << " valid" );
 }
 
 // -----------------------------------------------------------------------------
@@ -406,7 +420,7 @@ int DaemonConfigProjectApplication::IsValidConfigured( void )
  if( ReadStringFromFile( Job_Run_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Cannot read from file " << Job_Run_Script() );
  if( ReadStringFromFile( Job_Abort_Script() ).empty() ) CRITICAL_LOG_RETURN( 0, "DaemonConfigProjectApplication::IsValidConfigured; Cannot read from file " << Job_Abort_Script() );
 
- NORMAL_LOG_RETURN( 1, "DaemonConfigProjectApplication::IsValidConfigured; Configuration tested valid" );
+ NORMAL_LOG_RETURN( 1, "DaemonConfigProjectApplication::IsValidConfigured; Configuration tested for application " << Application_Name() << " valid" );
 }
 
 // -----------------------------------------------------------------------------

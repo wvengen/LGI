@@ -11,10 +11,16 @@ LGI project with a project server. Part III will show you how to add an
 extra project server into an existing LGI project. The last part part IV
 will detail on the maintenance of your LGI project servers.
 
+NOTE: For RHEL 5 and 6 based system, .spec files are present in the specs
+directory to build .rpm files.
+
 
 
 Part I : Howto setup a resource 
 -------------------------------
+
+NOTE: For RHEL 5 and 6 based system, .spec files are present in the specs
+directory to build .rpm files. The rpm make installing a resource easier!
 
 Setting up a resource within an LGI project is rather easy. Just follow the
 following steps:
@@ -67,6 +73,9 @@ following steps:
 Keep in mind for a project administrator, you should also include the new resource
 into the projects database. See part IV for an example.
 
+NOTE: For RHEL 5 and 6 based system, .spec files are present in the specs
+directory to build .rpm files.
+
 
 
 Part II : Howto setup a project server 
@@ -76,7 +85,15 @@ Setting up your own project is not too hard either. You can decide to be
 a fully independent project by setting up your own X.509 Certificate
 Authority, or you can decide to be a sub project and thus be an X.509 sub-CA
 of the LGI-CA. In this part, it is shown how to become an independant project
-and be your own X.509 CA.
+and be your own X.509 CA. 
+
+NOTE: One perhaps should use TinyCA (http://tinyca.sm-zone.net/) for managing
+certificates and keys for your project.
+
+NOTE: For RHEL 5 and 6 based system, .spec files are present in the specs
+directory to build .rpm files. The rpm automatically installs a project LGI
+and gives a working setup but excludes the MySQL and PHP APC optimizations
+detailed below!
 
 - Make sure libcurl, Perl, PHP, MySQL, Apache and OpenSSL are installed on 
   your system.
@@ -451,6 +468,11 @@ and be your own X.509 CA.
 You could also choose to use a different user account to setup your LGI
 project web-server. Just be sure that the user apache is part of the group 
 the new user is part of too so that apache can serve the content. 
+
+NOTE: For RHEL 5 and 6 bases system, .spec files are present in the specs
+directory to build .rpm files. The rpm automatically installs a working
+project LGI but the MySQL and python APC optimisations detailed above 
+have not been implemented into the rpm installation yet!
 
 
 

@@ -83,7 +83,7 @@ class LGI_Client:
 		if( Application ): Vars[ 'application' ] = Application;
 		if( State ): Vars[ 'state' ] = State;
 		if( Start ): Vars[ 'start' ] = Start;
-		if( Limit ): Vars[ 'limit' ] = Limit;
+		if( type( Limit ) == type( 1 ) ): Vars[ 'limit' ] = Limit;
 		return( self.__PostToServer( "/interfaces/interface_job_state.php", Vars ) );
 
 	# delete a job
