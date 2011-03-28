@@ -89,7 +89,7 @@ Fri November 19 2010 -- version 1.29
 - Added slave server capabilities report into daemon.
 
 
-Fri March 11 2011 -- version 1.30
+Mon March 28 2011 -- version 1.30
 ---------------------------------
 
 - Patched repository content listing code. It had a security hole 
@@ -119,6 +119,8 @@ Fri March 11 2011 -- version 1.30
 - Made sure that LGI python code can deal with limit=0 values.
 - Updated documentation.
 - Added configuration reload capabilities on SIGHUP into daemon.
+- Added logic to reset libcurl handle; some versions of libcurl 
+  seem to stop working after a fews days without any apparent reason.
 
 
 

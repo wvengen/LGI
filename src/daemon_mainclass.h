@@ -63,6 +63,7 @@ class Daemon : public DaemonConfig
                int IsSchedularReady( void );
                void StopScheduling( void );
                void ReloadConfigFile( void );
+               void ResetcURLHandle( void );
 
        protected:
 

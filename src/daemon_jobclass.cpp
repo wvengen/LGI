@@ -73,6 +73,14 @@ DaemonJob::DaemonJob( void )
 
 // -----------------------------------------------------------------------------
 
+void DaemonJob::SetcURLHandle( CURL *cURLHandle )
+{
+ DEBUG_LOG( "DaemonJob::SetcURLHandle; Setting internal cURL handle pointer" );
+ MycURLHandle = cURLHandle;
+}
+
+// -----------------------------------------------------------------------------
+
 DaemonJob::DaemonJob( string TheJobDirectory, CURL *cURLHandle )
 {
  JobDirectory.clear();

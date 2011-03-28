@@ -49,6 +49,23 @@ Daemon::~Daemon( void )
 
 // -----------------------------------------------------------------------------
 
+void Daemon::ResetcURLHandle( void )
+{
+ NORMAL_LOG( "Daemon::ResetcURLHandle; Resetting cURL handle for all jobs and daemon" );
+
+ if( MycURLHandle != NULL ) curl_easy_cleanup( MycURLHandle ); MycURLHandle = curl_easy_init();
+ if( MycURLHandle == NULL ) { CRITICAL_LOG( "Daemon::ResetcURLHandle; Could not create cURL handle" ); return; }
+ 
+ for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end(); ++Server )
+  if( !Server -> second.empty() )
+  {
+   for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end(); )
+    (JobPointer++) -> SetcURLHandle( MycURLHandle );       
+  }
+}
+
+// -----------------------------------------------------------------------------
+
 int Daemon::ScanDirectoryForJobs( string Directory )
 {
  struct stat FileStat;
@@ -887,6 +904,8 @@ int Daemon::RunSchedular( void )
   {
    if( !Jobs.empty() )
    {
+    ResetcURLHandle();
+
     CycleThroughJobs(); 
 
     if( JobsFinished )                            // if we have jobs finished, we can request new work now... 

@@ -130,6 +130,7 @@ class DaemonJob
               void CleanUpJobDirectory( void );             // remove job directory
               void KillJobRunScriptProcess( void );
               void InvalidateDaemonReferenceHash( void );
+              void SetcURLHandle( CURL *cURLHandle = NULL );
 
               string GetJobDirectory( void );               // retrieve data from job directory
               string GetProject( void );
