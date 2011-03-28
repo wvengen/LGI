@@ -891,10 +891,13 @@ int Daemon::RunSchedular( void )
 
   if( time( NULL ) - LastRequestTime >= RequestDelay )        // check for work every slow cycle time seconds...
   {
+   ResetcURLHandle();
+
    if( RequestWorkCycle() )                    // if we got some work, wait for fast cycle time now and ask for more... 
     RequestDelay = TheFastCycleTime;
    else
     RequestDelay = TheSlowCycleTime;
+
    LastRequestTime = time( NULL );
   }
   else
@@ -904,8 +907,6 @@ int Daemon::RunSchedular( void )
   {
    if( !Jobs.empty() )
    {
-    ResetcURLHandle();
-
     CycleThroughJobs(); 
 
     if( JobsFinished )                            // if we have jobs finished, we can request new work now... 
