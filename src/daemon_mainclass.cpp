@@ -56,12 +56,15 @@ void Daemon::ResetcURLHandle( void )
  if( MycURLHandle != NULL ) curl_easy_cleanup( MycURLHandle ); MycURLHandle = curl_easy_init();
  if( MycURLHandle == NULL ) { CRITICAL_LOG( "Daemon::ResetcURLHandle; Could not create cURL handle" ); return; }
  
- for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end(); ++Server )
-  if( !Server -> second.empty() )
-  {
-   for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end(); )
-    (JobPointer++) -> SetcURLHandle( MycURLHandle );       
-  }
+ if( !Jobs.empty() )
+ {
+  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end(); ++Server )
+   if( !Server -> second.empty() )
+   {
+    for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end(); )
+     (JobPointer++) -> SetcURLHandle( MycURLHandle );       
+   }
+ }
 }
 
 // -----------------------------------------------------------------------------
