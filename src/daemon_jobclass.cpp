@@ -66,17 +66,9 @@ int UnlinkDirectoryRecursively( string Directory )
 
 DaemonJob::DaemonJob( void )
 {
- JobDirectory.empty();
+ JobDirectory.clear();
  ErrorNumber = 0xFFFF;
  MycURLHandle = NULL;
-}
-
-// -----------------------------------------------------------------------------
-
-void DaemonJob::SetcURLHandle( CURL *cURLHandle )
-{
- DEBUG_LOG( "DaemonJob::SetcURLHandle; Setting internal cURL handle pointer" );
- MycURLHandle = cURLHandle;
 }
 
 // -----------------------------------------------------------------------------
@@ -398,6 +390,15 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
  dummy = chown( ( JobDirectory + "/" + LGI_JOBDAEMON_DAEMON_REFERENCE_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
  NORMAL_LOG( "DaemonJob::DaemonJob; Job with JobDirectory=" << JobDirectory << " has been setup" );
+}
+
+// -----------------------------------------------------------------------------
+
+void DaemonJob::SetcURLHandle( CURL *cURLHandle )
+{
+ if( JobDirectory.empty() ) { CRITICAL_LOG( "DaemonJob::SetcURLHandle; JobDirectory empty" ); return; }
+ VERBOSE_DEBUG_LOG( "DaemonJob::SetcURLHandle; Setting internal cURL handle pointer for job with JobDirectory=" << JobDirectory );
+ MycURLHandle = cURLHandle;
 }
 
 // -----------------------------------------------------------------------------
