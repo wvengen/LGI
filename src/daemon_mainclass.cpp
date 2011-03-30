@@ -51,7 +51,7 @@ Daemon::~Daemon( void )
 
 void Daemon::ResetcURLHandle( void )
 {
- NORMAL_LOG( "Daemon::ResetcURLHandle; Resetting cURL handle for all jobs and daemon" );
+ DEBUG_LOG( "Daemon::ResetcURLHandle; Resetting cURL handle for all jobs and daemon" );
 
  if( MycURLHandle != NULL ) curl_easy_cleanup( MycURLHandle ); MycURLHandle = curl_easy_init();
  if( MycURLHandle == NULL ) { CRITICAL_LOG( "Daemon::ResetcURLHandle; Could not create cURL handle" ); return; }
