@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # some settings...
-export CERT_PASSWD=""
+export CERT_PASSWD="m@rks0m3rs007"
 export VOMS="ncf"
 export LGI_DIR="${HOME}/LGI"
 export X509_USER_PROXY=./x509_proxy_cert
@@ -45,7 +45,7 @@ echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &>
 # create job script...
 cat > classical.submitted.sh << EOF_SCRIPT
 chmod +x ClassicalDynamics_Linux.x
-./ClassicalDynamics_Linux.x classical.in classical.out
+./ClassicalDynamics_Linux.x classical.in classical.out classical.stdout
 EOF_SCRIPT
 
 # create JDL for this job script...
@@ -56,10 +56,10 @@ executable = "/bin/bash";
 arguments = "classical.submitted.sh";
 stdoutput = "stdout";
 stderror = "stderr";
-outputsandbox = { "classical.out", "stdout", "stderr" };
+outputsandbox = { "classical.out", "classical.stdout", "stdout", "stderr" };
 inputsandbox = { "classical.submitted.sh", "ClassicalDynamics_Linux.x", "classical.in" };
 shallowretrycount = 3;
-requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 240 );
+requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 720 );
 myproxyserver = "px.grid.sara.nl";
 EOF_JDL
 
@@ -88,7 +88,7 @@ echo Job ${JOB_ID} finished, retrieving output... >> LGI_output
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
 
 # send back the output to LGI server...
-${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPO_URL} ./output-files/* > /dev/null
+${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPO_URL} ./output-files/*/* > /dev/null
 echo Uploaded output to repository ${REPO_URL}... >> LGI_output
 
 # and we are finished...
