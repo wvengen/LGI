@@ -35,14 +35,16 @@ if( $workunit -> canonical_resultid || $workunit -> error_mask )
  $xmldoc = parse_element( $workunit -> xml_doc, "<file_info>" );
  $filename = parse_element( $xmldoc, "<name>" );
  $url = "$download_dir/".dechex( hexdec( substr( md5( $filename ), 1, 7 ) ) % $fanoutnr )."/$filename";
- copy( $url, "$LGI_DIR/output/$filename.input" );
+ // copy( $url, "$LGI_DIR/output/$filename.input" );
+ copy( $url, "$LGI_DIR/output/classical.in" );
 
  if( $workunit -> canonical_resultid )
  {
   $resultunit = mysql_fetch_object( mysql_query( "SELECT * FROM result WHERE id=".$workunit -> canonical_resultid ) );
 
   $jobstderr = parse_element( $resultunit -> stderr_out, "<stderr_txt>" );
-  $file = fopen( "$LGI_DIR/output/$filename.error", "w" );
+  //$file = fopen( "$LGI_DIR/output/$filename.error", "w" );
+  $file = fopen( "$LGI_DIR/output/classical.stderr", "w" );
   fwrite( $file,  $jobstderr );
   fclose( $file );
 
@@ -57,7 +59,9 @@ if( $workunit -> canonical_resultid || $workunit -> error_mask )
   { 
    $filename = $outputfiles[ $index ];
    $url = $upload_dir."/".dechex( hexdec( substr( md5( $filename ), 1, 7 ) ) % $fanoutnr )."/".$filename;
-   copy( $url, "$LGI_DIR/output/$filename.output" );
+   // copy( $url, "$LGI_DIR/output/$filename.output" );
+   if( $index == 0 ) copy( $url, "$LGI_DIR/output/classical.out" );
+   if( $index == 1 ) copy( $url, "$LGI_DIR/output/classical.stdout" );
   }
  }
 
