@@ -929,7 +929,7 @@ int Daemon::RunSchedular( void )
 
 string EscapeSpacesInString( string Command )
 {
- string Result( 256, '\0' );
+ string Result;
 
  for( int i = 0; i < Command.size(); ++i )
  {
