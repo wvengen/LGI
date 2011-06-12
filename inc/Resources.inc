@@ -275,7 +275,7 @@ function Resource_Lock_Job( $ResourceData, $JobId, $CheckTheResource = True )
   return( 0 );
 
  // this trick works because of the UNIQUE job_id index in the running_locks table... it avoids table locks...
- mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobId );        
+ mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE lock_state>0 AND job_id=".$JobId );        
  return( 1 );
 }
 
@@ -311,7 +311,7 @@ function Resource_UnLock_Job( $ResourceData, $JobId, $CheckTheResource = True )
  $queryresult = mysql_query( "DELETE FROM running_locks WHERE job_id=".$JobId." AND resource_id=".$ResourceData -> resource_id." AND session_id=".$ResourceData -> SessionID );
 
  // and unlock the job in the job_queue table...
- $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobId );
+ $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE lock_state>0 AND job_id=".$JobId );
 
  return( 0 );
 }
@@ -338,7 +338,7 @@ function Resource_Remove_Stale_Locks( $ResourceData )
    $queryresult = mysql_query( "DELETE FROM running_locks WHERE lock_id=".$LockData->lock_id );
 
    // then remove lock from job_queue table...
-   $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$LockData->job_id );
+   $queryresult = mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE lock_state>0 AND job_id=".$LockData->job_id );
   }
 
  mysql_free_result( $TheLocks );

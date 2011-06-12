@@ -337,7 +337,7 @@ function Interface_Clear_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
 
  // for this to work, the resource_id field is signed in the running_locks table...
  if( mysql_query( "DELETE FROM running_locks WHERE resource_id=-1 AND session_id=0 AND job_id=".$JobID ) )
-  mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobID );
+  mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE lock_state>0 AND job_id=".$JobID );
  else
   return( LGI_Error_Response( 36, $ErrorMsgs[ 36 ], $ExitOnError ) );
 
@@ -364,7 +364,7 @@ function Interface_Set_Spin_Lock_On_Job( $JobID, $ExitOnError = true )
    return( 0 );
 
   // we didn't set it... decrease value again and try again later...
-  if( !mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE job_id=".$JobID ) )
+  if( !mysql_query( "UPDATE job_queue SET lock_state=lock_state-1 WHERE lock_state>0 AND job_id=".$JobID ) )
    return( LGI_Error_Response( 15, $ErrorMsgs[ 15 ], $ExitOnError ) );
 
   $Count++;
