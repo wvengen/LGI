@@ -89,8 +89,8 @@ Fri November 19 2010 -- version 1.29
 - Added slave server capabilities report into daemon.
 
 
-Sat April 16 2011 -- version 1.30
----------------------------------
+Thu June 16 2011 -- version 1.30
+--------------------------------
 
 - Patched repository content listing code. It had a security hole 
   found by Willem v. Engen.
@@ -123,5 +123,6 @@ Sat April 16 2011 -- version 1.30
   seem to stop working after a fews days without any apparent reason.
 - Removed small bug from escape string causing check system limits
   scripts to fail.
+- Removed small lock_state issue.
 
 
