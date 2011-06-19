@@ -35,6 +35,8 @@
    else
     $Content = "";
   }
+  else
+   $Content = "";
 
   echo "<repository_content name=\"$Repository\"> $Content </repository_content>";
 ?>
