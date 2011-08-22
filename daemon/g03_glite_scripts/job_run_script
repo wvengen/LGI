@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # some settings...
-export CERT_PASSWD=""
 export VOMS="gaussian"
 export LGI_DIR="${HOME}/LGI"
 export X509_USER_PROXY=./x509_proxy_cert
@@ -39,10 +38,10 @@ echo >> g03.inp
 echo >> g03.inp
 
 # register at myproxy myproxy.grid.cyf-kr.edu.pl...
-echo ${CERT_PASSWD} | myproxy-init -s myproxy.grid.cyf-kr.edu.pl -d -n -S > /dev/null
+myproxy-init -s myproxy.grid.cyf-kr.edu.pl -d -n > /dev/null
 
 # create new proxy cert for 196 hours...
-echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &> /dev/null
+voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
 
 # create job script...
 cat > g03.sh << EOF_SCRIPT

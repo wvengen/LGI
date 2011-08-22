@@ -1,15 +1,14 @@
 #!/bin/bash
 
 # some settings...
-export CERT_PASSWD=""
 export VOMS="ncf"
 export X509_USER_PROXY=./x509_proxy_cert
 
 # register at myproxy px.grid.sara.nl...
-echo ${CERT_PASSWD} | myproxy-init -s px.grid.sara.nl -d -n -S > /dev/null
+myproxy-init -s px.grid.sara.nl -d -n > /dev/null
 
 # create new proxy cert for 196 hours...
-echo ${CERT_PASSWD} | voms-proxy-init -voms ${VOMS} -valid 196:00 -pwstdin -q &> /dev/null
+voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
 
 # create job script...
 cat > hello.submitted.sh << EOF_SCRIPT
