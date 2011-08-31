@@ -251,6 +251,17 @@ function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
 
 // --------------------------------------------------- 
 
+function XML_Injection_Test( $Data, $Tag = "dummy" )
+{
+ $Attributes = "";
+ if( Parse_XML( "<".$Tag.">".$Data."</".$Tag.">", $Tag, $Attributes ) !== $Data ) 
+  return( True );
+ else
+  return( False );
+}
+
+// --------------------------------------------------- 
+
 function rmpath( $Path )
 {
  if( is_dir( $Path ) )

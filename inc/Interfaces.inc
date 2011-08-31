@@ -63,6 +63,14 @@ function Interface_Verify( &$Project, &$User, &$Groups, $ExitOnError = true )
  $Project = NormalizeString( $Project );
  $Groups = NormalizeCommaSeparatedField( $Groups, "," );
 
+ // check XML injections...
+ if( XML_Injection_Test( $User, "user" ) )
+  return( LGI_Error_Response( 72, $ErrorMsgs[ 72 ], $ExitOnError ) );
+ if( XML_Injection_Test( $Groups, "groups" ) )
+  return( LGI_Error_Response( 73, $ErrorMsgs[ 73 ], $ExitOnError ) );
+ if( XML_Injection_Test( $Project, "project" ) )
+  return( LGI_Error_Response( 75, $ErrorMsgs[ 75 ], $ExitOnError ) );
+
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
  $CommonName = mysql_escape_string( $CommonNameArray[ 1 ] );

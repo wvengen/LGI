@@ -66,6 +66,7 @@ else
   $Application = $_POST[ "application" ];
 if( $Application == "" ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 18 ] );
 if( strlen( $Application ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 46 ] );
+if( XML_Injection_Test( $Application, "application" ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 74 ] );
 $Application = NormalizeString( $Application );
 
 // check if target_resources was given...
@@ -77,6 +78,7 @@ else
   $TargetResources = $_POST[ "target_resources" ];
 if( $TargetResources == "" ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 27 ] );
 if( strlen( $TargetResources ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 50 ] );
+if( XML_Injection_Test( $TargetResources, "target_resources" ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 76 ] );
 
 // check if job_specifics was given...
 $JobSpecifics = "";
@@ -86,6 +88,7 @@ else
  if( isset( $_POST[ "job_specifics" ] ) )
   $JobSpecifics = $_POST[ "job_specifics" ];
 if( strlen( $JobSpecifics ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 53 ] );
+if( XML_Injection_Test( $JobSpecifics, "job_specifics" ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 79 ] );
 
 // check if write_access was given...
 $WriteAccess = "";
@@ -95,6 +98,7 @@ else
  if( isset( $_POST[ "write_access" ] ) )
   $WriteAccess = $_POST[ "write_access" ];
 if( strlen( $WriteAccess ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 52 ] );
+if( XML_Injection_Test( $WriteAccess, "write_access" ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 78 ] );
 
 // check if read_access was given...
 $ReadAccess = "";
@@ -104,6 +108,7 @@ else
  if( isset( $_POST[ "read_access" ] ) )
   $ReadAccess = $_POST[ "read_access" ];
 if( strlen( $ReadAccess ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 51 ] );
+if( XML_Injection_Test( $ReadAccess, "read_access" ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 77 ] );
 
 // check if input was given...
 $Input = "";

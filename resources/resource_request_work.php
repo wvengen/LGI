@@ -41,6 +41,8 @@ else
   return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ] ) );
  $Application = NormalizeString( $_POST[ "application" ] );
 }
+if( XML_Injection_Test( $Application, "application" ) ) 
+ return( LGI_Error_Response( 74, $ErrorMsgs[ 74 ] ) );
 
 // check if non-compulsory posts were set...
 if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && ctype_digit( $_POST[ "start" ] ) )
@@ -171,11 +173,11 @@ if( $NrOfPossibleJobs >= 1 )
      // build job record for this job...
      $ActualNrOfJobs += 1; 
      $ResponseJobs .= " <job number='".$ActualNrOfJobs."'> <job_id> ".$JobSpecs->job_id." </job_id>"; 
+     $ResponseJobs .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>"; 
      $ResponseJobs .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>"; 
      $ResponseJobs .= " <owners> ".$JobSpecs->owners." </owners>"; 
      $ResponseJobs .= " <read_access> ".$JobSpecs->read_access." </read_access>"; 
      $ResponseJobs .= " <write_access> ".$JobSpecs->write_access." </write_access>"; 
-     $ResponseJobs .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>"; 
      $ResponseJobs .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>"; 
     }
     else

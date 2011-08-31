@@ -129,10 +129,10 @@ if( !$DetailMode )
     $JobResponses .= " <state> ".$JobData->state." </state> <state_time_stamp> ".$JobData->state_time_stamp." </state_time_stamp>";
     $JobResponses .= " <target_resources> ".$JobData->target_resources." </target_resources>";
     $JobResponses .= " <owners> ".$JobData->owners." </owners>";
+    $JobResponses .= " <application> ".$JobData->application." </application>";
     $JobResponses .= " <read_access> ".$JobData->read_access." </read_access>";
     $JobResponses .= " <write_access> ".$JobData->write_access." </write_access>";
-    $JobResponses .= " <job_specifics> ".$JobData->job_specifics." </job_specifics>";
-    $JobResponses .= " <application> ".$JobData->application." </application> </job>";
+    $JobResponses .= " <job_specifics> ".$JobData->job_specifics." </job_specifics> </job>";
    }
   }
  }
@@ -163,15 +163,16 @@ else
  $Response .= " <job_id> ".$JobSpecs->job_id." </job_id>";
  $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
  $Response .= " <owners> ".$JobSpecs->owners." </owners>";
- $Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
- $Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
  $Response .= " <application> ".$JobSpecs->application." </application>";
  $Response .= " <state> ".$JobSpecs->state." </state>";
  $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";
  $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
  $Response .= " <repository_content> ".$RepoContent." </repository_content>";
  $Response .= " <input> ".binhex( $JobSpecs->input )." </input>";
- $Response .= " <output> ".binhex( $JobSpecs->output )." </output> </job>";
+ $Response .= " <output> ".binhex( $JobSpecs->output )." </output>";
+ $Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
+ $Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
+ $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>";
 }
 
 // return the response...

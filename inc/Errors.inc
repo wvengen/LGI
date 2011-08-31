@@ -92,5 +92,17 @@ $ErrorMsgs[ 68 ] = "Error in file upload to repository";
 $ErrorMsgs[ 69 ] = "Resource capabilities field posted to big"; 
 $ErrorMsgs[ 70 ] = "Application not configured on any of the known resources"; 
 $ErrorMsgs[ 71 ] = "Owners field posted too big"; 
+$ErrorMsgs[ 72 ] = "Possible XML injection detected in posted user field"; 
+$ErrorMsgs[ 73 ] = "Possible XML injection detected in posted groups field"; 
+$ErrorMsgs[ 74 ] = "Possible XML injection detected in posted application field"; 
+$ErrorMsgs[ 75 ] = "Possible XML injection detected in posted project field"; 
+$ErrorMsgs[ 76 ] = "Possible XML injection detected in posted target resources field"; 
+$ErrorMsgs[ 77 ] = "Possible XML injection detected in posted read access field"; 
+$ErrorMsgs[ 78 ] = "Possible XML injection detected in posted write access field"; 
+$ErrorMsgs[ 79 ] = "Possible XML injection detected in posted job specifics field"; 
+$ErrorMsgs[ 80 ] = "Possible XML injection detected in posted resource capabilities field"; 
+$ErrorMsgs[ 81 ] = "Possible XML injection detected in certificates resource name"; 
+$ErrorMsgs[ 82 ] = "Possible XML injection detected in posted state field"; 
+$ErrorMsgs[ 83 ] = "Possible XML injection detected in posted job owners field"; 
 
 ?>
