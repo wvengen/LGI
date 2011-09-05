@@ -188,7 +188,7 @@ if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
 {
  if( strlen( $_POST[ "job_specifics" ] ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
   return( LGI_Error_Response( 53, $ErrorMsgs[ 53 ] ) );
- if( XML_Injection_Test( $_POST[ "job_specifics" ] , "job_specifics" ) )
+ if( XML_Sanity_check( $_POST[ "job_specifics" ] ) )
   return( LGI_Error_Response( 72, $ErrorMsgs[ 72 ] ) );
  $InsertQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ]." <repository> $RepositoryURL:$RepositoryDir </repository> <repository_url> $RepositoryWWWURL </repository_url>" )."'";
 }

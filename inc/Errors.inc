@@ -92,7 +92,7 @@ $ErrorMsgs[ 68 ] = "Error in file upload to repository";
 $ErrorMsgs[ 69 ] = "Resource capabilities field posted to big"; 
 $ErrorMsgs[ 70 ] = "Application not configured on any of the known resources"; 
 $ErrorMsgs[ 71 ] = "Owners field posted too big"; 
-$ErrorMsgs[ 72 ] = "Possible XML injection detected in posted job specifics field"; 
-$ErrorMsgs[ 73 ] = "Possible XML injection detected in posted resource capabilities field"; 
+$ErrorMsgs[ 72 ] = "Posted job specifics field seems to be invalid XML"; 
+$ErrorMsgs[ 73 ] = "Posted resource capabilities field seems to be invalid XML"; 
 
 ?>

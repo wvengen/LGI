@@ -140,7 +140,7 @@ function Resource_Verify( &$Project, $SessionID = "", $Capabilities = "" )
   if( strlen( $Capabilities ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) 
    return( LGI_Error_Response( 69, $ErrorMsgs[ 69 ] ) );
 
-  if( XML_Injection_Test( $Capabilities, "resource_capabilities" ) )
+  if( XML_Sanity_Check( $Capabilities ) )
    return( LGI_Error_Response( 73, $ErrorMsgs[ 73 ] ) );
  }
  

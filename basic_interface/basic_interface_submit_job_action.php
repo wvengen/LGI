@@ -86,7 +86,7 @@ else
  if( isset( $_POST[ "job_specifics" ] ) )
   $JobSpecifics = $_POST[ "job_specifics" ];
 if( strlen( $JobSpecifics ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 53 ] );
-if( XML_Injection_Test( $JobSpecifics, "job_specifics" ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 72 ] );
+if( XML_Sanity_Check( $JobSpecifics ) ) Exit_With_Text( "ERROR: ".$ErrorMsgs[ 72 ] );
 
 // check if write_access was given...
 $WriteAccess = "";

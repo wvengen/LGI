@@ -267,14 +267,44 @@ function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
 
 // --------------------------------------------------- 
 
-function XML_Injection_Test( $Data, $Tag = "dummy" )
+function XML_Sanity_Check( $Data )
 {
- // quick and dirty test...
- $Attributes = "";
- if( Parse_XML( "<".$Tag.">".$Data."</".$Tag.">", $Tag, $Attributes ) !== $Data ) return( True );
+ $Length = strlen( $Data );
+ $Stack[ 0 ] = 0;
 
- // test more thouroughly now...
- 
+ for( $i = 0; $i < $Length - 1; ++$i )
+  if( $Data[ $i ] == '<' )    // located start of a tag...
+  {
+   // found a closing tag...
+   if( $Data[ $i + 1 ] == '/' )
+   {
+    $EndTag = $i + 2;
+    while( $EndTag < $Length  && $Data[ $EndTag ] != '>' ) ++$EndTag;
+    if( $EndTag >= $Length ) return( True );
+
+    // check if found closing tag matches last pushed tag on stack...
+    if( substr( $Data, $i + 2, $EndTag - $i - 2 ) !== $Stack[ $Stack[ 0 ] ] ) return( True );
+
+    // pop entry from stack and continue...
+    --$Stack[ 0 ];
+    $i = $EndTag;
+    continue;
+   }
+
+   // found a starting tag...
+   $EndTag = $i + 1;
+   while( $EndTag < $Length  && $Data[ $EndTag ] != ' ' && $Data[ $EndTag ] != '>' ) ++$EndTag;
+   if( $EndTag >= $Length ) return( True );
+
+   // push it onto stack and continue the scan...
+   $Stack[ $Stack[ 0 ] + 1 ] = substr( $Data, $i + 1, $EndTag - $i - 1 );
+   ++$Stack[ 0 ];
+   $i = $EndTag;   // just scan through the possible attribute...
+  }
+
+ // check if all tags were nicely closed...
+ if( $Stack[ 0 ] != 0 ) return( True );
+
  return( False );
 }
 
