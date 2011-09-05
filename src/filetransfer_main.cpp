@@ -115,7 +115,7 @@ int ListRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
@@ -192,7 +192,7 @@ int DownLoadFilesFromRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
@@ -253,7 +253,7 @@ int UpLoadFilesToRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
@@ -327,7 +327,7 @@ int DeleteFilesFromRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
