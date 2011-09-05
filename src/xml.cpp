@@ -67,16 +67,41 @@ void Parse_XML_ListAllTags( string XML, vector<string> &List )
 
 string XML_Escape( string Data )
 {
- // Implement escaping
- return( Data );
+ string Escaped = "";
+
+ for( int i = 0; i < Data.length(); ++i )
+ {
+  if( Data[ i ] == '<' ) { Escaped += "&lt;"; continue; }
+  if( Data[ i ] == '>' ) { Escaped += "&gt;"; continue; }
+  if( Data[ i ] == '\'' ) { Escaped += "&apos;"; continue; }
+  if( Data[ i ] == '\"' ) { Escaped += "&quot;"; continue; }
+  if( Data[ i ] == '&' ) { Escaped += "&amp;"; continue; }
+  Escaped += Data[ i ];
+ }
+
+ return( Escaped );
 }
 
 // -----------------------------------------------------------------------------
 
 string XML_UnEscape( string Data )
 {
- // Implement unescaping
- return( Data );
+ string UnEscaped = "";
+
+ for( int i = 0; i < Data.length(); ++i )
+ {
+  if( Data[ i ] == '&' )
+  {
+   if( Data.substr( i, 4 ) == "&lt;" ) { UnEscaped += '<'; i += 3; continue; }
+   if( Data.substr( i, 4 ) == "&gt;" ) { UnEscaped += '>'; i += 3; continue; }
+   if( Data.substr( i, 6 ) == "&apos;" ) { UnEscaped += '\''; i += 5; continue; }
+   if( Data.substr( i, 6 ) == "&quot;" ) { UnEscaped += '\"'; i += 5; continue; }
+   if( Data.substr( i, 5 ) == "&amp;" ) { UnEscaped += '&'; i += 4; continue; }
+  }
+  UnEscaped += Data[ i ];
+ }
+
+ return( UnEscaped );
 }
 
 // -----------------------------------------------------------------------------
