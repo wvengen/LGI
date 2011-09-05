@@ -187,7 +187,7 @@ function XML_Escape( $text )
 
 // --------------------------------------------------- 
 
-function XML_UnEscape( $text )
+function XML_UnEscape( $Data )
 {
  $Length = strlen( $Data );   
  $UnEscaped = "";
