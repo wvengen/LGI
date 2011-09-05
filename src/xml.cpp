@@ -90,6 +90,8 @@ string XML_UnEscape( string Data )
 
  for( int i = 0; i < Data.length(); ++i )
  {
+  if( ( Data[ i ] == '<' ) || ( Data[ i ] == '>' ) || 
+      ( Data[ i ] == '\"' ) || ( Data[ i ] == '\'' ) ) return( Data );
   if( Data[ i ] == '&' )
   {
    if( Data.substr( i, 4 ) == "&lt;" ) { UnEscaped += '<'; i += 3; continue; }
@@ -97,6 +99,7 @@ string XML_UnEscape( string Data )
    if( Data.substr( i, 6 ) == "&apos;" ) { UnEscaped += '\''; i += 5; continue; }
    if( Data.substr( i, 6 ) == "&quot;" ) { UnEscaped += '\"'; i += 5; continue; }
    if( Data.substr( i, 5 ) == "&amp;" ) { UnEscaped += '&'; i += 4; continue; }
+   return( Data );
   }
   UnEscaped += Data[ i ];
  }

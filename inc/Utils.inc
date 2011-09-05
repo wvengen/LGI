@@ -189,6 +189,10 @@ function XML_Escape( $text )
 
 function XML_UnEscape( $text )
 {
+ if( strpos( $text, "<" ) !== False ) return( $text );
+ if( strpos( $text, ">" ) !== False ) return( $text );
+ if( strpos( $text, "'" ) !== False ) return( $text );
+ if( strpos( $text, "\"" ) !== False ) return( $text );
  return( htmlspecialchars_decode( str_replace( '&apos;', '&#039;', $text ), ENT_QUOTES ) );
 }
 
