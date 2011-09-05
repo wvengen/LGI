@@ -189,11 +189,26 @@ function XML_Escape( $text )
 
 function XML_UnEscape( $text )
 {
- if( strpos( $text, "<" ) !== False ) return( $text );
- if( strpos( $text, ">" ) !== False ) return( $text );
- if( strpos( $text, "'" ) !== False ) return( $text );
- if( strpos( $text, "\"" ) !== False ) return( $text );
- return( htmlspecialchars_decode( str_replace( '&apos;', '&#039;', $text ), ENT_QUOTES ) );
+ $Length = strlen( $Data );   
+ $UnEscaped = "";
+   
+ for( $i = 0; $i < $Length; ++$i )
+ { 
+  if( ( $Data[ $i ] == '<' ) || ( $Data[ $i ] == '>' ) ||
+      ( $Data[ $i ] == '\"' ) || ( $Data[ $i ] == '\'' ) ) return( $Data );
+  if( $Data[ $i ] == '&' ) 
+  {
+   if( substr( $Data, $i, 4 ) == "&lt;" ) { $UnEscaped .= '<'; $i += 3; continue; }
+   if( substr( $Data, $i, 4 ) == "&gt;" ) { $UnEscaped .= '>'; $i += 3; continue; }
+   if( substr( $Data, $i, 6 ) == "&apos;" ) { $UnEscaped .= '\''; $i += 5; continue; }
+   if( substr( $Data, $i, 6 ) == "&quot;" ) { $UnEscaped .= '\"'; $i += 5; continue; }
+   if( substr( $Data, $i, 5 ) == "&amp;" ) { $UnEscaped .= '&'; $i += 4; continue; }
+   return( $Data );
+  } 
+  $UnEscaped .= $Data[ $i ];
+ }
+
+ return( $UnEscaped );
 }
 
 // --------------------------------------------------- 
@@ -210,7 +225,7 @@ function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
  if( $StartPos >= $XMLLength ) return( $Empty );
  if( $StartPos < 0 ) return( $Empty );
 
- for( $Index = $StartPos; $Index < $XMLLength; ++$Index )
+ for( $Index = $StartPos; $Index < $XMLLength - 1; ++$Index )
   if( $XML[ $Index ] == '<' )
   {
 

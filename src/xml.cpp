@@ -122,7 +122,7 @@ string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop )
  if( XMLLength <= 0 ) return( Empty );
  if( TagLength <= 0 ) return( Empty );
 
- for( Index = StartStop; Index < XMLLength; ++Index )           
+ for( Index = StartStop; Index < XMLLength - 1; ++Index )           
   if( XML[ Index ] == '<' )                             
   {
    
