@@ -54,13 +54,13 @@ $ResourceSpecs = mysql_fetch_object( $ResourceQuery );
 mysql_free_result( $ResourceQuery );
 
 // build response for this job...
-$Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
+$Response = " <resource> ".XML_Escape( $ResourceData->resource_name )." </resource> <resource_url> ".XML_Escape( $ResourceData->url )." </resource_url>";
 $Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
-$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
-$Response .= " <requested_resource_data> <resource_name> ".$ResourceSpecs->resource_name." </resource_name>";
+$Response .= " <project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project>";
+$Response .= " <project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server> <this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server>";
+$Response .= " <requested_resource_data> <resource_name> ".XML_Escape( $ResourceSpecs->resource_name )." </resource_name>";
 $Response .= " <client_certificate> ".binhex( $ResourceSpecs->client_certificate )." </client_certificate>";
-$Response .= " <resource_url> ".$ResourceSpecs->url." </url>";
+$Response .= " <resource_url> ".XML_Escape( $ResourceSpecs->url )." </url>";
 $Response .= " <last_call_time> ".$ResourceSpecs->last_call_time." </last_call_time> </requested_resource_data>";
 
 // return the response...

@@ -45,9 +45,9 @@ else
  $DetailMode = 0;
 
 // build response header...
-$Response =  " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
-$Response .= " <user> ".$JobUser." </user> <groups> ".$JobGroups." </groups>";
+$Response =  " <project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project>";
+$Response .= " <project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server> <this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server>";
+$Response .= " <user> ".XML_Escape( $JobUser )." </user> <groups> ".XML_Escape( $JobGroups )." </groups>";
 
 // should we detail on a job or not...
 if( !$DetailMode )
@@ -62,7 +62,7 @@ if( !$DetailMode )
  else
   $JobState = "any";
 
- $Response .= " <state> ".$JobState." </state>";
+ $Response .= " <state> ".XML_Escape( $JobState )." </state>";
 
  // see if application field was posted...
  if( isset( $_POST[ "application" ] ) && ( $_POST[ "application" ] != "" ) )
@@ -74,7 +74,7 @@ if( !$DetailMode )
  else
   $JobApplication = "any";
 
- $Response .= " <application> ".$JobApplication." </application>";
+ $Response .= " <application> ".XML_Escape( $JobApplication )." </application>";
 
  // see if start field was posted...
  if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && ctype_digit( $_POST[ "start" ] ) ) 
@@ -126,12 +126,12 @@ if( !$DetailMode )
     // and build it's response...
     $NrOfJobsReported++;
     $JobResponses .= " <job number='".$NrOfJobsReported."'> <job_id> ".$JobData->job_id." </job_id>";
-    $JobResponses .= " <state> ".$JobData->state." </state> <state_time_stamp> ".$JobData->state_time_stamp." </state_time_stamp>";
-    $JobResponses .= " <target_resources> ".$JobData->target_resources." </target_resources>";
-    $JobResponses .= " <owners> ".$JobData->owners." </owners>";
-    $JobResponses .= " <application> ".$JobData->application." </application>";
-    $JobResponses .= " <read_access> ".$JobData->read_access." </read_access>";
-    $JobResponses .= " <write_access> ".$JobData->write_access." </write_access>";
+    $JobResponses .= " <state> ".XML_Escape( $JobData->state )." </state> <state_time_stamp> ".$JobData->state_time_stamp." </state_time_stamp>";
+    $JobResponses .= " <target_resources> ".XML_Escape( $JobData->target_resources )." </target_resources>";
+    $JobResponses .= " <owners> ".XML_Escape( $JobData->owners )." </owners>";
+    $JobResponses .= " <application> ".XML_Escape( $JobData->application )." </application>";
+    $JobResponses .= " <read_access> ".XML_Escape( $JobData->read_access )." </read_access>";
+    $JobResponses .= " <write_access> ".XML_Escape( $JobData->write_access )." </write_access>";
     $JobResponses .= " <job_specifics> ".$JobData->job_specifics." </job_specifics> </job>";
    }
   }
@@ -161,17 +161,16 @@ else
  // finally send out the data in the response... 
  $Response .= " <number_of_jobs> 1 </number_of_jobs> <job number='1'>";
  $Response .= " <job_id> ".$JobSpecs->job_id." </job_id>";
- $Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
- $Response .= " <owners> ".$JobSpecs->owners." </owners>";
- $Response .= " <application> ".$JobSpecs->application." </application>";
- $Response .= " <state> ".$JobSpecs->state." </state>";
+ $Response .= " <target_resources> ".XML_Escape( $JobSpecs->target_resources )." </target_resources>";
+ $Response .= " <owners> ".XML_Escape( $JobSpecs->owners )." </owners>";
+ $Response .= " <application> ".XML_Escape( $JobSpecs->application )." </application>";
+ $Response .= " <state> ".XML_Escape( $JobSpecs->state )." </state>";
  $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";
- $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
  $Response .= " <repository_content> ".$RepoContent." </repository_content>";
  $Response .= " <input> ".binhex( $JobSpecs->input )." </input>";
  $Response .= " <output> ".binhex( $JobSpecs->output )." </output>";
- $Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
- $Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
+ $Response .= " <read_access> ".XML_Escape( $JobSpecs->read_access )." </read_access>";
+ $Response .= " <write_access> ".XML_Escape( $JobSpecs->write_access )." </write_access>";
  $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>";
 }
 

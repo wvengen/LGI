@@ -47,12 +47,12 @@ if( isset( $_POST[ "version" ] ) && isset( $_POST[ "servers" ] ) && isset( $_POS
   return( LGI_Error_Response( 41, $ErrorMsgs[ 41 ] ) );
  
  // build response header...
- $Response = "<project> ".Get_Selected_MySQL_DataBase()." </project> ";
- $Response .= "<project_master_server> ".Get_Master_Server_URL()." </project_master_server> ";
- $Response .= "<requesting_project_server> ".$ServerData->resource_name." </requesting_project_server> ";
- $Response .= "<this_project_server> ".Get_Server_URL()." </this_project_server> ";
+ $Response = "<project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project> ";
+ $Response .= "<project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server> ";
+ $Response .= "<requesting_project_server> ".XML_Escape( $ServerData->resource_name )." </requesting_project_server> ";
+ $Response .= "<this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server> ";
  $Response .= "<update_version> ".$UpdateVersion." </update_version> ";
- $Response .= "<target_servers> ".$TargetServers." </target_servers> ";
+ $Response .= "<target_servers> ".XML_Escape( $TargetServers )." </target_servers> ";
  $Response .= "<update_query> ".$UpdateQuery." </update_query> ";
 
  // check latest update we have...
@@ -115,16 +115,16 @@ $mysqlresult = mysql_query( "SELECT MAX(version) AS max FROM updates" );
 if( $mysqlresult ) 
 {
  $MaxVersion = mysql_fetch_object( $mysqlresult );
- $MaxVersion = $MaxVersion->max
+ $MaxVersion = $MaxVersion->max;
  mysql_free_result( $mysqlresult );
 }
 else
  $MaxVersion = -1;
 
-$Response = "<project> ".Get_Selected_MySQL_DataBase()." </project> ";
-$Response .= "<project_master_server> ".Get_Master_Server_URL()." </project_master_server> ";
-$Response .= "<requesting_project_server> ".$ServerData->resource_name." </requesting_project_server> ";
-$Response .= "<this_project_server> ".Get_Server_URL()." </this_project_server> ";
+$Response = "<project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project> ";
+$Response .= "<project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server> ";
+$Response .= "<requesting_project_server> ".XML_Escape( $ServerData->resource_name )." </requesting_project_server> ";
+$Response .= "<this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server> ";
 $Response .= "<update> <did_update_cyle> 1 </did_update_cyle> <update_version> ".$MaxVersion." </update_version> </update>";
 
 return( LGI_Response( $Response ) );

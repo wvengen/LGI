@@ -21,6 +21,7 @@
 require_once( '../inc/Config.inc' );
 require_once( '../inc/Errors.inc' );
 require_once( '../inc/MySQL.inc' );
+require_once( '../inc/Utils.inc' );
 
 // -------------------------------------------------------------------- 
 
@@ -29,7 +30,9 @@ function LGI_Response( $DataTags, $Exit = true, $ExtraInfoTags = "" )
  global $Config;
 
  $ExtraInfoTags = "<server_max_field_size> ".$Config["MAX_FIELD_SIZE"]." </server_max_field_size> ".$ExtraInfoTags;
- $ExtraInfoTags = "<CA_certificate> ".$Config["SERVER_SSL_CA_CERTIFICATE_URL"]." </CA_certificate> ".$ExtraInfoTags;
+ $ExtraInfoTags = "<CA_certificate> ".XML_Escape( $Config["SERVER_SSL_CA_CERTIFICATE_URL"] )." </CA_certificate> ".$ExtraInfoTags;
+ $ExtraInfoTags = "<LGI_version> ".$Config["LGI_VERSION"]. " </LGI_version> ".$ExtraInfoTags;
+ $ExtraInfoTags = "<API_version> ".$Config["API_VERSION"]. " </API_version> ".$ExtraInfoTags;
  $Response = "<LGI> ".$ExtraInfoTags." <response> ".$DataTags." </response> </LGI>";
 
  if( $Exit )
@@ -45,7 +48,7 @@ function LGI_Response( $DataTags, $Exit = true, $ExtraInfoTags = "" )
 
 function LGI_Error_Response( $ErrorNo, $ErrorMessage, $Exit = true, $ExtraInfoTags = "" )
 {
- $ErrorTags = "<error> <number> ".$ErrorNo." </number> <message> ".$ErrorMessage." </message> </error>";
+ $ErrorTags = "<error> <number> ".$ErrorNo." </number> <message> ".XML_Escape( $ErrorMessage )." </message> </error>";
 
  LGI_Response( $ErrorTags, $Exit, $ExtraInfoTags ); 
 
@@ -59,7 +62,7 @@ function LGI_BackOff_Response( $Exit = true )
  global $Config;
  global $ErrorMsgs;
 
- $ErrorMessage =  "<error> <number> 1 </number> <message> ".$ErrorMsgs[ 1 ]." </message>  <timeout> ".$Config["LGI_TIMEOUT_VALUE"]." </timeout> </error> ";
+ $ErrorMessage =  "<error> <number> 1 </number> <message> ".XML_Escape( $ErrorMsgs[ 1 ] )." </message>  <timeout> ".$Config["LGI_TIMEOUT_VALUE"]." </timeout> </error> ";
 
  LGI_Response( $ErrorMessage, $Exit );
 

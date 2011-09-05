@@ -497,7 +497,7 @@ int Daemon::RequestWorkCycle( void )
   {
    DaemonConfigProjectApplication TheApplication = TheProject.Application( nA );
    string AppName = TheApplication.Application_Name();
-   Capabilities += "<" + AppName + "> " + TheApplication.Capabilities() + " </" + AppName + "> ";
+   Capabilities += "<" + AppName + "> " + XML_Escape( TheApplication.Capabilities() ) + " </" + AppName + "> ";
   }
 
   VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; Capabilities reported to server " << Capabilities );

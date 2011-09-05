@@ -128,3 +128,12 @@ Wed August 31 2011 -- version 1.30
   caused wrong output in parsing response XML tags. 
 
 
+Mon September 5th 2011 -- version 1.31
+--------------------------------------
+
+- Added LGI server version number. Set initial version to 1.31.
+- Added API version number. Set initial version to 1.31.
+- Made XML tests more rigorous, added escaping and updated documentation.
+
+
+

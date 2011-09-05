@@ -41,8 +41,6 @@ else
   return( LGI_Error_Response( 46, $ErrorMsgs[ 46 ] ) );
  $Application = NormalizeString( $_POST[ "application" ] );
 }
-if( XML_Injection_Test( $Application, "application" ) ) 
- return( LGI_Error_Response( 74, $ErrorMsgs[ 74 ] ) );
 
 // check if non-compulsory posts were set...
 if( isset( $_POST[ "start" ] ) && ( $_POST[ "start" ] != "" ) && ctype_digit( $_POST[ "start" ] ) )
@@ -78,13 +76,13 @@ if( Resource_Check_For_Job_Locks( $ResourceData ) != 0 )
  return( LGI_Error_Response( 17, $ErrorMsgs[ 17 ] ) ); 
 
 // header of the response...
-$Response = "<start> ".$JobIdStart." </start> <limit> ".$JobIdLimit." </limit> <owners> ".$JobOwnersList." </owners>";
-$Response .= " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
+$Response = "<start> ".$JobIdStart." </start> <limit> ".$JobIdLimit." </limit> <owners> ".XML_Escape( $JobOwnersList )." </owners>";
+$Response .= " <resource> ".XML_Escape( $ResourceData->resource_name )." </resource> <resource_url> ".XML_Escape( $ResourceData->url )." </resource_url>";
 $Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
-$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
+$Response .= " <project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project>";
+$Response .= " <project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server> <this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server>";
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
-$Response .= " <application> ".$Application." </application>";
+$Response .= " <application> ".XML_Escape( $Application )." </application>";
 
 // create regexps for owners being allowed and being denied by resource...
 $OwnersAllowedRegExp = "";
@@ -174,10 +172,10 @@ if( $NrOfPossibleJobs >= 1 )
      $ActualNrOfJobs += 1; 
      $ResponseJobs .= " <job number='".$ActualNrOfJobs."'> <job_id> ".$JobSpecs->job_id." </job_id>"; 
      $ResponseJobs .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>"; 
-     $ResponseJobs .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>"; 
-     $ResponseJobs .= " <owners> ".$JobSpecs->owners." </owners>"; 
-     $ResponseJobs .= " <read_access> ".$JobSpecs->read_access." </read_access>"; 
-     $ResponseJobs .= " <write_access> ".$JobSpecs->write_access." </write_access>"; 
+     $ResponseJobs .= " <target_resources> ".XML_Escape( $JobSpecs->target_resources )." </target_resources>"; 
+     $ResponseJobs .= " <owners> ".XML_Escape( $JobSpecs->owners )." </owners>"; 
+     $ResponseJobs .= " <read_access> ".XML_Escape( $JobSpecs->read_access )." </read_access>"; 
+     $ResponseJobs .= " <write_access> ".XML_Escape( $JobSpecs->write_access )." </write_access>"; 
      $ResponseJobs .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>"; 
     }
     else

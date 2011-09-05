@@ -180,6 +180,20 @@ function Parse_XML( $XML, $Tag, &$Attributes )
 
 // --------------------------------------------------- 
 
+function XML_Escape( $text )
+{
+ return( str_replace( '&#039;', '&apos;', htmlspecialchars( $text, ENT_QUOTES ) ) );
+}
+
+// --------------------------------------------------- 
+
+function XML_UnEscape( $text )
+{
+ return( htmlspecialchars_decode( str_replace( '&apos;', '&#039;', $text ), ENT_QUOTES ) );
+}
+
+// --------------------------------------------------- 
+
 function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
 {
  $XMLLength = strlen( $XML );
@@ -197,6 +211,8 @@ function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
   {
 
    $BeginTagEnd = $BeginTagStart = $Index + 1;
+
+   if( $XML[ $BeginTagStart ] == '/' ) return( $Empty );
 
    while( $BeginTagEnd < $XMLLength  && $XML[ $BeginTagEnd ] != ' ' && $XML[ $BeginTagEnd ] != '>' ) ++$BeginTagEnd;
 
@@ -240,7 +256,7 @@ function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
    {
     $StartPos = $EndTagEnd + 1;
     $Attributes = substr( $XML, $AttributeStart, $AttributeEnd - $AttributeStart );
-    return( substr( $XML, $AttributeEnd + 1, $EndTagStart - $AttributeEnd - 3 ) );
+    return( XML_UnEscape( substr( $XML, $AttributeEnd + 1, $EndTagStart - $AttributeEnd - 3 ) ) );
    }
 
    $Index = $EndTagEnd;
@@ -253,11 +269,13 @@ function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
 
 function XML_Injection_Test( $Data, $Tag = "dummy" )
 {
+ // quick and dirty test...
  $Attributes = "";
- if( Parse_XML( "<".$Tag.">".$Data."</".$Tag.">", $Tag, $Attributes ) !== $Data ) 
-  return( True );
- else
-  return( False );
+ if( Parse_XML( "<".$Tag.">".$Data."</".$Tag.">", $Tag, $Attributes ) !== $Data ) return( True );
+
+ // test more thouroughly now...
+ 
+ return( False );
 }
 
 // --------------------------------------------------- 

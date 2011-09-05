@@ -53,8 +53,6 @@ if( isset( $_POST[ "state" ] ) && ( $_POST[ "state" ] != "" ) )
 {
  if( strlen( $_POST[ "state" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 45, $ErrorMsgs[ 45 ] ) );
- if( XML_Injection_Test( $_POST[ "state" ], "state" ) )
-  return( LGI_Error_Response( 82, $ErrorMsgs[ 82 ] ) );
  $UpdateQuery .= ", state='".mysql_escape_string( $_POST[ "state" ] )."'";
 }
 
@@ -62,9 +60,6 @@ if( isset( $_POST[ "target_resources" ] ) && ( $_POST[ "target_resources" ] != "
 {
  if( strlen( $_POST[ "target_resources" ] ) >= $Config[ "MAX_POST_SIZE_FOR_TINYTEXT" ] )
   return( LGI_Error_Response( 50, $ErrorMsgs[ 50 ] ) );
-
- if( XML_Injection_Test( $_POST[ "target_resources" ], "target_resources" ) )
-  return( LGI_Error_Response( 76, $ErrorMsgs[ 76 ] ) );
 
  // only do the allowed target_recources...
  $TargetResourcesArray = CommaSeparatedField2Array( $_POST[ "target_resources" ], "," );
@@ -106,7 +101,7 @@ if( isset( $_POST[ "job_specifics" ] ) && ( $_POST[ "job_specifics" ] != "" ) )
  if( strlen( $_POST[ "job_specifics" ] ) >= $Config[ "MAX_POST_SIZE_FOR_BLOB" ] )
   return( LGI_Error_Response( 53, $ErrorMsgs[ 53 ] ) );
  if( XML_Injection_Test( $_POST[ "job_specifics" ], "job_specifics" ) )
-  return( LGI_Error_Response( 79, $ErrorMsgs[ 79 ] ) );
+  return( LGI_Error_Response( 72, $ErrorMsgs[ 72 ] ) );
  $UpdateQuery .= ", job_specifics='".mysql_escape_string( $_POST[ "job_specifics" ] )."'";
 }
 
@@ -124,21 +119,21 @@ mysql_free_result( $JobQuery );
 ScheduleEvent();
 
 // build response for this job...
-$Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
-$Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
-$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
+$Response = " <resource> ".XML_Escape( $ResourceData->resource_name )." </resource> <resource_url> ".XML_Escape( $ResourceData->url )." </resource_url>";
+$Response .= " <resource_capabilities> ".XML_Escape( $ResourceData->resource_capabilities )." </resource_capabilities>";
+$Response .= " <project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project>";
+$Response .= " <project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server> <this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server>";
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 $Response .= " <job> <job_id> ".$JobSpecs->job_id." </job_id>";
-$Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
-$Response .= " <owners> ".$JobSpecs->owners." </owners>";
-$Response .= " <application> ".$JobSpecs->application." </application>";
-$Response .= " <state> ".$JobSpecs->state." </state>";
+$Response .= " <target_resources> ".XML_Escape( $JobSpecs->target_resources )." </target_resources>";
+$Response .= " <owners> ".XML_Escape( $JobSpecs->owners )." </owners>";
+$Response .= " <application> ".XML_Escape( $JobSpecs->application )." </application>";
+$Response .= " <state> ".XML_Escape( $JobSpecs->state )." </state>";
 $Response .= " <state_time_stamp> ".$JobSpecs->state_time_stamp." </state_time_stamp>";
 $Response .= " <input> ".binhex( $JobSpecs->input )." </input>";
 $Response .= " <output> ".binhex( $JobSpecs->output )." </output>";
-$Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
-$Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
+$Response .= " <read_access> ".XML_Escape( $JobSpecs->read_access )." </read_access>";
+$Response .= " <write_access> ".XML_Escape( $JobSpecs->write_access )." </write_access>";
 $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics> </job>";
 
 // return the response...

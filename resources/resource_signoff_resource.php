@@ -36,11 +36,11 @@ if( Resource_Verify_Session( $ResourceData ) )
 Resource_Remove_Stale_Locks( $ResourceData );
 
 // start building the response of this api-call...
-$Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
+$Response = " <resource> ".XML_Escape( $ResourceData->resource_name )." </resource> <resource_url> ".XML_Escape( $ResourceData->url )." </resource_url>";
 $Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
-$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server>";
-$Response .= " <this_project_server> ".Get_Server_URL()." </this_project_server>";
+$Response .= " <project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project>";
+$Response .= " <project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server>";
+$Response .= " <this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server>";
 
 $queryresult = mysql_query( "SELECT url FROM active_resources WHERE project_server=2" );
 if( $queryresult ) 
@@ -53,7 +53,7 @@ $Response .= " <number_of_slave_servers> ".$NumberOfServers." </number_of_slave_
 for( $i = 1; $i <= $NumberOfServers; $i++ )
 {
  $Server = mysql_fetch_object( $queryresult );
- $Response .= " <project_server number='".$i."'> ".$Server->url." </project_server>";
+ $Response .= " <project_server number='".$i."'> ".XML_Escape( $Server->url )." </project_server>";
 }
 
 if( $NumberOfServers ) mysql_free_result( $queryresult );

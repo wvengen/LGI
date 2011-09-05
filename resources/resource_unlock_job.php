@@ -56,10 +56,10 @@ if( Resource_UnLock_Job( $ResourceData, $JobId, False ) )
  return( LGI_Error_Response( 23, $ErrorMsgs[ 23 ] ) ); 
 
 // build response for this lock...
-$Response = " <resource> ".$ResourceData->resource_name." </resource> <resource_url> ".$ResourceData->url." </resource_url>";
+$Response = " <resource> ".XML_Escape( $ResourceData->resource_name )." </resource> <resource_url> ".XML_Escape( $ResourceData->url )." </resource_url>";
 $Response .= " <resource_capabilities> ".$ResourceData->resource_capabilities." </resource_capabilities>";
-$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
+$Response .= " <project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project>";
+$Response .= " <project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server> <this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server>";
 $Response .= " <session_id> ".$ResourceData->SessionID." </session_id>";
 $Response .= " <job_id> ".$JobId." </job_id>";
 $Response .= " <lock> <lock_id> ".$LockSpecs->lock_id." </lock_id> <job_id> ".$LockSpecs->job_id." </job_id>";

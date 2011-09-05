@@ -33,10 +33,10 @@ $JobGroups = NormalizeCommaSeparatedField( $_POST[ "groups" ], "," );
 $JobUser = $_POST[ "user" ];
 
 // start building the response of this api-call...
-$Response = "<user> ".$JobUser." </user> <groups> ".$JobGroups." </groups>";
-$Response .= " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server>";
-$Response .= " <this_project_server> ".Get_Server_URL()." </this_project_server>";
+$Response = "<user> ".XML_Escape( $JobUser )." </user> <groups> ".XML_Escape( $JobGroups )." </groups>";
+$Response .= " <project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project>";
+$Response .= " <project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server>";
+$Response .= " <this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server>";
 
 $queryresult = mysql_query( "SELECT resource_name,last_call_time,resource_capabilities FROM active_resources WHERE project_server=0" );
 
@@ -50,7 +50,7 @@ $Response .= " <number_of_resources> ".$NumberOfResources." </number_of_resource
 for( $i = 1; $i <= $NumberOfResources; $i++ )
 {
  $Resource = mysql_fetch_object( $queryresult );
- $Response .= " <resource number='".$i."'> <resource_name> $Resource->resource_name </resource_name>";
+ $Response .= " <resource number='".$i."'> <resource_name> ".XML_Escape( $Resource->resource_name )." </resource_name>";
  $Response .= " <resource_capabilities> $Resource->resource_capabilities </resource_capabilities>";
  $Response .= " <last_call_time> $Resource->last_call_time </last_call_time> </resource>";
 }

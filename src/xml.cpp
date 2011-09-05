@@ -35,6 +35,8 @@ void Parse_XML_ListAllTags( string XML, vector<string> &List )
   {
    BeginTagEnd = BeginTagStart = Index + 1;              // BeginTagStart marks the start of the tag 
 
+   if( XML[ BeginTagStart ] == '/' ) return;
+
    while( ( BeginTagEnd < XMLLength ) && ( XML[ BeginTagEnd ] != '>' ) ) ++BeginTagEnd;  // BeginTagEnd marks the '>'
 
    if( BeginTagEnd >= XMLLength ) return;            
@@ -63,6 +65,22 @@ void Parse_XML_ListAllTags( string XML, vector<string> &List )
 
 // -----------------------------------------------------------------------------
 
+string XML_Escape( string Data )
+{
+ // Implement escaping
+ return( Data );
+}
+
+// -----------------------------------------------------------------------------
+
+string XML_UnEscape( string Data )
+{
+ // Implement unescaping
+ return( Data );
+}
+
+// -----------------------------------------------------------------------------
+
 string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop )
 {
  int XMLLength = XML.length();
@@ -81,6 +99,8 @@ string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop )
   {
    
    BeginTagEnd = BeginTagStart = Index + 1;                                                                    // BeginTagStart marks the start of the tag 
+   
+   if( XML[ BeginTagStart ] == '/' ) return( Empty );
 
    while( ( BeginTagEnd < XMLLength ) && ( XML[ BeginTagEnd ] != ' '  ) && ( XML[ BeginTagEnd ] != '>' ) ) ++BeginTagEnd;  // BeginTagEnd marks the '>' or the ' ' 
 
@@ -122,7 +142,7 @@ string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop )
    {
     Attributes = XML.substr( AttributeStart, AttributeEnd - AttributeStart );
     StartStop = EndTagEnd + 1;
-    return( XML.substr( AttributeEnd + 1, EndTagStart - AttributeEnd - 3 ) );
+    return( XML_UnEscape( XML.substr( AttributeEnd + 1, EndTagStart - AttributeEnd - 3 ) ) );
    }
     
    Index = EndTagEnd;

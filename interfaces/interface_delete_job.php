@@ -75,18 +75,18 @@ else
 ScheduleEvent();
 
 // build response header...
-$Response =  " <project> ".Get_Selected_MySQL_DataBase()." </project>";
-$Response .= " <project_master_server> ".Get_Master_Server_URL()." </project_master_server> <this_project_server> ".Get_Server_URL()." </this_project_server>";
-$Response .= " <user> ".$JobUser." </user> <groups> ".$JobGroups." </groups>";
+$Response =  " <project> ".XML_Escape( Get_Selected_MySQL_DataBase() )." </project>";
+$Response .= " <project_master_server> ".XML_Escape( Get_Master_Server_URL() )." </project_master_server> <this_project_server> ".XML_Escape( Get_Server_URL() )." </this_project_server>";
+$Response .= " <user> ".XML_Escape( $JobUser )." </user> <groups> ".XML_Escape( $JobGroups )." </groups>";
 $Response .= " <number_of_jobs> 1 </number_of_jobs> <job number='1'>";
 $Response .= " <job_id> ".$JobSpecs->job_id." </job_id>";
-$Response .= " <target_resources> ".$JobSpecs->target_resources." </target_resources>";
-$Response .= " <application> ".$JobSpecs->application." </application>";
-$Response .= " <owners> ".$JobSpecs->owners." </owners>";
-$Response .= " <read_access> ".$JobSpecs->read_access." </read_access>";
-$Response .= " <write_access> ".$JobSpecs->write_access." </write_access>";
+$Response .= " <target_resources> ".XML_Escape( $JobSpecs->target_resources )." </target_resources>";
+$Response .= " <application> ".XML_Escape( $JobSpecs->application )." </application>";
+$Response .= " <owners> ".XML_Escape( $JobSpecs->owners )." </owners>";
+$Response .= " <read_access> ".XML_Escape( $JobSpecs->read_access )." </read_access>";
+$Response .= " <write_access> ".XML_Escape( $JobSpecs->write_access )." </write_access>";
 $Response .= " <job_specifics> ".$JobSpecs->job_specifics." </job_specifics>";
-$Response .= " <state> ".$JobState." </state> <state_time_stamp> ".$JobStateTimeStamp." </state_time_stamp> </job>";
+$Response .= " <state> ".XML_Escape( $JobState )." </state> <state_time_stamp> ".$JobStateTimeStamp." </state_time_stamp> </job>";
 
 // return the response...
 return( LGI_Response( $Response ) );

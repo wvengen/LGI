@@ -133,8 +133,6 @@ function Resource_Verify( &$Project, $SessionID = "", $Capabilities = "" )
    return( LGI_Error_Response( 58, $ErrorMsgs[ 58 ] ) );
  }
  $Project = NormalizeString( $Project );
- if( XML_Injection_Test( $Project, "project" ) )
-  return( LGI_Error_Response( 75, $ErrorMsgs[ 75 ] ) );
 
  // check if capabilites were given and is correct...
  if( isset( $Capabilities ) && ( $Capabilities !== "" ) )
@@ -143,15 +141,12 @@ function Resource_Verify( &$Project, $SessionID = "", $Capabilities = "" )
    return( LGI_Error_Response( 69, $ErrorMsgs[ 69 ] ) );
 
   if( XML_Injection_Test( $Capabilities, "resource_capabilities" ) )
-   return( LGI_Error_Response( 80, $ErrorMsgs[ 80 ] ) );
+   return( LGI_Error_Response( 73, $ErrorMsgs[ 73 ] ) );
  }
  
  // get common name from certificate ...
  $CommonNameArray = CommaSeparatedField2Array( SSL_Get_Common_Name(), ";" );
  $CommonName = mysql_escape_string( $CommonNameArray[ 1 ] );
-
- if( XML_Injection_Test( $CommonName, "resource" ) )
-  return( LGI_Error_Response( 81, $ErrorMsgs[ 81 ] ) );
 
  // check if certificate has any allowed projects listed...
  if( $CommonNameArray[ 0 ] >= 2 )  

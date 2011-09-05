@@ -60,4 +60,7 @@ $Config[ "DEFAULT_JOB_STATUS_LIMIT" ]    = 128;                    // the defaul
 $Config[ "MAX_WORK_REQUEST_LIMIT" ]  = 256;                        // the max request limit for resources
 $Config[ "MAX_JOB_STATUS_LIMIT" ]    = 4096;                       // the max request limit for interfaces
 
+$Config[ "LGI_VERSION" ] = "1.31";                                 // the server version number
+$Config[ "API_VERSION" ] = "1.31";                                 // the API version number
+
 ?>
