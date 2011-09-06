@@ -81,7 +81,7 @@ void PrintHelp( char *ExeName )
  cout << "-U user                 specify username." << endl;
  cout << "-G groups               specify groups." << endl;
  cout << "-P project              specify project name." << endl;
- cout << "-W                      be less strickt in hostname checks of project server certificates." << endl;
+ cout << "-W                      be less strict in hostname checks of project server certificates." << endl;
  cout << "-m                      switch user or resource mode." << endl << endl;
 }
 

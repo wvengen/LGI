@@ -92,7 +92,7 @@ void PrintHelp( char *ExeName )
  cout << "-x                             output lists in XML format." << endl;
  cout << "-c directory                   specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
  cout << "-j jobdirectory                specify job directory to use. if not specified try current directory or specify the following options." << endl;
- cout << "-W                             be less strickt in hostname checks of project server certificates." << endl;
+ cout << "-W                             be less strict in hostname checks of project server certificates." << endl;
  cout << "-K keyfile                     specify key file." << endl;
  cout << "-C certificatefile             specify certificate file." << endl;
  cout << "-CA cacertificatefile          specify ca certificate file." << endl << endl;

@@ -98,7 +98,7 @@ void PrintHelp( char *ExeName )
  cout << "-n           log normal messages. this is the default." << endl;
  cout << "-v           also log debug messages." << endl;
  cout << "-vv          also log verbose debug messages." << endl;
- cout << "-W           be less strickt in hostname checks of project server certificates." << endl;
+ cout << "-W           be less strict in hostname checks of project server certificates." << endl;
  cout << "-l file      use specified logfile. default is to log to standard output." << endl << endl;
 }
 
