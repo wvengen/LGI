@@ -69,14 +69,16 @@ DaemonJob::DaemonJob( void )
  JobDirectory.clear();
  ErrorNumber = 0xFFFF;
  MycURLHandle = NULL;
+ CheckHostname = true;
 }
 
 // -----------------------------------------------------------------------------
 
-DaemonJob::DaemonJob( string TheJobDirectory, CURL *cURLHandle )
+DaemonJob::DaemonJob( string TheJobDirectory, CURL *cURLHandle, bool Strict )
 {
  JobDirectory.clear();
  MycURLHandle = cURLHandle;
+ CheckHostname = Strict;
 
  DIR *Entry = opendir( TheJobDirectory.c_str() );
 
@@ -132,7 +134,7 @@ DaemonJob::DaemonJob( string TheJobDirectory, CURL *cURLHandle )
 
 // -----------------------------------------------------------------------------
 
-DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber, CURL *cURLHandle )
+DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber, CURL *cURLHandle, bool Strict )
 {
  DaemonConfigProjectApplication Application;
  string TheHash, TheScript;
@@ -142,6 +144,7 @@ DaemonJob::DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, 
 
  JobDirectory.clear();
  MycURLHandle = cURLHandle;
+ CheckHostname = Strict;
 
  // first check if config matches the XML response...
  if( NormalizeString( Parse_XML( TheXML, "project" ) ) != TheConfig.Project( ProjectNumber ).Project_Name() )
@@ -626,7 +629,7 @@ string DaemonJob::GetStateFromServer( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetStateFromServer; JobDirectory empty" );
 
- Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle );
+ Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle, CheckHostname );
  string Response;
 
  do
@@ -650,7 +653,7 @@ string DaemonJob::GetStateTimeStampFromServer( void )
 {
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( JobDirectory, "DaemonJob::GetStateTimeStampFromServer; JobDirectory empty" );
 
- Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle );
+ Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle, CheckHostname );
  string Response;
 
  do
@@ -689,7 +692,7 @@ int DaemonJob::UpdateJob( string State, string Resources, string Input, string O
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; JobDirectory empty" );
  if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJob; SessionID empty" );
 
- Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle );
+ Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle, CheckHostname );
  string Response, Data, HexedInput, HexedOutput;
 
  if( !Input.empty() ) BinHex( Input, HexedInput );
@@ -822,7 +825,7 @@ int DaemonJob::LockJob( void )
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::LockJob; JobDirectory empty" );
  if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::LockJob; SessionID empty" );
 
- Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle );
+ Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle, CheckHostname );
  string Response;
 
  do
@@ -845,7 +848,7 @@ int DaemonJob::UnLockJob( void )
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UnLockJob; JobDirectory empty" );
  if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UnLockJob; SessionID empty" );
 
- Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle );
+ Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle, CheckHostname );
  string Response;
 
  do
@@ -868,7 +871,7 @@ int DaemonJob::SignUp( void )
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignUp; JobDirectory empty" );
  if( !SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignUp; SessionID not empty" );
 
- Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle );
+ Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle, CheckHostname );
  string Response;
 
  do
@@ -893,7 +896,7 @@ int DaemonJob::SignOff( void )
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignOff; JobDirectory empty" );
  if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::SignOff; SessionID empty" );
 
- Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle );
+ Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle, CheckHostname );
  string Response;
 
  do
@@ -918,7 +921,7 @@ int DaemonJob::UpdateJobFromServer( bool UpdateOutputToo )
  if( JobDirectory.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; JobDirectory empty" );
  if( SessionID.empty() ) CRITICAL_LOG_RETURN( 0, "DaemonJob::UpdateJobFromServer; SessionID empty" );
 
- Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle );
+ Resource_Server_API Server( GetKeyFile(), GetCertificateFile(), GetCACertificateFile(), MycURLHandle, CheckHostname );
  string Response, Data;
 
  do

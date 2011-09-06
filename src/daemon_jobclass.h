@@ -124,8 +124,8 @@ class DaemonJob
        public:
 
               DaemonJob();
-              DaemonJob( string TheJobDirectory, CURL *cURLHandle = NULL );
-              DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber, CURL *cURLHandle = NULL );
+              DaemonJob( string TheJobDirectory, CURL *cURLHandle = NULL, bool Strict = true );
+              DaemonJob( string TheXML, DaemonConfig TheConfig, int ProjectNumber, int ApplicationNumber, CURL *cURLHandle = NULL, bool Strict = true );
 
               void CleanUpJobDirectory( void );             // remove job directory
               void KillJobRunScriptProcess( void );
@@ -191,6 +191,7 @@ class DaemonJob
               int ErrorNumber;
               string JobDirectory, SessionID;
               CURL *MycURLHandle;
+              bool CheckHostname;
       };
 
 // -----------------------------------------------------------------------------

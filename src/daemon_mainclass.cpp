@@ -136,7 +136,7 @@ int Daemon::ScanDirectoryForJobs( string Directory )
 
     FileMask = ( LGI_JOBDAEMON_ALL_BIT_VALUES_TOGETHER << 1 ) + 1;      // make sure we won't include it again...
 
-    DaemonJob TheScannedJob( Directory, MycURLHandle );                 // also make sure we use our curl handle...
+    DaemonJob TheScannedJob( Directory, MycURLHandle, CheckHostname );                 // also make sure we use our curl handle...
 
     if( TheScannedJob.GetJobDirectory().empty() )
      CRITICAL_LOG( "Daemon::ScanDirectoryForJobs; Job with directory " << Directory << " seems corrupt, it will be ignored" )
@@ -679,7 +679,7 @@ int Daemon::RequestWorkCycle( void )
          VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No owners were denied service for job " << Job_Id );
 
          // create temporary job directory with the jobs response data...
-         DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, nA, MycURLHandle );
+         DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, nA, MycURLHandle, CheckHostname );
 
          // see if job has limits from job limits script somehow... if so, delete temp job directory...
          if( TempJob.RunJobCheckLimitsScript() == 0 )
