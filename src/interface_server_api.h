@@ -40,7 +40,7 @@ class Interface_Server_API
       {
        public:
 
-              Interface_Server_API( string KeyFile, string CertificateFile, string CAFile, CURL *cURLHandle = NULL );
+              Interface_Server_API( string KeyFile, string CertificateFile, string CAFile, CURL *cURLHandle = NULL, bool Strict = true );
               ~Interface_Server_API( void );
 
               int Interface_Project_Server_List( string &Response, string ServerURL, string Project, string User, string Groups );
@@ -61,6 +61,7 @@ class Interface_Server_API
        char   CURLErrorBuffer[ CURL_ERROR_SIZE ];
        CURL   *MycURLHandle;
        int    CreatedMycURLHandle;
+       bool   CheckHostname;
       }; 
   
 // ------------------------------------------------------------------------------

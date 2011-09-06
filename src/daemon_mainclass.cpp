@@ -21,7 +21,7 @@
 
 // -----------------------------------------------------------------------------
 
-Daemon::Daemon( string TheConfigFile, int SlowCycleTime, int FastCycleTime ) : DaemonConfig( TheConfigFile )
+Daemon::Daemon( string TheConfigFile, int SlowCycleTime, int FastCycleTime, bool Strict ) : DaemonConfig( TheConfigFile )
 {
  ReloadConfig = ReadyForScheduling = 0; Jobs.clear(); Accounting.clear(); ConfigFile = TheConfigFile;
 
@@ -37,6 +37,7 @@ Daemon::Daemon( string TheConfigFile, int SlowCycleTime, int FastCycleTime ) : D
  TheSlowCycleTime = SlowCycleTime;
  ReadyForScheduling = 1;
  MycURLHandle = curl_easy_init();
+ CheckHostname = Strict;
  if( MycURLHandle == NULL ) CRITICAL_LOG( "Daemon::Daemon; Could not create cURL handle for all connections" );
 }
 
@@ -316,7 +317,7 @@ int Daemon::CycleThroughJobs( void )
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with job scripts cycle" );
  
- Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File(), MycURLHandle );
+ Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File(), MycURLHandle, CheckHostname );
  string ServerURL, Project, Response;
 
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; ++Server )
@@ -473,7 +474,7 @@ int Daemon::RequestWorkCycle( void )
 
  if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) NORMAL_LOG_RETURN( JobsObtained, "Daemon::RequestWorkCycle; Total job limit reached, not requesting any work" );
 
- Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File(), MycURLHandle );
+ Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File(), MycURLHandle, CheckHostname );
 
  for( int nP = 1; nP <= Number_Of_Projects() && ReadyForScheduling; ++nP )     // cycle through all projects...
  {

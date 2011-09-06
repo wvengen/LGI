@@ -47,7 +47,7 @@
 
 // ----------------------------------------------------------------------
 
-int Command = 0, OutputXML = 0;
+int Command = 0, OutputXML = 0, CheckHostname = 1;
 
 string KeyFile, CertificateFile, CACertificateFile, RepositoryURL,
        RepositoryServer, RepositoryDir;
@@ -92,6 +92,7 @@ void PrintHelp( char *ExeName )
  cout << "-x                             output lists in XML format." << endl;
  cout << "-c directory                   specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
  cout << "-j jobdirectory                specify job directory to use. if not specified try current directory or specify the following options." << endl;
+ cout << "-W                             be less strickt in hostname checks of project server certificates." << endl;
  cout << "-K keyfile                     specify key file." << endl;
  cout << "-C certificatefile             specify certificate file." << endl;
  cout << "-CA cacertificatefile          specify ca certificate file." << endl << endl;
@@ -115,7 +116,7 @@ int ListRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, CheckHostname );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
@@ -192,7 +193,7 @@ int DownLoadFilesFromRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, CheckHostname );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
@@ -253,7 +254,7 @@ int UpLoadFilesToRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, CheckHostname );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
@@ -327,7 +328,7 @@ int DeleteFilesFromRepository( void )
   curl_easy_setopt( cURLHandle, CURLOPT_SSLKEY, KeyFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_CAINFO, CACertificateFile.c_str() );
   curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
+  curl_easy_setopt( cURLHandle, CURLOPT_SSL_VERIFYHOST, CheckHostname );
   curl_easy_setopt( cURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( cURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( cURLHandle, CURLOPT_NOPROGRESS, 1 );
@@ -402,6 +403,8 @@ int main( int argc, char *argv[] )
   if( !strcmp( argv[ i ], "-h" ) ) {
     PrintHelp( argv[ 0 ] );
     return( 0 );
+  } else if( !strcmp( argv[ i ], "-W" ) ) {
+    CheckHostname = 0;
   } else if( !strcmp( argv[ i ], "-j" ) ) {
     if( argv[ ++i ] ) 
     {

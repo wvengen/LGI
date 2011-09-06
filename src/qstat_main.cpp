@@ -41,6 +41,7 @@ int OutputInXML = 0;
 int ListServers = 0;
 int LogLevel = 0;
 int Count = 0;
+bool Strict = true;
 
 // ----------------------------------------------------------------------
 
@@ -83,6 +84,7 @@ void PrintHelp( char *ExeName )
  cout << "-S serverurl               specify project server to query." << endl;
  cout << "-U user                    specify username." << endl;
  cout << "-G groups                  specify groups." << endl;
+ cout << "-W                         be less strickt in hostname checks of project server certificates." << endl;
  cout << "-K keyfile                 specify key file." << endl;
  cout << "-C certificatefile         specify certificate file." << endl;
  cout << "-CA cacertificatefile      specify ca certificate file." << endl << endl;
@@ -110,6 +112,8 @@ int main( int argc, char *argv[] )
   if( !strcmp( argv[ i ], "-h" ) ) {
     PrintHelp( argv[ 0 ] );
     return( 0 );
+  } else if( !strcmp( argv[ i ], "-W" ) ) {
+    Strict = false;
   } else if( !strcmp( argv[ i ], "-x" ) ) {
     OutputInXML = 1;
   } else if( !strcmp( argv[ i ], "-cnt" ) ) {
@@ -252,7 +256,7 @@ int main( int argc, char *argv[] )
  curl_global_init( CURL_GLOBAL_ALL );
 
  // now start qstating the server...
- Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );
+ Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile, NULL, Strict );
 
  if( ListServers )            // should we list servers...
  {

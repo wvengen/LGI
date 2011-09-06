@@ -40,7 +40,7 @@ class Resource_Server_API
       {
        public:
 
-              Resource_Server_API( string KeyFile, string CertificateFile, string CAFile, CURL *cURLHandle = NULL );
+              Resource_Server_API( string KeyFile, string CertificateFile, string CAFile, CURL *cURLHandle = NULL, bool Strict = true );
               ~Resource_Server_API( void );
 
               int Resource_SignUp_Resource( string &Response, string ServerURL, string Project, string Capabilities = "" );
@@ -66,6 +66,7 @@ class Resource_Server_API
        char   CURLErrorBuffer[ CURL_ERROR_SIZE ];
        CURL   *MycURLHandle;
        int    CreatedMycURLHandle;
+       bool   CheckHostname;
       }; 
   
 // ------------------------------------------------------------------------------

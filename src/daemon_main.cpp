@@ -98,6 +98,7 @@ void PrintHelp( char *ExeName )
  cout << "-n           log normal messages. this is the default." << endl;
  cout << "-v           also log debug messages." << endl;
  cout << "-vv          also log verbose debug messages." << endl;
+ cout << "-W           be less strickt in hostname checks of project server certificates." << endl;
  cout << "-l file      use specified logfile. default is to log to standard output." << endl << endl;
 }
 
@@ -109,6 +110,7 @@ int main( int argc, char *argv[] )
  int    Daemonize = 0;
  int    FastCycleTime = 120;
  int    SlowCycleTime = 600;
+ bool   Strict = true;
  string ConfigFile( "LGI.cfg" );
 
  // check arguments here...
@@ -125,6 +127,8 @@ int main( int argc, char *argv[] )
  {
   if( !strcmp( argv[ i ], "-q" ) ) {
    LogLevel = CRITICAL_LOGGING;
+  } else if( !strcmp( argv[ i ], "-W" ) ) {
+   Strict = false;
   } else if( !strcmp( argv[ i ], "-n" ) ) {
    LogLevel = CRITICAL_LOGGING | NORMAL_LOGGING;
   } else if( !strcmp( argv[ i ], "-v" ) ) {
@@ -192,7 +196,7 @@ int main( int argc, char *argv[] )
 
  curl_global_init( CURL_GLOBAL_ALL );
  
- TheDaemon = new Daemon( ConfigFile, SlowCycleTime, FastCycleTime );
+ TheDaemon = new Daemon( ConfigFile, SlowCycleTime, FastCycleTime, Strict );
 
  if( TheDaemon != NULL )
  {

@@ -35,7 +35,10 @@
 
 string KeyFile, CertificateFile, CACertificateFile, ServerURL, Response,
        Project, State, Application, User, Groups, ConfigDir;
+
 vector<string> Job_Ids;
+
+bool Strict = true;
 
 // ----------------------------------------------------------------------
 
@@ -70,6 +73,7 @@ void PrintHelp( char *ExeName )
  cout << "-S serverurl               specify project server to query." << endl;
  cout << "-U user                    specify username." << endl;
  cout << "-G groups                  specify groups." << endl;
+ cout << "-W                         be less strickt in hostname checks of project server certificates." << endl;
  cout << "-K keyfile                 specify key file." << endl;
  cout << "-C certificatefile         specify certificate file." << endl;
  cout << "-CA cacertificatefile      specify ca certificate file." << endl << endl;
@@ -106,6 +110,8 @@ int main( int argc, char *argv[] )
   if( !strcmp( argv[ i ], "-h" ) ) {
     PrintHelp( argv[ 0 ] );
     return( 0 );
+  } else if( !strcmp( argv[ i ], "-W" ) ) {
+    Strict = false;
   } else if( !strcmp( argv[ i ], "-c" ) ) {
     if( argv[ ++i ] )
     {
@@ -211,7 +217,7 @@ int main( int argc, char *argv[] )
  curl_global_init( CURL_GLOBAL_ALL );
 
  // now start contacting the server...
- Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );
+ Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile, NULL, Strict );
 
 
  for( int j = 0; j < Job_Ids.size(); ++j )

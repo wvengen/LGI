@@ -22,15 +22,16 @@
 
 // ------------------------------------------------------------------------------
 
-Resource_Server_API::Resource_Server_API( string KeyFile, string CertificateFile, string CAFile, CURL *cURLHandle )
+Resource_Server_API::Resource_Server_API( string KeyFile, string CertificateFile, string CAFile, CURL *cURLHandle, bool Strict )
 {
- DEBUG_LOG( "Resource_Server_API::Resource_Server_API; KeyFile=" << KeyFile << ", CertificateFile=" << CertificateFile << ", CAFile=" << CAFile );
+ DEBUG_LOG( "Resource_Server_API::Resource_Server_API; KeyFile=" << KeyFile << ", CertificateFile=" << CertificateFile << ", CAFile=" << CAFile << ", Strict=" << Strict );
 
  PrivateKeyFile = KeyFile;
  PublicCertificateFile = CertificateFile;
  CAChainFile = CAFile;
  MycURLHandle = cURLHandle;
  CreatedMycURLHandle = 0;
+ CheckHostname = Strict;
 }
 
 // ------------------------------------------------------------------------------
@@ -58,7 +59,10 @@ CURL *Resource_Server_API::SetupcURLForPost( string &PostURL )
   curl_easy_setopt( MycURLHandle, CURLOPT_SSLKEY, PrivateKeyFile.c_str() );
   curl_easy_setopt( MycURLHandle, CURLOPT_CAINFO, CAChainFile.c_str() );
   curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYPEER, 1 );
-  curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
+  if( CheckHostname ) 
+   curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYHOST, 1 );
+  else
+   curl_easy_setopt( MycURLHandle, CURLOPT_SSL_VERIFYHOST, 0 );
   curl_easy_setopt( MycURLHandle, CURLOPT_NOSIGNAL, 1 );
   curl_easy_setopt( MycURLHandle, CURLOPT_VERBOSE, 0 );
   curl_easy_setopt( MycURLHandle, CURLOPT_NOPROGRESS, 1 );

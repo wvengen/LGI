@@ -56,7 +56,7 @@ class Daemon : public DaemonConfig
       {
        public:
 
-               Daemon( string TheConfigFile, int SlowCycleTime = 600, int FastCycleTime = 120 );
+               Daemon( string TheConfigFile, int SlowCycleTime = 600, int FastCycleTime = 120, bool Strict = true );
                ~Daemon( void );
 
                int RunSchedular( void );
@@ -88,6 +88,7 @@ class Daemon : public DaemonConfig
                                     TheSlowCycleTime;
        CURL                        *MycURLHandle;
        string                       ConfigFile;
+       bool                         CheckHostname;
       };
 
 // -----------------------------------------------------------------------------

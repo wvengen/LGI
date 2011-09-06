@@ -44,6 +44,8 @@ string KeyFile, CertificateFile, CACertificateFile,
        Job_Specifics, Owners, Read_Access, Input, 
        Write_Access, Output, User, Groups;
 
+bool Strict = true;
+
 // ----------------------------------------------------------------------
 
 string ReadLineFromFile( string FileName )
@@ -79,6 +81,7 @@ void PrintHelp( char *ExeName )
  cout << "-U user                 specify username." << endl;
  cout << "-G groups               specify groups." << endl;
  cout << "-P project              specify project name." << endl;
+ cout << "-W                      be less strickt in hostname checks of project server certificates." << endl;
  cout << "-m                      switch user or resource mode." << endl << endl;
 }
 
@@ -139,6 +142,8 @@ int main( int argc, char *argv[] )
   if( !strcmp( argv[ i ], "-h" ) ) {
     PrintHelp( argv[ 0 ] );
     return( 0 );
+  } else if( !strcmp( argv[ i ], "-W" ) ) {
+    Strict = false;
   } else if( !strcmp( argv[ i ], "-x" ) ) {
     XMLOutput = 1;
   } else if( !strcmp( argv[ i ], "-c" ) ) {
@@ -336,7 +341,7 @@ int main( int argc, char *argv[] )
  // now act accordingly... first see if we are in user mode or not...
  if( ResourceMode )
  {
-  Resource_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
+  Resource_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile, NULL, Strict );         
 
   // first try to sign up...
   Flag = ServerAPI.Resource_SignUp_Resource( Response, ServerURL, Project );
@@ -392,7 +397,7 @@ int main( int argc, char *argv[] )
  }
  else    // when the submit is in user mode...
  {
-  Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile );         
+  Interface_Server_API ServerAPI( KeyFile, CertificateFile, CACertificateFile, NULL, Strict );         
 
   Flag = ServerAPI.Interface_Submit_Job( Response, ServerURL, Project, User, Groups, Application, Target_Resources, Job_Specifics, Input, Read_Access, Write_Access, "", FilesToUpload );
   if( Flag != CURLE_OK )
