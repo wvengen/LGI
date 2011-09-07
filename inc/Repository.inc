@@ -205,20 +205,38 @@ function GetRepositoryContent( $RepositoryURL )
 
   if( $RepositoryArray[ 0 ] == 2 )
   {
+   $Find = "find ".$RepositoryArray[ 2 ]." -type f -printf '//%P/%s/%T@//'";    // use seperators that cannot appear in paths or filenames...
    if( $Config[ "REPOSITORY_SSH_IDENTITY_FILE" ] != "" )
-   {
-    $Find = "find ".$RepositoryArray[ 2 ]." -type f -printf '<file name=\\\"%P\\\"> <size> %s </size> <date> %T@ </date> </file> '";
     $Content = shell_exec( $Config[ "REPOSITORY_SSH_COMMAND" ]." -i ".$Config[ "REPOSITORY_SSH_IDENTITY_FILE" ]." ".$RepositoryArray[ 1 ]." \"$Find\"" );
-   }
    else
-   {
-    $Find = "find ".$RepositoryArray[ 2 ]." -type f -printf '<file name=\"%P\"> <size> %s </size> <date> %T@ </date> </file> '";
     $Content = shell_exec( $Find );
-   }
   }
  }
 
- return( $Content );
+ $Data = ""; $NrOfFiles = 0; $Length = strlen( $Content );
+ for( $i = 2; $i < $Length; ++$i )
+ {
+  $SepPos = strpos( $Content, "//", $i );
+
+  $DatePos = $SepPos - 1;
+  while( $DatePos > $i && $Content[ $DatePos ] != '/' ) --$DatePos;
+  $SizePos = $DatePos - 1;
+  while( $SizePos > $i && $Content[ $SizePos ] != '/' ) --$SizePos;
+  $FilePos = $DatePos - 1;
+  while( $FilePos > 0 && substr( $Content, $FilePos, 2 ) != '//' ) --$FilePos;
+
+  $Date = substr( $Content, $DatePos + 1, $SepPos - $DatePos - 1 );
+  $Size = substr( $Content, $SizePos + 1, $DatePos - $SizePos - 1 );
+  $File = substr( $Content, $FilePos + 2, $SizePos - $FilePos - 2 );
+
+  $NrOfFiles++;
+  $Data .= " <file number=\"$NrOfFiles\"> <file_name> ".XML_Escape( $File )." </file_name> <size> $Size </size> <date> $Date </date> </file>";
+
+  $i = $SepPos + 4;
+ }
+ $Data .= " <number_of_files> $NrOfFiles </number_of_files>";
+
+ return( $Data );
 }
 
 

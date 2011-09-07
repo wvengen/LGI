@@ -131,43 +131,36 @@ int ListRepository( void )
    return( cURLResult );
   }
 
-  if( OutputXML ) cout << Response << endl;  
-
   Response = NormalizeString( Parse_XML( Response, "repository_content" ) );
 
   if( !Response.empty() )
   {
-   FileNr = 0;
+   if( OutputXML ) 
+   {
+    cout << Response << endl;  
+    return( 0 );
+   }
+
    FileData = Parse_XML( Response, "file", File, Pos = 0 );
 
-   if( !OutputXML ) cout << endl;
+   if( !FileData.empty() )
+   {
+    cout << endl;
 
-   do {
-    FileNr++;
+    do {
+        TimeStamp = atoi( NormalizeString( Parse_XML( FileData, "date" ) ).c_str() );
+        TimeStampStr = ctime( &TimeStamp );
+        TimeStampStr[ 24 ] = '\0';
 
-    if( !OutputXML )
-    {
-     TimeStamp = atoi( NormalizeString( Parse_XML( FileData, "date" ) ).c_str() );
-     TimeStampStr = ctime( &TimeStamp );
-     TimeStampStr[ 24 ] = '\0';
-
-     cout << left << setw( 32 ) << File.substr( 6, File.length() - 7 ) << " " << right << 
+        cout << left << setw( 32 ) <<  NormalizeString( Parse_XML( FileData, "file_name" ) ) << " " << right << 
              setw( 8 ) << NormalizeString( Parse_XML( FileData, "size" ) ) << " " <<
              TimeStampStr << " [" << TimeStamp << "]" << endl;
-    }
-    else
-     cout << " <file number=\"" << FileNr << "\"> " << FileData << " <file_name> " << 
-             File.substr( 6, File.length() - 7 ) << " </file_name> </file>";
 
+        FileData = Parse_XML( Response, "file", File, Pos );
+    } while( !FileData.empty() );
 
-    FileData = Parse_XML( Response, "file", File, Pos );
-
-   } while( !FileData.empty() );
-
-   if( !OutputXML ) 
     cout << endl;
-   else
-    cout << " <number_of_files> " << FileNr << " </number_of_files>" << endl;
+   }
   }
   else 
    if( OutputXML ) cout << " <number_of_files> 0 </number_of_files>" << endl;

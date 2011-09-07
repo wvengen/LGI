@@ -447,17 +447,13 @@ int main( int argc, char *argv[] )
 
   // here we output the repository content too...
   Response = NormalizeString( Parse_XML( Parse_XML( Response, "job" ), "repository_content" ) );
-  if( !Response.empty() )
+  if( !Response.empty() ) Output = Parse_XML( Response, "file", Input, Flag = 0 );
+  if( !Response.empty() && !Output.empty() )
   {
    cout << "Repository content    : ";
 
-   Output = Parse_XML( Response, "file", Input, Flag = 0 );
    do {
-    TimeStamp = atoi( NormalizeString( Parse_XML( Output, "date" ) ).c_str() );
-    TimeStampStr = ctime( &TimeStamp );
-    TimeStampStr[ 24 ] = '\0';
-
-    cout << Input.substr( 6, Input.length() - 7 ); 
+    cout << Parse_XML( Output, "file_name" );
 
     Output = Parse_XML( Response, "file", Input, Flag );
 
