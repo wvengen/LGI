@@ -534,7 +534,7 @@ int main( int argc, char *argv[] )
     cout << "Repository content    : ";
 
     do {
-     cout << Parse_XML( BinData, "file_name" ); 
+     cout << NormalizeString( Parse_XML( BinData, "file_name" ) ); 
 
      BinData = Parse_XML( Response, "file", State, Flag );
 

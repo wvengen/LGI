@@ -62,5 +62,5 @@
    $i = $SepPos + 4;
   }
 
-  echo " <number_of_files> $NrOfFiles </number_of_files> </repository>";
+  echo " <number_of_files> $NrOfFiles </number_of_files> </repository_content>";
 ?> 

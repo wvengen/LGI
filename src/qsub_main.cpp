@@ -453,7 +453,7 @@ int main( int argc, char *argv[] )
    cout << "Repository content    : ";
 
    do {
-    cout << Parse_XML( Output, "file_name" );
+    cout << NormalizeString( Parse_XML( Output, "file_name" ) );
 
     Output = Parse_XML( Response, "file", Input, Flag );
 
