@@ -1065,12 +1065,12 @@ int DaemonJob::RunJobRunScript( void )
  UID = GetJobSandboxUID();      // get sandbox uid...
 
  if( ( first_pid = fork() ) == 0 )   // fork and let child fork again to exec script
- {                                   // so that first forked child can exit and parent  
-  setsid();                          // can wait on it to avoid zombies...
-  setpgid( 0, 0 );
+ {                                   // so that first forked child can exit and parent can wait on it to avoid zombies...
 
   if( ( second_pid = fork() ) == 0 )  // this child will become a child of 'init' cause its parent quitted...
   {
+   setsid();
+   setpgid( 0, 0 );
    setregid( UID, UID );                               // set real and effective uid and gid correctly of child...
    setreuid( UID, UID );
  
@@ -1117,7 +1117,7 @@ void DaemonJob::SetSessionID( string ID )
 void DaemonJob::KillJobRunScriptProcess( void )
 {
  if( JobDirectory.empty() ) { CRITICAL_LOG( "DaemonJob::KillJobRunScriptProcess; JobDirectory empty" ); return; }
- if( int PID = GetJobRunScriptPid() ) { int status = kill( PID, SIGKILL ); NORMAL_LOG( "DaemonJob::KillJobRunScriptProcess; Killed job_run_script process with pid " << PID ); }
+ if( int PID = GetJobRunScriptPid() ) { int status = kill( -PID, SIGKILL ); NORMAL_LOG( "DaemonJob::KillJobRunScriptProcess; Killed job_run_script process with pid " << PID ); }
 }
 
 // -----------------------------------------------------------------------------
