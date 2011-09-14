@@ -79,6 +79,15 @@ string ReadLineFromFile( string FileName )
 
 // ----------------------------------------------------------------------
 
+string BaseName( string& Path )
+{
+  int idx = Path.rfind( '/' );
+  if( idx ) return( Path.substr( idx + 1 ) );
+  return( Path );
+}
+
+// ----------------------------------------------------------------------
+
 void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " [options] command repository-url [files]" << endl << endl;
@@ -203,7 +212,7 @@ int DownLoadFilesFromRepository( void )
      continue;
     }
 
-    string URL = RepositoryURL + "/" + basename( FileList[ i ].c_str() );
+    string URL = RepositoryURL + "/" + BaseName( FileList[ i ] );
 
     curl_easy_setopt( cURLHandle, CURLOPT_URL, URL.c_str() );
     curl_easy_setopt( cURLHandle, CURLOPT_WRITEDATA, TheFile );
@@ -269,7 +278,7 @@ int UpLoadFilesToRepository( void )
 
     fseek( TheFile, 0L, SEEK_END );
 
-    string URL = RepositoryURL + "/" + basename( FileList[ i ].c_str() );
+    string URL = RepositoryURL + "/" + BaseName( FileList[ i ] );
 
     unsigned long FileSize = ftell( TheFile );
 

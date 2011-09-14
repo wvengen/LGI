@@ -37,6 +37,12 @@ void Parse_XML_ListAllTags( string XML, vector<string> &List )
 
    if( XML[ BeginTagStart ] == '/' ) return;
 
+   if( XML.substr( BeginTagStart, 3 ) == "!--" )         // did we hit a comment tag?
+   {
+    Index = XML.find( "-->", BeginTagStart + 3 ) + 3;     // go and find end of comment and ignore anything in between
+    continue;
+   }
+
    while( ( BeginTagEnd < XMLLength ) && ( XML[ BeginTagEnd ] != '>' ) ) ++BeginTagEnd;  // BeginTagEnd marks the '>'
 
    if( BeginTagEnd >= XMLLength ) return;            
@@ -129,6 +135,12 @@ string Parse_XML( string XML, string Tag, string &Attributes, int &StartStop )
    BeginTagEnd = BeginTagStart = Index + 1;                                                                    // BeginTagStart marks the start of the tag 
    
    if( XML[ BeginTagStart ] == '/' ) return( Empty );
+
+   if( XML.substr( BeginTagStart, 3 ) == "!--" )         // did we hit a comment tag?
+   {
+    Index = XML.find( "-->", BeginTagStart + 3 ) + 3;     // go and find end of comment and ignore anything in between
+    continue;
+   }
 
    while( ( BeginTagEnd < XMLLength ) && ( XML[ BeginTagEnd ] != ' '  ) && ( XML[ BeginTagEnd ] != '>' ) ) ++BeginTagEnd;  // BeginTagEnd marks the '>' or the ' ' 
 

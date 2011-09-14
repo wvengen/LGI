@@ -128,13 +128,15 @@ Wed August 31 2011 -- version 1.30
   caused wrong output in parsing response XML tags. 
 
 
-Wed September 7th 2011 -- version 1.31
---------------------------------------
+Wed September 14th 2011 -- version 1.31
+---------------------------------------
 
 - Added LGI server version number. Set initial version to 1.31.
 - Added API version number. Set initial version to 1.31.
 - Made XML tests more rigorous, added escaping and updated documentation.
 - Added weak server certificate hostname check option into cli and daemon.
 - Revised the repository listing approach.
-
+- Updated documentation regarding certificates a bit.
+- Made sure code also compiles on OS X; implemented BaseName.
+- Made sure xml now allows for "<!--  -->" comments.
 

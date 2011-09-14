@@ -233,6 +233,12 @@ function Parse_XML_Extended( $XML, $Tag, &$Attributes, &$StartPos )
 
    if( $XML[ $BeginTagStart ] == '/' ) return( $Empty );
 
+   if( substr( $XML, $BeginTagStart, 3 ) == "!--" )       
+   {
+    $Index = strpos( $XML, "-->", $BeginTagStart + 3 ) + 3;   
+    continue;
+   }
+
    while( $BeginTagEnd < $XMLLength  && $XML[ $BeginTagEnd ] != ' ' && $XML[ $BeginTagEnd ] != '>' ) ++$BeginTagEnd;
 
    if( $BeginTagEnd >= $XMLLength ) return( $Empty );
@@ -294,6 +300,13 @@ function XML_Sanity_Check( $Data )
  for( $i = 0; $i < $Length - 1; ++$i )
   if( $Data[ $i ] == '<' )    // located start of a tag...
   {
+   // ignore comment tags...
+   if( substr( $Data, $i, 3 ) == "<!--" )         
+   {
+    $i = strpos( $Data, "-->", $i + 4 ) + 3;
+    continue;
+   }
+
    // found a closing tag...
    if( $Data[ $i + 1 ] == '/' )
    {

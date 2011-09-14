@@ -112,6 +112,13 @@ detailed below!
 
   tar -zxf LGI.tar.gz -C /var/www/html
 
+  A better approach is to create a user LGI on the project server and make the
+  user apache also member of the LGI group. In this case all files should be
+  group readable, the repository directory should be 'sticky' and all
+  directories should be group executable. The default settings in the .tar.gz
+  file take care of this. The .rpm installation also takes care of this,
+  uses the LGI username and also implements init scripts.
+
 - Use OpenSSL to create a CA private key and certificate with which you can
   create and sign your project server, resource and client certificates:
 
@@ -140,6 +147,8 @@ detailed below!
 
   and in filling in the commonname of the CA certificate, be sure to use the 
   correct LGI format 'apache@exampleserver.somewhere.org; exampleprojectname'.
+  If you decided to use a special LGI username; make sure you use the correct
+  commonname accordingly.
 
   Now create the CA signed server certificate from this request:
 
@@ -163,6 +172,18 @@ detailed below!
 
     cp /var/www/html/LGI/certificates/exampleserver.crt /var/www/html/LGI
 
+- Next create a certificate for Apache itself. The previously generated
+  certificate is used by the scheduler running as apache or LGI on the project
+  server. Apache itself also needs a certificate to identify itself to resources
+  and interfacing communicating with the project server. Keep in mind in this
+  Apache certificate (the 'exampleserver_apache' files in this manual below) the
+  commonname should be the fully qualified hostname. It can also be signed 
+  by the CA setup in the previous step. If you choose not to use another
+  certificate for your Apache with the correct fully quallified hostname as
+  the commonname, be aware that you need to relax the checkings of resources
+  with their daemons and the command line interface utilities through the '-W'
+  option.
+
 - Make sure Apache is setup correctly to use client and server certificates
   for https and check that the following options have been set correctly into
   the https (virtual host) configuration:
@@ -170,8 +191,8 @@ detailed below!
   SSLSessionCache shmcb:/var/cache/mod_ssl/scache(512000)
   SSLSessionCacheTimeout 5
 	
-  SSLCertificateFile /var/www/html/LGI/certificates/exampleserver.crt
-  SSLCertificateKeyFile /var/www/html/LGI/certificates/exampleserver.key
+  SSLCertificateFile /var/www/html/LGI/certificates/exampleserver_apache.crt
+  SSLCertificateKeyFile /var/www/html/LGI/certificates/exampleserver_apache.key
   SSLCertificateChainFile /var/www/html/LGI/certificates/exampleCA.crt
   SSLCACertificateFile /var/www/html/LGI/certificates/exampleCA.crt
   SSLVerifyClient require
@@ -371,7 +392,6 @@ detailed below!
 
   !!!!! WORD OF CAUTION !!!!!
 
-
 - Now create a MySQL user and database for your project with the database
   name equal to your project name "exampleprojectname":
 
@@ -465,10 +485,6 @@ detailed below!
 
   Your project servers has been setup now and can be used!
 
-You could also choose to use a different user account to setup your LGI
-project web-server. Just be sure that the user apache is part of the group 
-the new user is part of too so that apache can serve the content. 
-
 NOTE: For RHEL 5 and 6 bases system, .spec files are present in the specs
 directory to build .rpm files. The rpm automatically installs a working
 project LGI but the MySQL and python APC optimisations detailed above 
@@ -484,7 +500,9 @@ adding slave servers is fairly straightforward. Follow the same procedure on
 the slave server as was described in part II for the master server, but now
 there is no need to setup a CA. You only have to generate a server key and a
 certificate request for the slave server, and obviously sign that request with
-your CA certificate.
+your CA certificate. Also keep in mind that for the slave server apache
+configuration an extra certificate is needed with the commonname set to the
+correct fully quallified hostname.
 
 However, at the point where you insert the server entry into the fresh database
 in part II, use that command now to insert the MASTER server data into the 
