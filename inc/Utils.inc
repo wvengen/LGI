@@ -301,7 +301,7 @@ function XML_Sanity_Check( $Data )
   if( $Data[ $i ] == '<' )    // located start of a tag...
   {
    // ignore comment tags...
-   if( substr( $Data, $i, 3 ) == "<!--" )         
+   if( substr( $Data, $i, 4 ) == "<!--" )         
    {
     $i = strpos( $Data, "-->", $i + 4 ) + 3;
     continue;
