@@ -145,7 +145,7 @@ detailed below!
     openssl req -new -key /var/www/html/LGI/certificates/exampleserver.key 
             -out /var/www/html/LGI/certificates/exampleserver.crs
 
-  and in filling in the commonname of the CA certificate, be sure to use the 
+  and in filling in the commonname of the server certificate, be sure to use the 
   correct LGI format 'apache@exampleserver.somewhere.org; exampleprojectname'.
   If you decided to use a special LGI username; make sure you use the correct
   commonname accordingly.
@@ -436,7 +436,7 @@ detailed below!
 
     Enter resource name: apache@exampleserver.somewhere.org
     Enter resource url: https://exampleserver.somewhere.org/LGI
-    Enter certificate file: /var/www/html/LGI/certificates/exampleCA.crt
+    Enter certificate file: /var/www/html/LGI/certificates/exampleserver.crt
     Enter project server flag: 1
     Enter servers to update: any
 
@@ -481,6 +481,7 @@ detailed below!
   You can also add a crontab entry to automatically check if the scheduler is
   running once per hour:
 
+    MAILTO=""
     1 * * * * /var/www/html/LGI/scheduler/check_running
 
   Your project servers has been setup now and can be used!
@@ -500,7 +501,7 @@ adding slave servers is fairly straightforward. Follow the same procedure on
 the slave server as was described in part II for the master server, but now
 there is no need to setup a CA. You only have to generate a server key and a
 certificate request for the slave server, and obviously sign that request with
-your CA certificate. Also keep in mind that for the slave server apache
+your CA certificate. Also keep in mind that for the slave server Apache
 configuration an extra certificate is needed with the commonname set to the
 correct fully quallified hostname.
 
@@ -528,7 +529,8 @@ slave database:
 Again be sure to set the servers to be updated to 'any'. This will make sure
 that the first update of this slave and of the master server are synchronized.
 All other updates from the master server (including the addition of this
-slave below) will be automatically picked up by this slave.
+slave below) will be automatically picked up by this slave once the scheduler
+runs.
 
 Now insert the slave server details into the master server database:
 
