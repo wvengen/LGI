@@ -11,7 +11,7 @@
 # some default settings...
 MYSQL_HOST="localhost"
 MYSQL_USER="LGI"
-MYSQL_PASSWD=""
+MYSQL_PASSWD="LGIpasswd"
 MYSQL_DB="LGI"
 
 LGI_ROOT=${HOME}/scheduler
@@ -52,19 +52,19 @@ function done_nothing {
 # ----------------------------------------------------
 
 function list_groups_allowed {
- run_mysql "SELECT group_name,application,job_limit FROM groups_allowed"
+ run_mysql "SELECT group_name,application,job_limit FROM groups_allowed" | column -t
 }
 
 # ----------------------------------------------------
 
 function list_users_allowed {
- run_mysql "SELECT user_name,application,job_limit FROM users_allowed"
+ run_mysql "SELECT user_name,application,job_limit FROM users_allowed" | column -t
 }
 
 # ----------------------------------------------------
 
 function list_resources_allowed {
- run_mysql "SELECT resource_name,url,last_call_time,project_server,resource_capabilities FROM active_resources"
+ run_mysql "SELECT resource_name,url,last_call_time,project_server,resource_capabilities FROM active_resources" | column -t
 }
 
 # ----------------------------------------------------
@@ -76,13 +76,13 @@ function list_resources_denied {
 # ----------------------------------------------------
 
 function list_users_denied {
- run_mysql "SELECT user_name,application FROM users_denied"
+ run_mysql "SELECT user_name,application FROM users_denied" | column -t
 }
 
 # ----------------------------------------------------
 
 function list_groups_denied {
- run_mysql "SELECT group_name,application FROM groups_denied"
+ run_mysql "SELECT group_name,application FROM groups_denied" | column -t
 }
 
 # ----------------------------------------------------
@@ -344,7 +344,7 @@ function del_resources_denied {
 # ----------------------------------------------------
 
 # determine option #1...
-OPT=$( tr '[:upper:]' '[:lower:]' <<<"${1}" )
+OPT=$( tr '[:upper:]' '[:lower:]' <<< "${1}" )
 case "${OPT}" in
 
   list)  OPTION1="list";;
@@ -358,7 +358,7 @@ case "${OPT}" in
 esac
 
 # determine option #2...
-OPT=$( tr '[:upper:]' '[:lower:]' <<<"${2}" )
+OPT=$( tr '[:upper:]' '[:lower:]' <<< "${2}" )
 case "${OPT}" in
 
   users)     OPTION2="users";;
@@ -372,7 +372,7 @@ case "${OPT}" in
 esac
 
 # determine option #3...
-OPT=$( tr '[:upper:]' '[:lower:]' <<<"${3}" )
+OPT=$( tr '[:upper:]' '[:lower:]' <<< "${3}" )
 case "${OPT}" in
 
   allowed)   OPTION3="allowed";;
