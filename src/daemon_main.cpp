@@ -29,6 +29,7 @@
 #include "csv.h"
 #include "binhex.h"
 #include "hash.h"
+#include "util.h"
 #include "daemon_configclass.h"
 #include "daemon_jobclass.h"
 #include "daemon_mainclass.h"
@@ -70,18 +71,6 @@ void TheSignalHandler( int S )
    TheDaemon -> StopScheduling();
   }
  }
-}
-
-// ----------------------------------------------------------------------
-
-string ReadLineFromFile( string FileName )
-{
- fstream File( FileName.c_str(), fstream::in );
- string Line;
-
- if( !File ) return( Line );
- getline( File, Line );
- return( Line );
 }
 
 // ----------------------------------------------------------------------

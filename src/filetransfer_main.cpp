@@ -35,6 +35,7 @@
 #include "csv.h"
 #include "binhex.h"
 #include "hash.h"
+#include "user_configclass.h"
 #include "daemon_configclass.h"
 #include "daemon_jobclass.h"
 
@@ -67,27 +68,6 @@ size_t WriteToStringCallBack( void *ptr, size_t size, size_t nmemb, void *stream
 
 // ----------------------------------------------------------------------
 
-string ReadLineFromFile( string FileName )
-{
- fstream File( FileName.c_str(), fstream::in );
- string Line;
-
- if( !File ) return( Line );
- getline( File, Line );
- return( Line );
-}
-
-// ----------------------------------------------------------------------
-
-string BaseName( string& Path )
-{
-  int idx = Path.rfind( '/' );
-  if( idx ) return( Path.substr( idx + 1 ) );
-  return( Path );
-}
-
-// ----------------------------------------------------------------------
-
 void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " [options] command repository-url [files]" << endl << endl;
@@ -99,7 +79,7 @@ void PrintHelp( char *ExeName )
  cout << "options:" << endl << endl;
  cout << "-h                             show this help." << endl;
  cout << "-x                             output lists in XML format." << endl;
- cout << "-c directory                   specify the configuration directory to read. default is ~/.LGI. specify options below to overrule." << endl;
+ cout << "-c directory                   specify the configuration directory or file to read. default is ~/.LGI. specify options below to overrule." << endl;
  cout << "-j jobdirectory                specify job directory to use. if not specified try current directory or specify the following options." << endl;
  cout << "-W                             be less strict in hostname checks of project server certificates." << endl;
  cout << "-K keyfile                     specify key file." << endl;
@@ -375,6 +355,7 @@ int DeleteFilesFromRepository( void )
 int main( int argc, char *argv[] )
 {
  DaemonJob Job;
+ UserConfig Config;
 
  // turn logging facilities off...
  InitializeLogger( 0 );
@@ -392,11 +373,9 @@ int main( int argc, char *argv[] )
  // if that didn't work, try and read default config from ~/.LGI...
  if( KeyFile.empty() | CertificateFile.empty() | CACertificateFile.empty() )
  {
-  string ConfigDir = string( getenv( "HOME" ) ) + "/.LGI";
-
-  if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
-  if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
-  if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+  KeyFile = Config.PrivateKeyFile();
+  CertificateFile = Config.CertificateFile();
+  CACertificateFile = Config.CA_ChainFile();
  }
 
  // read passed arguments here...
@@ -430,11 +409,10 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-c" ) ) {
     if( argv[ ++i ] )
     {
-     string ConfigDir = string( argv[ i ] );
-
-     if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
-     if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
-     if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+     Config.Read( argv[ i ] );
+     KeyFile = Config.PrivateKeyFile();
+     CertificateFile = Config.CertificateFile();
+     CACertificateFile = Config.CA_ChainFile();
     }
     else
     {

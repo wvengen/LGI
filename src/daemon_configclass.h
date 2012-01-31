@@ -35,6 +35,7 @@
 #include "csv.h"
 #include "binhex.h"
 #include "hash.h"
+#include "util.h"
 
 using namespace std;
 
@@ -129,12 +130,6 @@ class DaemonConfigProjectApplication
 
        string ApplicationCache;
       };
-
-// -----------------------------------------------------------------------------
-
-string ReadStringFromFile( string FileName, int MaxSize = -1 );
-void   WriteStringToFile( string String, string FileName );
-string AbsolutePath( string FileName );
 
 // -----------------------------------------------------------------------------
 

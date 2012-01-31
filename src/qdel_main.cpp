@@ -26,6 +26,7 @@
 #include <curl/curl.h>
 
 #include "logger.h"
+#include "user_configclass.h"
 #include "interface_server_api.h"
 #include "xml.h"
 #include "csv.h"
@@ -51,18 +52,6 @@ int IsNumber( char *String )
 
 // ----------------------------------------------------------------------
 
-string ReadLineFromFile( string FileName )
-{
- fstream File( FileName.c_str(), fstream::in );
- string Line;
-
- if( !File ) return( Line );
- getline( File, Line );
- return( Line );
-}
-
-// ----------------------------------------------------------------------
-
 void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " [options] job_id" << endl << endl;
@@ -83,6 +72,8 @@ void PrintHelp( char *ExeName )
 
 int main( int argc, char *argv[] )
 {
+ UserConfig Config;
+
  // check number of arguments first...
  if( argc < 2 )
  {
@@ -94,15 +85,13 @@ int main( int argc, char *argv[] )
  InitializeLogger( 0 );
 
  // setup default values from default configuration directory...
- ConfigDir = string( getenv( "HOME" ) ) + "/.LGI";
-
- User = ReadLineFromFile( ConfigDir + "/user" );
- Groups = ReadLineFromFile( ConfigDir + "/groups" );
- ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
- Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
- if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
- if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
- if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+ User = Config.User();
+ Groups = Config.Groups();
+ ServerURL = Config.DefaultServer();
+ Project = Config.DefaultProject();
+ CACertificateFile = Config.CA_ChainFile();
+ CertificateFile = Config.CertificateFile();
+ KeyFile = Config.PrivateKeyFile();
 
  // read passed arguments here...
  for( int i = 1; i < argc; ++i )
@@ -115,15 +104,14 @@ int main( int argc, char *argv[] )
   } else if( !strcmp( argv[ i ], "-c" ) ) {
     if( argv[ ++i ] )
     {
-     ConfigDir = string( argv[ i ] );
-
-     if( !ReadLineFromFile( ConfigDir + "/user" ).empty() ) User = ReadLineFromFile( ConfigDir + "/user" );
-     if( !ReadLineFromFile( ConfigDir + "/groups" ).empty() ) Groups = ReadLineFromFile( ConfigDir + "/groups" );
-     if( !ReadLineFromFile( ConfigDir + "/defaultserver" ).empty() ) ServerURL = ReadLineFromFile( ConfigDir + "/defaultserver" );
-     if( !ReadLineFromFile( ConfigDir + "/defaultproject" ).empty() ) Project = ReadLineFromFile( ConfigDir + "/defaultproject" );
-     if( !ReadLineFromFile( ConfigDir + "/privatekey" ).empty() ) KeyFile = ConfigDir + "/privatekey";
-     if( !ReadLineFromFile( ConfigDir + "/certificate" ).empty() ) CertificateFile = ConfigDir + "/certificate";
-     if( !ReadLineFromFile( ConfigDir + "/ca_chain" ).empty() ) CACertificateFile = ConfigDir + "/ca_chain";
+     Config.Read( argv [ i ] );
+     if( !Config.User().empty() ) User = Config.User();
+     if( !Config.Groups().empty() ) Groups = Config.Groups();
+     if( !Config.DefaultServer().empty() ) ServerURL = Config.DefaultServer();
+     if( !Config.DefaultProject().empty() ) Project = Config.DefaultProject();
+     if( !Config.CA_ChainFile().empty() ) CACertificateFile = Config.CA_ChainFile();
+     if( !Config.CertificateFile().empty() ) CertificateFile = Config.CertificateFile();
+     if( !Config.PrivateKeyFile().empty() ) KeyFile = Config.PrivateKeyFile();
     }
     else
     {

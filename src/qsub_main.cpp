@@ -48,18 +48,6 @@ bool Strict = true;
 
 // ----------------------------------------------------------------------
 
-string ReadLineFromFile( string FileName )
-{
- fstream File( FileName.c_str(), fstream::in );
- string Line;
-
- if( !File ) return( Line );
- getline( File, Line );
- return( Line );
-}
-
-// ----------------------------------------------------------------------
-
 void PrintHelp( char *ExeName )
 {
  cout << endl << ExeName << " -a application [options] [files to upload to repository]" << endl << endl;
