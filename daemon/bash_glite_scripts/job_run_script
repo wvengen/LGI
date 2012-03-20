@@ -4,12 +4,6 @@
 export VOMS="ncf"
 export X509_USER_PROXY=./x509_proxy_cert
 
-# register at myproxy px.grid.sara.nl...
-myproxy-init -s px.grid.sara.nl -d -n > /dev/null
-
-# create new proxy cert for 196 hours...
-voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
-
 # create JDL for this job script...
 cat > bash.submitted.jdl << EOF_JDL
 type = "Job";
@@ -21,7 +15,7 @@ stderror = "stderr";
 outputsandbox = { "LGI_output", "stderr" };
 inputsandbox = { "LGI_input" };
 shallowretrycount = 3;
-requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 30 );
+requirements = ( other.gluecepolicymaxcputime > 720 );
 myproxyserver = "px.grid.sara.nl";
 EOF_JDL
 
@@ -29,24 +23,36 @@ EOF_JDL
 export RUNNING=""
 while [ "${RUNNING}" == "" ]
 do
+ myproxy-init -s px.grid.sara.nl -d -n > /dev/null
+ voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
  glite-wms-job-submit -a -o ${HOME}/my-glite-jobs bash.submitted.jdl | grep https | grep 9000 | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`
+ if [ "${RUNNING}" == "" ]
+ then
+    sleep 300
+ fi
 done
 
 # wait until job is finished, sleep a bit...
 export JOB_STATE=""
 while [ "${JOB_STATE}" == "" ]
 do
-    sleep 300
-    export JOB_ID=`cat ./running`
-    export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+  sleep 300
+  export JOB_ID=`cat ./running`
+  export OUTPUT=`glite-wms-job-status ${JOB_ID}`
+  export JOB_STATE=`echo ${OUTPUT} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+  export FAILED=`echo ${OUTPUT} | grep -i "expired"`
+  if [ "${FAILED}" != "" ]
+  then
+    voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null 
+  fi
 done
 
 # retrieve the output now...
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
 
 # send back the output to LGI server...
-cp ./output-files/LGI_output ./LGI_output &> /dev/null
+cp ./output-files/*/LGI_output ./LGI_output &> /dev/null
 
 # and we are finished...
 touch ./finished

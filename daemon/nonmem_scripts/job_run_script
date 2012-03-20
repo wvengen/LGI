@@ -46,7 +46,7 @@ cp ${LGI_DIR}/daemon/NONMEM/NONMEMVI.tar NONMEM_6.2.0/UNIX
 cp ${LGI_DIR}/daemon/NONMEM/SETUP .
 
 # compile locally...
-./SETUP ./ ./ `which f77` -O `which ar` IEEE
+./SETUP ./ ./ `which gfortran` -O `which ar` IEEE
 
 # run the bugger...
 ./run/nmfe6 input.nonmem output.nonmem

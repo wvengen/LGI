@@ -35,12 +35,6 @@ fi
 # now copy executable...
 cp ${LGI_DIR}/daemon/CLASSICAL/ClassicalDynamics_Linux.x . > /dev/null
 
-# register at myproxy px.grid.sara.nl...
-myproxy-init -s px.grid.sara.nl -d -n > /dev/null
-
-# create new proxy cert for 196 hours...
-voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
-
 # create job script...
 cat > classical.submitted.sh << EOF_SCRIPT
 chmod +x ClassicalDynamics_Linux.x
@@ -58,7 +52,7 @@ stderror = "stderr";
 outputsandbox = { "classical.out", "classical.stdout", "stdout", "stderr" };
 inputsandbox = { "classical.submitted.sh", "ClassicalDynamics_Linux.x", "classical.in" };
 shallowretrycount = 3;
-requirements = ( other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 720 );
+requirements = ( other.gluecepolicymaxcputime > 1440 );
 myproxyserver = "px.grid.sara.nl";
 EOF_JDL
 
@@ -66,8 +60,14 @@ EOF_JDL
 export RUNNING=""
 while [ "${RUNNING}" == "" ]
 do
+ myproxy-init -s px.grid.sara.nl -d -n > /dev/null
+ voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
  glite-wms-job-submit -a -o ${HOME}/my-glite-jobs classical.submitted.jdl | grep https | grep 9000 | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`
+ if [ "${RUNNING}" == "" ]
+ then
+    sleep 300
+ fi
 done
 
 export JOB_ID=`cat ./running`
@@ -79,7 +79,13 @@ while [ "${JOB_STATE}" == "" ]
 do
     sleep 300
     export JOB_ID=`cat ./running`
-    export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+    export OUTPUT=`glite-wms-job-status ${JOB_ID}`
+    export JOB_STATE=`echo ${OUTPUT} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+    export FAILED=`echo ${OUTPUT} | grep -i "expired"`
+    if [ "${FAILED}" != "" ]
+    then
+      voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null 
+    fi
 done
 echo Job ${JOB_ID} finished, retrieving output... >> LGI_output
 

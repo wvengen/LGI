@@ -73,22 +73,22 @@ stderror = "stderr";
 outputsandbox = { "stdout", "stderr", "nwchem.output.tar.gz" };
 inputsandbox = { ${FILE_LIST_2} };
 shallowretrycount = 3;
-requirements = ( other.glueceinfototalcpus >= 4 && other.gluecepolicymaxcputime > 720 );
+requirements = ( other.gluecepolicymaxcputime > 10080 );
 myproxyserver = "px.grid.sara.nl";
 EOF_JDL
-
-# register at myproxy px.grid.sara.nl...
-myproxy-init -s px.grid.sara.nl -d -n > /dev/null
-
-# create new proxy cert for 196 hours...
-voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
 
 # create and submit new job from JDL...
 export RUNNING=""
 while [ "${RUNNING}" == "" ]
 do
+ myproxy-init -s px.grid.sara.nl -d -n > /dev/null
+ voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
  glite-wms-job-submit -a -o ${HOME}/my-glite-jobs nwchem.submitted.jdl | grep https | grep 9000 | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`
+ if [ "${RUNNING}" == "" ]
+ then
+    sleep 300
+ fi
 done
 
 export JOB_ID=`cat ./running`
@@ -100,7 +100,13 @@ while [ "${JOB_STATE}" == "" ]
 do
     sleep 300
     export JOB_ID=`cat ./running`
-    export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+    export OUTPUT=`glite-wms-job-status ${JOB_ID}`
+    export JOB_STATE=`echo ${OUTPUT} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+    export FAILED=`echo ${OUTPUT} | grep -i "expired"`
+    if [ "${FAILED}" != "" ]
+    then
+      voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null 
+    fi
 done
 echo Job ${JOB_ID} finished, retrieving output... >> LGI_output
 

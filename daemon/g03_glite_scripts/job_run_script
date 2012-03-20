@@ -37,9 +37,6 @@ dos2unix g03.inp > /dev/null
 echo >> g03.inp
 echo >> g03.inp
 
-# register at myproxy myproxy.grid.cyf-kr.edu.pl...
-myproxy-init -s myproxy.grid.cyf-kr.edu.pl -d -n > /dev/null
-
 # create new proxy cert for 196 hours...
 voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
 
@@ -99,7 +96,7 @@ stderror = "g03.stderr";
 outputsandbox = { "g03.stdout", "g03.stderr" };
 inputsandbox = { "g03.inp", "g03.sh" };
 shallowretrycount = 3;
-requirements = ( regexp( "cyf-kr.edu.pl", other.glueceuniqueid ) && other.glueceinfototalcpus >= 1 && other.gluecepolicymaxcputime > 720 );
+requirements = ( regexp( "cyf-kr.edu.pl", other.glueceuniqueid ) && other.gluecepolicymaxcputime > 1440 );
 myproxyserver = "myproxy.grid.cyf-kr.edu.pl";
 EOF_JDL
 
@@ -107,8 +104,14 @@ EOF_JDL
 export RUNNING=""
 while [ "${RUNNING}" == "" ]
 do
+ myproxy-init -s px.grid.sara.nl -d -n > /dev/null
+ voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
  glite-wms-job-submit -a -o ${HOME}/my-glite-jobs g03.jdl | grep https | grep 9000 | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`
+ if [ "${RUNNING}" == "" ]
+ then
+    sleep 300
+ fi
 done
 
 export JOB_ID=`cat ./running`
@@ -118,9 +121,15 @@ echo Job ${JOB_ID} submitted to glite... >> LGI_output
 export JOB_STATE=""
 while [ "${JOB_STATE}" == "" ]
 do
-    sleep 300
-    export JOB_ID=`cat ./running`
-    export JOB_STATE=`glite-wms-job-status ${JOB_ID} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+  sleep 300
+  export JOB_ID=`cat ./running`
+  export OUTPUT=`glite-wms-job-status ${JOB_ID}`
+  export JOB_STATE=`echo ${OUTPUT} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
+  export FAILED=`echo ${OUTPUT} | grep -i "expired"`
+  if [ "${FAILED}" != "" ]
+  then
+    voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null 
+  fi
 done
 echo Job ${JOB_ID} finished, retrieving output... >> LGI_output
 
@@ -128,7 +137,7 @@ echo Job ${JOB_ID} finished, retrieving output... >> LGI_output
 glite-wms-job-output --dir ./output-files ${JOB_ID} &> /dev/null
 
 # send back the output to LGI server...
-${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPO_URL} ./output-files/* > /dev/null
+${LGI_DIR}/daemon/bin/LGI_filetransfer upload ${REPO_URL} ./output-files/*/* > /dev/null
 echo Uploaded output to repository ${REPO_URL}... >> LGI_output
 
 # and we are finished...
