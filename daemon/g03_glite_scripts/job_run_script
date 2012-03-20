@@ -37,9 +37,6 @@ dos2unix g03.inp > /dev/null
 echo >> g03.inp
 echo >> g03.inp
 
-# create new proxy cert for 196 hours...
-voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
-
 # create job script...
 cat > g03.sh << EOF_SCRIPT
 if [ "\${g03root}" == "" ]
