@@ -101,7 +101,7 @@ EOF_JDL
 export RUNNING=""
 while [ "${RUNNING}" == "" ]
 do
- myproxy-init -s px.grid.sara.nl -d -n > /dev/null
+ myproxy-init -s myproxy.grid.cyf-kr.edu.pl -d -n > /dev/null
  voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
  glite-wms-job-submit -a -o ${HOME}/my-glite-jobs g03.jdl | grep https | grep 9000 | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`
