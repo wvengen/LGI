@@ -29,6 +29,7 @@ then
  echo Input file g03.inp has been downloaded from repository ${REPO_URL}... > LGI_output
 else
  cp LGI_input g03.inp > /dev/null
+ chmod u+w g03.inp > /dev/null
  echo Input copied... > LGI_output
 fi
 
