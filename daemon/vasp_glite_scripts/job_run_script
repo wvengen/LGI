@@ -43,9 +43,8 @@ sh MakeVasp.sh &>/dev/null
 mkdir RUN_HERE &>/dev/null
 mv ${FILE_LIST} RUN_HERE &>/dev/null
 cd RUN_HERE &>/dev/null
-N=`cat /proc/cpuinfo | grep processor | wc -l`
-N=4
-../mpirun -n \$N ../vasp
+../vasp
+rm -rf TMP*
 tar -zcvf ../VASP.output.tar.gz * &>/dev/null
 cd .. &>/dev/null
 EOF_SCRIPT
