@@ -73,6 +73,7 @@ else
 endif
 
 mpiexec -n 8 /home/${USER}/VASP/Vasp.4.6/vasp > VASP.output
+rm -rf TMP*
 
 END_OF_LL_SUBMIT_SCRIPT
 
