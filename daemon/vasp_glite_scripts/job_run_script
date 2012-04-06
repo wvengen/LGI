@@ -44,7 +44,7 @@ mkdir RUN_HERE &>/dev/null
 mv ${FILE_LIST} RUN_HERE &>/dev/null
 cd RUN_HERE &>/dev/null
 ../vasp
-rm -rf WAVECAR
+rm -rf WAVECAR TMPCAR
 tar -zcvf ../VASP.output.tar.gz * &>/dev/null
 cd .. &>/dev/null
 EOF_SCRIPT
