@@ -47,7 +47,7 @@ while [ "${JOB_STATE}" == "" ]
 do
     sleep 300
     export JOB_ID=`cat ./running`
-    export OUTPUT=`glite-wms-job-status ${JOB_ID}`
+    export OUTPUT=`glite-wms-job-status ${JOB_ID} 2>&1`
     export JOB_STATE=`echo ${OUTPUT} | grep "Current Status" | grep -iE "Done|Cancelled|Cleared|Aborted"`
     export FAILED=`echo ${OUTPUT} | grep -i "expired"`
     if [ "${FAILED}" != "" ]
