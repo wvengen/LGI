@@ -123,6 +123,7 @@ class LGI_Client:
 		if( TargetResources ): Vars[ 'target_resources' ] = TargetResources;
 		if( WriteAccess ): Vars[ 'write_access' ] = WriteAccess;
 		if( ReadAccess ): Vars[ 'read_access' ] = ReadAccess;
+		if( JobSpecifics ): Vars[ 'job_specifics' ] = JobSpecifics;
 		if( Input ): Vars[ 'input' ] = binascii.b2a_hex( Input );
 		if( FileList ):
 			for FileName in FileList:
