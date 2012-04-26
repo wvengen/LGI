@@ -95,14 +95,14 @@ outputsandbox = { "g03.stdout", "g03.stderr" };
 inputsandbox = { "g03.inp", "g03.sh" };
 shallowretrycount = 3;
 requirements = ( regexp( "cyf-kr.edu.pl", other.glueceuniqueid ) && other.gluecepolicymaxcputime > 1440 );
-myproxyserver = "myproxy.grid.cyf-kr.edu.pl";
+myproxyserver = "myproxy.cern.ch";
 EOF_JDL
 
 # create and submit new job from JDL...
 export RUNNING=""
 while [ "${RUNNING}" == "" ]
 do
- myproxy-init -s myproxy.grid.cyf-kr.edu.pl -d -n > /dev/null
+ myproxy-init -s myproxy.cern.ch -d -n > /dev/null
  voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
  glite-wms-job-submit -a -o ${HOME}/my-glite-jobs g03.jdl | grep https | grep 9000 | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`
