@@ -4,6 +4,7 @@
 export VOMS="ncf"
 export LGI_DIR="${HOME}/LGI"
 export X509_USER_PROXY=./x509_proxy_cert
+export MYPROXY="px.grid.sara.nl"
 
 # get repository url and download input...
 export REPO_URL=`${LGI_DIR}/daemon/bin/xml repository_url < LGI_job_specifics`
@@ -74,14 +75,14 @@ outputsandbox = { "stdout", "stderr", "nwchem.output.tar.gz" };
 inputsandbox = { ${FILE_LIST_2} };
 shallowretrycount = 3;
 requirements = ( other.gluecepolicymaxcputime > 10080 );
-myproxyserver = "px.grid.sara.nl";
+myproxyserver = "${MYPROXY}";
 EOF_JDL
 
 # create and submit new job from JDL...
 export RUNNING=""
 while [ "${RUNNING}" == "" ]
 do
- myproxy-init -s px.grid.sara.nl -d -n > /dev/null
+ myproxy-init -s ${MYPROXY} -d -n > /dev/null
  voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
  glite-wms-job-submit -a -o ${HOME}/my-glite-jobs nwchem.submitted.jdl | grep https | grep 9000 | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`

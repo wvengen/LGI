@@ -3,6 +3,7 @@
 # some settings...
 export VOMS="ncf"
 export X509_USER_PROXY=./x509_proxy_cert
+export MYPROXY="px.grid.sara.nl"
 
 # create JDL for this job script...
 cat > bash.submitted.jdl << EOF_JDL
@@ -16,14 +17,14 @@ outputsandbox = { "LGI_output", "stderr" };
 inputsandbox = { "LGI_input" };
 shallowretrycount = 3;
 requirements = ( other.gluecepolicymaxcputime > 720 );
-myproxyserver = "px.grid.sara.nl";
+myproxyserver = "${MYPROXY}";
 EOF_JDL
 
 # create and submit new job from JDL...
 export RUNNING=""
 while [ "${RUNNING}" == "" ]
 do
- myproxy-init -s px.grid.sara.nl -d -n > /dev/null
+ myproxy-init -s ${MYPROXY} -d -n > /dev/null
  voms-proxy-init -voms ${VOMS} -valid 196:00 -q &> /dev/null
  glite-wms-job-submit -a -o ${HOME}/my-glite-jobs bash.submitted.jdl | grep https | grep 9000 | tail -1 &> ./running
  export RUNNING=`cat ./running | grep -E '^https'`
