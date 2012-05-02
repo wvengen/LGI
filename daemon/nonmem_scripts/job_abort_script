@@ -1,9 +1,0 @@
-#!/bin/sh
-if [ -f running ]
-then
- PID=`cat running`
- kill $PID
- touch finished
- rm running
-fi
-exit 0
