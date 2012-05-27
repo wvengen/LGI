@@ -36,9 +36,8 @@ Daemon::Daemon( string TheConfigFile, int SlowCycleTime, int FastCycleTime, bool
  TheFastCycleTime = FastCycleTime;
  TheSlowCycleTime = SlowCycleTime;
  ReadyForScheduling = 1;
- MycURLHandle = curl_easy_init();
+ MycURLHandle = NULL;
  CheckHostname = Strict;
- if( MycURLHandle == NULL ) CRITICAL_LOG( "Daemon::Daemon; Could not create cURL handle for all connections" );
 }
 
 // -----------------------------------------------------------------------------
@@ -65,7 +64,6 @@ void Daemon::ClosecURLHandle( void )
      (JobPointer++) -> SetcURLHandle( MycURLHandle );
    }
  }
-
 }
 
 // -----------------------------------------------------------------------------
@@ -268,10 +266,12 @@ int Daemon::RemoveJobFromDaemonLists( DaemonJob Job )
 int Daemon::CycleThroughJobs( void )
 {
  if( Jobs.empty() ) CRITICAL_LOG_RETURN( 0, "Daemon::CycleThroughJobs; Daemon lists empty" ); 
- 
+
  JobsFinished = 0;
 
  DEBUG_LOG( "Daemon::CycleThroughJobs; Starting with update from server cycle" );
+ 
+ ResetcURLHandle();
 
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; ++Server )
   if( !Server -> second.empty() )
@@ -473,6 +473,8 @@ int Daemon::CycleThroughJobs( void )
    }
 
   }
+
+ ClosecURLHandle();
  
  // now see which lists are empty, so we can remove them...
  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end() && ReadyForScheduling; )
@@ -493,6 +495,8 @@ int Daemon::RequestWorkCycle( void )
  JobsObtained = 0;
 
  if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) NORMAL_LOG_RETURN( JobsObtained, "Daemon::RequestWorkCycle; Total job limit reached, not requesting any work" );
+ 
+ ResetcURLHandle();
 
  Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File(), MycURLHandle, CheckHostname );
 
@@ -799,7 +803,9 @@ int Daemon::RequestWorkCycle( void )
   }
   while( ServerPointer != ServerList.end() && ReadyForScheduling );
 
- } 
+ }
+ 
+ ClosecURLHandle(); 
 
  NORMAL_LOG_RETURN( JobsObtained, "Daemon::RequestWorkCycle; Request for work cycle done" ); 
 }
@@ -915,14 +921,11 @@ int Daemon::RunSchedular( void )
 
   if( time( NULL ) - LastRequestTime >= RequestDelay )        // check for work every slow cycle time seconds...
   {
-   ResetcURLHandle();
 
    if( RequestWorkCycle() )                    // if we got some work, wait for fast cycle time now and ask for more... 
     RequestDelay = TheFastCycleTime;
    else
     RequestDelay = TheSlowCycleTime;
-
-   ClosecURLHandle();
 
    LastRequestTime = time( NULL );
   }
@@ -933,11 +936,7 @@ int Daemon::RunSchedular( void )
   {
    if( !Jobs.empty() )
    {
-    ResetcURLHandle();
-
     CycleThroughJobs(); 
-
-    ClosecURLHandle();
 
     if( JobsFinished )                            // if we have jobs finished, we can request new work now... 
      RequestDelay = TheFastCycleTime;
