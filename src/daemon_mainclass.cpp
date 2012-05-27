@@ -50,6 +50,26 @@ Daemon::~Daemon( void )
 
 // -----------------------------------------------------------------------------
 
+void Daemon::ClosecURLHandle( void )
+{
+ DEBUG_LOG( "Daemon::ClosecURLHandle; Closing cURL handle for all jobs and daemon" );
+ 
+ if( MycURLHandle != NULL ) curl_easy_cleanup( MycURLHandle ); MycURLHandle = NULL;
+
+ if( !Jobs.empty() )
+ {
+  for( map<string,list<DaemonJob> >::iterator Server = Jobs.begin(); Server != Jobs.end(); ++Server )
+   if( !Server -> second.empty() )
+   {
+    for( list<DaemonJob>::iterator JobPointer = Server -> second.begin(); JobPointer != Server -> second.end(); )
+     (JobPointer++) -> SetcURLHandle( MycURLHandle );
+   }
+ }
+
+}
+
+// -----------------------------------------------------------------------------
+
 void Daemon::ResetcURLHandle( void )
 {
  DEBUG_LOG( "Daemon::ResetcURLHandle; Resetting cURL handle for all jobs and daemon" );
@@ -902,6 +922,8 @@ int Daemon::RunSchedular( void )
    else
     RequestDelay = TheSlowCycleTime;
 
+   ClosecURLHandle();
+
    LastRequestTime = time( NULL );
   }
   else
@@ -911,7 +933,11 @@ int Daemon::RunSchedular( void )
   {
    if( !Jobs.empty() )
    {
+    ResetcURLHandle();
+
     CycleThroughJobs(); 
+
+    ClosecURLHandle();
 
     if( JobsFinished )                            // if we have jobs finished, we can request new work now... 
      RequestDelay = TheFastCycleTime;

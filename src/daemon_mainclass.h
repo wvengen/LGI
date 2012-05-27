@@ -64,6 +64,7 @@ class Daemon : public DaemonConfig
                void StopScheduling( void );
                void ReloadConfigFile( void );
                void ResetcURLHandle( void );
+               void ClosecURLHandle( void );
 
        protected:
 
