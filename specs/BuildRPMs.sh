@@ -7,16 +7,26 @@ mkdir -p ${SPECS}/RPM/RPMS ${SPECS}/RPM/BUILD ${SPECS}/RPM/SPECS ${SPECS}/RPM/TM
 
 if [ -e ${SPECS}/../src/daemon_main.cpp ]; then
 	# if we're in-tree, update the source tarball
-	tar -c -z -C ${SPECS}/.. -f ${SPECS}/LGI.tar.gz \*
+	echo "Generating source tarball..."
+	mkdir ${SPECS}/LGI
+	ln -s ${SPECS}/../* ${SPECS}/LGI
+	rm -f ${SPECS}/LGI/specs
+	tar -c -h -z -f ${SPECS}/RPM/SOURCES/LGI.tar.gz -C ${SPECS} LGI
+	rm -f ${SPECS}/LGI/* && rmdir ${SPECS}/LGI
+elif [ -e ${SPECS}/LGI.tar.gz ]; then
+	# if we have it locally with the specs, copy it
+	cp ${SPECS}/LGI.tar.gz ${SPECS}/RPM/SOURCES/
 elif [ ! -e ${SPECS}/LGI.tar.gz ]; then
-	# if not, we may need to download it
-	wget -q http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
+	# if not, we may need to download it (and cache it)
+	echo "Downloading sources..."
+	wget -q -O ${SPECS}/LGI.tar.gz http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
+	cp ${SPECS}/LGI.tar.gz ${SPECS}/RPM/SOURCES/
 fi
 
 # build
 rpmbuild --define "_topdir ${SPECS}/RPM" -ba LGI_server.spec LGI_resource.spec LGI_python.spec LGI_cli.spec
 
 # cleanup
-cp ${SPECS}/RPM/RPMS/*/LGI_* .
-cp ${SPECS}/RPM/SRPMS/LGI_* .
+mv ${SPECS}/RPM/RPMS/*/LGI_* .
+mv ${SPECS}/RPM/SRPMS/LGI_* .
 rm -rf ${SPECS}/RPM

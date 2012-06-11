@@ -48,7 +48,6 @@ See %{url}
 mkdir -p $RPM_BUILD_ROOT
 rm -rf $RPM_BUILD_ROOT/*
 rm -rf $RPM_BUILD_DIR/LGI*
-rm -rf $RPM_SOURCE_DIR/LGI*
 
 %clean
 rm -rf $RPM_BUILD_ROOT/*
