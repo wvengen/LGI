@@ -37,6 +37,8 @@ Packager: mark somers <m.somers@chem.leidenuniv.nl>
 BuildRoot: %{_buildroot}
 Prefix: %{prefix}
 Requires: /etc/redhat-release, /bin/sed, /sbin/chkconfig, /sbin/service, /bin/cat, /usr/bin/killall, /bin/touch
+BuildRequires: gcc-c++
+BuildRequires: curl-devel
 
 %description
 This is the resource software for running as part of the Leiden Grid Infrastructure Grid. 
