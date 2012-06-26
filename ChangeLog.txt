@@ -128,8 +128,8 @@ Wed August 31 2011 -- version 1.30
   caused wrong output in parsing response XML tags. 
 
 
-Sun may 27th 2012 -- version 1.31
------------------------------------
+Tue June 26th 2012 -- version 1.31
+----------------------------------
 
 - Added LGI server version number. Set initial version to 1.31.
 - Added API version number. Set initial version to 1.31.
@@ -142,5 +142,8 @@ Sun may 27th 2012 -- version 1.31
 - Made sure job specifics in LGI.py can also be supplied.
 - cURL handles are closed now after scheduling cycles to avoid server side
   FIN_WAIT2 states.
+- Imported the .spec files from willem v engen and his build script.
+
+
 
 
