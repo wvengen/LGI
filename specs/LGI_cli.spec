@@ -37,6 +37,8 @@ Packager: mark somers <m.somers@chem.leidenuniv.nl>
 BuildRoot: %{_buildroot}
 Prefix: %{prefix}
 Requires: /etc/redhat-release, /bin/sed
+BuildRequires: gcc-c++
+BuildRequires: curl-devel
 
 %description
 This is the command line interface to the Leiden Grid Infrastructure Grid. 
@@ -47,8 +49,6 @@ See %{url}
 mkdir -p $RPM_BUILD_ROOT
 rm -rf $RPM_BUILD_ROOT/*
 rm -rf $RPM_BUILD_DIR/LGI*
-rm -rf $RPM_SOURCE_DIR/LGI*
-wget --quiet -P $RPM_SOURCE_DIR %{sources}
 
 %clean
 rm -rf $RPM_BUILD_ROOT/*
