@@ -2,7 +2,7 @@
 # The LGI command line interface spec file...
 #
 %define name LGI_cli
-%define version 1.31
+%define version 1.31.1
 %define release 1.el5
 %define sources http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
 %define url http://gliteui.wks.gorlaeus.net/LGI
