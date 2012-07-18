@@ -518,9 +518,9 @@ int Daemon::RequestWorkCycle( void )
   DEBUG_LOG( "Daemon::RequestWorkCycle; Signing up to project " << TheProject.Project_Name() << " at server " << TheProject.Project_Master_Server() );
 
   // setup capabilities of this resource for this project's application...
-  for( int nA = 1; nA <= TheProject.Number_Of_Applications() && ReadyForScheduling; ++nA )
+  for( int nA = 0; nA < TheProject.Number_Of_Applications() && ReadyForScheduling; ++nA )
   {
-   DaemonConfigProjectApplication TheApplication = TheProject.Application( nA );
+   DaemonConfigProjectApplication TheApplication = TheProject.Application( nA + 1 );
    string AppName = TheApplication.Application_Name();
    Capabilities += "<" + AppName + "> " + XML_Escape( TheApplication.Capabilities() ) + " </" + AppName + "> ";
   }
@@ -582,12 +582,11 @@ int Daemon::RequestWorkCycle( void )
    if( !Response.empty() )
    {
 
-    // now check all applications for this project on this server...
-    for( int nA = 1; nA <= TheProject.Number_Of_Applications() && ReadyForScheduling; ++nA ) 
+    // now check all applications for this project on this server... but start with a random application each time...
+    for( int nA = 0, RandomEntry = rand(); nA < TheProject.Number_Of_Applications() && ReadyForScheduling; ++nA ) 
     {
-     DaemonConfigProjectApplication TheApplication;
-
-     TheApplication = TheProject.Application( nA );
+     int ApplicationIndex = ( ( nA + RandomEntry ) % TheProject.Number_Of_Applications() ) + 1;
+     DaemonConfigProjectApplication TheApplication = TheProject.Application( ApplicationIndex );
   
      // check if limits are reached... 
      if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) continue;
@@ -703,7 +702,7 @@ int Daemon::RequestWorkCycle( void )
          VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No owners were denied service for job " << Job_Id );
 
          // create temporary job directory with the jobs response data...
-         DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, nA, MycURLHandle, CheckHostname );
+         DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, ApplicationIndex, MycURLHandle, CheckHostname );
 
          // see if job has limits from job limits script somehow... if so, delete temp job directory...
          if( TempJob.RunJobCheckLimitsScript() == 0 )

@@ -36,6 +36,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <time.h>
+#include <stdlib.h>
 
 #include <curl/curl.h>
 

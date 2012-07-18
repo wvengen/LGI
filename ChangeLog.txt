@@ -128,8 +128,8 @@ Wed August 31 2011 -- version 1.30
   caused wrong output in parsing response XML tags. 
 
 
-Tue July 3rd 2012 -- version 1.31.1
------------------------------------
+Thu July 19th 2012 -- version 1.31.2
+------------------------------------
 
 - Added LGI server version number. Set initial version to 1.31.
 - Added API version number. Set initial version to 1.31.
@@ -144,7 +144,8 @@ Tue July 3rd 2012 -- version 1.31.1
   FIN_WAIT2 states.
 - Imported the .spec files from willem v engen and his build script.
 - Switched to x.y.z versioning system. Started with 1.31.1.
-
+- Made sure daemon requests work from applications starting with a random
+  application each server request.
 
 
 
