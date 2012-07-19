@@ -3,7 +3,7 @@
 #   to LGI-github.tar.gz, so that's the only file required.
 Format: 1.0
 Source: lgi
-Version: 5.6-3
+Version: 1.31-1
 Maintainer: W. van Engen <wvengen+lgi@nikhef.nl
 Files: 
- <md5_not_needed> <size_not_needed> LGI-github.tar.gz
+ 1234567890abcdef1234567890abcdef 1234 LGI-github.tar.gz
