@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+SRCDIR=src/
+PREFIX=/usr
+INSTALL=install
+
+override_dh_auto_install:
+	# lgi-client
+	$(INSTALL) -d $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)LGI_qstat $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)LGI_qsub $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)LGI_qdel $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)LGI_filetransfer $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)hexbin $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)binhex $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)hash $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)csv $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)xml $(CURDIR)/debian/lgi-client$(PREFIX)/bin
+	# lgi-resource
+	$(INSTALL) -d $(CURDIR)/debian/lgi-resource$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)LGI_qsub $(CURDIR)/debian/lgi-resource$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)LGI_filetransfer $(CURDIR)/debian/lgi-resource$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)hexbin $(CURDIR)/debian/lgi-resource$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)binhex $(CURDIR)/debian/lgi-resource$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)hash $(CURDIR)/debian/lgi-resource$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)csv $(CURDIR)/debian/lgi-resource$(PREFIX)/bin
+	$(INSTALL) -m755 $(SRCDIR)xml $(CURDIR)/debian/lgi-resource$(PREFIX)/bin
+	$(INSTALL) -d $(CURDIR)/debian/lgi-resource$(PREFIX)/sbin
+	$(INSTALL) -m755 $(SRCDIR)LGI_daemon $(CURDIR)/debian/lgi-resource$(PREFIX)/sbin
+
+%:
+	dh $@ --sourcedir=$(SRCDIR)
+

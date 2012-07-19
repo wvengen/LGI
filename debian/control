@@ -1,0 +1,25 @@
+Source: lgi
+Section: unknown
+Priority: extra
+Maintainer: Willem van Engen <wvengen+lgi@nikhef.nl>
+Build-Depends: debhelper (>= 8.0.0), libcurl4-nss-dev
+Standards-Version: 3.9.2
+Homepage: http://gliteui.wks.gorlaeus.net/LGI/
+Vcs-Git: git://github.com/wvengen/LGI.git
+Vcs-Browser: https://github.com/wvengen/LGI
+
+Package: lgi-client
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: command line interface to a Leiden Grid Infrastructure Grid
+
+Package: lgi-resource
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, psmisc
+Description: resource software for a Leiden Grid Infrastructure Grid
+  Resource software for running applications as part of the Leiden Grid
+  Infrastructure Grid.
+
+Package: lgi-doc
+Architecture: all
+Description: documentation for lgi
