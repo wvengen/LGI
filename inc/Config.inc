@@ -24,8 +24,8 @@ $Config[ "SERVER_URL" ]            = "https://gliteui.wks.gorlaeus.net/LGI";    
 $Config[ "SERVER_NAME" ]           = "LGI@gliteui.wks.gorlaeus.net";          // the unique name of this project server
 
 $Config[ "SERVER_SSL_CERTIFICATE_FILE" ]     = "../certificates/LGI@gliteui.crt";      // the certificate of this server
-$Config[ "SERVER_SSL_KEY" ]                  = "../certificates/LGI@gliteui.key";      // the certificate key file of this server
-$Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ]   = "http://gliteui.wks.gorlaeus.net/Certificates/LGI+CA.crt";   // the certificate of the CA server
+$Config[ "SERVER_SSL_KEY" ]                  = "../privatekeys/LGI@gliteui.key";      // the certificate key file of this server
+$Config[ "SERVER_SSL_CA_CERTIFICATE_URL" ]   = "http://gliteui.wks.gorlaeus.net/certificates/LGI+CA.crt";   // the certificate of the CA server
 $Config[ "SERVER_SSL_CA_CERTIFICATE_FILE" ]  = "../certificates/LGI+CA.crt";           // the local certificate of the CA server
 
 $Config[ "REPOSITORY_DIRECTORY" ]     = "/var/www/html/LGI/repository";        // location on filesystem of basic interface repository server

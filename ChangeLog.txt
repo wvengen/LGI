@@ -146,7 +146,8 @@ Thu July 19th 2012 -- version 1.31.2
 - Switched to x.y.z versioning system. Started with 1.31.1.
 - Made sure daemon requests work from applications starting with a random
   application each server request.
-
+- Added privatekeys directory and adapted .spec files to save configs when
+  updating.
 
 
 

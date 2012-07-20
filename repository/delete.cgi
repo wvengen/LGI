@@ -110,7 +110,7 @@ sub reply
  $remhost = $ENV{'REMOTE_HOST'} || $ENV{'REMOTE_ADDR'} || "-";
     
  $logline = "$remhost $remuser status $status ($message)";
- &log($logline);
+ #&log($logline);
  exit(0);
 }
 

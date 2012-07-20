@@ -67,6 +67,7 @@ mkdir -p $RPM_BUILD_ROOT/%{prefix}/docs/hello_world_ll_scripts
 mkdir -p $RPM_BUILD_ROOT/%{prefix}/docs/hello_world_sge_scripts
 mkdir -p $RPM_BUILD_ROOT/%{prefix}/docs/hello_world_glite_scripts
 mkdir -p $RPM_BUILD_ROOT/%{prefix}/certificates
+mkdir -p $RPM_BUILD_ROOT/%{prefix}/privatekeys
 mkdir -p $RPM_BUILD_ROOT/var/run
 mkdir -p $RPM_BUILD_ROOT/var/spool/LGI
 mkdir -p $RPM_BUILD_ROOT/etc/init.d
@@ -100,7 +101,7 @@ cat << EOF_DEF_CFG > $RPM_BUILD_ROOT/etc/LGI.cfg
 	<ca_certificate_file> PATCHTHIS/certificates/LGI+CA.crt </ca_certificate_file>
 	<resource>
 		<resource_certificate_file> PATCHTHIS/certificates/PATCHCERTHERE </resource_certificate_file>
-		<resource_key_file> PATCHTHIS/certificates/PATCHKEYHERE </resource_key_file>
+		<resource_key_file> PATCHTHIS/privatekeys/PATCHKEYHERE </resource_key_file>
                 <run_directory> /var/spool/LGI </run_directory>
                 <owner_allow> </owner_allow>
 		<owner_deny> </owner_deny>
@@ -198,26 +199,51 @@ EOF_LOGROTATE
 
 %files
 %defattr(-,root,root)
-%dir /var/spool/LGI
-%{prefix}
+%attr(755,root,root) %dir /etc
+%attr(755,root,root) %dir /etc/profile.d
+%attr(755,root,root) %dir /etc/logrotate.d
+%attr(755,root,root) %dir /var/run
+%attr(755,root,root) %dir /var/spool
+%attr(755,root,root) %dir /var/spool/LGI
+%attr(755,root,root) %dir %{prefix}
 %attr(750,root,root) %dir %{prefix}/sbin
-%attr(750,root,root) %dir %{prefix}/certificates
-%attr(750,root,root) %{prefix}/sbin/LGI_daemon
-%config /etc/LGI.cfg
+%attr(755,root,root) %dir %{prefix}/certificates
+%attr(750,root,root) %dir %{prefix}/privatekeys
+%attr(755,root,root) %dir %{prefix}/bin
+%attr(755,root,root) %dir %{prefix}/docs
+%attr(744,root,root) %{prefix}/docs/*
+%attr(755,root,root) %dir %{prefix}/docs/hello_world_scripts
+%attr(755,root,root) %dir %{prefix}/docs/hello_world_pbs_scripts
+%attr(755,root,root) %dir %{prefix}/docs/hello_world_ll_scripts
+%attr(755,root,root) %dir %{prefix}/docs/hello_world_sge_scripts
+%attr(755,root,root) %dir %{prefix}/docs/hello_world_glite_scripts
+%attr(750,root,root) %{prefix}/sbin/*
+%attr(755,root,root) %{prefix}/bin/*
+%attr(644,root,root) %{prefix}/certificates/LGI+CA.crt
+%config(noreplace) %attr(640,root,root) /etc/LGI.cfg
 %attr(755,root,root) /etc/init.d/LGI_daemon
-/etc/profile.d/LGI.sh
-/etc/profile.d/LGI.csh
-/etc/logrotate.d/LGI
+%attr(644,root,root) /etc/profile.d/LGI.sh
+%attr(644,root,root) /etc/profile.d/LGI.csh
+%attr(644,root,root) /etc/logrotate.d/LGI
+%attr(644,root,root) %{prefix}/docs/hello_world_glite_scripts/*
+%attr(644,root,root) %{prefix}/docs/hello_world_sge_scripts/*
+%attr(644,root,root) %{prefix}/docs/hello_world_ll_scripts/*
+%attr(644,root,root) %{prefix}/docs/hello_world_pbs_scripts/*
+%attr(644,root,root) %{prefix}/docs/hello_world_scripts/*
 
 %preun
 if [ "$1" = "0" ]; then
- service LGI_daemon stop &> /dev/null
+ if [ -f /var/spool/LGI/LGI_daemon.lock ]; then
+  service LGI_daemon stop &> /dev/null
+ fi
  chkconfig LGI_daemon off &> /dev/null
 fi
 
 %pre
 if [ "$1" = "2" ]; then
- service LGI_daemon stop &> /dev/null
+ if [ -f /var/spool/LGI/LGI_daemon.lock ]; then
+  service LGI_daemon stop &> /dev/null
+ fi
 fi
 
 %post
@@ -235,7 +261,7 @@ if [ "$1" = "1" ]; then
 This machine ($HOSTNAME) has been configured as an LGI resource now.
 
 Please place the certificate in the file $RPM_INSTALL_PREFIX/certificates/$HOSTNAME.crt 
-and the private key in the file $RPM_INSTALL_PREFIX/certificates/$HOSTNAME.key before 
+and the private key in the file $RPM_INSTALL_PREFIX/privatekeys/$HOSTNAME.key before 
 starting the daemon with 'service LGI_daemon start'. To survive a reboot, use 'chkconfig LGI_daemon on'. 
 
 Also make sure your LGI project server administrator has inserted the resource certificate into the LGI 

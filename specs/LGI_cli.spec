@@ -2,7 +2,7 @@
 # The LGI command line interface spec file...
 #
 %define name LGI_cli
-%define version 1.31.2
+%define version 1.31.3
 %define release 1.el5
 %define sources http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
 %define url http://gliteui.wks.gorlaeus.net/LGI
@@ -85,10 +85,17 @@ EOF_PROFILE_CSH
 
 %files
 %defattr(-,root,root)
-%{prefix}
-%attr(750,root,root) %dir %{prefix}/certificates
-/etc/profile.d/LGI.sh
-/etc/profile.d/LGI.csh
+%attr(755,root,root) %dir %{prefix}
+%attr(755,root,root) %dir %{prefix}/docs
+%attr(755,root,root) %dir %{prefix}/bin
+%attr(755,root,root) %dir %{prefix}/certificates
+%attr(755,root,root) %dir /etc
+%attr(755,root,root) %dir /etc/profile.d
+%attr(755,root,root) %{prefix}/bin/*
+%attr(644,root,root) %{prefix}/docs/*
+%config(noreplace) %attr(644,root,root) %{prefix}/certificates/LGI+CA.crt
+%attr(644,root,root) /etc/profile.d/LGI.sh
+%attr(644,root,root) /etc/profile.d/LGI.csh
 
 %post
 ESCAPED=`echo -e "$RPM_INSTALL_PREFIX" | sed "s/\//\\\\\\\\\//g"`

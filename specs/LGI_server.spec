@@ -2,7 +2,7 @@
 # The LGI server spec file...
 #
 %define name LGI_server
-%define version 1.31.2
+%define version 1.31.3
 %define release 1.el5
 %define sources http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
 %define url http://gliteui.wks.gorlaeus.net/LGI
@@ -56,7 +56,8 @@ tar -zxf $RPM_SOURCE_DIR/LGI*.tar.gz
 
 %install
 mkdir -p $RPM_BUILD_ROOT/%{prefix}/certificates
-mkdir -p $RPM_BUILD_ROOT/%{prefix}/basic_interface
+mkdir -p $RPM_BUILD_ROOT/%{prefix}/privatekeys
+mkdir -p $RPM_BUILD_ROOT/%{prefix}/basic_interface/java_scripts
 mkdir -p $RPM_BUILD_ROOT/%{prefix}/docs
 mkdir -p $RPM_BUILD_ROOT/%{prefix}/inc
 mkdir -p $RPM_BUILD_ROOT/%{prefix}/interfaces
@@ -86,7 +87,7 @@ cp $RPM_BUILD_DIR/LGI*/index.php $RPM_BUILD_ROOT/%{prefix}
 cp $RPM_BUILD_DIR/LGI*/LGI.conf $RPM_BUILD_ROOT/%{prefix}
 ln -s %{prefix}/LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/LGI.conf
 cp $RPM_BUILD_DIR/LGI*/certificates/LGI+CA.crt $RPM_BUILD_ROOT/%{prefix}/certificates
-cp $RPM_BUILD_DIR/LGI*/certificates/LGI+CA.crt $RPM_BUILD_ROOT/%{prefix}
+ln -s %{prefix}/certificates/LGI+CA.crt $RPM_BUILD_ROOT/%{prefix}/LGI+CA.crt
 cat > $RPM_BUILD_ROOT/%{prefix}/scheduler/LGI_scheduler << END_OF_SCHED
 #!/bin/sh
 #
@@ -149,7 +150,7 @@ SSLCryptoDevice builtin
  SSLEngine on
  SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP
  SSLCertificateFile PATCHTHIS/certificates/LGI@PATCHHOSTNAME.crt
- SSLCertificateKeyFile PATCHTHIS/certificates/LGI@PATCHHOSTNAME.key
+ SSLCertificateKeyFile PATCHTHIS/privatekeys/LGI@PATCHHOSTNAME.key
  SSLCertificateChainFile PATCHTHIS/certificates/LGI+CA.crt
  SSLCACertificateFile PATCHTHIS/certificates/LGI+CA.crt
  # SSLCARevocationFile PATCHTHIS/certificates/LGI+CA.crl
@@ -173,11 +174,16 @@ ln -s %{prefix}/ssl_LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/ssl_LGI.conf
 
 %files
 %defattr(-,root,root)
-%{prefix}
-%attr(750,root,root) %dir %{prefix}/certificates
+%attr(755,root,root) %dir /etc
+%attr(755,root,root) %dir /etc/httpd
+%attr(755,root,root) %dir /etc/httpd/conf.d
+%attr(755,root,root) %dir %{prefix}
+%attr(755,root,root) %dir %{prefix}/certificates
+%attr(750,root,root) %dir %{prefix}/privatekeys
 %attr(750,root,root) %dir %{prefix}/basic_interface
+%attr(640,root,root) %{prefix}/basic_interface/*
 %attr(750,root,root) %dir %{prefix}/basic_interface/java_scripts
-%attr(750,root,root) %dir %{prefix}/docs
+%attr(755,root,root) %dir %{prefix}/docs
 %attr(750,root,root) %dir %{prefix}/inc
 %attr(750,root,root) %dir %{prefix}/interfaces
 %attr(750,root,root) %dir %{prefix}/resources
@@ -185,17 +191,17 @@ ln -s %{prefix}/ssl_LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/ssl_LGI.conf
 %attr(6770,root,root) %dir %{prefix}/repository
 %attr(750,root,root) %dir %{prefix}/tools
 %attr(750,root,root) %dir %{prefix}/scheduler
-%attr(640,root,root) %{prefix}/certificates/*
-%attr(640,root,root) %{prefix}/basic_interface/*.php
+%attr(644,root,root) %{prefix}/certificates/LGI+CA.crt
 %attr(640,root,root) %{prefix}/basic_interface/java_scripts/*
-%attr(640,root,root) %{prefix}/docs/*
+%attr(644,root,root) %{prefix}/docs/*
+%attr(755,root,root) %dir %{prefix}/docs/*
 %attr(640,root,root) %{prefix}/inc/*
 %attr(640,root,root) %{prefix}/interfaces/*
 %attr(640,root,root) %{prefix}/resources/*
 %attr(640,root,root) %{prefix}/servers/*
 %attr(640,root,root) %{prefix}/scheduler/*
 %attr(750,root,root) %{prefix}/scheduler/scheduler.php
-%attr(750,root,root) %{prefix}/scheduler/LGI_scheduler
+%attr(755,root,root) %{prefix}/scheduler/LGI_scheduler
 %attr(640,root,root) %{prefix}/repository/*
 %attr(750,root,root) %{prefix}/repository/*.cgi
 %attr(640,root,root) %{prefix}/tools/*
@@ -206,19 +212,21 @@ ln -s %{prefix}/ssl_LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/ssl_LGI.conf
 %attr(640,root,root) %{prefix}/LGI*.tar.gz
 %attr(640,root,root) %{prefix}/SETUP.txt
 %attr(640,root,root) %{prefix}/index.php
-%attr(640,root,root) %{prefix}/LGI.conf
-%attr(640,root,root) %{prefix}/ssl_LGI.conf
-%attr(640,root,root) %{prefix}/LGI+CA.crt
+%attr(644,root,root) %{prefix}/LGI.conf
+%attr(644,root,root) %{prefix}/ssl_LGI.conf
+%attr(644,root,root) %{prefix}/LGI+CA.crt
 %attr(640,root,root) %{prefix}/*/.htaccess
 %attr(640,root,root) %{prefix}/repository/.LGI_resource_list
-%attr(640,root,root) /etc/httpd/conf.d/ssl_LGI.conf
-%attr(640,root,root) /etc/httpd/conf.d/LGI.conf
-%attr(750,root,root) /etc/init.d/LGI_scheduler
+%attr(644,root,root) /etc/httpd/conf.d/ssl_LGI.conf
+%attr(644,root,root) /etc/httpd/conf.d/LGI.conf
+%attr(755,root,root) /etc/init.d/LGI_scheduler
 
 %preun
 if [ "$1" = "0" ]; then
  apachectl stop &> /dev/null
- service LGI_scheduler stop &> /dev/null
+ if [ -f $RPM_INSTALL_PREFIX/scheduler/LGI_scheduler.lock ]; then
+  service LGI_scheduler stop &> /dev/null
+ fi
  chkconfig LGI_scheduler off &> /dev/null
  cat << END_OF_MESSAGE
 apache has been stopped as part of the erase!
@@ -256,7 +264,9 @@ fi
 LGIPASSWD=`dd if=/dev/urandom count=128 2> /dev/null | tr -dc A-Za-z0-9 | head -c 12`
 if [ "$1" = "2" ]; then
  LGIPASSWD=`grep MYSQL_PASSWD $RPM_INSTALL_PREFIX/inc/Config.inc | cut -d'=' -f2 | sed "s/;\$//g" | sed "s/\"//g"`
- service LGI_scheduler stop &> /dev/null
+ if [ -f $RPM_INSTALL_PREFIX/scheduler/LGI_scheduler.lock ]; then
+  service LGI_scheduler stop &> /dev/null
+ fi
  apachectl stop &> /dev/null
  cat << END_OF_MESSAGE_2
 LGI_scheduler and apache have been stopped as part of the upgrade!
@@ -311,11 +321,10 @@ ESCAPED=`echo -e "$RPM_INSTALL_PREFIX" | sed "s/\//\\\\\\\\\//g"`
 sed "s/LGIpasswd/$LGIPASSWD/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/gliteui.wks.gorlaeus.net/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/gliteui/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
-sed "s/Certificates\/LGI+CA.crt/LGI\/LGI+CA.crt/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/..\/certificates/$ESCAPED\/certificates/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
+sed "s/..\/privatekeys/$ESCAPED\/privatekeys/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/\/var\/www\/html\/LGI\/repository/$ESCAPED\/repository/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
-sed "s/MYSQL_PASSWD=\"\"/MYSQL_PASSWD=\"$LGIPASSWD\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB
-sed "s/MYSQL_DB=\"\"/MYSQL_DB=\"LGI\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB
+sed "s/MYSQL_PASSWD=\"LGIpasswd\"/MYSQL_PASSWD=\"$LGIPASSWD\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB
 sed "s/LGI_ROOT=\${HOME}\/scheduler/LGI_ROOT=\"$ESCAPED\/scheduler\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB
 sed "s/PATCHTHIS/$ESCAPED/g" -i $RPM_INSTALL_PREFIX/scheduler/LGI_scheduler
 rm -rf /etc/init.d/LGI_scheduler; ln -s $RPM_INSTALL_PREFIX/scheduler/LGI_scheduler /etc/init.d/LGI_scheduler
@@ -329,7 +338,7 @@ if [ "$1" = "1" ]; then
 This machine ($HOSTNAME) has been configured as an LGI project server now.
 
 Please place the certificate in the file $RPM_INSTALL_PREFIX/certificates/LGI@$HOSTNAME.crt
-and the private key in the file $RPM_INSTALL_PREFIX/certificates/LGI@$HOSTNAME.key.
+and the private key in the file $RPM_INSTALL_PREFIX/privatekeys/LGI@$HOSTNAME.key.
 
 Make sure you insert the master server certificate into the LGI database by using
 '$RPM_INSTALL_PREFIX/tools/ManageDB add resources allowed'. If $HOSTNAME 

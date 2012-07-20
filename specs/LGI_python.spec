@@ -2,7 +2,7 @@
 # The LGI python interface spec file...
 #
 %define name LGI_python
-%define version 1.31.2
+%define version 1.31.3
 %define release 1.el5
 %define sources http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
 %define url http://gliteui.wks.gorlaeus.net/LGI
@@ -58,15 +58,23 @@ tar -zxf $RPM_SOURCE_DIR/LGI*.tar.gz
 %install
 mkdir -p $RPM_BUILD_ROOT/%{prefix}/python
 mkdir -p $RPM_BUILD_ROOT/%{prefix}/docs
+mkdir -p $RPM_BUILD_ROOT/%{prefix}/certificates
 cp $RPM_BUILD_DIR/LGI*/python/LGI.py $RPM_BUILD_ROOT/%{prefix}/python
 cp $RPM_BUILD_DIR/LGI*/docs/LGI.pdf $RPM_BUILD_ROOT/%{prefix}/docs
 cp $RPM_BUILD_DIR/LGI*/docs/ExampleInterface.py $RPM_BUILD_ROOT/%{prefix}/docs
 cp $RPM_BUILD_DIR/LGI*/ChangeLog.txt $RPM_BUILD_ROOT/%{prefix}/docs
 cp $RPM_BUILD_DIR/LGI*/LICENSE.txt $RPM_BUILD_ROOT/%{prefix}/docs
+cp $RPM_BUILD_DIR/LGI*/certificates/LGI+CA.crt $RPM_BUILD_ROOT/%{prefix}/certificates
 
 %files
 %defattr(-,root,root)
-%{prefix}
+%attr(755,root,root) %dir %{prefix}
+%attr(755,root,root) %dir %{prefix}/python
+%attr(755,root,root) %dir %{prefix}/docs
+%attr(755,root,root) %dir %{prefix}/certificates
+%attr(644,root,root) %{prefix}/certificates/LGI+CA.crt
+%attr(755,root,root) %{prefix}/python/*
+%attr(644,root,root) %{prefix}/docs/*
 
 %postun
 if [ "$1" = "0" ]; then
