@@ -11,7 +11,7 @@ if [ -e ${SPECS}/../src/daemon_main.cpp ]; then
 	mkdir ${SPECS}/LGI
 	ln -s ${SPECS}/../* ${SPECS}/LGI
 	rm -f ${SPECS}/LGI/specs
-	tar -c -h -z -f ${SPECS}/RPM/SOURCES/LGI.tar.gz -C ${SPECS} LGI
+	tar --exclude .svn -c -h -z -f ${SPECS}/RPM/SOURCES/LGI.tar.gz -C ${SPECS} LGI
 	rm -f ${SPECS}/LGI/* && rmdir ${SPECS}/LGI
 elif [ -e ${SPECS}/LGI.tar.gz ]; then
 	# if we have it locally with the specs, copy it
