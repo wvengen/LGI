@@ -213,7 +213,7 @@ ln -s %{prefix}/ssl_LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/ssl_LGI.conf
 %attr(640,root,root) %{prefix}/SETUP.txt
 %attr(640,root,root) %{prefix}/index.php
 %attr(644,root,root) %{prefix}/LGI.conf
-%attr(644,root,root) %{prefix}/ssl_LGI.conf
+%config(noreplace) %attr(644,root,root) %{prefix}/ssl_LGI.conf
 %attr(644,root,root) %{prefix}/LGI+CA.crt
 %attr(640,root,root) %{prefix}/*/.htaccess
 %attr(640,root,root) %{prefix}/repository/.LGI_resource_list
@@ -314,6 +314,7 @@ chown -R LGI.LGI $RPM_INSTALL_PREFIX
 chmod g+w $RPM_INSTALL_PREFIX/repository
 chmod 750 $RPM_INSTALL_PREFIX/docs/screen_shots
 chmod 750 $RPM_INSTALL_PREFIX/docs/hello_world_pbs_scripts
+chmod 750 $RPM_INSTALL_PREFIX/privatekeys
 chmod 770 $RPM_INSTALL_PREFIX
 rm -rf $RPM_INSTALL_PREFIX/docs/ExampleInterface.pyc $RPM_INSTALL_PREFIX/docs/ExampleInterface.pyo
 HOSTNAME=`hostname -f`
