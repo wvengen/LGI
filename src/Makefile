@@ -1,10 +1,13 @@
-FLAGS=-O2
+FLAGS=-O2 
 CC=g++
 LD=g++
 
+# defines...
+DEFINES=-D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
+
 # default compile run...
 %.o : %.cpp
-	${CC} ${FLAGS} -c $<
+	${CC} ${FLAGS} ${DEFINES} -c $<
 
 # some defines...
 LIBS=-lcurl
