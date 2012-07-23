@@ -72,6 +72,7 @@ cp -r $RPM_BUILD_DIR/LGI*/basic_interface $RPM_BUILD_ROOT/%{prefix}
 cp -r $RPM_BUILD_DIR/LGI*/docs $RPM_BUILD_ROOT/%{prefix}
 cp -r $RPM_BUILD_DIR/LGI*/inc $RPM_BUILD_ROOT/%{prefix}
 cp -r $RPM_BUILD_DIR/LGI*/interfaces $RPM_BUILD_ROOT/%{prefix}
+cp -r $RPM_BUILD_DIR/LGI*/privatekeys $RPM_BUILD_ROOT/%{prefix}
 cp -r $RPM_BUILD_DIR/LGI*/resources $RPM_BUILD_ROOT/%{prefix}
 cp -r $RPM_BUILD_DIR/LGI*/servers $RPM_BUILD_ROOT/%{prefix}
 cp -r $RPM_BUILD_DIR/LGI*/repository $RPM_BUILD_ROOT/%{prefix}
@@ -196,6 +197,8 @@ ln -s %{prefix}/ssl_LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/ssl_LGI.conf
 %attr(644,root,root) %{prefix}/docs/*
 %attr(755,root,root) %dir %{prefix}/docs/*
 %attr(640,root,root) %{prefix}/inc/*
+%config(noreplace) %attr(640,root,root) %{prefix}/inc/Config.inc
+%attr(640,root,root) %{prefix}/privatekeys/*
 %attr(640,root,root) %{prefix}/interfaces/*
 %attr(640,root,root) %{prefix}/resources/*
 %attr(640,root,root) %{prefix}/servers/*
@@ -206,11 +209,11 @@ ln -s %{prefix}/ssl_LGI.conf $RPM_BUILD_ROOT/etc/httpd/conf.d/ssl_LGI.conf
 %attr(750,root,root) %{prefix}/repository/*.cgi
 %attr(640,root,root) %{prefix}/tools/*
 %attr(750,root,root) %{prefix}/tools/ManageDB
-%attr(640,root,root) %{prefix}/ChangeLog.txt
-%attr(640,root,root) %{prefix}/LICENSE.txt
-%attr(640,root,root) %{prefix}/LGI.db
-%attr(640,root,root) %{prefix}/LGI*.tar.gz
-%attr(640,root,root) %{prefix}/SETUP.txt
+%attr(644,root,root) %{prefix}/ChangeLog.txt
+%attr(644,root,root) %{prefix}/LICENSE.txt
+%attr(644,root,root) %{prefix}/LGI.db
+%attr(644,root,root) %{prefix}/LGI*.tar.gz
+%attr(644,root,root) %{prefix}/SETUP.txt
 %attr(640,root,root) %{prefix}/index.php
 %attr(644,root,root) %{prefix}/LGI.conf
 %config(noreplace) %attr(644,root,root) %{prefix}/ssl_LGI.conf
@@ -322,8 +325,8 @@ ESCAPED=`echo -e "$RPM_INSTALL_PREFIX" | sed "s/\//\\\\\\\\\//g"`
 sed "s/LGIpasswd/$LGIPASSWD/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/gliteui.wks.gorlaeus.net/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/gliteui/$HOSTNAME/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
-sed "s/..\/certificates/$ESCAPED\/certificates/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
-sed "s/..\/privatekeys/$ESCAPED\/privatekeys/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
+sed "s/\.\.\/certificates/$ESCAPED\/certificates/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
+sed "s/\.\.\/privatekeys/$ESCAPED\/privatekeys/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/\/var\/www\/html\/LGI\/repository/$ESCAPED\/repository/g" -i $RPM_INSTALL_PREFIX/inc/Config.inc
 sed "s/MYSQL_PASSWD=\"LGIpasswd\"/MYSQL_PASSWD=\"$LGIPASSWD\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB
 sed "s/LGI_ROOT=\${HOME}\/scheduler/LGI_ROOT=\"$ESCAPED\/scheduler\"/g" -i $RPM_INSTALL_PREFIX/tools/ManageDB

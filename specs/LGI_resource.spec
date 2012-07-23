@@ -2,7 +2,7 @@
 # The LGI resource spec file...
 #
 %define name LGI_resource
-%define version 1.31.2
+%define version 1.31.3
 %define release 1.el5
 %define sources http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
 %define url http://gliteui.wks.gorlaeus.net/LGI
@@ -225,11 +225,11 @@ EOF_LOGROTATE
 %attr(644,root,root) /etc/profile.d/LGI.sh
 %attr(644,root,root) /etc/profile.d/LGI.csh
 %attr(644,root,root) /etc/logrotate.d/LGI
-%attr(644,root,root) %{prefix}/docs/hello_world_glite_scripts/*
-%attr(644,root,root) %{prefix}/docs/hello_world_sge_scripts/*
-%attr(644,root,root) %{prefix}/docs/hello_world_ll_scripts/*
-%attr(644,root,root) %{prefix}/docs/hello_world_pbs_scripts/*
-%attr(644,root,root) %{prefix}/docs/hello_world_scripts/*
+%attr(744,root,root) %{prefix}/docs/hello_world_glite_scripts/*
+%attr(744,root,root) %{prefix}/docs/hello_world_sge_scripts/*
+%attr(744,root,root) %{prefix}/docs/hello_world_ll_scripts/*
+%attr(744,root,root) %{prefix}/docs/hello_world_pbs_scripts/*
+%attr(744,root,root) %{prefix}/docs/hello_world_scripts/*
 
 %preun
 if [ "$1" = "0" ]; then
