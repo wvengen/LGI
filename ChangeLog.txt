@@ -154,4 +154,6 @@ Tue July 24th 2012 -- version 1.31.4
   needed to run the daemon on the nikhef grid nodes.
 - Fixed a small race condition in spawning the job run scripts while 
   still writing the pid of child.
+- Made sure the start and stop scripts created by .spec files actually
+  start and stop at boot and shutdown...
 

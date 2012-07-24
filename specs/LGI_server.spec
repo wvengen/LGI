@@ -94,7 +94,7 @@ cat > $RPM_BUILD_ROOT/%{prefix}/scheduler/LGI_scheduler << END_OF_SCHED
 #
 # LGI_scheduler: script to start/stop the LGI project server scheduler
 #
-# chkconfig: 2345 55 25
+# chkconfig: 2345 65 35
 # description: LGI scheduler
     
 # source function library
@@ -102,22 +102,22 @@ cat > $RPM_BUILD_ROOT/%{prefix}/scheduler/LGI_scheduler << END_OF_SCHED
 
 start() {
     echo -n $"Starting LGI scheduler: "
-    daemon --user LGI "PATCHTHIS/scheduler/scheduler.php &" && touch PATCHTHIS/scheduler/LGI_scheduler.lock
+    daemon --user LGI "PATCHTHIS/scheduler/scheduler.php &" && touch /var/lock/subsys/LGI_scheduler
     echo
 }   
     
 stop() {
     echo -n $"Stopping LGI scheduler: "
-    killproc PATCHTHIS/scheduler/scheduler.php && rm -f PATCHTHIS/scheduler/LGI_scheduler.lock
+    killproc PATCHTHIS/scheduler/scheduler.php && rm -f /var/lock/subsys/LGI_scheduler
     echo
 }
 
 case "\$1" in
     start)
-        [ ! -f PATCHTHIS/scheduler/LGI_scheduler.lock ] && start
+        [ ! -f /var/lock/subsys/LGI_scheduler ] && start
         ;;
     stop)
-        [ -f PATCHTHIS/scheduler/LGI_scheduler.lock ] && stop
+        [ -f /var/lock/subsys/LGI_scheduler ] && stop
         ;;
     restart)
         stop
@@ -230,7 +230,7 @@ if [ "$1" = "0" ]; then
  if [ -f $RPM_INSTALL_PREFIX/scheduler/LGI_scheduler.lock ]; then
   service LGI_scheduler stop &> /dev/null
  fi
- chkconfig LGI_scheduler off &> /dev/null
+ chkconfig --del LGI_scheduler &> /dev/null
  cat << END_OF_MESSAGE
 apache has been stopped as part of the erase!
 END_OF_MESSAGE
@@ -353,7 +353,7 @@ master server for this.
 Double check the SSL configuration of apache in /etc/httpd/conf.d/ssl_LGI.conf before starting 
 it with 'apachectl configtest'. Start apache with 'apachectl start' if all is fine.
 
-Start the scheduler with 'service LGI_scheduler start'. To survive a reboot, use 'chkconfig LGI_scheduler on'.
+Start the scheduler with 'service LGI_scheduler start'. To survive a reboot, use 'chkconfig --add LGI_scheduler'.
 
 Please read $RPM_INSTALL_PREFIX/SETUP.txt to fine-tune your setup for extra performance.
 

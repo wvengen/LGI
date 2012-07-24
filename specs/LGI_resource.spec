@@ -155,22 +155,22 @@ cat << EOF_INITD > $RPM_BUILD_ROOT/etc/init.d/LGI_daemon
 
 start() {
     echo -n $"Starting LGI daemon: "
-    daemon PATCHTHIS/sbin/LGI_daemon -d -l /var/log/LGI.log /etc/LGI.cfg && touch /var/spool/LGI/LGI_daemon.lock
+    daemon PATCHTHIS/sbin/LGI_daemon -d -l /var/log/LGI.log /etc/LGI.cfg && touch /var/lock/subsys/LGI_daemon
     echo
 }
 
 stop() {
     echo -n $"Stopping LGI daemon: "
-    killproc PATCHTHIS/sbin/LGI_daemon && rm -rf /var/spool/LGI/LGI_daemon.lock
+    killproc PATCHTHIS/sbin/LGI_daemon && rm -rf /var/lock/subsys/LGI_daemon
     echo
 }
 
 case "\$1" in
     start)
-	[ ! -f /var/spool/LGI/LGI_daemon.lock ] && start
+	[ ! -f /var/lock/subsys/LGI_daemon ] && start
 	;;
     stop)
-	[ -f /var/spool/LGI/LGI_daemon.lock ] && stop
+	[ -f /var/lock/subsys/LGI_daemon ] && stop
 	;;
     restart)
 	stop
@@ -236,7 +236,7 @@ if [ "$1" = "0" ]; then
  if [ -f /var/spool/LGI/LGI_daemon.lock ]; then
   service LGI_daemon stop &> /dev/null
  fi
- chkconfig LGI_daemon off &> /dev/null
+ chkconfig --del LGI_daemon &> /dev/null
 fi
 
 %pre
@@ -262,7 +262,7 @@ This machine ($HOSTNAME) has been configured as an LGI resource now.
 
 Please place the certificate in the file $RPM_INSTALL_PREFIX/certificates/$HOSTNAME.crt 
 and the private key in the file $RPM_INSTALL_PREFIX/privatekeys/$HOSTNAME.key before 
-starting the daemon with 'service LGI_daemon start'. To survive a reboot, use 'chkconfig LGI_daemon on'. 
+starting the daemon with 'service LGI_daemon start'. To survive a reboot, use 'chkconfig --add LGI_daemon'. 
 
 Also make sure your LGI project server administrator has inserted the resource certificate into the LGI 
 database on the LGI project (master) server.
