@@ -128,7 +128,7 @@ Wed August 31 2011 -- version 1.30
   caused wrong output in parsing response XML tags. 
 
 
-Mon July 23th 2012 -- version 1.31.3
+Tue July 24th 2012 -- version 1.31.3
 ------------------------------------
 
 - Added LGI server version number. Set initial version to 1.31.
@@ -149,6 +149,7 @@ Mon July 23th 2012 -- version 1.31.3
 - Added privatekeys directory and adapted .spec files to save configs when
   updating.
 - Made sure daemon can handle big files if compiled in 32 bit.
-
-
+- Added option to compile daemon not using double fork daemonizing of run
+  scripts. Add __NO_DOUBLE_FORK__ option into defines to enable. This was
+  needed to run the daemon on the nikhef grid nodes.
 

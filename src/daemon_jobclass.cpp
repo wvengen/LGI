@@ -1060,16 +1060,24 @@ int DaemonJob::RunJobRunScript( void )
 
  string Data; if( !ReadStringFromHashedFile( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT, Data ) ) CRITICAL_LOG_RETURN( 1, "DaemonJob::RunJobRunScript; Script seems corrupt, refusing to run it" );
 
- int first_pid, second_pid, status, UID;
+ int first_pid, second_pid, UID, status;
 
  UID = GetJobSandboxUID();      // get sandbox uid...
 
+#if defined(__NO_DOUBLE_FORK__)
+#warning double fork method turned off!!
+ NORMAL_LOG( "DaemonJob::RunJobRunScript; code was compiled without the double fork method" );
+#else
  if( ( first_pid = fork() ) == 0 )   // fork and let child fork again to exec script
  {                                   // so that first forked child can exit and parent can wait on it to avoid zombies...
+#endif
 
   if( ( second_pid = fork() ) == 0 )  // this child will become a child of 'init' cause its parent quitted...
   {
+#if defined(__NO_DOUBLE_FORK__)
+#else
    setsid();
+#endif
    setpgid( 0, 0 );
    setregid( UID, UID );                               // set real and effective uid and gid correctly of child...
    setreuid( UID, UID );
@@ -1082,18 +1090,21 @@ int DaemonJob::RunJobRunScript( void )
   // write the obtained pid of the run script to file...
   char TempBuffer[ 64 ];
   sprintf( TempBuffer, "%d", second_pid );
-  status = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE ).c_str(), S_IWUSR );
-  status = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE + HASHFILE_EXTENTION ).c_str(), S_IWUSR );
+  status = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE ).c_str(), S_IRUSR | S_IWUSR );
+  status = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR | S_IWUSR );
   WriteStringToHashedFile( string( TempBuffer ), JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE );
   status = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE ).c_str(), S_IRUSR );
   status = chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE ).c_str(), UID, UID );
   status = chmod( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE + HASHFILE_EXTENTION ).c_str(), S_IRUSR );
   status = chown( ( JobDirectory + "/" + LGI_JOBDAEMON_JOB_RUN_SCRIPT_PID_FILE + HASHFILE_EXTENTION ).c_str(), UID, UID );
 
+#if defined(__NO_DOUBLE_FORK__)
+#else
   _exit( 0 );                           // here we quit the parent of the above child...
  }
 
  waitpid( first_pid, &status, 0 );      // and here we wait on the first forked child that we quited above...
+#endif
 
  NORMAL_LOG_RETURN( 0, "DaemonJob::RunJobRunScript; Script started on background with pid " << GetJobRunScriptPid() << " for job with directory " << JobDirectory );
 }
