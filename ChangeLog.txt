@@ -128,7 +128,7 @@ Wed August 31 2011 -- version 1.30
   caused wrong output in parsing response XML tags. 
 
 
-Tue July 24th 2012 -- version 1.31.3
+Tue July 24th 2012 -- version 1.31.4
 ------------------------------------
 
 - Added LGI server version number. Set initial version to 1.31.
@@ -152,4 +152,6 @@ Tue July 24th 2012 -- version 1.31.3
 - Added option to compile daemon not using double fork daemonizing of run
   scripts. Add __NO_DOUBLE_FORK__ option into defines to enable. This was
   needed to run the daemon on the nikhef grid nodes.
+- Fixed a small race condition in spawning the job run scripts while 
+  still writing the pid of child.
 
