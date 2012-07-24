@@ -945,6 +945,8 @@ int Daemon::RunSchedular( void )
 
   sleep( 1 );                // sleep for a second each time...
 
+  int status; waitpid( -1, &status, WNOHANG );    // reap children to avoid zombies...
+
  } while( ReadyForScheduling );
 
  return( ReadyForScheduling );
