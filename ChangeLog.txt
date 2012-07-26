@@ -128,7 +128,7 @@ Wed August 31 2011 -- version 1.30
   caused wrong output in parsing response XML tags. 
 
 
-Tue July 24th 2012 -- version 1.31.4
+Thu July 26th 2012 -- version 1.31.5
 ------------------------------------
 
 - Added LGI server version number. Set initial version to 1.31.
@@ -155,5 +155,8 @@ Tue July 24th 2012 -- version 1.31.4
 - Fixed a small race condition in spawning the job run scripts while 
   still writing the pid of child.
 - Made sure the start and stop scripts created by .spec files actually
-  start and stop at boot and shutdown...
+  start and stop at boot and shutdown.
+- Made sure the default reset of running jobs without a pulse does not
+  alter the target_resources field anymore.
+
 
