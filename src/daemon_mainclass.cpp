@@ -500,11 +500,10 @@ int Daemon::RequestWorkCycle( void )
 
  Resource_Server_API ServerAPI( Resource_Key_File(), Resource_Certificate_File(), CA_Certificate_File(), MycURLHandle, CheckHostname );
 
- for( int nP = 1; nP <= Number_Of_Projects() && ReadyForScheduling; ++nP )     // cycle through all projects...
+ for( int nP = 0, RandomProjectEntry = rand(); nP < Number_Of_Projects() && ReadyForScheduling; ++nP )     // cycle through all projects... but pick start at random...
  {
-  DaemonConfigProject TheProject;
-
-  TheProject = Project( nP );
+  int ProjectIndex = ( ( nP + RandomProjectEntry ) % Number_Of_Projects() ) + 1;
+  DaemonConfigProject TheProject( Project( ProjectIndex ) );
 
   // check if limits are reached... 
   if( Job_Limit() <= Accounting[ "; TOTALS;" ] ) continue;
@@ -583,9 +582,9 @@ int Daemon::RequestWorkCycle( void )
    {
 
     // now check all applications for this project on this server... but start with a random application each time...
-    for( int nA = 0, RandomEntry = rand(); nA < TheProject.Number_Of_Applications() && ReadyForScheduling; ++nA ) 
+    for( int nA = 0, RandomApplicationEntry = rand(); nA < TheProject.Number_Of_Applications() && ReadyForScheduling; ++nA ) 
     {
-     int ApplicationIndex = ( ( nA + RandomEntry ) % TheProject.Number_Of_Applications() ) + 1;
+     int ApplicationIndex = ( ( nA + RandomApplicationEntry ) % TheProject.Number_Of_Applications() ) + 1;
      DaemonConfigProjectApplication TheApplication = TheProject.Application( ApplicationIndex );
   
      // check if limits are reached... 
@@ -702,7 +701,7 @@ int Daemon::RequestWorkCycle( void )
          VERBOSE_DEBUG_LOG( "Daemon::RequestWorkCycle; No owners were denied service for job " << Job_Id );
 
          // create temporary job directory with the jobs response data...
-         DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), nP, ApplicationIndex, MycURLHandle, CheckHostname );
+         DaemonJob TempJob( ExtraJobDetailsTags + "<job> " + JobData + " </job>", (*this), ProjectIndex, ApplicationIndex, MycURLHandle, CheckHostname );
 
          // see if job has limits from job limits script somehow... if so, delete temp job directory...
          if( TempJob.RunJobCheckLimitsScript() == 0 )

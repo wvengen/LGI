@@ -2,7 +2,7 @@
 # The LGI server spec file...
 #
 %define name LGI_server
-%define version 1.31.5
+%define version 1.31.6
 %define release 1.el5
 %define sources http://gliteui.wks.gorlaeus.net/LGI/LGI.tar.gz
 %define url http://gliteui.wks.gorlaeus.net/LGI

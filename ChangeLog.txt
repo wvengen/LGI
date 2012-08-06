@@ -128,8 +128,8 @@ Wed August 31 2011 -- version 1.30
   caused wrong output in parsing response XML tags. 
 
 
-Thu July 26th 2012 -- version 1.31.5
-------------------------------------
+Mon August 6th 2012 -- version 1.31.6
+-------------------------------------
 
 - Added LGI server version number. Set initial version to 1.31.
 - Added API version number. Set initial version to 1.31.
@@ -158,5 +158,7 @@ Thu July 26th 2012 -- version 1.31.5
   start and stop at boot and shutdown.
 - Made sure the default reset of running jobs without a pulse does not
   alter the target_resources field anymore.
-
+- Made sure the project to start requesting work from is picked at 
+  random too. The project server of the project is not chosen at random
+  to allow for static load ballance over servers.
 
