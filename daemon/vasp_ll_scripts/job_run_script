@@ -5,16 +5,15 @@ echo $$ > running
 setenv LGI_DIR /home/${USER}/LGI
 
 setenv REPOSITORY_URL `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o repository_file repository_url; cat repository_file`
-setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics -o cpus_file cpus; grep -E '^([0-9]{1,2})$' cpus_file`
 
 setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics cpus | grep -E '^([0-9]{1,2})$'`
-if ( ${CPUS} <= 0 || ${CPUS} > 8 ) then
-   setenv CPUS 8
+if ( ${CPUS} <= 0 || ${CPUS} > 16 ) then
+   setenv CPUS 16
 endif
 
 setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics walltime | grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$'`
-if ( `echo ${WALLTIME} | cut -d':' -f 1` <= 0 || `echo ${WALLTIME} | cut -d ':' -f 1` > 24 ) then
-   setenv WALLTIME "24:00:00"
+if ( `echo ${WALLTIME} | cut -d':' -f 1` <= 0 || `echo ${WALLTIME} | cut -d ':' -f 1` > 96 ) then
+   setenv WALLTIME "96:00:00"
 endif
 
 setenv NODES `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics nodes | grep -E '^([0-9]{1,2})$'`
