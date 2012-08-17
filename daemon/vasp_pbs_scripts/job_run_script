@@ -65,7 +65,7 @@ if ( \${REPOSITORY_URL} != "" ) then
  setenv DATE \`date\`
  echo "VASP_PBS started VASP on node \${NODE} at \${DATE}."
  mpiexec /home/${USER}/VASP/Vasp.4.6/vasp > stdout
- rm -rf WAVECAR TMPCAR
+ rm -rf WAVECAR TMPCAR CHG CHGCAR
 
  setenv FILE_LIST \`ls\`
  if ( "\${FILE_LIST}" != "" ) then
