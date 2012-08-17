@@ -72,7 +72,7 @@ else
  dos2unix -n \${LOADL_STEP_INITDIR}/LGI_input INCAR
 endif
 
-mpiexec -n 8 /home/${USER}/VASP/vasp_4.6_huygens_mpi > stdout
+mpiexec -n ${CPUS} /home/${USER}/VASP/vasp_4.6_huygens_mpi > stdout
 rm -rf WAVECAR TMPCAR
 
 END_OF_LL_SUBMIT_SCRIPT
