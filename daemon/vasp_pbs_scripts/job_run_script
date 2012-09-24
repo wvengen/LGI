@@ -3,13 +3,13 @@
 setenv LGI_DIR /home/${USER}/LGI
 
 setenv CPUS `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics cpus | grep -E '^([0-9]{1,2})$'`
-if ( ${CPUS} <= 0 || ${CPUS} > 1 ) then
-   setenv CPUS 1
+if ( ${CPUS} <= 0 || ${CPUS} > 12 ) then
+   setenv CPUS 2
 endif
 
 setenv WALLTIME `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics walltime | grep -E '^([0-9]{1,2}):([0-9]{1,2}):([0-9]{1,2})$'`
-if ( `echo ${WALLTIME} | cut -d':' -f 1` <= 0 || `echo ${WALLTIME} | cut -d ':' -f 1` > 4 ) then
-   setenv WALLTIME "4:00:00"
+if ( `echo ${WALLTIME} | cut -d':' -f 1` <= 0 || `echo ${WALLTIME} | cut -d ':' -f 1` > 96 ) then
+   setenv WALLTIME "96:00:00"
 endif
 
 setenv NODES `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics nodes | grep -E '^([0-9]{1,2})$'`
@@ -20,7 +20,7 @@ endif
 
 cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -S /bin/csh
-#PBS -l nodes=${NODES}:ppn=${CPUS},walltime=${WALLTIME}
+#PBS -l nodes=${NODES}:ppn=${CPUS},walltime=${WALLTIME},pmem=4gb
 #PBS -N VASP_pbs
 #PBS -o LGI_output
 
@@ -64,7 +64,25 @@ if ( \${REPOSITORY_URL} != "" ) then
 
  setenv DATE \`date\`
  echo "VASP_PBS started VASP on node \${NODE} at \${DATE}."
- mpiexec /home/${USER}/VASP/Vasp.4.6/vasp > stdout
+ setenv CHECK_SCRIPT \`\${LGI_DIR}/daemon/bin/xml checkscript < \${PBS_O_WORKDIR}/LGI_job_specifics\` 
+ if ( "\${CHECK_SCRIPT}" != "" ) then
+   echo "Using \${CHECK_SCRIPT} as check script..."
+   cp /home/${USER}/LGI/daemon/vasp_pbs_scripts/\${CHECK_SCRIPT}_vasp52 ./checkscript
+   mpiexec /home/${USER}/VASP/vasp_5.2.12_mpi > stdout &
+   set PID=\$!
+   while ( -d /proc/\${PID} )
+     if ( -x ./checkscript ) then
+       setenv CHECK \`./checkscript\`
+       if ( "\${CHECK}" == "stop" ) then
+        kill \${PID}
+        wait
+       endif
+     endif
+     sleep 120
+   end
+ else
+   mpiexec /home/${USER}/VASP/vasp_5.2.12_mpi > stdout
+ endif
  rm -rf WAVECAR TMPCAR CHG CHGCAR
 
  setenv FILE_LIST \`ls\`

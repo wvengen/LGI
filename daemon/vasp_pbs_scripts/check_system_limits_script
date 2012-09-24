@@ -1,6 +1,6 @@
 #!/bin/sh
-queued_in_small=`qstat -u mark | awk '{print $2 " " $3 " " $10 }' | grep small | grep Q | wc -l`
-if (( $queued_in_small < 1 ))
+queued_in_long=`qstat -u mark | awk '{print $2 " " $3 " " $10 }' | grep long | grep Q | wc -l`
+if (( $queued_in_long < 1 ))
 then
  exit 0
 else
