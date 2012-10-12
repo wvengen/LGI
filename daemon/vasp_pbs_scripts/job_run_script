@@ -17,10 +17,14 @@ if ( ${NODES} <= 0 || ${NODES} > 1 ) then
    setenv NODES 1
 endif
 
+setenv MEM `${LGI_DIR}/daemon/bin/xml -i LGI_job_specifics mem | grep -E '^([0-9]{1,2})$'`
+if ( ${MEM} <= 0 || ${MEM} > 24 ) then
+   setenv MEM 4
+endif
 
 cat > ./pbs_script << END_OF_PBS_SCRIPT
 #PBS -S /bin/csh
-#PBS -l nodes=${NODES}:ppn=${CPUS},walltime=${WALLTIME},pmem=4gb
+#PBS -l nodes=${NODES}:ppn=${CPUS},walltime=${WALLTIME},pmem=${MEM}gb
 #PBS -N VASP_pbs
 #PBS -o LGI_output
 
